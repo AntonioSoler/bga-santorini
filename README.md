@@ -1,5 +1,5 @@
 # bga-santorini
-🎲 Santorini implementation for Board Game Arena 
+🎲 Santorini implementation for Board Game Arena
 
 Languages: PHP JS SQL CSS
 
