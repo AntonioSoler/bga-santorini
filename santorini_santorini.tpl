@@ -7,8 +7,38 @@
       <div id="map_scrollable">
         <div id="bg-anchor"></div>
       </div>
-      <div id="map_surface"></div>
+      <div id="map_surface">
+		  <div id="testbuilding" class="building1">
+			  <div class="side1"></div>
+			  <div class="side2"></div>
+			  <div class="side3"></div>
+			  <div class="side4"></div>
+		  </div>
+		  <div id="testbuilding" class="building2">
+			  <div class="side1"></div>
+			  <div class="side2"></div>
+			  <div class="side3"></div>
+			  <div class="side4"></div>
+		  </div>
+		  <div id="testbuilding" class="building3">
+			  <div class="side1"></div>
+			  <div class="side2"></div>
+			  <div class="side3"></div>
+			  <div class="side4"></div>
+		  </div>
+		  <div id="testbuilding" class="building4">
+			  <div class="side1"></div>
+			  <div class="side2"></div>
+			  <div class="side3"></div>
+			  <div class="side4"></div>
+		  </div>
+	  </div>
+	  
       <div id="map_scrollable_oversurface"></div>
+	  <div id="base_side1" class="baseside"></div>
+	  <div id="base_side2" class="baseside"></div>
+	  <div id="base_side3" class="baseside"></div>
+	  <div id="base_side4" class="baseside"></div>
     </div>
   </div>
 </div>

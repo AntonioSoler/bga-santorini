@@ -1,0 +1,8 @@
+This directory can contain any extra source and text files,
+which are not required to run the game.
+
+The files will be checked in into source control but won't be packaged
+for deployment.
+It can contains notes, docs, tools, tests, data files, etc...
+
+Total directory size should remain below 1 Mb.

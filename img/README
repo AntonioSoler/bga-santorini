@@ -1,0 +1,10 @@
+This directory contains all graphic files for your game:
+ - jpg and png formats are recommended, gif is also accepted
+ - do not use subdirectories
+ - use the "CSS sprite" technique for faster loading
+ - use a reasonable resolution for the web and compression
+
+Typically, this directory should contain less than 10 files (beside
+box graphics and publisher images), with no file larger than 4 Mb.
+
+See: http://en.doc.boardgamearena.com/Game_art:_img_directory for more details.

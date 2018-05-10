@@ -1,0 +1,7 @@
+This directory is meant to hold PHP files for inclusion in your
+<gamename>.game.php if needed.
+
+It is recommended to name your files starting with a trigram of your game name.
+For example if you have a class to manage pathfinding in the game
+Tobago, it will be called TBGPathFinding.php (and the class inside be
+called TBGPathFinding) to avoid potential namespace collisions.

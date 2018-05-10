@@ -86,7 +86,7 @@ define([
                         dojo.destroy(e.target);
                     }
                 }, false);
-                this.dragElement3d($("pagesection_gameview"));
+                this.draggableElement3d($("pagesection_gameview"));
 
                 // Setup remaining tile counter
                 dojo.place($('count_remain'), 'game_play_area_wrap', 'first');
@@ -236,16 +236,9 @@ define([
             },
 
             onMouseWheel: function(evt) {
-                //dojo.stopEvent(evt);
                 dojo.stopEvent(evt);
                 var d = Math.max(-1, Math.min(1, (evt.wheelDelta || -evt.detail))) * 0.1;
-                if (!this.control3dmode3d) {
-                    // 2D mode zoom in/out
-                    this.setZoom(this.zoom + d);
-                } else {
-                    // 3D mode adjust camera
-                    this.change3d(0, 0, 0, 0, d, true, false);
-                }
+                this.change3d(0, 0, 0, 0, d, true, false);
             },
 
             myonMouseDown: function(evt) {
@@ -258,18 +251,19 @@ define([
                     var _101d = dojo.position(this.container_div);
                     this.dragging_offset_x = evt.pageX - (_101c.x - _101d.x);
                     this.dragging_offset_y = evt.pageY - (_101c.y - _101d.y);
-                    this.dragging_handler = dojo.connect($("ebd-body"), "onmousemove", this, "onMouseMove");
-                    this.dragging_handler_touch = dojo.connect($("ebd-body"), "ontouchmove", this, "onMouseMove");
+                    this.dragging_handler = dojo.connect($("pagesection_gameview"), "onmousemove", this, "onMouseMove");
+                    //this.dragging_handler_touch = dojo.connect($("ebd-body"), "ontouchmove", this, "onMouseMove");
+
                 }
             },
 
-            dragElement3d: function(elmnt) {
+            draggableElement3d: function(elmnt) {
                 dojo.connect(elmnt, "onmousedown", this, "drag3dMouseDown");
                 dojo.connect(elmnt, "onmouseup", this, "closeDragElement3d");
+
                 elmnt.oncontextmenu = function() {
                     return false;
                 }
-                //elmnt.style.transition = "transform 0.05s ease";
                 this.drag3d = elmnt;
             },
 
@@ -277,27 +271,36 @@ define([
                 e = e || window.event;
                 if (e.which == 3) {
                     dojo.stopEvent(e);
-                    //this.dragging_3dhandler = dojo.connect($("ebd-body"), "mousemove", this, "elementDrag3d");
                     $("ebd-body").onmousemove = dojo.hitch(this, this.elementDrag3d);
+                    $("pagesection_gameview").onmouseleave = dojo.hitch(this, this.closeDragElement3d);
+                    dojo.addClass($("ebd-body"), "grabbinghand");
                 }
             },
 
             elementDrag3d: function(e) {
-                e = e || window.event;
-                this.change3d(e.movementY / (-10), 0, 0, e.movementX / (-10), 0, true, false);
+				e = e || window.event;
+				dojo.stopEvent(e);
+				if (!this.isdragging) {
+					this.isdragging=true;	
+					var viewportOffset = e.currentTarget.getBoundingClientRect();
+					//$("mouse_debug").style.display="block";
+					//$("mouse_debug").innerHTML = "e.screenY:" + e.screenY + "<br> height: " + window.innerHeight + "<br> ofsettop: " + viewportOffset.top + "<br>E:"+ e.clientX + " " + e.clientY +"<br> "+ e.currentTarget.id ; 
+					if ((e.screenY - viewportOffset.top) > (3 * window.innerHeight / 4)) {
+						x = e.movementX;
+					} else {
+						x = -1 * e.movementX;
+					}
+					this.change3d(e.movementY / (-10), 0, 0, x / (-10), 0, true, false);
+					this.isdragging=false;
+				}	
             },
 
             closeDragElement3d: function(evt) {
                 /* stop moving when mouse button is released:*/
-                console.log("mouseup button 3");
                 if (evt.which == 3) {
-                    /*if(evt.preventDefault != undefined)
-                    		evt.preventDefault();
-                    if(evt.stopPropagation != undefined)
-                    	evt.stopPropagation();*/
                     dojo.stopEvent(evt);
                     $("ebd-body").onmousemove = null;
-                    //dojo.disconnect(this.dragging_3dhandler);
+                    dojo.removeClass($("ebd-body"), "grabbinghand");
                 }
             },
 
