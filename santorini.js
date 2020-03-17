@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * santorini implementation : © quietmint & Morgalad
+ * santorini implementation : (c) Morgalad
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -23,22 +23,17 @@ define([
         "ebg/scrollmap"
     ],
     function(dojo, declare) {
-        // Terrain constants
-        const JUNGLE = 1;
-        const GRASS = 2;
-        const SAND = 3;
-        const ROCK = 4;
-        const LAKE = 5;
-        const VOLCANO = 6;
-
-        // Building constants
+        // Plyer colors
+        const BLUE = "0000ff";
+        const WHITE = "ffffff";
+        
         const HUT = 1;
         const TEMPLE = 2;
         const TOWER = 3;
 
         // Zoom limits
-        const ZOOM_MIN = 0.1;
-        const ZOOM_MAX = 3;
+        const ZOOM_MIN = 0.2;
+        const ZOOM_MAX = 2;
 
         return declare("bgagame.santorini", ebg.core.gamegui, {
             constructor: function() {
@@ -89,15 +84,12 @@ define([
                 this.draggableElement3d($("pagesection_gameview"));
 
                 // Setup remaining tile counter
-                dojo.place($('count_remain'), 'game_play_area_wrap', 'first');
+               // dojo.place($('count_remain'), 'game_play_area_wrap', 'first');
 
                 // Setup player boards
                 colorNames = {
-                    'ff0000': 'red',
-                    'ffa500': 'yellow',
-                    'ffffff': 'white',
-                    'b1634f': 'brown',
-					'000000': 'black'
+                    '0000ff': 'blue',
+                    'ffffff': 'white'
                 };
                 for (var player_id in gamedatas.players) {
                     var player = gamedatas.players[player_id];
