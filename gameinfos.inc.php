@@ -12,29 +12,29 @@
 $gameinfos = array(
 
 // Game designer (or game designers, separated by commas)
-'designer' => 'Marcel-André Casasola Merkle',
+'designer' => 'Dr. Gordon Hamilton',
 
 // Game artist (or game artists, separated by commas)
-'artist' => 'Manuel Casasola Merkle, Xavier Gueniffey Durin',
+'artist' => 'Lina Cossette, David Forest',
 
 // Year of FIRST publication of this game. Can be negative.
-'year' => 2006,
+'year' => 2016,
 
 // Game publisher
-'publisher' => 'Ferti Games',
+'publisher' => 'Roxley',
 
 // Url of game publisher website
-'publisher_website' => 'http://www.ferti-games.com/',
+'publisher_website' => 'https://roxley.com',
 
 // Board Game Geek ID of the publisher
-'publisher_bgg_id' => 1562,
+'publisher_bgg_id' => 21765,
 
 // Board game geek if of the game
-'bgg_id' => 24508,
+'bgg_id' => 194655,
 
 
 // Players configuration that can be played (ex: 2 to 4 players)
-'players' => array( 2, 3, 4 ),
+'players' => array( 2 ),
 
 // Suggest players to play with this number of players. Must be null if there is no such advice, or if there is only one possible player configuration.
 'suggest_player_number' => null,
@@ -72,22 +72,22 @@ $gameinfos = array(
 
 // If in the game, all losers are equal (no score to rank them or explicit in the rules that losers are not ranked between them), set this to true
 // The game end result will display "Winner" for the 1st player and "Loser" for all other players
-'losers_not_ranked' => true,
+'losers_not_ranked' => false,
 
 // Complexity of the game, from 0 (extremely simple) to 5 (extremely complex)
-'complexity' => 3,
+'complexity' => 2,
 
 // Luck of the game, from 0 (absolutely no luck in this game) to 5 (totally luck driven)
-'luck' => 2,
+'luck' => 0,
 
 // Strategy of the game, from 0 (no strategy can be setup) to 5 (totally based on strategy)
-'strategy' => 4,
+'strategy' => 5,
 
 // Diplomacy of the game, from 0 (no interaction in this game) to 5 (totally based on interaction and discussion between players)
-'diplomacy' => 1,
+'diplomacy' => 0,
 
 // Colors attributed to players
-'player_colors' => array( "ff0000", "ffa500", "b1634f", "ffffff" , "000000" ),
+'player_colors' => array( "ff0000", "ffffff" ),
 
 // Favorite colors support : if set to "true", support attribution of favorite colors based on player's preferences (see reattributeColorsBasedOnPreferences PHP method)
 'favorite_colors_support' => true,
@@ -109,7 +109,7 @@ $gameinfos = array(
     'max' => null
 ),
 
-'enable_3d' => false, 
+'enable_3d' => true, 
 
 // Games categories
 //  You can attribute a maximum of FIVE "tags" for your game.
@@ -118,7 +118,7 @@ $gameinfos = array(
 //  http://en.doc.boardgamearena.com/Game_meta-information:_gameinfos.inc.php
 //  IMPORTANT: this list should be ORDERED, with the most important tag first.
 //  IMPORTANT: it is mandatory that the FIRST tag is 1, 2, 3 and 4 (= game category)
-'tags' => array( 3, 12, 103, 206 ),
+'tags' => array( 1, 11, 106 ),
 
 
 //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)

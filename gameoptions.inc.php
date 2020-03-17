@@ -26,15 +26,19 @@
 
 $game_options = array(
     100 => array(
-        'name' => totranslate('Number of tiles'),
+        'name' => totranslate('God powers'),
         'values' => array(
             0 => array(
-                'name' => '12 tiles per player'
+                'name' => totranslate('None')
             ),
             1 => array(
-                'name' => 'All 48 tiles',
-                'tmdisplay' => totranslate('All 48 tiles')
+                'name' => totranslate('Simple'),
+                'tmdisplay' => totranslate('Simple God Powers')
             ),
+            /*2 => array(
+                'name' => totranslate('Advanced'),
+                'tmdisplay' => totranslate('Advanced God Powers')
+            ),*/
         ),
     ),
 );

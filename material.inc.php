@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * santorini implementation : © quietmint
+ * santorini implementation : © Emmanuel Colin <ecolin@boardgamearena.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -20,18 +20,3 @@
  */
 
 $this->rotations = array( 0, 60, 120, 180, 240, 300 );
-
-$this->terrain = array(
-    VOLCANO => clienttranslate('volcano'),
-    JUNGLE => clienttranslate('jungle'),
-    GRASS => clienttranslate('clearing'),
-    SAND => clienttranslate('sand'),
-    ROCK => clienttranslate('rock'),
-    LAKE => clienttranslate('lake'),
-);
-
-$this->buildings = array(
-    HUT => clienttranslate('huts'),
-    TEMPLE => clienttranslate('temples'),
-    TOWER => clienttranslate('towers'),
-);

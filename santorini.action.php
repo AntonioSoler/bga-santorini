@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * santorini implementation : © quietmint
+ * santorini implementation : © Emmanuel Colin <ecolin@boardgamearena.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -36,42 +36,35 @@ class action_santorini extends APP_GameAction
         }
     }
 
-    public function commitTile()
+    public function place()
     {
         self::setAjaxMode();
         $x = (int) self::getArg('x', AT_int, true);
         $y = (int) self::getArg('y', AT_int, true);
         $z = (int) self::getArg('z', AT_posint, true);
-        $r = (int) self::getArg('r', AT_posint, true);
-        $this->game->actionCommitTile($x, $y, $z, $r);
+        $this->game->place($x, $y, $z);
         self::ajaxResponse();
     }
 
-	public function selectSpace()
+    public function move()
     {
         self::setAjaxMode();
         $x = (int) self::getArg('x', AT_int, true);
         $y = (int) self::getArg('y', AT_int, true);
         $z = (int) self::getArg('z', AT_posint, true);
-        $this->game->actionSelectSpace($x, $y, $z);
+        $worker_id = (int) self::getArg('worker_id', AT_posint, true);
+        $this->game->move($worker_id, $x, $y, $z);
         self::ajaxResponse();
     }
 
-	public function cancel()
-    {
-        self::setAjaxMode();
-        $this->game->actionCancel();
-        self::ajaxResponse();
-    }
-
-    public function commitBuilding()
+	public function build()
     {
         self::setAjaxMode();
         $x = (int) self::getArg('x', AT_int, true);
         $y = (int) self::getArg('y', AT_int, true);
         $z = (int) self::getArg('z', AT_posint, true);
-        $option_nbr = (int) self::getArg('option_nbr', AT_posint, true);
-        $this->game->actionCommitBuilding($x, $y, $z, $option_nbr);
+        $this->game->build($x, $y, $z);
         self::ajaxResponse();
     }
+    
 }

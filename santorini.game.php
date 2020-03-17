@@ -2,7 +2,7 @@
  /**
   *------
   * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
-  * santorini implementation : © quietmint
+  * santorini implementation : © Emmanuel Colin <ecolin@boardgamearena.com>
   *
   * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
   * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -17,29 +17,6 @@
   */
 
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
-require_once('santorini.board.php');
-
-// Terrain constants
-define('JUNGLE', 1);
-define('GRASS', 2);
-define('SAND', 3);
-define('ROCK', 4);
-define('LAKE', 5);
-define('VOLCANO', 6);
-
-// Building constants
-define('HUT', 1);
-define('TEMPLE', 2);
-define('TOWER', 3);
-
-// State constants
-define('ST_GAME_BEGIN', 1);
-define('ST_NEXT_PLAYER', 2);
-define('ST_TILE', 3);
-define('ST_ELIMINATE', 5);
-define('ST_SELECT_SPACE', 6);
-define('ST_BUILDING', 7);
-define('ST_GAME_END', 99);
 
 class santorini extends Table
 {
@@ -57,11 +34,12 @@ class santorini extends Table
             'selection_x' => 10,
             'selection_y' => 11,
             'selection_z' => 12,
-            'variantAllTiles' => 100,
+            'moved_worker' => 13,
+            'variant_powers' => 100,
         ));
 
-        $this->tiles = self::getNew('module.common.deck');
-        $this->tiles->init('tile');
+        $this->pieces = self::getNew('module.common.deck');
+        $this->pieces->init('piece');
     }
 
     protected function getGameName()
@@ -81,49 +59,29 @@ class santorini extends Table
         self::setGameStateInitialValue('selection_x', 0);
         self::setGameStateInitialValue('selection_y', 0);
         self::setGameStateInitialValue('selection_z', 0);
+        self::setGameStateInitialValue('moved_worker', 0);
 
-        // Create tiles
-        // Distribution from https://boardgamegeek.com/image/155164/santorini
-        $tiles = array();
-        for ($left = JUNGLE; $left <= LAKE; $left++) {
-            for ($right = JUNGLE; $right <= LAKE; $right++) {
-                $type = "$left$right";
-                $nbr = 1;
-                switch ($type) {
-                case JUNGLE.GRASS:
-                    $nbr = 6;
-                    break;
+        // Init pieces
+        $pieces = array();
+        $pieces[] = array('type' => 'worker_blue', 'type_arg' => 0, 'nbr' => 2);
+        $pieces[] = array('type' => 'worker_white', 'type_arg' => 0, 'nbr' => 2);
+        $pieces[] = array('type' => 'dome', 'type_arg' => 0, 'nbr' => 18);
+        $pieces[] = array('type' => 'level1', 'type_arg' => 0, 'nbr' => 22);
+        $pieces[] = array('type' => 'level2', 'type_arg' => 0, 'nbr' => 18);
+        $pieces[] = array('type' => 'level3', 'type_arg' => 0, 'nbr' => 14);
+        $this->pieces->createCards($pieces, 'deck', 0);
 
-                case GRASS.JUNGLE:
-                    $nbr = 5;
-                    break;
-
-                case JUNGLE.SAND:
-                case SAND.JUNGLE:
-                    $nbr = 4;
-                    break;
-
-                case JUNGLE.ROCK:
-                case JUNGLE.LAKE:
-                case GRASS.SAND:
-                case GRASS.ROCK:
-                case SAND.GRASS:
-                case SAND.ROCK:
-                case ROCK.JUNGLE:
-                case ROCK.GRASS:
-                    $nbr = 2;
-                    break;
+        // Init board (tridimensional 5x5x4)
+        $sql = 'INSERT INTO board (x, y, z) VALUES ';
+        $values = array();
+        for ($x = 0; $x < 5; $x++) {
+            for ($y = 0; $y < 5; $y++) {
+                for ($z = 0; $z < 4; $z++) {
+                    $values[] = "('$x','$y','$z')";
                 }
-                $tiles[] = array('type' => $type, 'type_arg' => 0, 'nbr' => $nbr);
             }
         }
-        $this->tiles->createCards($tiles, 'deck');
-        $this->tiles->shuffle('deck');
-
-        // Default variant uses 12 tiles per player
-        if (!self::getGameStateValue('variantAllTiles') && count($players) < 4) {
-            $this->tiles->pickCardsForLocation(12 * (4 - count($players)), 'deck', 'box');
-        }
+        self::DbQuery($sql . implode($values, ','));
 
         // Create players
         self::DbQuery('DELETE FROM player');
@@ -135,21 +93,15 @@ class santorini extends Table
             $color = array_shift($default_colors);
             $values[] = "('".$player_id."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."')";
 
-            // Give each player a tile
-            $tile = $this->tiles->pickCard('deck', $player_id);
-            $tile['remain'] = $this->tiles->countCardInLocation('deck');
-            self::notifyPlayer($player_id, 'draw', '', $tile);
-            self::initStat('player', 'tiles', 0, $player_id);
-            self::initStat('player', 'buildings_' . HUT, 0, $player_id);
-            self::initStat('player', 'buildings_' . TEMPLE, 0, $player_id);
-            self::initStat('player', 'buildings_' . TOWER, 0, $player_id);
-            self::initStat('player', 'destroy', 0, $player_id);
+            $workers = $this->pieces->getCardsOfType('worker_' . ($color == 'ffffff' ? 'white' : 'blue'));
+            $this->pieces->moveCards(array_keys($workers), 'deck', $player_id);
         }
         self::DbQuery($sql . implode($values, ','));
         self::reattributeColorsBasedOnPreferences($players, $gameinfos['player_colors']);
         self::reloadPlayersBasicInfos();
-        self::initStat('table', 'tiles', 0);
-        self::initStat('table', 'z', 0);
+
+        // Active first player to play
+        $this->activeNextPlayer();
     }
 
     /*
@@ -164,20 +116,12 @@ class santorini extends Table
     protected function getAllDatas()
     {
         $player_id = self::getCurrentPlayerId();
-        $board = new santoriniBoard();
         $result = array();
         $result['players'] = $this->getPlayers();
-        foreach ($result['players'] as $id => $player) {
-            $tile = $this->getTileInHand($id);
-            if ($id == $player_id || $id == self::getActivePlayerId()) {
-                $result['players'][$id]['preview'] = $tile;
-            } elseif ($tile != null) {
-                $result['players'][$id]['unknownPreview'] = true;
-            }
-        }
-        $result['terrain'] = $this->terrain;
-        $result['spaces'] = $board->getSpaces();
-        $result['remain'] = $this->tiles->countCardInLocation('deck');
+        $result['spaces'] = $this->getSpaces();
+        $result['placed_pieces'] = $this->getPlacedPieces();
+        $result['available_pieces'] = $this->getAvailablePieces();
+        $result['moved_worker'] = self::getGamestateValue('moved_worker');
         return $result;
     }
 
@@ -193,9 +137,11 @@ class santorini extends Table
     */
     public function getGameProgression()
     {
-        $totalTiles = 48 - $this->tiles->countCardInLocation('box');
-        $tileProgress = $this->tiles->countCardInLocation('board') / $totalTiles * 100;
-        return round($tileProgress);
+        // Number of pieces on the board / total number of pieces
+        $nbr_placed = count(self::getPlacedPieces());
+        $nbr_available = count(self::getAvailablePieces());
+        
+        return $nbr_placed / ($nbr_placed+$nbr_available);
     }
 
 
@@ -205,104 +151,74 @@ class santorini extends Table
 
     public function getPlayers()
     {
-        return self::getCollectionFromDb('SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, temples, towers, huts FROM player');
+        return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated FROM player");
     }
 
     public function getPlayer($player_id)
     {
-        return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, temples, towers, huts FROM player WHERE player_id = $player_id");
+        return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated FROM player WHERE player_id = $player_id");
     }
 
-    public function getTileInHand($player_id)
+    public function getPlacedPieces()
     {
-        $t = $this->tiles->getPlayerHand($player_id);
-        if (!empty($t)) {
-            $t = array_shift($t);
-            $tile = array(
-                'player_id' => $player_id,
-                'tile_id' => (int) $t['id'],
-                'tile_type' => $t['type'],
-            );
-            return $tile;
-        }
+        return $this->pieces->getCardsInLocation('board');
     }
 
-    public function getPossibleTile()
+    public function getAvailablePieces()
     {
-        $possible = array();
-        $board = new santoriniBoard();
-        if ($board->empty()) {
-            // Center is only possible space at game start
-            $possible[] = array('x' => 0, 'y' => 0, 'z' => 1, 'r' => $this->rotations);
-        } else {
-            $spaces = $board->getSpaces();
-            foreach ($spaces as $space) {
-                $adjacents = $board->getSpaceAdjacents($space);
-                foreach ($adjacents as $as) {
-                    if (!$as->exists() && !array_key_exists("$as", $possible)) {
-                        $validRotations = array();
-                        $rotations = $board->getSpaceRotations($as);
-                        foreach ($rotations as $r => $rspaces) {
-                            if ($board->isValidTilePlacement($rspaces)) {
-                                $validRotations[] = $r;
-                            }
-                        }
-                        $possible["$as"] = array('x' => $as->x, 'y' => $as->y, 'z' => $as->z, 'r' => $validRotations);
-                    }
+        return $this->pieces->getCardsInLocation('deck');
+    }
 
-                    $bacons = $board->getSpaceAdjacents($as);
-                    foreach ($bacons as $bs) {
-                        if (!$bs->exists() && !array_key_exists("$bs", $possible)) {
-                            $validRotations = array();
-                            $rotations = $board->getSpaceRotations($bs);
-                            foreach ($rotations as $r => $rspaces) {
-                                if ($board->isValidTilePlacement($rspaces)) {
-                                    $validRotations[] = $r;
-                                }
-                            }
-                            $possible["$bs"] = array('x' => $bs->x, 'y' => $bs->y, 'z' => $bs->z, 'r' => $validRotations);
-                        }
-                    }
-                }
+    public function getSpaces()
+    {
+        return self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id FROM board ORDER BY x, y, z');
+    }
 
-                // Check for possible eruptions
-                if ($space->face == VOLCANO) {
-                    $above = $board->getSpaceAbove($space);
-                    if (!$above->exists()) {
-                        $validRotations = array();
-                        $rotations = $board->getSpaceRotations($above);
-                        foreach ($rotations as $r => $rspaces) {
-                            $above->r = $r;
-                            if ($board->isValidTilePlacement($rspaces)) {
-                                $validRotations[] = $r;
-                            }
-                        }
-                        $possible["$above"] = array('x' => $above->x, 'y' => $above->y, 'z' => $above->z, 'r' => $validRotations);
-                    }
-                }
+    public function getAccessibleSpaces()
+    {
+        $unoccupied =  self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id FROM board WHERE piece_id is null ORDER BY x ASC, y ASC, z ASC');
+
+        $accessible = array();
+        $x = null;
+        $y = null;
+        foreach( $unoccupied as $space_id => $space ) {
+            // Accessible = first going up on the z_axis among unnocupied spaces correctly sorted
+            if ($space['x'] !== $x || $space['y'] !== $y) {
+                $accessible[$space_id] = $space;
+                $x = $space['x'];
+                $y = $space['y'];
             }
         }
 
-        // Remove possible spaces with no valid rotations
-        $possible = array_filter($possible, function ($item) {
-            return !empty($item['r']);
-        });
-
-        return array_values($possible);
+        return $accessible;
     }
 
-
-    public function getPossibleSpaces($player)
+    public function getNeighbouringSpaces($worker_id, $formoving=false)
     {
-        $possible = array();
-        $board = new santoriniBoard();
-        $spaces = $board->getSpaces();
-        foreach ($spaces as $space) {
-            if (!empty($board->getBuildingOptions($space, $player))) {
-                $possible[] = $space;
+        $worker_space = self::getNonEmptyObjectFromDb("SELECT space_id, x, y, z, piece_id FROM board WHERE piece_id = '$worker_id'");
+        $x = $worker_space['x'];
+        $y = $worker_space['y'];
+        $z = $worker_space['z'];
+
+        //throw new BgaUserException(print_r($worker_id, true));
+        //throw new BgaUserException(print_r($formoving, true));
+
+        $accessible = self::getAccessibleSpaces();
+
+        $neighbouring = array();
+        foreach( $accessible as $space_id => $space ) {
+            // Neighbouring = 1 planar coordinate distant / height for moving is only one step when going upwards
+            if (($x != $space['x'] || $y != $space['y'])
+                    && abs($x - $space['x']) <= 1
+                    && abs($y - $space['y']) <= 1
+                    && (!$formoving || $space['z'] - $z <= 1)) {
+                $neighbouring[$space_id] = $space;
             }
         }
-        return $possible;
+
+        //throw new BgaUserException(print_r($neighbouring, true));
+
+        return $neighbouring;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -314,155 +230,133 @@ class santorini extends Table
         (note: each method below must match an input method in santorini.action.php)
     */
 
-
-    public function actionCommitTile($x, $y, $z, $r)
+    public function place($x, $y, $z)
     {
+        self::checkAction('place');
+
         $player_id = self::getActivePlayerId();
-        $tile = $this->getTileInHand($player_id);
-        $tile_id = $tile['tile_id'];
-        $board = new santoriniBoard();
-        $spaces = $board->getSpacesForTile($x, $y, $z, $r, $tile['tile_type']);
-        $valid = $board->isValidTilePlacement($spaces);
-        if (!$valid) {
-            throw new BgaVisibleSystemException('Invalid tile placement');
+
+        // Get unplaced workers for the active player
+        $workers = $this->pieces->getCardsInLocation('deck', $player_id);
+
+        if (count($workers) == 0) {
+            throw new BgaVisibleSystemException( 'No more workers to place' );
         }
-
-        // Add volcano face at the clicked location
-        self::DbQuery("INSERT INTO board (x, y, z, r, face, tile_id, subface, tile_player_id) VALUES ($x, $y, $z, $r, " . VOLCANO . ", $tile_id, 0, $player_id) ");
-        $board_id = self::DbGetLastId();
-        $this->tiles->moveCard($tile['tile_id'], 'board', $board_id);
-
-        // Add secondary faces at adjacent locations
-        $values = array(
-            1 => "({$spaces[1]->x}, {$spaces[1]->y}, $z, $r, {$spaces[1]->face}, $tile_id, 1, $player_id)",
-            2 => "({$spaces[2]->x}, {$spaces[2]->y}, $z, $r, {$spaces[2]->face}, $tile_id, 2, $player_id)",
-        );
-        self::DbQuery("INSERT INTO board (x, y, z, r, face, tile_id, subface, tile_player_id) VALUES " . implode($values, ','));
-        $highest = self::getStat('z');
-        if ($z > $highest) {
-            self::setStat($z, 'z');
+        $space_id = self::getUniqueValueFromDb( "SELECT space_id FROM board WHERE x = '$x' AND y = '$y' AND z = '$z' AND piece_id is null" );
+        if ($space_id === null) {
+            throw new BgaUserException( _("This space is not free") );
         }
-
-        $player = $this->getPlayer($player_id);
-        $tile['i18n'] = array('face_name', 'face_name2');
-        $tile['player_name'] = $player['name'];
-        $tile['face_name'] = $this->terrain[$spaces[1]->face];
-        $tile['face_name2'] = $this->terrain[$spaces[2]->face];
-        $tile['x'] = $x;
-        $tile['y'] = $y;
-        $tile['z'] = $z;
-        $tile['r'] = $r;
-
-        // Destroy huts under the tile
-        $destroyCount = 0;
-        for ($i = 1 ; $i <= 2 ; $i++) {
-            $spaceBelow = $board->getSpaceBelow($spaces[$i]);
-            if ($spaceBelow->bldg_type == HUT) {
-                $destroyCount += $spaceBelow->z;
-                self::DbQuery("UPDATE board SET bldg_type = NULL, bldg_player_id = NULL WHERE x = {$spaceBelow->x} AND y = {$spaceBelow->y} AND z = {$spaceBelow->z}");
-                self::notifyAllPlayers('destroyBuilding', '', array(
-                    'tile_id' => $spaceBelow->tile_id,
-                    'subface' => $spaceBelow->subface,
-                ));
-            }
+        if ($z > 0) {
+            throw new BgaVisibleSystemException( 'Worker placed higher than ground floor' );
         }
-        if ($destroyCount > 0) {
-            self::incStat($destroyCount, 'destroy', $player_id);
-        }
+        
+        // Place one worker in this space
+        $worker = array_shift($workers);
+        $worker_id = $worker['id'];
 
-        $msg = clienttranslate('${player_name} places a tile with ${face_name} and ${face_name2} on level ${z}');
-        if ($destroyCount > 0) {
-            $msg = clienttranslate('${player_name} places a tile with ${face_name} and ${face_name2} on level ${z}, destroying ${count} ${bldg_name}.');
-            $tile['i18n'][] = 'bldg_name';
-            $tile['bldg_name'] = $this->buildings[HUT];
-            $tile['count'] = $destroyCount;
-        }
-        self::notifyAllPlayers('commitTile', $msg, $tile);
-        $this->gamestate->nextState('eliminate');
-    }
+        self::DbQuery( "UPDATE board SET piece_id = '$worker_id' WHERE x = '$x' AND y = '$y' AND z = '$z'" );
 
-    public function actionSelectSpace($x, $y, $z)
-    {
-        self::setGameStateValue('selection_x', $x);
-        self::setGameStateValue('selection_y', $y);
-        self::setGameStateValue('selection_z', $z);
-        $this->gamestate->nextState('building');
-    }
+        $this->pieces->moveCard($worker_id, 'board', $player_id);
 
-    public function actionCancel()
-    {
-        $this->gamestate->nextState('cancel');
-    }
-
-    public function actionCommitBuilding($x, $y, $z, $option_nbr)
-    {
-        $player_id = self::getActivePlayerId();
-        $player = $this->getPlayer($player_id);
-        $board = new santoriniBoard();
-        $space = $board->getSpace($x, $y, $z);
-        $options = $board->getBuildingOptions($space, $player);
-        if (!array_key_exists($option_nbr, $options)) {
-            throw new BgaVisibleSystemException(sprintf('Invalid option: %d', $option_nbr));
-        }
-        $bldg_type = intdiv($option_nbr, 10);
-
-        // Add buildings
-        $buildings = array();
-        $count = 0;
-        foreach ($options[$option_nbr] as $h) {
-            if ($bldg_type == HUT) {
-                $count += $h->z;
-            } else {
-                $count+=1;
-            }
-            self::DbQuery("UPDATE board SET bldg_player_id = $player_id, bldg_type = $bldg_type WHERE x = {$h->x} AND y = {$h->y} AND z = {$h->z}");
-            $h->bldg_player_id = $player_id;
-            $h->bldg_type = $bldg_type;
-            $buildings[] = $h;
-        }
-
-        // Subtract buildings from player
-        $bldgName = $this->buildings[$bldg_type];
-        $columnName = strtolower($bldgName);
-        self::DbQuery("UPDATE player SET $columnName = $columnName - $count WHERE player_id = $player_id AND $columnName >= $count");
-        if (self::DbAffectedRow() != 1) {
-            throw new BgaVisibleSystemException(sprintf('You do not have enough buildings. This placement requires %d %s.', $count, $bldgName));
-        }
-
-        // Increment statistics
-        self::incStat($count, 'buildings_' . $bldg_type, $player_id);
-
-        // Update player building counts
-        $player = $this->getPlayer($player_id);
+        // Notify
         $args = array(
-            'i18n' => array('bldg_name', 'face_name'),
+            'i18n' => array(),
             'player_id' => $player_id,
-            'player_name' => $player['name'],
-            'face_name' => $this->terrain[$space->face],
-            'huts' => $player['huts'],
-            'temples' => $player['temples'],
-            'towers' => $player['towers'],
-            'bldg_name' => $bldgName,
-            'bldg_type' => $bldg_type,
-            'count' => $count,
-            'buildings' => $buildings,
+            'player_name' => self::getActivePlayerName(),
+            'worker_id' => $worker_id,
+            'space_id' => $space_id,
         );
-        self::notifyAllPlayers('commitBuilding', clienttranslate('${player_name} places ${count} ${bldg_name} on ${face_name}'), $args);
+        self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places a worker'), $args);
 
-        // Draw next tile
-        $newTile = $this->tiles->pickCard('deck', $player_id);
-        if ($newTile != null) {
-            self::notifyAllPlayers('draw', '', array(
-                'player_id' => $player_id,
-                'remain' => $this->tiles->countCardInLocation('deck'),
-            ));
-            self::notifyPlayer($player_id, 'draw', '', array(
-                'player_id' => $player_id,
-                'tile_id' => $newTile['id'],
-                'tile_type' => $newTile['type'],
-            ));
+        $this->gamestate->nextState('placed');
+    }
+
+    public function move($worker_id, $x, $y, $z)
+    {
+        self::checkAction('move');
+
+        $player_id = self::getActivePlayerId();
+
+        // Get workers for the active player
+        $workers = $this->pieces->getCardsInLocation('board', $player_id);
+
+        if (!in_array($worker_id, array_keys($workers))) {
+            throw new BgaUserException( _("This worker is not yours") );
         }
-        $this->gamestate->nextState('nextPlayer');
+        $space_id = self::getUniqueValueFromDb( "SELECT space_id FROM board WHERE x = '$x' AND y = '$y' AND z = '$z' AND piece_id is null" );
+        if ($space_id === null) {
+            throw new BgaUserException( _("This space is not free") );
+        }
+        //throw new BgaUserException(print_r($worker_id, true));
+        $neighbouring = self::getNeighbouringSpaces($worker_id, true);
+        //throw new BgaUserException(print_r($neighbouring, true));
+        if (!in_array($space_id, array_keys($neighbouring))) {
+            throw new BgaUserException( _("You cannot reach this space with this worker") );
+        }
+
+        // Move worker
+        self::DbQuery( "UPDATE board SET piece_id = null WHERE piece_id = '$worker_id'" );
+        self::DbQuery( "UPDATE board SET piece_id = '$worker_id' WHERE x = '$x' AND y = '$y' AND z = '$z'" );
+
+        // Set moved worker
+        self::setGamestateValue( 'moved_worker', $worker_id );
+
+        // Notify
+        $args = array(
+            'i18n' => array(),
+            'player_id' => $player_id,
+            'player_name' => self::getActivePlayerName(),
+            'worker_id' => $worker_id,
+            'space_id' => $space_id,
+        );
+        self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
+
+        $this->gamestate->nextState('moved');
+    }
+
+    public function build($x, $y, $z)
+    {
+        self::checkAction('build');
+
+        $player_id = self::getActivePlayerId();
+        $worker_id = self::getGamestateValue( 'moved_worker' );
+
+        $space_id = self::getUniqueValueFromDb( "SELECT space_id FROM board WHERE x = '$x' AND y = '$y' AND z = '$z' AND piece_id is null" );
+        if ($space_id === null) {
+            throw new BgaUserException( _("This space is not free") );
+        }
+        $neighbouring = self::getNeighbouringSpaces($worker_id);
+        if (!in_array($space_id, array_keys($neighbouring))) {
+            throw new BgaUserException( _("This space is not neighbouring the moved worker") );
+        }
+
+        $type = ($z === 0 ? 'level1' : ($z === 1 ? 'level2' : ($z === 2 ? 'level3' : 'dome')));
+        $blocks = $this->pieces->getCardsOfTypeInLocation($type, null, 'deck', null);
+        if (count($blocks) == 0) {
+            throw new BgaUserException( _("No more blocks for building at this level") );
+        }
+        $block = array_shift($blocks);
+        $block_id = $block['id'];
+
+        self::DbQuery( "UPDATE board SET piece_id = '$block_id' WHERE x = '$x' AND y = '$y' AND z = '$z'" );
+
+        // Reset moved worker
+        self::setGamestateValue( 'moved_worker', 0 );
+
+        // Notify
+        $args = array(
+            'i18n' => array(),
+            'player_id' => $player_id,
+            'player_name' => self::getActivePlayerName(),
+            'block' => $block,
+            'space_id' => $space_id,
+            'level' => $z
+        );
+        $msg = clienttranslate('${player_name} builds at ground level');
+        if ($z > 0) $msg = clienttranslate('${player_name} builds at level ${level}');
+        self::notifyAllPlayers('blockBuilt', $msg, $args);
+
+        $this->gamestate->nextState('built');
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -475,39 +369,39 @@ class santorini extends Table
         game state.
     */
 
-    public function argTile()
+    public function argPlaceWorker()
     {
         $player_id = self::getActivePlayerId();
-        $tile = $this->getTileInHand($player_id);
-        $result = $tile;
-        $result['possible'] = $this->getPossibleTile();
+
+        // Return unoccupied spaces that are accessible
+        $result = array( 'accessible_spaces' => self::getAccessibleSpaces() );
         return $result;
     }
 
-    public function argBuildingSpaces()
+    public function argPlayerMove()
     {
         $player_id = self::getActivePlayerId();
-        $player = $this->getPlayer($player_id);
-        $result = array(
-            'spaces' => $this->getPossibleSpaces($player)
-        );
+
+        // Return for each worker of this player the spaces he can move to
+        $workers = $this->pieces->getCardsInLocation('board', self::getActivePlayerId());
+
+        $destinations = array();
+        foreach ($workers as $worker_id => $worker) {
+            $destinations[$worker_id] = self::getNeighbouringSpaces($worker_id);
+        }
+        
+        $result = array( 'destinations_by_worker' => $destinations );
         return $result;
     }
 
-    public function argBuildingTypes()
+    public function argPlayerBuild()
     {
         $player_id = self::getActivePlayerId();
-        $player = $this->getPlayer($player_id);
-        $board = new santoriniBoard();
-        $space = $board->getSpace(self::getGameStateValue('selection_x'), self::getGameStateValue('selection_y'), self::getGameStateValue('selection_z'));
-        $result = array(
-            'x' => $space->x,
-            'y' => $space->y,
-            'z' => $space->z,
-            'tile_id' => $space->tile_id,
-            'subface' => $space->subface,
-            'options' => $board->getBuildingOptions($space, $player),
-        );
+
+        // Return available spaces neighbouring the moved player
+        $worker_id = self::getGamestateValue('moved_worker');
+        
+        $result = array( 'neighbouring_spaces' => self::getNeighbouringSpaces($worker_id) );
         return $result;
     }
 
@@ -520,93 +414,42 @@ class santorini extends Table
         The action method of state X is called everytime the current game state is set to X.
     */
 
-    public function stNextPlayer()
+    public function stNextPlayerPlaceWorker()
     {
-        $this->activeNextPlayer();
-
-        // You win if you place all of two types of buildings
-        $players = $this->getPlayers();
-        $weights = array();
-        foreach ($players as $player_id => $player) {
-            $counts = array(
-                $this->buildings[HUT] => $player['huts'],
-                $this->buildings[TEMPLE] => $player['temples'],
-                $this->buildings[TOWER] => $player['towers'],
-            );
-            asort($counts);
-            $bldg_counts = array_values($counts);
-            $bldg_names = array_keys($counts);
-            if ($bldg_counts[0] == 0 && $bldg_counts[1] == 0) {
-                self::notifyAllPlayers('win', clienttranslate('${player_name} has placed all ${bldg_name} and ${bldg_name2}!'), array(
-                    'i18n' => array('bldg_name', 'bldg_name2'),
-                    'player_id' => array($player_id),
-                    'player_name' => $player['name'],
-                    'bldg_name' => $bldg_names[0],
-                    'bldg_name2' => $bldg_names[1],
-                ));
-                self::DbQuery("UPDATE player SET player_score = 1 WHERE player_id = {$player['id']}");
-                $this->gamestate->nextState('gameEnd');
-                return;
-            }
-            if (!$player['eliminated'] && !$player['zombie']) {
-                // Compute weight of temples > towers > huts (lowest wins)
-                $weights[$player_id] = $player['huts'] + $player['towers'] * 100 + $player['temples'] * 1000;
-            }
-        }
-
-        // You win if you are the only player remaining
-        if (count($weights) == 1) {
-            reset($weights);
-            $player_id = key($weights);
-            self::notifyAllPlayers('win', '', array('player_ids' => array($player_id)));
-            self::DbQuery("UPDATE player SET player_score = 1 WHERE player_id = $player_id");
-            $this->gamestate->nextState('gameEnd');
-            return;
-        }
-
         $player_id = self::getActivePlayerId();
-        $tile = $this->getTileInHand($player_id);
-        if ($tile == null) {
-            // You win if you place the most temples, then towers, then huts
-            asort($weights);
-            $best = reset($weights);
-            $winners = array();
-            foreach ($weights as $id => $weight) {
-                if ($weight == $best) {
-                    $winners[] = $id;
-                } else {
-                    break;
-                }
-            }
-            self::notifyAllPlayers('win', '', array('player_ids' => $winners));
-            self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id IN (' . implode(',', $winners) . ')');
-            $this->gamestate->nextState('gameEnd');
-            return;
+        
+        // Get unplaced workers for the active player
+        $workers = $this->pieces->getCardsInLocation('deck', $player_id);
+
+        if (count($workers) > 0) {
+            // It's still this player turn, he has to place both workers
+        } else {
+            // Move on to the other player
+            $player_id = $this->activeNextPlayer();
+            $workers = $this->pieces->getCardsInLocation('deck', $player_id);
         }
 
-        $tile['remain'] = $this->tiles->countCardInLocation('deck');
-        self::notifyAllPlayers('draw', '', $tile);
-        self::incStat(1, 'tiles');
-        self::incStat(1, 'tiles', $player_id);
-        self::giveExtraTime($player_id);
-        $this->gamestate->nextState('tile');
+        if (count($workers) > 0) {
+            self::giveExtraTime($player_id);
+            $this->gamestate->nextState('next');
+        } else {
+            self::giveExtraTime($player_id);
+            $this->gamestate->nextState('done');
+        }
     }
 
-    public function stEliminate()
+    public function stNextPlayer()
     {
-        // Check for player elimination
-        $player_id = self::getActivePlayerId();
-        $player = $this->getPlayer($player_id);
-        if (empty($this->getPossibleSpaces($player))) {
-            self::notifyAllPlayers('eliminate', clienttranslate('${player_name} cannot place a building!'), array(
-                'player_id' => $player_id,
-                'player_name' => $player['name'],
-            ));
-            self::eliminatePlayer($player['id']);
-            $this->gamestate->nextState('nextPlayer');
-        } else {
-            $this->gamestate->nextState('selectSpace');
-        }
+        $player_id = $this->activeNextPlayer();
+
+        self::giveExtraTime($player_id);
+        
+        $this->gamestate->nextState('next');
+    }
+
+    public function stCheckEndOfGame()
+    {
+        // TODO: active player reached level 3 or active player cannot move or active player cannot build
     }
 
     //////////////////////////////////////////////////////////////////////////////

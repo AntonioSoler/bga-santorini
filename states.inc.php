@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * santorini implementation : © quietmint
+ * santorini implementation : © Emmanuel Colin <ecolin@boardgamearena.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -49,85 +49,88 @@
 
 //    !! It is not a good idea to modify this file when a game is running !!
 
+
 $machinestates = array(
     // The initial state. Please do not modify.
-    ST_GAME_BEGIN => array(
+    1 => array(
         'name' => 'gameSetup',
         'description' => '',
         'type' => 'manager',
         'action' => 'stGameSetup',
         'transitions' => array(
-            '' => ST_NEXT_PLAYER,
+            '' => 2,
         ),
     ),
 
-    ST_NEXT_PLAYER => array(
+    2 => array(
+        'name' => 'nextPlayerPlaceWorker',
+        'description' => '',
+        'type' => 'game',
+        'action' => 'stNextPlayerPlaceWorker',
+        'transitions' => array(
+            'next' => 3,
+            'done' => 5,
+        ),
+        'updateGameProgression' => true,
+    ),
+
+    3 => array(
+        'name' => 'playerPlaceWorker',
+        'description' => clienttranslate('${actplayer} must place a worker'),
+        'descriptionmyturn' => clienttranslate('${you} must place a worker'),
+        'type' => 'activeplayer',
+        'args' => 'argPlaceWorker',
+        'possibleactions' => array( 'place' ),
+        'transitions' => array(
+            'zombiePass' => 2,
+            'placed' => 2,
+        ),
+    ),
+
+    4 => array(
         'name' => 'nextPlayer',
         'description' => '',
         'type' => 'game',
         'action' => 'stNextPlayer',
         'transitions' => array(
-            'tile' => ST_TILE,
-            'gameEnd' => ST_GAME_END,
+            'next' => 5
         ),
         'updateGameProgression' => true,
     ),
 
-    ST_TILE => array(
-        'name' => 'tile',
-        'description' => clienttranslate('${actplayer} must place a tile'),
-        'descriptionmyturn' => clienttranslate('${you} must place a tile'),
+    5 => array(
+        'name' => 'playerMove',
+        'description' => clienttranslate('${actplayer} must move a worker'),
+        'descriptionmyturn' => clienttranslate('${you} must move a worker'),
         'type' => 'activeplayer',
-        'args' => 'argTile',
-        'possibleactions' => array( 'commitTile' ),
+        'args' => 'argPlayerMove',
+        'action' => 'stCheckEndOfGame',
+        'possibleactions' => array( 'move', 'endgame' ),
         'transitions' => array(
-            'zombiePass' => ST_ELIMINATE,
-            'eliminate' => ST_ELIMINATE,
+            'zombiePass' => 4,
+            'moved' => 6,
+            'endgame' => 99,
         ),
     ),
 
-    ST_ELIMINATE => array(
-        'name' => 'eliminate',
-        'description' => '',
-        'type' => 'game',
-        'action' => 'stEliminate',
-        'transitions' => array(
-            'selectSpace' => ST_SELECT_SPACE,
-            'nextPlayer' => ST_NEXT_PLAYER,
-        ),
-        'updateGameProgression' => true,
-    ),
-
-    ST_SELECT_SPACE => array(
-        'name' => 'selectSpace',
-        'description' => clienttranslate('${actplayer} must select a space to build'),
-        'descriptionmyturn' => clienttranslate('${you} must select a space to build'),
+    6 => array(
+        'name' => 'playerBuild',
+        'description' => clienttranslate('${actplayer} must build'),
+        'descriptionmyturn' => clienttranslate('${you} must build'),
         'type' => 'activeplayer',
-        'args' => 'argBuildingSpaces',
-        'possibleactions' => array( 'selectSpace' ),
+        'args' => 'argPlayerBuild',
+        'action' => 'stCheckEndOfGame',
+        'possibleactions' => array( 'build' , 'endgame' ),
         'transitions' => array(
-            'zombiePass' => ST_NEXT_PLAYER,
-            'building' => ST_BUILDING,
-        ),
-    ),
-
-    ST_BUILDING => array(
-        'name' => 'building',
-        'description' => clienttranslate('${actplayer} must place a building'),
-        'descriptionmyturn' => clienttranslate('${you} must place a building'),
-        'type' => 'activeplayer',
-        'args' => 'argBuildingTypes',
-        'possibleactions' => array( 'commitBuilding' , 'cancel' ),
-        'transitions' => array(
-            'zombiePass' => ST_NEXT_PLAYER,
-            'nextPlayer' => ST_NEXT_PLAYER,
-            'cancel' => ST_SELECT_SPACE,
+            'zombiePass' => 4,
+            'built' => 4,
+            'endgame' => 99,
         ),
     ),
 
     // Final state.
     // Please do not modify.
-    ST_GAME_END => array(
+    99 => array(
         'name' => 'gameEnd',
         'description' => clienttranslate('End of game'),
         'type' => 'manager',
