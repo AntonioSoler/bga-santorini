@@ -66,7 +66,9 @@ html, .mode_3d #game_play_area_background {
   background-size:contain;
   width: 600px;
   height: 600px;
-  transform:translateZ(-5px)
+  top: 0px;
+  left: 0px;
+  transform:translateZ(-5px);
 }
 
 #playArea {
@@ -166,7 +168,38 @@ html, .mode_3d #game_play_area_background {
   height: 100%;
   cursor: move;
 }
+.maplevel {
+  position: absolute;
+  padding: 2em;
+  /* width: 100%; */
+  /* height: 100%; */
+  box-shadow: inset 0px 0px 1px 2px #f5ec40;
+}
+#map_level0{
+  transform:translateZ(0px);
+}
 
+#map_level1{
+  transform:translateZ(60px);
+}
+
+#map_level2{
+  transform:translateZ(105px);
+}
+
+#map_level3{
+  transform:translateZ(135px);
+}
+.mapspace {
+  /* position: absolute; */
+  display: inline-block;
+  margin: 0.1em;
+  /* top: 40px; */
+  /* left: 40px; */
+  width: 100px;
+  height: 100px;
+  box-shadow: inset 0px 0px 1px 2px #c3d;
+}
 .mode_3d #map_surface {
   cursor: default;
 }
@@ -222,7 +255,17 @@ html, .mode_3d #game_play_area_background {
   top: 48.3%;
 }
 
-.building1 {
+#sky{
+  position: absolute;
+  transform-origin: center center;
+  transform-style: preserve-3d;
+  width: 100px;
+  height: 100px;
+  transform: translate3d(250px, 250px, 200px);
+  box-shadow: inset 0px 0px 1px 15px #25f3f3;
+}
+
+.level1 {
   transform: translateZ(80px);
   position: absolute;
   width: 100px;
@@ -232,7 +275,7 @@ html, .mode_3d #game_play_area_background {
   backface-visibility: hidden;
 }
 
-.building1:after {
+.level1:after {
   content:"";
   transform: translateZ(6px);
   position: absolute;
@@ -243,7 +286,7 @@ html, .mode_3d #game_play_area_background {
   backface-visibility: hidden;
 }
 
-.building1:before {
+.level1:before {
   content:"";
   transform: translateZ(60px) scale(0.8);
    transform-origin:center center;
@@ -256,7 +299,7 @@ html, .mode_3d #game_play_area_background {
   border-radius:1%;
 }
 
-.building1 .side1{
+.level1 .side1{
   position:absolute;
   transform-origin:bottom center;
   transform: rotateX(-90deg) translatez(30px);
@@ -268,7 +311,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 400% 500%;
 }
 
-.building1 .side2{
+.level1 .side2{
   position:absolute;
   transform-origin:bottom center;
   transform: translatey(-10px) rotateX(-90deg)  rotateY(90deg) translatez(39px);
@@ -280,7 +323,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 400% 500%;
 }
 
-.building1 .side3{
+.level1 .side3{
   position:absolute;
   transform-origin:bottom center;
   transform: translatey(-10px) rotateX(-90deg)  rotateY(180deg) translatez(39px);
@@ -292,7 +335,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 400% 500%;
 }
 
-.building1 .side4{
+.level1 .side4{
   position:absolute;
   transform-origin:bottom center;
   transform: translatey(-10px) rotateX(-90deg)  rotateY(-90deg) translatez(39px);
@@ -307,7 +350,7 @@ html, .mode_3d #game_play_area_background {
 
 
 
-.building1 .side1:after{
+.level1 .side1:after{
   position:absolute;
   content:"";
   transform-origin:bottom center;
@@ -321,7 +364,7 @@ html, .mode_3d #game_play_area_background {
 }
 
 
-.building1 .side2:after{
+.level1 .side2:after{
   position:absolute;
   content:"";
   transform-origin:bottom center;
@@ -335,7 +378,7 @@ html, .mode_3d #game_play_area_background {
 }
 
 
-.building1 .side3:after{
+.level1 .side3:after{
   position:absolute;
   content:"";
   transform-origin:bottom center;
@@ -348,7 +391,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 400% 500%;
 }
 
-.building1 .side4:after{
+.level1 .side4:after{
   position:absolute;
   content:"";
   transform-origin:bottom center;
@@ -361,7 +404,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 400% 500%;
 }
 
-.building2 {
+.level2 {
   transform: translateZ(140px);
   position: absolute;
   width: 100px;
@@ -372,7 +415,7 @@ html, .mode_3d #game_play_area_background {
   /* display:  none; */
 }
 
-.building2:before {
+.level2:before {
   content:"";
    transform: translateZ(45px) scale(0.8);
   transform-origin:center center;
@@ -385,7 +428,7 @@ html, .mode_3d #game_play_area_background {
   border-radius:1%;
 }
 
-.building2 .side1{
+.level2 .side1{
   position:absolute;
   transform-origin:bottom center;
   transform: translate(10px) rotateX(-90deg) translatez(43px);
@@ -397,7 +440,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 500% 600%;
 }
 
-.building2 .side2{
+.level2 .side2{
   position:absolute;
   transform-origin:bottom center;
   transform: translatey(5px) rotateX(-90deg)  rotateY(90deg) translatez(48px);
@@ -410,7 +453,7 @@ html, .mode_3d #game_play_area_background {
 }
 
 
-.building2 .side3{
+.level2 .side3{
   position:absolute;
   transform-origin:bottom center;
   transform: translatex(10px) rotateX(-90deg)  rotateY(180deg) translatez(33px);
@@ -422,7 +465,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 500% 600%;
 }
 
-.building2 .side4{
+.level2 .side4{
   position:absolute;
   transform-origin:bottom center;
   transform: translatey(5px) rotateX(-90deg)  rotateY(-90deg) translatez(29px);
@@ -434,7 +477,7 @@ html, .mode_3d #game_play_area_background {
   background-size: 500% 600%;
 }
 
-.building3 {
+.level3 {
   transform: translateZ(185px) scale(0.8);
   transform-origin:center center;
   position: absolute;
@@ -447,7 +490,7 @@ html, .mode_3d #game_play_area_background {
   border-radius:1%;
 }
 
-.building3:after {
+.level3:after {
   content:"";
   transform: translateZ(1px);
   position: absolute;
@@ -459,7 +502,7 @@ html, .mode_3d #game_play_area_background {
   border-radius:1%;
 }
 
-.building3:before {
+.level3:before {
   content:"";
   transform: translateZ(29px);
   transform-origin:center center;
@@ -473,7 +516,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side1{
+.level3 .side1{
   position:absolute;
   transform-origin:bottom center;
   transform: translatex(28px) rotateX(-90deg) translatez(70px);
@@ -485,7 +528,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side1:after{
+.level3 .side1:after{
   content:"";
   position:absolute;
   transform-origin:bottom left;
@@ -498,7 +541,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side2{
+.level3 .side2{
   position:absolute;
   transform-origin:bottom center;
   transform: translatex(21px) translatey(20px) rotateX(-90deg)  rotateY(90deg) translatez(57px);
@@ -510,7 +553,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side2:after{
+.level3 .side2:after{
   content:"";
   position:absolute;
   transform-origin:bottom left;
@@ -523,7 +566,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side3{
+.level3 .side3{
   position:absolute;
   transform-origin:bottom center;
   transform: translatex(28px) translatey(20px) rotateX(-90deg)  rotateY(180deg) translatez(47px);
@@ -535,7 +578,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side3:after{
+.level3 .side3:after{
   content:"";
   position:absolute;
   transform-origin:bottom left;
@@ -548,7 +591,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side4{
+.level3 .side4{
   position:absolute;
   transform-origin:bottom center;
   transform: translatex(21px) translatey(22px) rotateX(-90deg)  rotateY(270deg) translatez(41px);
@@ -560,7 +603,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building3 .side4:after{
+.level3 .side4:after{
   content:"";
   position:absolute;
   transform-origin:bottom left;
@@ -573,7 +616,7 @@ html, .mode_3d #game_play_area_background {
   /* box-shadow: 0px 0px 1px 1px orange; */
 }
 
-.building4 {
+.dome {
   transform: translateZ(216px) scale3d(0.75,0.75,0.75);
   transform-origin:center center;
   position: absolute;
@@ -585,7 +628,7 @@ html, .mode_3d #game_play_area_background {
   /* display:  none; */
 }
 
-.building4:after {
+.dome:after {
   content:"";
   transform: translateZ(19px) scale3d(0.75,0.75,0.75);
   transform-origin:center center;
@@ -597,7 +640,7 @@ html, .mode_3d #game_play_area_background {
   border-radius:100%;
 }
 
-.building4 .side1{
+.dome .side1{
   left: 50px;
   transform: rotatey(-90deg) scale3d(0.6,1,1);
   transform-origin: left center;
@@ -609,7 +652,7 @@ html, .mode_3d #game_play_area_background {
   border-radius: 0px 50px 50px 0px;
 }
 
-.building4 .side2{
+.dome .side2{
   top: 5px;
   transform: rotatex(-90deg) scale3d(1,0.6,1);
   transform-origin: bottom center;
@@ -620,7 +663,7 @@ html, .mode_3d #game_play_area_background {
   border-radius: 50px 50px 0px 0px;
 }
 
-.building4 .side3{
+.dome .side3{
   top: 5px;
   transform: rotatex(-90deg) rotatey(-45deg) scale3d(1,0.6,1);
   transform-origin: bottom center;
@@ -631,7 +674,7 @@ html, .mode_3d #game_play_area_background {
   border-radius: 50px 50px 0px 0px;
 }
 
-.building4 .side4{
+.dome .side4{
   top: 5px;
   transform: rotatex(-90deg) rotatey(45deg) scale3d(1,0.6,1);
   transform-origin: bottom center;
@@ -644,7 +687,7 @@ html, .mode_3d #game_play_area_background {
 
 
 /*
-.building4 .side4{
+.dome .side4{
   transform: translateZ(10px) scale3d(0.95,0.95,0.95);
   transform-origin:center center;
   position: absolute;
@@ -708,16 +751,27 @@ html, .mode_3d #game_play_area_background {
   animation: 350ms fade-in ease-in-out;
   background-position: -252px -97px;
 }
-#woman {width: 200px;
-    height: 200px;
+.worker {
+    position: absolute;
+    top:0px;
+	width: 100px;
+    height: 100px;
     transform-style: preserve-3d;
-	transform: scale3d(0.6,0.6,0.6);
 }
 
-#man {width: 200px;
-    height: 200px;
+.woman {width: 60px;
+    height: 60px;
     transform-style: preserve-3d;
-	transform: scale3d(0.6,0.6,0.6);
+	transform: scale3d(0.2,0.2,0.2);
+	transform-origin: center center;
+}
+
+.man {
+    width: 60px;
+    height: 60px;
+    transform-style: preserve-3d;
+    transform: scale3d(0.2,0.2,0.2);
+    transform-origin: center center;
 }
 
 #figurefoot{
@@ -725,11 +779,11 @@ html, .mode_3d #game_play_area_background {
     transform: translateZ(0px);
     width: 300px;
     height: 360px;
-    background-image: url(http://i.imgur.com/6lZRD72.png);
+    background-image: url(img/peana.png);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
-	transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 
 #figurefoot:after{
@@ -738,7 +792,7 @@ html, .mode_3d #game_play_area_background {
     transform: translateZ(-15px);
     width: 300px;
     height: 360px;
-    background-image: url(http://i.imgur.com/6lZRD72.png);
+    background-image: url(img/peana.png);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
@@ -750,7 +804,7 @@ html, .mode_3d #game_play_area_background {
     transform: translate3d(-50px , -70px ,242px) rotateX(-90deg);
     width: 320px;
     height: 484px;
-    background-image: url(http://i.imgur.com/OaIqAek.png);
+    background-image: url(img/figures.png);
     background-repeat: no-repeat;
 	transform-style: preserve-3d;
   background-size:cover;
@@ -758,12 +812,12 @@ html, .mode_3d #game_play_area_background {
 
 #manbody{
   position: absolute;
-    transform: translate3d(30px , -70px ,240px) rotateX(-90deg);
-    width: 250px;
-    height: 484px;
-    background-image: url(http://i.imgur.com/OaIqAek.png);
-    background-repeat: no-repeat;
-	transform-style: preserve-3d;
+  transform: translate3d(30px , -70px ,240px) rotateX(-90deg);
+  width: 250px;
+  height: 484px;
+  background-image: url(img/figures.png);
+  background-repeat: no-repeat;
+  transform-style: preserve-3d;
   background-size:cover;
   background-position:  -640px 0px;
 }
@@ -771,11 +825,11 @@ html, .mode_3d #game_play_area_background {
 #womanbody::after{
     content: "";
     position: absolute;
-    transform: rotatey(180deg) translateZ(10px);
+    transform: rotatey(180deg) translateZ(20px);
     width: 320px;
     background-repeat: no-repeat;
     height: 484px;
-    background-image: url(http://i.imgur.com/jn8nJUl.png);
+    background-image: background-image: url(img/figures.png);
     transform-style: preserve-3d;
   background-size:cover;
   background-position:  -330px 0px ;
@@ -784,12 +838,37 @@ html, .mode_3d #game_play_area_background {
 #manbody::after{
     content: "";
     position: absolute;
-    transform: rotatey(180deg) translateZ(10px);
+    transform: rotatey(180deg) translateZ(20px);
     width: 260px;
     background-repeat: no-repeat;
     height: 484px;
-    background-image: url(http://i.imgur.com/OaIqAek.png);
+    background-image: background-image: url(img/figures.png);
     transform-style: preserve-3d;
   background-size:cover;
   background-position:  -900px 0px;
 }
+
+..worker_blue #figurefoot {
+	background-image: url(img/peana-b.png) !important;	
+}
+.worker_blue #manbody {
+background-image: url(img/figures-b.png) !important;
+}
+.worker_blue #womanbody {
+background-image: url(img/figures-b.png) !important;
+}
+.worker_blue #figurefoot::after{
+	background-image: url(img/peana-b.png) !important;	
+}
+.worker_blue #manbody::after{
+background-image:url(img/figures-b.png) !important;
+}
+.worker_blue #womanbody::after{
+background-image: url(img/figures-b.png) !important;
+}
+
+
+
+
+
+

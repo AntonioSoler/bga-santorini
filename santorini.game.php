@@ -63,8 +63,10 @@ class santorini extends Table
 
         // Init pieces
         $pieces = array();
-        $pieces[] = array('type' => 'worker_blue', 'type_arg' => 0, 'nbr' => 2);
-        $pieces[] = array('type' => 'worker_white', 'type_arg' => 0, 'nbr' => 2);
+        $pieces[] = array('type' => 'worker_blue', 'type_arg' => 0, 'nbr' => 1);
+        $pieces[] = array('type' => 'worker_white', 'type_arg' => 0, 'nbr' => 1);
+		$pieces[] = array('type' => 'worker_blue', 'type_arg' => 1, 'nbr' => 1);
+        $pieces[] = array('type' => 'worker_white', 'type_arg' => 1, 'nbr' => 1);
         $pieces[] = array('type' => 'dome', 'type_arg' => 0, 'nbr' => 18);
         $pieces[] = array('type' => 'level1', 'type_arg' => 0, 'nbr' => 22);
         $pieces[] = array('type' => 'level2', 'type_arg' => 0, 'nbr' => 18);

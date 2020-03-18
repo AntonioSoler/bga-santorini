@@ -14,6 +14,8 @@
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
  */
+//# sourceURL=santorini.js
+//@ sourceURL=santorini.js
 
 define([
         "dojo", "dojo/_base/declare",
@@ -94,23 +96,9 @@ define([
                 for (var player_id in gamedatas.players) {
                     var player = gamedatas.players[player_id];
                     player.colorName = colorNames[player.color];
-                    dojo.place(this.format_block('jstpl_player_board', player), 'player_board_' + player_id);
-                    this.updatePlayerCounters(player);
-                    if (player.preview) {
-                        // Show a tile preview
-                        player.preview.player_id = player_id;
-                        player.preview.remain = gamedatas.remain;
-                        this.notif_draw({
-                            args: player.preview
-                        });
-                    } else if (player.unknownPreview) {
-                        // Show an unknown tile preview
-                        this.notif_draw({
-                            args: {
-                                player_id: player_id
-                            }
-                        });
-                    }
+                    //dojo.place(this.format_block('jstpl_player_board', player), 'player_board_' + player_id);
+                    //this.updatePlayerCounters(player);
+                    
                 }
 
                 // Setup scrollable map
@@ -124,27 +112,17 @@ define([
                 }
 
                 // Setup tiles and buildings
-                if (Array.isArray(gamedatas.spaces)) {
-                    var prior_tile = {};
-                    // Sort by play order to create tiles before buildings
-                    gamedatas.spaces.sort(function(a, b) {
-                        return a.id - b.id;
-                    });
+                if ( gamedatas.spaces !== null ) {
+                    
                     for (var s in gamedatas.spaces) {
-                        var space = gamedatas.spaces[s];
-                        if (space.subface == 0) {
-                            // Create a tile for each volcano
-                            var coords = this.getCoords(space.x, space.y);
-                            var tileEl = this.createTile(space);
-                            this.positionTile(tileEl, coords);
-                            prior_tile[space.tile_player_id] = space.tile_id;
-                        } else if (space.bldg_player_id) {
-                            this.placeBuilding(space);
-                        }
-                    }
-                    for (var player_id in prior_tile) {
-                        var player = this.gamedatas.players[player_id];
-                        dojo.addClass('tile_' + prior_tile[player_id], 'prior-move-' + player.colorName);
+                        var thisSpace = gamedatas.spaces[s];
+						
+                        if ( thisSpace.piece_id !== null ) {
+                            thisPiece = gamedatas.placed_pieces[thisSpace.piece_id];
+                            var pieceEl = this.createPiece(thisPiece);
+                            this.positionPiece (pieceEl, thisPiece);
+                            
+                        } 
                     }
                 }
 
@@ -328,35 +306,19 @@ define([
                 }
             },
 
-            createTile: function(tile) {
-                var face0 = VOLCANO;
-                var face1 = tile.tile_type.charAt(0);
-                var face2 = tile.tile_type.charAt(1);
-                var tileEl = $('tile_' + tile.tile_id);
-                if (tileEl != null) {
-                    dojo.destroy(tileEl);
-                }
-                var levelSuffix = '';
-                if (tile.z) {
-                    levelSuffix = ', ' + this.format_string_recursive(_('level ${z}'), {
-                        z: tile.z
-                    });
-                }
-                tileEl = dojo.place(this.format_block('jstpl_tile', {
-                    id: tile.tile_id,
-                    z: tile.z || '',
-                    rotate: tile.r || 0,
-                    face0: face0,
-                    face1: face1,
-                    face2: face2,
-                    title0: _(this.gamedatas.terrain[face0]) + levelSuffix,
-                    title1: _(this.gamedatas.terrain[face1]) + levelSuffix,
-                    title2: _(this.gamedatas.terrain[face2]) + levelSuffix,
-                }), 'map_scrollable');
-                return tileEl;
+            createPiece: function(piece) {
+				if ( piece.type.startsWith("worker")){
+                var piecetype = "woman";
+			    if ( piece.type_arg == "1" ) { piecetype = "man"; };
+                thispieceEL = dojo.place(this.format_block('jstpl_'+piecetype, {
+                    id: piece.id,
+                    color: piece.type,
+                    player: piece.location_arg
+                }), 'sky');
+                return thispieceEL;} 
             },
 
-            placeBuilding: function(building) {
+            positionPiece: function(pieceEl,position) { /*
                 var hexId = 'hex_' + building.tile_id + '_' + building.subface;
                 var container = $('bldg_' + hexId) || dojo.place('<div id="bldg_' + hexId + '" class="bldg-container"></div>', $(hexId));
                 if (building.bldg_player_id) {
@@ -369,7 +331,7 @@ define([
                 var buildingCount = building.bldg_type == HUT ? +building.z : 1;
                 for (var i = 1; i <= buildingCount; i++) {
                     var buildingEl = dojo.place(buildingHtml, container);
-                }
+                }*/
             },
 
             positionTile: function(tileEl, coords) {
