@@ -18,7 +18,7 @@
 
 html, .mode_3d #game_play_area_background {
   
-background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012138 70%);
+  background:url(img/background.jpg) center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012138 70%);
 }
 
 .mode_3d {
@@ -50,13 +50,34 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
     cursor: moz-grabbing !important
 }
 
+#bg-anchor {
+  position: absolute;
+  background: url(img/board.png) no-repeat;
+  background-size:contain;
+  width: 600px;
+  height: 600px;
+  top: -270px;
+  left: -307px;
+}
+#bg-anchor:after {
+  content:"";
+  position: absolute;
+  background: url(img/board-back.png) no-repeat;
+  background-size:contain;
+  width: 600px;
+  height: 600px;
+  top: 0px;
+  left: 0px;
+  transform:translateZ(-5px);
+}
+
 #playArea {
   margin: 15px;
-  height: 1100px;
-  width: 1200px;
+  height: 850px;
+  width: 100%;
   display: block;
-  /* background-position: center; */
-  /* background-repeat: no-repeat; */
+  background-position: center;
+  background-repeat: no-repeat;
   pointer-events: visible;
 }
 
@@ -120,51 +141,38 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 /** Scrollable area **/
 
 #map_container {
-  position: absolute;
+  position: relative;
   width: 100%;
   height: 100%;
-  background: url(img/background.jpg);
+  /* overflow: hidden; */
 }
 
+.mode_3d #playArea {
+  height: 1200px;
+}
 
 #map_scrollable,
 #map_scrollable_oversurface {
   position: absolute;
   top: 300px;
   left: 350px;
-
+  transform: translateZ(80px);
 }
-
 
 #map_surface {
   position: absolute;
-  background: url(img/board.png) no-repeat;
-  background-size:contain;
-  width: 600px;
-  height: 600px;
-  top: 280px;
-  left: 300px;
-  transform: translateZ(80px);
-  cursor: move;
-}
-#map_surface:after {
-  content:"";
-  position: absolute;
-  background: url(img/board-back.png) no-repeat;
-  background-size:contain;
-  width: 600px;
-  height: 600px;
   top: 0px;
   left: 0px;
-  transform:translateZ(-5px);
+  width: 100%;
+  height: 100%;
+  cursor: move;
 }
-
 .maplevel {
   position: absolute;
   padding: 2em;
   /* width: 100%; */
   /* height: 100%; */
-  /* box-shadow: inset 0px 0px 1px 2px #f5ec40; */
+  box-shadow: inset 0px 0px 1px 2px #f5ec40;
 }
 #map_level0{
   transform:translateZ(0px);
@@ -182,11 +190,11 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   transform:translateZ(135px);
 }
 .mapspace {
-  position: absolute;
-  /* display: inline-block; */
-  /* margin: 0.1em; */
-  /* top: 40px; */
-  /* left: 40px; */
+  /* position: absolute; */
+  display: inline-block;
+  margin: 0.1em;
+  top: 40px;
+  left: 40px;
   width: 100px;
   height: 100px;
   /* box-shadow: inset 0px 0px 1px 2px #c3d; */
@@ -204,21 +212,26 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 #base_side1{
-  transform: translate3d(347px,290px,0px) rotateX(-57deg);
+  transform: translate3d(570px,340px,0px) rotateX(-57deg);
 }
 #base_side2{
-  transform: translate3d(549px,490px,0px) rotate(90deg) rotateX(-57deg);
+  transform: translate3d(772px,540px,0px) rotate(90deg) rotateX(-57deg);
 }
 
 #base_side3{
-  transform: translate3d(150px,490px,0px) rotate(-90deg) rotateX(-57deg);
+  transform: translate3d(371px,543px,0px) rotate(-90deg) rotateX(-57deg);
 }
 
 #base_side4{
-  transform: translate3d(352px,690px,0px) rotate(180deg) rotateX(-57deg);
+  transform: translate3d(573px,742px,0px) rotate(180deg) rotateX(-57deg);
 }
 
-/** Fade **/
+
+#map_footer {
+  text-align: center;
+}
+
+/** Faces **/
 
 @keyframes fade-in {
   0% {
@@ -247,7 +260,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   transform-style: preserve-3d;
   width: 100px;
   height: 100px;
-  transform: translate3d(250px, 250px, 250px);
+  transform: translate3d(250px, 250px, 200px);
   box-shadow: inset 0px 0px 1px 15px #25f3f3;
 }
 
@@ -745,47 +758,44 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
     transform-style: preserve-3d;
 }
 
-.woman {
-    width: 70px;
-    height: 70px;
+.woman {width: 60px;
+    height: 60px;
     transform-style: preserve-3d;
-    transform: translatez(4px) scale3d(0.15,0.15,0.15);
-    transform-origin: center center;
+	transform: scale3d(0.2,0.2,0.2);
+	transform-origin: center center;
 }
 
 .man {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
     transform-style: preserve-3d;
-    transform: translatez(4px) scale3d(0.15,0.15,0.15);
+    transform: scale3d(0.2,0.2,0.2);
     transform-origin: center center;
 }
 
 #figurefoot{
     position: absolute;
-    transform: translateZ(1px);
+    transform: translateZ(0px);
     width: 300px;
-    height: 300px;
+    height: 360px;
     background-image: url(img/peana.png);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
     transform-style: preserve-3d;
-    border-radius: 50%;
-    box-shadow: 0px 0px 20px 30px #c3d;
 }
 
 #figurefoot:after{
     content: "";
     position: absolute;
-    transform: translateZ(10px);
+    transform: translateZ(-15px);
     width: 300px;
-    height: 300px;
+    height: 360px;
     background-image: url(img/peana.png);
     background-repeat: no-repeat;
     background-position: center center;
     background-size: contain;
-    transform-style: preserve-3d;
+	transform-style: preserve-3d;
 }
 
 #womanbody{

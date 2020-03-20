@@ -40,7 +40,7 @@ define([
         return declare("bgagame.santorini", ebg.core.gamegui, {
             constructor: function() {
                 // Scrollable area
-                this.scrollmap = new ebg.scrollmap();
+              
                 this.hexWidth = 84;
                 this.hexHeight = 71;
                 this.tryTile = null;
@@ -103,8 +103,8 @@ define([
 
                 // Setup scrollable map
                 var mapContainer = $('map_container');
-                this.scrollmap.onMouseDown = this.myonMouseDown;
-                this.scrollmap.create(mapContainer, $('map_scrollable'), $('map_surface'), $('map_scrollable_oversurface'));
+                mapContainer.onMouseDown = this.myonMouseDown;
+                //this.scrollmap.create(mapContainer, $('map_scrollable'), $('map_surface'), $('map_scrollable_oversurface'));
                 if (dojo.isFF) {
                     dojo.connect($('pagesection_gameview'), 'DOMMouseScroll', this, 'onMouseWheel');
                 } else {
@@ -120,7 +120,8 @@ define([
                         if ( thisSpace.piece_id !== null ) {
                             thisPiece = gamedatas.placed_pieces[thisSpace.piece_id];
                             var pieceEl = this.createPiece(thisPiece);
-                            this.positionPiece (pieceEl, thisPiece);
+							targetEL = $('mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z);
+                            this.positionPiece (pieceEl, targetEL);
                             
                         } 
                     }
@@ -160,12 +161,10 @@ define([
             onEnteringState: function(stateName, args) {
                 console.log('Entering state: ' + stateName, args.args);
                 if (this.isCurrentPlayerActive()) {
-                    if (stateName == 'tile') {
-                        if (args.args.possible.length == 1) {
+                    if (stateName == 'playerMove') {
+                        if (Object.keys(args.args.destinations_by_worker).length >= 1) {
                             // Auto-choose only option
-                            this.onClickPossibleTile(null, 0);
-                        } else {
-                            this.showPossibleTile();
+                        
                         }
                     } else if (stateName == 'selectSpace') {
                         this.showPossibleSpaces();
@@ -284,6 +283,254 @@ define([
                     this.ajaxcall('/santorini/santorini/' + action + '.html', args, this, function(result) {});
                 }
             },
+			
+			delayedExec : function(onStart, onEnd, duration, delay) {
+				if (typeof duration == "undefined") {
+					duration = 500;
+				}
+				if (typeof delay == "undefined") {
+					delay = 0;
+				}
+				if (this.instantaneousMode) {
+					delay = Math.min(1, delay);
+					duration = Math.min(1, duration);
+				}
+				if (delay) {
+					setTimeout(function() {
+						onStart();
+						if (onEnd) {
+							setTimeout(onEnd, duration);
+						}
+					}, delay);
+				} else {
+					onStart();
+					if (onEnd) {
+						setTimeout(onEnd, duration);
+					}
+				}
+			},
+			
+			stripPosition : function(token) {
+				// console.log(token + " STRIPPING");
+				// remove any added positioning style
+				dojo.style(token, "display", null);
+				dojo.style(token, "top", null);
+				dojo.style(token, "left", null);
+				dojo.style(token, "position", null);
+				dojo.style (token , { transform: "" });
+			},
+			stripTransition : function(token) {
+				this.setTransition(token, "");
+			},
+			setTransition : function(token, value) {
+				dojo.style(token, "transition", value);
+				dojo.style(token, "-webkit-transition", value);
+				dojo.style(token, "-moz-transition", value);
+				dojo.style(token, "-o-transition", value);
+			},
+			resetPosition : function(token) {
+				// console.log(token + " RESETING");
+				// remove any added positioning style
+				dojo.style(token, "display", null);
+				dojo.style(token, "top", "0px");
+				dojo.style(token, "left", "0px");
+				dojo.style(token, "position", null);
+				dojo.style(token, "transform", null);
+			},
+			
+			getTransform :	function (elem) {
+			var computedStyle = getComputedStyle(elem, null),
+				val = computedStyle.transform ||
+					computedStyle.webkitTransform ||
+					computedStyle.MozTransform ||
+					computedStyle.msTransform,
+				matrix = this.parseMatrix(val),
+				rotateY = Math.asin(-matrix.m13),
+				rotateX, 
+				rotateZ;
+				position = computedStyle.position;
+				rotateX = Math.atan2(matrix.m23, matrix.m33);
+				rotateZ = Math.atan2(matrix.m12, matrix.m11);
+			return {
+				transformStyle: val,
+				matrix: matrix,
+				rotate: {
+					x: rotateX,
+					y: rotateY,
+					z: rotateZ
+				},
+				translate: {
+					x: matrix.m41,
+					y: matrix.m42,
+					z: matrix.m43
+				},
+				position: position
+			};
+		},
+
+
+		/* Parses a matrix string and returns a 4x4 matrix
+		---------------------------------------------------------------- */
+
+		parseMatrix: function  (matrixString) {
+			var c = matrixString.split(/\s*[(),]\s*/).slice(1,-1),
+				matrix;
+
+			if (c.length === 6) {
+				// 'matrix()' (3x2)
+				matrix = {
+					m11: +c[0], m21: +c[2], m31: 0, m41: +c[4],
+					m12: +c[1], m22: +c[3], m32: 0, m42: +c[5],
+					m13: 0,     m23: 0,     m33: 1, m43: 0,
+					m14: 0,     m24: 0,     m34: 0, m44: 1
+				};
+			} else if (c.length === 16) {
+				// matrix3d() (4x4)
+				matrix = {
+					m11: +c[0], m21: +c[4], m31: +c[8], m41: +c[12],
+					m12: +c[1], m22: +c[5], m32: +c[9], m42: +c[13],
+					m13: +c[2], m23: +c[6], m33: +c[10], m43: +c[14],
+					m14: +c[3], m24: +c[7], m34: +c[11], m44: +c[15]
+				};
+
+			} else {
+				// handle 'none' or invalid values.
+				matrix = {
+					m11: 1, m21: 0, m31: 0, m41: 0,
+					m12: 0, m22: 1, m32: 0, m42: 0,
+					m13: 0, m23: 0, m33: 1, m43: 0,
+					m14: 0, m24: 0, m34: 0, m44: 1
+				};
+			}
+			return matrix;
+		},
+
+		/* Adds vector v2 to vector v1
+		---------------------------------------------------------------- */
+
+		addVectors: function (v1, v2) {
+			return {
+				x: v1.x + v2.x,
+				y: v1.y + v2.y,
+				z: v1.z + v2.z
+			};
+		},
+
+
+		/* Rotates vector v1 around vector v2
+		---------------------------------------------------------------- */
+
+				rotateVector: function  (v1, v2) {
+					var x1 = v1.x,
+						y1 = v1.y,
+						z1 = v1.z,
+						angleX = v2.x / 2,
+						angleY = v2.y / 2,
+						angleZ = v2.z / 2,
+
+						cr = Math.cos(angleX),
+						cp = Math.cos(angleY),
+						cy = Math.cos(angleZ),
+						sr = Math.sin(angleX),
+						sp = Math.sin(angleY),
+						sy = Math.sin(angleZ),
+
+						w = cr * cp * cy + -sr * sp * -sy,
+						x = sr * cp * cy - -cr * sp * -sy,
+						y = cr * sp * cy + sr * cp * sy,
+						z = cr * cp * sy - -sr * sp * -cy,
+
+						m0 = 1 - 2 * ( y * y + z * z ),
+						m1 = 2 * (x * y + z * w),
+						m2 = 2 * (x * z - y * w),
+
+						m4 = 2 * ( x * y - z * w ),
+						m5 = 1 - 2 * ( x * x + z * z ),
+						m6 = 2 * (z * y + x * w ),
+
+						m8 = 2 * ( x * z + y * w ),
+						m9 = 2 * ( y * z - x * w ),
+						m10 = 1 - 2 * ( x * x + y * y );
+
+					return {
+						x: x1 * m0 + y1 * m4 + z1 * m8,
+						y: x1 * m1 + y1 * m5 + z1 * m9,
+						z: x1 * m2 + y1 * m6 + z1 * m10
+					};
+				},
+				
+			
+			computeVertexData: function (elem) {
+				var w = elem.offsetWidth / 2,
+					h = elem.offsetHeight / 2,
+					v = {
+						  a: { x: 0, y: 0, z: 0 }
+					},
+					transform;
+				// Walk up the DOM and apply parent element transforms to each vertex
+                //	while (elem.id != "overall-content" ) {
+					while (elem.id != "playArea" ) { 
+					transform = this.getTransform(elem);
+					v.a = this.addVectors( v.a , transform.translate );
+					elem = elem.parentNode;		
+				}
+				return v;
+				
+			},
+			
+			attachToNewParentNoDestroy : function(mobile, new_parent) {
+				if (mobile === null) {
+					console.error("attachToNewParent: mobile obj is null");
+					return;
+				}
+				if (new_parent === null) {
+					console.error("attachToNewParent: new_parent is null");
+					return;
+				}
+				if (typeof mobile == "string") {
+					mobile = $(mobile);
+				}
+				if (typeof new_parent == "string") {
+					new_parent = $(new_parent);
+				}
+
+				var src = dojo.position(mobile);
+				dojo.style(mobile, "position", "absolute");
+				dojo.place(mobile, new_parent, "last");
+				return;
+			},
+			
+			slideToObjectAbsolute : function(token, finalPlace, x, y, duration,delay,onEnd) {
+				if (typeof token == 'string') {
+					token = $(token);
+				}
+				if (typeof finalPlace == 'string') {
+					finalPlace = $(finalPlace);
+				}
+				
+				var self = this;
+					
+			    this.delayedExec(function() {
+					self.stripTransition(token);
+
+					
+					origin=self.computeVertexData(token);
+					destination=self.computeVertexData(finalPlace);	
+					
+					x += origin.a.x - destination.a.x;
+					y += origin.a.y - destination.a.y;
+					z = origin.a.z - destination.a.z;
+					dojo.style (token , { transform: "translate3D("+ x +"px, "+ y +"px, "+ z +"px)" });
+					self.setTransition(token, "all " + duration + "ms ease-in-out");
+					self.attachToNewParentNoDestroy (token,finalPlace);
+				
+				}, function() {
+					self.stripPosition(token);
+					if (onEnd) {
+						setTimeout(onEnd, duration);
+					}
+				}, duration, delay);				
+			},
 
             updatePlayerCounters: function(player) {
                 var player_id = player.player_id || player.id;
@@ -318,20 +565,9 @@ define([
                 return thispieceEL;} 
             },
 
-            positionPiece: function(pieceEl,position) { /*
-                var hexId = 'hex_' + building.tile_id + '_' + building.subface;
-                var container = $('bldg_' + hexId) || dojo.place('<div id="bldg_' + hexId + '" class="bldg-container"></div>', $(hexId));
-                if (building.bldg_player_id) {
-                    building.colorName = this.gamedatas.players[building.bldg_player_id].colorName;
-                    dojo.addClass(hexId, 'has-bldg');
-                } else {
-                    building.colorName = 'tempbuilding';
-                }
-                var buildingHtml = this.format_block('jstpl_building_' + building.bldg_type, building);
-                var buildingCount = building.bldg_type == HUT ? +building.z : 1;
-                for (var i = 1; i <= buildingCount; i++) {
-                    var buildingEl = dojo.place(buildingHtml, container);
-                }*/
+            positionPiece: function(pieceEl,destination) { 
+			this.slideToObjectAbsolute(pieceEl, destination ,0,0, 1000, 0 ,function(){;} )
+			//this.slideToObjectAbsolute(pieceEl, 'sky' ,0,0, 1000, 1 , dojo.hitch( this ,function(){ this.slideToObjectAbsolute(pieceEl, destination,0,0, 1000, 0 ,function(){;} )}));
             },
 
             positionTile: function(tileEl, coords) {
@@ -599,7 +835,6 @@ define([
                 dojo.subscribe('draw', this, 'notif_draw');
                 dojo.subscribe('commitTile', this, 'notif_tile');
                 dojo.subscribe('commitBuilding', this, 'notif_building');
-                dojo.subscribe('destroyBuilding', this, 'notif_destroyBuilding');
             },
 
             notif_draw: function(n) {
@@ -655,9 +890,9 @@ define([
                 }
             },
 
-            notif_destroyBuilding: function(n) {
-                console.log('notif_destroyBuilding', n.args);
-                $('bldg_hex_' + n.args.tile_id + '_' + n.args.subface).innerHTML = '';
-            },
+            notif_moveworker : function(notif) {
+				var destination = notif.args.destination;
+				this.slideToObjectAbsolute('card_'+notif.args.card_id, 'sky' ,0,0, 1000, 1 , dojo.hitch( this ,function(){ this.slideToObjectAbsolute('card_'+notif.args.card_id, destination,0,0, 1000 )}));
+			},
         });
     });
