@@ -155,7 +155,11 @@
   var jstpl_woman = '<div id="worker_${id}" class="worker ${color} ${player}"><div class="woman"><div id="figurefoot"></div><div id="womanbody"></div></div></div>';
   // Man
   var jstpl_man = '<div id="worker_${id}" class="worker ${color} ${player}"><div class="man"><div id="figurefoot"></div><div id="manbody"></div></div></div>';
-
+  
+  // WorkerTarget
+  var jstpl_movetarget = '<div id="movetarget_${id}" class="worker_${worker} movetarget" ></div>';
+  //
+  var jstpl_buildtarget = '<div id="buildtarget_${id}" class="buildtarget" space="${id}" x="${x}" y="${y}" z="${y}"></div>';
   
 </script>
 

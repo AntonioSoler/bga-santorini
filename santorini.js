@@ -76,7 +76,7 @@ define([
 
             setup: function(gamedatas) {
                 console.info('SETUP', gamedatas);
-
+                this.handles = [];
                 // Setup 'fade-out' element destruction
                 $('overall-content').addEventListener('animationend', function(e) {
                     if (e.animationName == 'fade-out') {
@@ -163,11 +163,13 @@ define([
                 if (this.isCurrentPlayerActive()) {
                     if (stateName == 'playerMove') {
                         if (Object.keys(args.args.destinations_by_worker).length >= 1) {
-                            // Auto-choose only option
-                        
+							//this.destinations_by_worker = args.args.destinations_by_worker;
+							this.activateworkers();
+							
                         }
                     } else if (stateName == 'selectSpace') {
                         this.showPossibleSpaces();
+					
                     } else if (stateName == 'building') {
                         this.showPossibleBuilding();
 
@@ -593,31 +595,28 @@ define([
             },
 
             clearPossible: function() {
-                this.tryTile = null;
-                this.tryBuilding = null;
                 this.removeActionButtons();
                 this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
-                dojo.query('.possible').forEach(dojo.destroy);
-                dojo.query('.tempbuilding').forEach(dojo.destroy);
+                dojo.query('.movetarget').forEach(dojo.destroy);
+                dojo.query('.buildtarget').forEach(dojo.destroy);
+				
+				dojo.forEach(this.handles, dojo.disconnect)
+				dojo.query(".activeworker").removeClass("activeworker");
+				this.handles = [];
             },
 
-            showPossibleTile: function() {
+            activateworkers: function() {
                 this.clearPossible();
-                for (var i in this.gamedatas.gamestate.args.possible) {
-                    var possible = this.gamedatas.gamestate.args.possible[i];
-                    var coords = this.getCoords(possible.x, possible.y);
-                    var possibleHtml = this.format_block('jstpl_possible', {
-                        id: i,
-                        z: possible.z - 1,
-                        style: coords.style,
-                        label: possible.z ,
-                    });
-                    var possibleEl = dojo.place(possibleHtml, 'map_scrollable_oversurface');
+                for (var w in this.gamedatas.gamestate.args.destinations_by_worker) {
+                    var thisWorker = this.gamedatas.gamestate.args.destinations_by_worker[w];
+                    dojo.addClass($("worker_"+w), "activeworker");
+					
+					this.handles.push( dojo.connect($("worker_"+w),'onclick', this, 'onClickPossibleworker'));
                 }
-                dojo.query('.face.possible').connect('onclick', this, 'onClickPossibleTile');
+                
             },
 
-            showPossibleSpaces: function() {
+            showPossibleSpaces: function(worker_id) {
                 this.clearPossible();
                 for (var i in this.gamedatas.gamestate.args.spaces) {
                     var possible = this.gamedatas.gamestate.args.spaces[i];
@@ -677,43 +676,22 @@ define([
             // Tile actions
             /////
 
-            onClickPossibleTile: function(evt, possible_nbr) {
+            onClickPossibleworker: function(evt, worker_id) {
                 this.clearPossible();
-                if (possible_nbr == null) {
+                if (worker_id == null) {
                     dojo.stopEvent(evt);
                     var idParts = evt.currentTarget.id.split('_');
-                    possible_nbr = idParts[1];
+                    worker_id = idParts[1];
                 }
-                var possible = this.gamedatas.gamestate.args.possible[possible_nbr];
-                var coords = this.getCoords(possible.x, possible.y);
-                this.tryTile = {
-                    tile_id: this.gamedatas.gamestate.args.tile_id,
-                    tile_type: this.gamedatas.gamestate.args.tile_type,
-                    x: possible.x,
-                    y: possible.y,
-                    z: possible.z,
-                    r: possible.r[0],
-                    possible: possible,
-                };
-                console.log('Trying tile ' + this.tryTile.tile_id + ' at [' + possible.x + ',' + possible.y + ',' + possible.z + ']');
-
-                // Create tile
-                var tileEl = this.createTile(this.tryTile);
-                this.placeOnObject(tileEl.id, 'tile_p_' + this.player_id);
-                this.positionTile(tileEl, coords);
-
-                // Create rotator
-                if (possible.r.length > 1) {
-                    var rotatorHtml = this.format_block('jstpl_possible', {
-                        id: 'rotator',
-                        z: possible.z,
-                        style: coords.style,
-                        label: '↻',
-                    });
-                    var rotateEl = dojo.place(rotatorHtml, 'map_scrollable_oversurface');
-                    dojo.connect(rotateEl, 'onclick', this, 'onClickRotateTile');
-                }
-
+                for (var s in this.gamedatas.gamestate.args.destinations_by_worker[worker_id]) {
+                    var thisWorker = this.gamedatas.gamestate.args.destinations_by_worker[worker_id][s];
+                    var thisSpace = thisWorker.space_id ;
+					newtarget = dojo.place(this.format_block('jstpl_movetarget', {
+						id: thisSpace,
+						worker: worker_id						
+						}), 'mapspace_'+thisWorker.x+'_'+thisWorker.y+'_'+thisWorker.z );
+					
+				}
                 this.removeActionButtons();
                 this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
             },

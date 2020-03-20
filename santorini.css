@@ -190,6 +190,8 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   width: 100px;
   height: 100px;
   /* box-shadow: inset 0px 0px 1px 2px #c3d; */
+  /* pointer-events: auto; */
+  pointer-events: none;
 }
 .mode_3d #map_surface {
   cursor: default;
@@ -233,7 +235,24 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 .fade-out {
-  animation: fade-out 350ms forwards ease-in-out !important;
+  animation: fade-out 1000ms forwards ease-in-out !important;
+}
+
+@keyframes activefoot {
+  100% {
+    box-shadow: 0px 0px 20px 80px #cc33ddc4;
+  }
+  1% {
+    box-shadow: 0px 0px 20px 20px #cc33dda6;
+  }
+}
+
+.activeworker #figurefoot {
+  
+  animation: activefoot 1000ms infinite;
+}
+.activeworker{
+ pointer-events: auto !important; 
 }
 
 #testbuilding{
@@ -333,9 +352,6 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   background-size: 400% 500%;
 }
 
-
-
-
 .level1 .side1:after{
   position:absolute;
   content:"";
@@ -349,7 +365,6 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   background-size: 400% 500%;
 }
 
-
 .level1 .side2:after{
   position:absolute;
   content:"";
@@ -362,7 +377,6 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   background-position: -100px -360px;
   background-size: 400% 500%;
 }
-
 
 .level1 .side3:after{
   position:absolute;
@@ -671,72 +685,6 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   border-radius: 50px 50px 0px 0px;
 }
 
-
-/*
-.dome .side4{
-  transform: translateZ(10px) scale3d(0.95,0.95,0.95);
-  transform-origin:center center;
-  position: absolute;
-  width: 100px;
-  height: 100px;
-  background: Blue;
-  background-position:bottom right;
-  background-size: 500% 375%;
-  border-radius:100%;
-}
-*/
-.facelabel {
-  position: absolute;
-  left: 0;
-  right: 0;
-  text-align: center;
-  line-height: 97px;
-  font-size: 30px;
-  font-weight: bold;
-  color: #ffffff;
-  -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
-  text-shadow: 1px 1px 10px #23312d;
-  transform: translateZ(1px);
-  transition: transform 350ms ease-in-out;
-  display: none;
-}
-.possible .facelabel {
-  display: block;
-}
-
-.possible.facelabel {
-  display: block;
-}
-
-.rotate60 .facelabel {
-  transform: rotate(-60deg) translateZ(1px);
-}
-.rotate120 .facelabel {
-  transform: rotate(-120deg) translateZ(1px);
-}
-.rotate180 .facelabel {
-  transform: rotate(-180deg) translateZ(1px);
-}
-.rotate240 .facelabel {
-  transform: rotate(-240deg) translateZ(1px);
-}
-.rotate300 .facelabel {
-  transform: rotate(-300deg) translateZ(1px);
-}
-
-.face.possible {
-  position: absolute;
-  transform: translateZ(1px) scale(0.8);
-  cursor: pointer;
-  animation: 350ms fade-in ease-in-out;
-  background-position: -252px -97px;
-}
 .worker {
     position: absolute;
     top:0px;
@@ -772,8 +720,34 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
     background-size: contain;
     transform-style: preserve-3d;
     border-radius: 50%;
-    box-shadow: 0px 0px 20px 30px #c3d;
+    box-shadow: 0px 0px 20px 20px rgba(0, 0, 0, 0.45);
 }
+
+.movetarget{
+    position: absolute;
+    transform: translateZ(2px) scale3d(0.5,0.5,0.5);
+    transform-origin: center center;
+    width: 100px;
+    height: 100px;
+    transform-style: preserve-3d;
+    border-radius: 50%;
+    animation: movetargetanim 1500ms infinite;
+    /* box-shadow: 0px 0px 20px 20px rgba(0, 0, 0, 0.45); */
+    pointer-events: auto !important;
+	cursor: pointer;
+}
+
+@keyframes movetargetanim {
+  100% {
+    box-shadow: inset 0px 0px 20px 10px #cc33ddc4;
+  }
+  50% {
+    box-shadow: inset 0px 0px 20px 20px #cc33dda6;
+  }
+  0% {
+    box-shadow: inset 0px 0px 20px 10px #cc33dda6;
+  }
+ }
 
 #figurefoot:after{
     content: "";
