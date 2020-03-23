@@ -27,11 +27,7 @@ define([
     function(dojo, declare) {
         // Plyer colors
         const BLUE = "0000ff";
-        const WHITE = "ffffff";
-        
-        const HUT = 1;
-        const TEMPLE = 2;
-        const TOWER = 3;
+        const WHITE = "ffffff";        
 
         // Zoom limits
         const ZOOM_MIN = 0.2;
@@ -119,10 +115,10 @@ define([
 						
                         if ( thisSpace.piece_id !== null ) {
                             thisPiece = gamedatas.placed_pieces[thisSpace.piece_id];
-                            var pieceEl = this.createPiece(thisPiece);
-							targetEL = $('mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z);
-                            this.positionPiece (pieceEl, targetEL);
                             
+							targetEL = $('mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z);
+							var pieceEl = this.createPiece(thisPiece,targetEL);
+                            //this.positionPiece (pieceEl, targetEL);                           
                         } 
                     }
                 }
@@ -161,16 +157,32 @@ define([
             onEnteringState: function(stateName, args) {
                 console.log('Entering state: ' + stateName, args.args);
                 if (this.isCurrentPlayerActive()) {
+					this.clearPossible();
                     if (stateName == 'playerMove') {
                         if (Object.keys(args.args.destinations_by_worker).length >= 1) {
 							//this.destinations_by_worker = args.args.destinations_by_worker;
 							this.activateworkers();
 							
                         }
+					}	
+					if (stateName == 'playerPlaceWorker') {
+                        if (Object.keys(args.args.accessible_spaces).length >= 1) {
+							//this.destinations_by_worker = args.args.destinations_by_worker;
+							for (var s in this.gamedatas.gamestate.args.accessible_spaces) {
+								var thisSpace = this.gamedatas.gamestate.args.accessible_spaces[s];
+								
+								newtarget = dojo.place(this.format_block('jstpl_movetarget', {
+									id: thisSpace.space_id,
+									worker: 0						
+									}), 'mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z );
+								this.handles.push( dojo.connect(newtarget,'onclick', this, 'onClickPlaceTarget'));
+							}
+							
+                        }	
                     } else if (stateName == 'selectSpace') {
                         this.showPossibleSpaces();
 					
-                    } else if (stateName == 'building') {
+                    } else if (stateName == 'playerBuild') {
                         this.showPossibleBuilding();
 
                     }
@@ -224,7 +236,6 @@ define([
                     this.dragging_offset_y = evt.pageY - (_101c.y - _101d.y);
                     this.dragging_handler = dojo.connect($("pagesection_gameview"), "onmousemove", this, "onMouseMove");
                     //this.dragging_handler_touch = dojo.connect($("ebd-body"), "ontouchmove", this, "onMouseMove");
-
                 }
             },
 
@@ -429,31 +440,25 @@ define([
 						angleX = v2.x / 2,
 						angleY = v2.y / 2,
 						angleZ = v2.z / 2,
-
 						cr = Math.cos(angleX),
 						cp = Math.cos(angleY),
 						cy = Math.cos(angleZ),
 						sr = Math.sin(angleX),
 						sp = Math.sin(angleY),
 						sy = Math.sin(angleZ),
-
 						w = cr * cp * cy + -sr * sp * -sy,
 						x = sr * cp * cy - -cr * sp * -sy,
 						y = cr * sp * cy + sr * cp * sy,
 						z = cr * cp * sy - -sr * sp * -cy,
-
 						m0 = 1 - 2 * ( y * y + z * z ),
 						m1 = 2 * (x * y + z * w),
 						m2 = 2 * (x * z - y * w),
-
 						m4 = 2 * ( x * y - z * w ),
 						m5 = 1 - 2 * ( x * x + z * z ),
 						m6 = 2 * (z * y + x * w ),
-
 						m8 = 2 * ( x * z + y * w ),
 						m9 = 2 * ( y * z - x * w ),
 						m10 = 1 - 2 * ( x * x + y * y );
-
 					return {
 						x: x1 * m0 + y1 * m4 + z1 * m8,
 						y: x1 * m1 + y1 * m5 + z1 * m9,
@@ -471,7 +476,7 @@ define([
 					transform;
 				// Walk up the DOM and apply parent element transforms to each vertex
                 //	while (elem.id != "overall-content" ) {
-					while (elem.id != "playArea" ) { 
+					while (elem.id != "map_surface" ) { 
 					transform = this.getTransform(elem);
 					v.a = this.addVectors( v.a , transform.translate );
 					elem = elem.parentNode;		
@@ -514,10 +519,12 @@ define([
 					
 			    this.delayedExec(function() {
 					self.stripTransition(token);
-
-					
+	
 					origin=self.computeVertexData(token);
 					destination=self.computeVertexData(finalPlace);	
+					
+					w = token.offsetWidth / 2;
+					h = token.offsetHeight / 2;
 					
 					x += origin.a.x - destination.a.x;
 					y += origin.a.y - destination.a.y;
@@ -534,13 +541,6 @@ define([
 				}, duration, delay);				
 			},
 
-            updatePlayerCounters: function(player) {
-                var player_id = player.player_id || player.id;
-                $('count_huts_' + player_id).innerText = player.huts;
-                $('count_temples_' + player_id).innerText = player.temples;
-                $('count_towers_' + player_id).innerText = player.towers;
-            },
-
             setZoom: function(newZoom) {
                 var newZoom = Math.max(ZOOM_MIN, Math.min(ZOOM_MAX, newZoom));
                 if (this.zoom != newZoom) {
@@ -555,16 +555,26 @@ define([
                 }
             },
 
-            createPiece: function(piece) {
+            createPiece: function(piece,location) {
+				location = location || 'sky';
 				if ( piece.type.startsWith("worker")){
-                var piecetype = "woman";
-			    if ( piece.type_arg == "1" ) { piecetype = "man"; };
-                thispieceEL = dojo.place(this.format_block('jstpl_'+piecetype, {
-                    id: piece.id,
-                    color: piece.type,
-                    player: piece.location_arg
-                }), 'sky');
-                return thispieceEL;} 
+					var piecetype = "woman";
+					if ( piece.type_arg == "1" ) { piecetype = "man"; };
+					thispieceEL = dojo.place(this.format_block('jstpl_'+piecetype, {
+						id: piece.id,
+						color: piece.type,
+						player: piece.location_arg
+					}), location );
+                } else {
+					rand= Math.floor(Math.random() * 4);					
+					angles = [0,90,180,270];
+					thispieceEL = dojo.place(this.format_block('jstpl_'+piece.type, {
+						id: piece.id,
+						angle: angles[rand]
+					}), location );
+				}
+				
+				return thispieceEL;
             },
 
             positionPiece: function(pieceEl,destination) { 
@@ -577,21 +587,8 @@ define([
                 tileEl.style.top = coords.top + 'px';
             },
 
-            removeTile: function(tileEl) {
+            removeEl: function(tileEl) {
                 dojo.addClass(tileEl, 'fade-out');
-            },
-
-            getCoords: function(x, y) {
-                var top = this.hexHeight * y - 70;
-                var left = this.hexWidth * x - 35;
-                if (y % 2 != 0) {
-                    left += this.hexWidth / 2;
-                }
-                return {
-                    top: top,
-                    left: left,
-                    style: 'top:' + top + 'px;left:' + left + 'px',
-                };
             },
 
             clearPossible: function() {
@@ -599,7 +596,6 @@ define([
                 this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
                 dojo.query('.movetarget').forEach(dojo.destroy);
                 dojo.query('.buildtarget').forEach(dojo.destroy);
-				
 				dojo.forEach(this.handles, dojo.disconnect)
 				dojo.query(".activeworker").removeClass("activeworker");
 				this.handles = [];
@@ -610,63 +606,20 @@ define([
                 for (var w in this.gamedatas.gamestate.args.destinations_by_worker) {
                     var thisWorker = this.gamedatas.gamestate.args.destinations_by_worker[w];
                     dojo.addClass($("worker_"+w), "activeworker");
-					
 					this.handles.push( dojo.connect($("worker_"+w),'onclick', this, 'onClickPossibleworker'));
-                }
-                
-            },
-
-            showPossibleSpaces: function(worker_id) {
-                this.clearPossible();
-                for (var i in this.gamedatas.gamestate.args.spaces) {
-                    var possible = this.gamedatas.gamestate.args.spaces[i];
-                    var coords = this.getCoords(possible.x, possible.y);
-                    var possibleHtml = this.format_block('jstpl_possible', {
-                        id: i,
-                        z: possible.z,
-                        style: coords.style,
-                        label: possible.z,
-                    });
-                    var possibleEl = dojo.place(possibleHtml, 'map_scrollable_oversurface');
-                }
-                dojo.query('.face.possible').connect('onclick', this, 'onClickPossibleSpaces');
+                }              
             },
 
             showPossibleBuilding: function() {
                 this.clearPossible();
-                var options = this.gamedatas.gamestate.args.options;
-                var tile_id = this.gamedatas.gamestate.args.tile_id;
-                var subface = this.gamedatas.gamestate.args.subface;
-
-                var possibleEl = dojo.place("<div id='buildPalette' class='palette possible'></div>", "hex_" + tile_id + "_" + subface);
-                dojo.place("<div id='cancelator' style='transform:rotate(0deg)'><span class='facelabel'> ✗ </span></div>", 'buildPalette');
-
-                var option_keys = Object.keys(options);
-                if (option_keys.length == 1) {
-                    var option_nbr = option_keys[0];
-                    this.onClickPossibleBuilding(null, option_nbr);
-                } else {
-                    for (var option_nbr in options) {
-                        var spaces = options[option_nbr];
-                        var bldg_type = Math.floor(option_nbr / 10);
-                        var possibleHtml = this.format_block('jstpl_building_' + bldg_type, {
-                            colorName: 'tempbuilding'
-                        });
-                        if (bldg_type == HUT) {
-                            var hutCount = spaces.reduce(function(sum, space) {
-                                return sum + space.z;
-                            }, 0);
-                            possibleHtml += "<span class='facelabel'>" + hutCount + "</span>";
-                        }
-                        dojo.place("<div id='rota_" + option_nbr + "' class='rotator' style='transform:rotate(0deg)' >" + possibleHtml + "</div>", 'buildPalette');
-                        dojo.query('#rota_' + option_nbr).connect('onclick', this, 'onClickPossibleBuilding');
-                    }
-
-                    for (var k = 0; k < $('buildPalette').children.length; k++) {
-                        $('buildPalette').children[k].style.animation = "rotator" + (k + 1) + " 1.5s ease forwards 1";
-                    }
-                    dojo.query('#cancelator').connect('onclick', this, 'onClickCancelBuilding');
+				for (var s in this.gamedatas.gamestate.args.neighbouring_spaces) {
+                    var thisSpace = this.gamedatas.spaces[s];
+                    newtarget = dojo.place(this.format_block('jstpl_buildtarget', {
+						id: s												
+						}), 'mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z );
+					this.handles.push( dojo.connect(newtarget,'onclick', this, 'onClickBuildTarget'));
                 }
+                
             },
 
             ///////////////////////////////////////////////////
@@ -690,112 +643,82 @@ define([
 						id: thisSpace,
 						worker: worker_id						
 						}), 'mapspace_'+thisWorker.x+'_'+thisWorker.y+'_'+thisWorker.z );
-					
+					this.handles.push( dojo.connect(newtarget,'onclick', this, 'onClickMoveTarget'));
 				}
                 this.removeActionButtons();
                 this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
             },
 
-            onClickRotateTile: function(evt) {
+            onClickCancelMove: function(evt) {
                 dojo.stopEvent(evt);
-
-                // Determine new rotation
-                var rotations = this.tryTile.possible.r;
-                var index = rotations.indexOf(this.tryTile.r);
-                this.tryTile.r = rotations[(index + 1) % rotations.length];
-
-                // Apply to tile
-                var tileEl = $('tile_' + this.tryTile.tile_id);
-                tileEl.style.transform = null;
-                dojo.removeClass(tileEl, 'rotate0 rotate60 rotate120 rotate180 rotate240 rotate300');
-                dojo.addClass(tileEl, 'rotate' + this.tryTile.r);
+               
             },
 
-            onClickCancelTile: function(evt) {
+            onClickMoveTarget: function(evt) {
                 dojo.stopEvent(evt);
-                if (this.tryTile != null) {
-                    var player_id = this.getActivePlayerId();
-                    var tileEl = $('tile_' + this.tryTile.tile_id);
-                    this.removeTile(tileEl);
-                    this.showPossibleTile();
-                }
+				if( this.checkAction( 'move' ) )    // Check that this action is possible at this moment
+				{           
+					var idParts = evt.currentTarget.className.split(/[_ ]/);
+					worker_id = idParts[1];
+				
+					var coords = evt.currentTarget.parentElement.id.split('_');
+					x = coords[1];
+					y = coords[2];
+					z = coords[3];
+					this.ajaxcall( "/santorini/santorini/move.html", {
+						worker_id:worker_id,
+						x:x,
+						y:y,
+						z:z
+					}, this, function( result ) {} );
+				}            
+                this.clearPossible();
             },
-
-            onClickCommitTile: function(evt) {
+			
+			onClickPlaceTarget: function(evt) {
                 dojo.stopEvent(evt);
-                if (this.tryTile == null) {
-                    this.showMessage(_('You must place a tile.'), 'error');
-                    return;
-                }
-                this.doAction('commitTile', this.tryTile);
+				if( this.checkAction( 'place' ) )    // Check that this action is possible at this moment
+				{           
+					var idParts = evt.currentTarget.className.split(/[_ ]/);
+					worker_id = idParts[1];
+				
+					var coords = evt.currentTarget.parentElement.id.split('_');
+					x = coords[1];
+					y = coords[2];
+					z = coords[3];
+					this.ajaxcall( "/santorini/santorini/place.html", {
+						x:x,
+						y:y,
+						z:z
+					}, this, function( result ) {} );
+				}            
+                this.clearPossible();
             },
+			
 
             /////
             // Building actions
             /////
 
-            onClickPossibleSpaces: function(evt) {
+            onClickBuildTarget: function(evt) {
                 dojo.stopEvent(evt);
+				if( this.checkAction( 'build' ) )    // Check that this action is possible at this moment
+				{           
+					var idParts = evt.currentTarget.id.split(/[_ ]/);
+					space_id = idParts[1];
+				
+					var coords = evt.currentTarget.parentElement.id.split('_');
+					x = coords[1];
+					y = coords[2];
+					z = coords[3];
+					this.ajaxcall( "/santorini/santorini/build.html", {
+						x:x,
+						y:y,
+						z:z
+					}, this, function( result ) {} );
+				}            
                 this.clearPossible();
-
-                var idParts = evt.currentTarget.id.split('_');
-                var possible = this.gamedatas.gamestate.args.spaces[idParts[1]];
-                console.log('Select space [' + possible.x + ',' + possible.y + ',' + possible.z + ']');
-                this.doAction('selectSpace', {
-                    x: possible.x,
-                    y: possible.y,
-                    z: possible.z,
-                    tile_id: possible.tile_id,
-                    subface: possible.subface
-                })
             },
-
-            onClickPossibleBuilding: function(evt, option_nbr) {
-                this.clearPossible();
-                if (option_nbr == null) {
-                    dojo.stopEvent(evt);
-                    var idParts = evt.currentTarget.id.split('_');
-                    option_nbr = idParts[1];
-                }
-                this.tryBuilding = {
-                    x: this.gamedatas.gamestate.args.x,
-                    y: this.gamedatas.gamestate.args.y,
-                    z: this.gamedatas.gamestate.args.z,
-                    option_nbr: +option_nbr,
-                };
-                var bldg_type = Math.floor(option_nbr / 10);
-                var spaces = this.gamedatas.gamestate.args.options[option_nbr];
-                console.log('Trying building option ' + option_nbr + ' at [' + this.tryBuilding.x + ',' + this.tryBuilding.y + ',' + this.tryBuilding.z + ']');
-
-                // Create temp buildings
-                for (var b in spaces) {
-                    var possible = spaces[b];
-                    this.placeBuilding({
-                        x: possible.x,
-                        y: possible.y,
-                        z: possible.z,
-                        tile_id: possible.tile_id,
-                        subface: possible.subface,
-                        bldg_type: bldg_type,
-                    });
-                }
-                dojo.query('.tempbuilding').connect('onclick', this, 'showPossibleBuilding');
-            },
-
-            onClickCancelBuilding: function(evt) {
-                dojo.query(".tempbuilding").forEach(dojo.destroy);
-                this.doAction("cancel");
-            },
-
-            onClickCommitBuilding: function(evt) {
-                dojo.stopEvent(evt);
-                if (this.tryBuilding == null) {
-                    this.showMessage(_('You must place a building.'), 'error');
-                    return;
-                }
-                this.doAction('commitBuilding', this.tryBuilding);
-            },
-
 
             ///////////////////////////////////////////////////
             //// Reaction to cometD notifications
@@ -810,67 +733,40 @@ define([
 
             */
             setupNotifications: function() {
-                dojo.subscribe('draw', this, 'notif_draw');
-                dojo.subscribe('commitTile', this, 'notif_tile');
-                dojo.subscribe('commitBuilding', this, 'notif_building');
+                dojo.subscribe('blockBuilt', this, 'notif_building');
+				this.notifqueue.setSynchronous('blockBuilt', 2000);
+                dojo.subscribe('workerPlaced', this, 'notif_workerPlaced');
+				this.notifqueue.setSynchronous('workerPlaced', 2000);
+                dojo.subscribe('workerMoved', this, 'notif_moveworker');
+				this.notifqueue.setSynchronous('workerMoved', 2000);
             },
 
-            notif_draw: function(n) {
-                console.log('notif_draw', n.args);
-
-                // Show preview tile
-                var player_id = n.args.player_id;
-                if (n.args.tile_type) {
-                    var tileEl = this.createTile({
-                        tile_id: 'p_' + player_id,
-                        tile_type: n.args.tile_type
-                    });
-                    dojo.place(tileEl, 'preview_' + player_id, 'only');
-                    dojo.removeClass('preview_' + player_id, 'unknown');
-                } else {
-                    $('preview_' + player_id).innerHTML = '';
-                    dojo.addClass('preview_' + player_id, 'unknown');
-                }
-
-                // Update remaining tile counter
-                if (n.args.remain != null) {
-                    $('count_remain').innerText = n.args.remain;
-                }
-            },
-
-            notif_tile: function(n) {
+            notif_workerPlaced: function(n) {
                 console.log('notif_tile', n.args);
                 var player_id = this.getActivePlayerId();
                 var player = this.gamedatas.players[player_id];
-                var colorClass = 'prior-move-' + player.colorName;
-
-                // Create tile
-                var tileEl = this.createTile(n.args);
-                this.placeOnObject(tileEl, 'tile_p_' + player_id);
-                dojo.query('.tile.' + colorClass).removeClass(colorClass)
-                dojo.addClass(tileEl, colorClass);
-
-                // Move into position
-                var coords = this.getCoords(n.args.x, n.args.y);
-                this.positionTile(tileEl, coords);
-
-                // Destroy preview
-                var previewEl = $('tile_p_' + player_id);
-                this.removeTile(previewEl);
+				thisPiece = this.gamedatas.available_pieces[n.args.worker_id]
+                var pieceEl = this.createPiece(thisPiece);
+				thisSpace = this.gamedatas.spaces[n.args.space_id];
+				targetEL = $('mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z);
+                this.positionPiece (pieceEl, targetEL);
             },
 
             notif_building: function(n) {
                 console.log('notif_building', n.args);
-                this.updatePlayerCounters(n.args);
-                for (var i in n.args.buildings) {
-                    var building = n.args.buildings[i];
-                    this.placeBuilding(building);
-                }
+                var player_id = this.getActivePlayerId();
+                var player = this.gamedatas.players[player_id];
+				thisPiece = this.gamedatas.available_pieces[n.args.block.id]
+                var pieceEl = this.createPiece(thisPiece);
+				thisSpace = this.gamedatas.spaces[n.args.space_id];
+				targetEL = $('mapspace_'+thisSpace.x+'_'+thisSpace.y+'_'+thisSpace.z);
+                this.positionPiece (pieceEl, targetEL);
             },
 
             notif_moveworker : function(notif) {
-				var destination = notif.args.destination;
-				this.slideToObjectAbsolute('card_'+notif.args.card_id, 'sky' ,0,0, 1000, 1 , dojo.hitch( this ,function(){ this.slideToObjectAbsolute('card_'+notif.args.card_id, destination,0,0, 1000 )}));
+				thisSpace= this.gamedatas.spaces[notif.args.space_id];
+				var destination = "mapspace_"+thisSpace.x+"_"+thisSpace.y+"_"+thisSpace.z;
+				this.slideToObjectAbsolute('worker_'+notif.args.worker_id, 'sky' ,0,0, 1000, 1 , dojo.hitch( this ,function(){ this.slideToObjectAbsolute('worker_'+notif.args.worker_id, destination,0,0, 1000 )}));
 			},
         });
     });

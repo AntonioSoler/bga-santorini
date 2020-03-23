@@ -1,7 +1,7 @@
 /**
  *------
  * BGA framework: (c) Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * santorini implementation : (c) quietmint & Morgalad
+ * santorini implementation : (c) Morgalad
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -51,7 +51,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 #playArea {
-  margin: 15px;
+  /* margin: 15px; */
   height: 1100px;
   width: 1200px;
   display: block;
@@ -121,6 +121,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 
 #map_container {
   position: absolute;
+  display: block;
   width: 100%;
   height: 100%;
   background: url(img/background.jpg);
@@ -142,10 +143,8 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   background-size:contain;
   width: 600px;
   height: 600px;
-  top: 280px;
-  left: 300px;
-  transform: translateZ(80px);
-  cursor: move;
+  transform: translate3d(300px,280px,80px);
+  display: block;
 }
 #map_surface:after {
   content:"";
@@ -154,32 +153,35 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   background-size:contain;
   width: 600px;
   height: 600px;
-  top: 0px;
-  left: 0px;
+  /* top: 0px; */
+  /* left: 0px; */
   transform:translateZ(-5px);
 }
 
 .maplevel {
   position: absolute;
-  padding: 2em;
-  /* width: 100%; */
-  /* height: 100%; */
+  /* padding: 2em; */
+  /* top: 30px; */
+  /* left: 30px; */
+  width: 100%;
+  height: 100%;
   /* box-shadow: inset 0px 0px 1px 2px #f5ec40; */
+  pointer-events: none;
 }
 #map_level0{
-  transform:translateZ(0px);
+  transform: translate3d(30px,30px,0px);
 }
 
 #map_level1{
-  transform:translateZ(60px);
+  transform: translate3d(30px,30px,62px);
 }
 
 #map_level2{
-  transform:translateZ(105px);
+  transform: translate3d(30px,30px,105px);
 }
 
 #map_level3{
-  transform:translateZ(135px);
+  transform: translate3d(30px,30px,140px);
 }
 .mapspace {
   position: absolute;
@@ -248,10 +250,10 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 .activeworker #figurefoot {
-  
   animation: activefoot 1000ms infinite;
 }
 .activeworker{
+  cursor: pointer;
  pointer-events: auto !important; 
 }
 
@@ -262,16 +264,16 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 
 #sky{
   position: absolute;
-  transform-origin: center center;
+  transform-origin: top left;
   transform-style: preserve-3d;
   width: 100px;
   height: 100px;
-  transform: translate3d(250px, 250px, 250px);
-  box-shadow: inset 0px 0px 1px 15px #25f3f3;
+  transform: translate3d(250px, 250px, 500px);
+  /*  box-shadow: inset 0px 0px 1px 15px #25f3f3; */
 }
 
 .level1 {
-  transform: translateZ(80px);
+  transform: translateZ(3px);
   position: absolute;
   width: 100px;
   height: 100px;
@@ -405,7 +407,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 .level2 {
-  transform: translateZ(140px);
+  transform: translateZ(0px);
   position: absolute;
   width: 100px;
   height: 100px;
@@ -478,7 +480,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 .level3 {
-  transform: translateZ(185px) scale(0.8);
+  transform: translateZ(6px) scale(0.8);
   transform-origin:center center;
   position: absolute;
   width: 100px;
@@ -492,7 +494,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 
 .level3:after {
   content:"";
-  transform: translateZ(1px);
+  transform: translateZ(-2px);
   position: absolute;
   width: 100px;
   height: 100px;
@@ -617,7 +619,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 }
 
 .dome {
-  transform: translateZ(216px) scale3d(0.75,0.75,0.75);
+  transform: translateZ(3px) scale3d(0.75,0.75,0.75);
   transform-origin:center center;
   position: absolute;
   width: 100px;
@@ -687,8 +689,8 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 
 .worker {
     position: absolute;
-    top:0px;
-	width: 100px;
+    /* top:0px; */
+    width: 100px;
     height: 100px;
     transform-style: preserve-3d;
 }
@@ -696,17 +698,21 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 .woman {
     width: 70px;
     height: 70px;
+    left: 30px;
+    top: 30px;
     transform-style: preserve-3d;
     transform: translatez(4px) scale3d(0.15,0.15,0.15);
-    transform-origin: center center;
+    /* transform-origin: center center; */
 }
 
 .man {
     width: 70px;
     height: 70px;
+    left: 30px;
+    top: 30px;
     transform-style: preserve-3d;
     transform: translatez(4px) scale3d(0.15,0.15,0.15);
-    transform-origin: center center;
+    
 }
 
 #figurefoot{
@@ -735,6 +741,22 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
     /* box-shadow: 0px 0px 20px 20px rgba(0, 0, 0, 0.45); */
     pointer-events: auto !important;
 	cursor: pointer;
+	border: solid purple 1px;
+}
+
+.buildtarget{
+    position: absolute;
+    transform: translateZ(2px) scale3d(0.8,0.8,0.8);
+    transform-origin: center center;
+    width: 99px;
+    height: 99px;
+    transform-style: preserve-3d;
+    animation: movetargetanim 1500ms infinite;
+    /* box-shadow: 0px 0px 20px 20px rgba(0, 0, 0, 0.45); */
+    pointer-events: auto !important;
+    cursor: pointer;
+    border: solid purple 1px;
+    border-radius: 10px;
 }
 
 @keyframes movetargetanim {

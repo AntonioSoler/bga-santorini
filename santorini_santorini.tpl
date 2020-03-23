@@ -7,6 +7,7 @@
 			<div id="base_side3" class="baseside"></div>
 			<div id="base_side4" class="baseside"></div>
 			<div id="map_surface">
+			    <div id="sky"></div>
 				<div id="map_level0" class="maplevel">
 						<div id="mapspace_0_0_0" class="mapspace" style="transform:translate3d(  5px,   5px,  0px);"></div>
 						<div id="mapspace_1_0_0" class="mapspace" style="transform:translate3d(110px,   5px,  0px);"></div>
@@ -115,7 +116,6 @@
 						<div id="mapspace_3_4_3" class="mapspace" style="transform:translate3d(320px, 425px,  0px);"></div>
 						<div id="mapspace_4_4_3" class="mapspace" style="transform:translate3d(425px, 425px,  0px);"></div>
 				</div>
-				<div id="sky"></div>
 			</div>
 		</div>	
 	</div>
@@ -142,12 +142,12 @@
 </div>\
 <div id="preview_${id}" class="preview"></div>';
 
-  // Level 1
-  var jstpl_level_1 = '<div id="building_${id}" class="level1"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
+  // Level 1  style="transform-origin: center center;transform: rotate(${angle}deg);"
+  var jstpl_level1 = '<div id="building_${id}" class="level1" style="transform-origin: center center;transform: rotate(${angle}deg);" ><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
   // Level 2
-  var jstpl_level_2 = '<div id="building_${id}" class="level2"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
+  var jstpl_level2 = '<div id="building_${id}" class="level2" style="transform-origin: center center;transform: rotate(${angle}deg);" ><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
   // Level 1
-  var jstpl_level_1 = '<div id="building_${id}" class="level3"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
+  var jstpl_level3 = '<div id="building_${id}" class="level3"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
   // dome
   var jstpl_dome = '<div id="building_${id}" class="dome"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
 
@@ -159,7 +159,7 @@
   // WorkerTarget
   var jstpl_movetarget = '<div id="movetarget_${id}" class="worker_${worker} movetarget" ></div>';
   //
-  var jstpl_buildtarget = '<div id="buildtarget_${id}" class="buildtarget" space="${id}" x="${x}" y="${y}" z="${y}"></div>';
+  var jstpl_buildtarget = '<div id="buildtarget_${id}" class="buildtarget" ></div>';
   
 </script>
 

@@ -341,6 +341,7 @@ class santorini extends Table
         $block_id = $block['id'];
 
         self::DbQuery( "UPDATE board SET piece_id = '$block_id' WHERE x = '$x' AND y = '$y' AND z = '$z'" );
+		self::DbQuery( "UPDATE piece SET card_location = 'board' WHERE card_id = $block_id " );
 
         // Reset moved worker
         self::setGamestateValue( 'moved_worker', 0 );
