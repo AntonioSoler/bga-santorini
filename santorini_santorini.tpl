@@ -143,9 +143,9 @@
 <div id="preview_${id}" class="preview"></div>';
 
   // Level 1  style="transform-origin: center center;transform: rotate(${angle}deg);"
-  var jstpl_level1 = '<div id="building_${id}" class="level1" style="transform-origin: center center;transform: rotate(${angle}deg);" ><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
+  var jstpl_level1 = '<div id="building_${id}" class="level1"><div class="rotator" style="transform-origin: center center;transform: rotate(${angle}deg);"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div></div>';
   // Level 2
-  var jstpl_level2 = '<div id="building_${id}" class="level2" style="transform-origin: center center;transform: rotate(${angle}deg);" ><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
+  var jstpl_level2 = '<div id="building_${id}" class="level2"><div class="rotator" style="transform-origin: center center;transform: rotate(${angle}deg);"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div></div>';
   // Level 1
   var jstpl_level3 = '<div id="building_${id}" class="level3"><div class="side1"></div><div class="side2"></div><div class="side3"></div><div class="side4"></div></div>';
   // dome

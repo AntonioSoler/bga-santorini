@@ -282,6 +282,13 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
   backface-visibility: hidden;
 }
 
+.rotator {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  backface-visibility: hidden;
+}
+
 .level1:after {
   content:"";
   transform: translateZ(6px);
@@ -419,13 +426,13 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 
 .level2:before {
   content:"";
-   transform: translateZ(45px) scale(0.8);
+  transform: translateZ(45px) scale(0.8);
   transform-origin:center center;
   position: absolute;
   width: 100px;
   height: 100px;
   background: url( img/buildings.png);
-  background-position:bottom left;
+  background-position: -100px 100px;
   background-size: 500% 375%;
   border-radius:1%;
 }
@@ -632,58 +639,58 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
 
 .dome:after {
   content:"";
-  transform: translateZ(19px) scale3d(0.75,0.75,0.75);
+  transform: translateZ(26px) scale3d(0.7,0.7,0.7);
   transform-origin:center center;
   position: absolute;
   width: 100px;
   height: 100px;
-  background: RoyalBlue  ;
+  background: RoyalBlue;
   background-size: 500% 375%;
   border-radius:100%;
 }
 
 .dome .side1{
   left: 50px;
-  transform: rotatey(-90deg) scale3d(0.6,1,1);
+  transform: rotatey(-90deg) scale3d(0.8,1,1);
   transform-origin: left center;
   position: absolute;
   width: 45px;
   height: 100px;
-  background: RoyalBlue;
+  background: royalblue;
   background-position:bottom right;
   border-radius: 0px 50px 50px 0px;
 }
 
 .dome .side2{
   top: 5px;
-  transform: rotatex(-90deg) scale3d(1,0.6,1);
+  transform: rotatex(-90deg) scale3d(1,0.8,1);
   transform-origin: bottom center;
   position: absolute;
   width: 100px;
   height: 45px;
-  background: RoyalBlue  ;
+  background: royalblue;
   border-radius: 50px 50px 0px 0px;
 }
 
 .dome .side3{
   top: 5px;
-  transform: rotatex(-90deg) rotatey(-45deg) scale3d(1,0.6,1);
+  transform: rotatex(-90deg) rotatey(-45deg) scale3d(1,0.8,1);
   transform-origin: bottom center;
   position: absolute;
   width: 100px;
   height: 45px;
-  background: RoyalBlue  ;  
+  background: RoyalBlue;
   border-radius: 50px 50px 0px 0px;
 }
 
 .dome .side4{
   top: 5px;
-  transform: rotatex(-90deg) rotatey(45deg) scale3d(1,0.6,1);
+  transform: rotatex(-90deg) rotatey(45deg) scale3d(1,0.8,1);
   transform-origin: bottom center;
   position: absolute;
   width: 100px;
   height: 45px;
-  background: RoyalBlue  ;  
+  background: royalblue;
   border-radius: 50px 50px 0px 0px;
 }
 
@@ -740,7 +747,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
     animation: movetargetanim 1500ms infinite;
     /* box-shadow: 0px 0px 20px 20px rgba(0, 0, 0, 0.45); */
     pointer-events: auto !important;
-	cursor: pointer;
+	cursor: pointer !important;
 	border: solid purple 1px;
 }
 
@@ -754,7 +761,7 @@ background: center center no-repeat , radial-gradient(#012138 30%, #0c4966, #012
     animation: movetargetanim 1500ms infinite;
     /* box-shadow: 0px 0px 20px 20px rgba(0, 0, 0, 0.45); */
     pointer-events: auto !important;
-    cursor: pointer;
+    cursor: pointer !important;
     border: solid purple 1px;
     border-radius: 10px;
 }

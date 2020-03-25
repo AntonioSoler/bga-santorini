@@ -194,10 +194,9 @@ define([
             //
             onLeavingState: function(stateName) {
                 console.info('Leaving state: ' + stateName);
-                if (stateName == 'tile' || stateName == 'building') {
+                
                     this.clearPossible();
-                    dojo.query(".tempbuilding").forEach(dojo.destroy);
-                }
+                
             },
 
             // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
@@ -206,15 +205,10 @@ define([
             onUpdateActionButtons: function(stateName, args) {
                 console.info('Update action buttons: ' + stateName, args);
                 if (this.isCurrentPlayerActive()) {
-                    if (stateName == 'tile') {
-                        if (this.tryTile) {
-                            this.addActionButton('button_reset', _('Cancel'), 'onClickCancelTile', null, false, 'gray');
-                            this.addActionButton('button_commit', _('Done'), 'onClickCommitTile');
-                        }
-                    } else if (stateName == 'building') {
-                        this.addActionButton('button_reset', _('Cancel'), 'onClickCancelBuilding', null, false, 'gray');
-                        this.addActionButton('button_commit', _('Done'), 'onClickCommitBuilding');
-                    }
+                    if (stateName == 'playerMove') {
+                            this.addActionButton('button_reset', _('Cancel'), 'onClickCancelMove', null, false, 'gray');
+                            
+                    }	
                 }
             },
 
@@ -593,7 +587,7 @@ define([
 
             clearPossible: function() {
                 this.removeActionButtons();
-                this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
+                //this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
                 dojo.query('.movetarget').forEach(dojo.destroy);
                 dojo.query('.buildtarget').forEach(dojo.destroy);
 				dojo.forEach(this.handles, dojo.disconnect)
@@ -645,12 +639,14 @@ define([
 						}), 'mapspace_'+thisWorker.x+'_'+thisWorker.y+'_'+thisWorker.z );
 					this.handles.push( dojo.connect(newtarget,'onclick', this, 'onClickMoveTarget'));
 				}
-                this.removeActionButtons();
+                
                 this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
             },
 
             onClickCancelMove: function(evt) {
                 dojo.stopEvent(evt);
+				this.clearPossible();
+				this.activateworkers();
                
             },
 
@@ -673,6 +669,7 @@ define([
 					}, this, function( result ) {} );
 				}            
                 this.clearPossible();
+				this.removeActionButtons();
             },
 			
 			onClickPlaceTarget: function(evt) {
@@ -766,7 +763,7 @@ define([
             notif_moveworker : function(notif) {
 				thisSpace= this.gamedatas.spaces[notif.args.space_id];
 				var destination = "mapspace_"+thisSpace.x+"_"+thisSpace.y+"_"+thisSpace.z;
-				this.slideToObjectAbsolute('worker_'+notif.args.worker_id, 'sky' ,0,0, 1000, 1 , dojo.hitch( this ,function(){ this.slideToObjectAbsolute('worker_'+notif.args.worker_id, destination,0,0, 1000 )}));
+				this.slideToObjectAbsolute('worker_'+notif.args.worker_id, 'sky' ,0,0, 800, 0 , dojo.hitch( this ,function(){ this.slideToObjectAbsolute('worker_'+notif.args.worker_id, destination,0,0, 800 )}));
 			},
         });
     });

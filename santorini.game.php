@@ -178,8 +178,8 @@ class santorini extends Table
 
     public function getAccessibleSpaces()
     {
-        $unoccupied =  self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id FROM board WHERE piece_id is null ORDER BY x ASC, y ASC, z ASC');
-
+        $unoccupied =  self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id FROM board WHERE piece_id is null and ( x , y ) NOT IN ( SELECT x , y  FROM board JOIN piece on piece_id=piece.card_id WHERE card_type LIKE "worker%" and piece_id is not null ) ORDER BY x ASC, y ASC, z ASC');
+                         // UPDATED: checking that there is no worker on an empty space below
         $accessible = array();
         $x = null;
         $y = null;
@@ -390,7 +390,7 @@ class santorini extends Table
 
         $destinations = array();
         foreach ($workers as $worker_id => $worker) {
-            $destinations[$worker_id] = self::getNeighbouringSpaces($worker_id);
+            $destinations[$worker_id] = self::getNeighbouringSpaces($worker_id, true);
         }
         
         $result = array( 'destinations_by_worker' => $destinations );
@@ -453,7 +453,17 @@ class santorini extends Table
     public function stCheckEndOfGame()
     {
         // TODO: active player reached level 3 or active player cannot move or active player cannot build
-    }
+		$positions =  self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id, card_type , card_location_arg FROM board JOIN piece on piece_id=piece.card_id WHERE piece_id is not null AND card_type like "worker%" and z=3');
+		if ( sizeof( $positions ) > 0 ) {
+			foreach( $positions as $space_id => $space ) {
+				self::notifyAllPlayers('message', clienttranslate('A worker reached the top level of a building.'), array());
+				//var_dump( $space );
+				self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $space['card_location_arg'] );
+				$this->gamestate->nextState('endgame');
+            
+            }
+		}
+	}
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie
