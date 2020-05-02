@@ -67,10 +67,10 @@ class santorini extends Table
         $pieces[] = array('type' => 'worker_white', 'type_arg' => 0, 'nbr' => 1);
 		$pieces[] = array('type' => 'worker_blue', 'type_arg' => 1, 'nbr' => 1);
         $pieces[] = array('type' => 'worker_white', 'type_arg' => 1, 'nbr' => 1);
-        $pieces[] = array('type' => 'dome', 'type_arg' => 0, 'nbr' => 18);
-        $pieces[] = array('type' => 'level1', 'type_arg' => 0, 'nbr' => 22);
-        $pieces[] = array('type' => 'level2', 'type_arg' => 0, 'nbr' => 18);
-        $pieces[] = array('type' => 'level3', 'type_arg' => 0, 'nbr' => 14);
+        $pieces[] = array('type' => 'dome', 'type_arg' => 0, 'nbr' => 25);
+        $pieces[] = array('type' => 'level1', 'type_arg' => 0, 'nbr' => 25);
+        $pieces[] = array('type' => 'level2', 'type_arg' => 0, 'nbr' => 25);
+        $pieces[] = array('type' => 'level3', 'type_arg' => 0, 'nbr' => 25);
         $this->pieces->createCards($pieces, 'deck', 0);
 
         // Init board (tridimensional 5x5x4)
