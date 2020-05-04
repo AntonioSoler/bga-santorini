@@ -3,7 +3,7 @@
 
 Languages: PHP JS SQL CSS
 
-(c) 2018 Nick Venturella & Antonio Soler
+(c) 2020 Nick Venturella & Antonio Soler & Timothée Pecatte
 
 This work is done using licensed material from Roxley Games and SpinMaster with their agreement:
 
