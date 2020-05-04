@@ -31,9 +31,6 @@ class santorini extends Table
     parent::__construct();
 
     self::initGameStateLabels(array(
-    'selection_x' => 10,
-    'selection_y' => 11,
-    'selection_z' => 12,
     'moved_worker' => 13,
     'variant_powers' => 100,
     ));
@@ -53,9 +50,6 @@ class santorini extends Table
  */
 protected function setupNewGame($players, $options = array())
 {
-  self::setGameStateInitialValue('selection_x', 0);
-  self::setGameStateInitialValue('selection_y', 0);
-  self::setGameStateInitialValue('selection_z', 0);
   self::setGameStateInitialValue('moved_worker', 0);
 
 
@@ -90,13 +84,9 @@ protected function setupNewGame($players, $options = array())
  */
 protected function getAllDatas()
 {
-  // TODO to remove ?
-  $player_id = self::getCurrentPlayerId();
-
   return [
     'players' => $this->getPlayers(),
     'placedPieces' => $this->getPlacedPieces(),
-    'availablePieces' => $this->getAvailablePieces(),
     'movedWorker' => self::getGamestateValue('moved_worker'),
   ];
 }
@@ -111,7 +101,6 @@ public function getGameProgression()
   // TODO
   // Number of pieces on the board / total number of pieces
   $nbr_placed = count(self::getPlacedPieces());
-  $nbr_available = count(self::getAvailablePieces());
 
   return 0.3;
 //    return $nbr_placed / ($nbr_placed+$nbr_available);
@@ -123,49 +112,67 @@ public function getGameProgression()
 //////////// Utility functions ////////////
 ///////////////////////////////////////////
 
+/*
+ * getPlayers: return all basic infos about all players
+ */
 public function getPlayers()
 {
   return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated FROM player");
 }
 
-public function getPlayer($player_id)
+/*
+ * getPlayer: return all basic infos about one player
+ * params: int $pId -> player id
+ */
+public function getPlayer($pId)
 {
   return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated FROM player WHERE player_id = $player_id");
 }
 
 
+/*
+ * getPlacedPieces: return all pieces on the board
+ */
 public function getPlacedPieces()
 {
   return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board'");
 }
 
-public function getAvailablePieces()
-{
-  return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'deck'");
-}
 
-
+/*
+ * getAvailableWorkers: return all available workers
+ * opt params : int $pId -> if specified, return only available workers of corresponding player
+ */
 public function getAvailableWorkers($pId = -1)
 {
   return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' ".($pId == -1? "" : "AND player_id = '$pId'") );
 }
 
-public function getWorkers($pId = -1)
+/*
+ * getPlacedWorkers: return all placed workers
+ * opt params : int $pId -> if specified, return only placed workers of corresponding player
+ */
+public function getPlacedWorkers($pId = -1)
 {
   return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' ".($pId == -1? "" : "AND player_id = '$pId'") );
 }
 
+
+/*
+ * getPiece: return all info about a piece
+ * params : int $id
+ */
 public function getPiece($id)
 {
   return self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$id'");
 }
 
 
+
 /*
  * getBoard:
  *   return a 3d matrix reprensenting the board with all the placed pieces
  */
-
 public function getBoard(){
   // Create an empty 5*5*4 board
   $board = [];
@@ -343,7 +350,6 @@ public function moveWorker($wId, $x, $y, $z)
  * build: build a piece to a location on the board
  *  - int $x,$y,$z : the location on the board
  */
-
 public function build($x, $y, $z)
 {
   self::checkAction('build');
@@ -415,7 +421,7 @@ public function argPlaceWorker()
 public function argPlayerMove()
 {
   // Return for each worker of this player the spaces he can move to
-  $workers = $this->getWorkers( self::getActivePlayerId() );
+  $workers = $this->getPlacedWorkers( self::getActivePlayerId() );
   foreach ($workers as &$worker)
     $worker["accessibleSpaces"] = self::getNeighbouringSpaces($worker, 'moving');
 
@@ -469,17 +475,27 @@ public function stNextPlayerPlaceWorker()
 }
 
 
+/*
+ * stNextPlayer:
+ *   go to next player
+ */
 public function stNextPlayer()
 {
-$player_id = $this->activeNextPlayer();
-
-self::giveExtraTime($player_id);
-
-$this->gamestate->nextState('next');
+  $pId = $this->activeNextPlayer();
+  self::giveExtraTime($pId);
+  $this->gamestate->nextState('next');
 }
 
+
+/*
+ * stCheckEndOfGame:
+ *   check if winning condition has been achieved by one of the player
+ */
+// TODO: add the losing condition : active player player cannot build
+// TODO : the winning condition is not correct : we have to check the level 3 has been achieved by a UP movement during player turn
+// (important for some gods that can push players or swap places, ...)
 public function stCheckEndOfGame()
-{   // TODO: active player player cannot build
+{
 /*
 $player_id = self::getActivePlayerId();
 $state=$this->gamestate->state();

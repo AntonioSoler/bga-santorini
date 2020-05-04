@@ -34,9 +34,7 @@ define([
  * Constructor
  */
 constructor: function() {
-	this.hexWidth = 84;
-	this.hexHeight = 71;
-	this.tryTile = null;
+
 },
 
 /*
@@ -59,8 +57,6 @@ setup: function(gamedatas) {
 		for (var player_id in gamedatas.players) {
 			var player = gamedatas.players[player_id];
 			player.colorName = colorNames[player.color];
-			//dojo.place(this.format_block('jstpl_player_board', player), 'player_board_' + player_id);
-			//this.updatePlayerCounters(player);
 		}*/
 
 	// Setup workers and buildings
@@ -153,53 +149,10 @@ onUpdateActionButtons: function(stateName, args) {
 ///////////////////////////////////////
 
 /*
- * doAction:
- * 	TODO description ?
- * params :
- *  - action: TODO
- *  - args: TODO
- */
-doAction: function(action, args) {
-	if (this.checkAction(action)) {
-		console.info('Taking action: ' + action, args);
-		args = args || {};
-		//args.lock = true; TODO remove ?
-
-		this.ajaxcall('/santorini/santorini/' + action + '.html', args, this, function(result) {});
-	}
-},
-
-
-/*
- * delayedExec:
- * 	TODO description ? remove ?
- */
-delayedExec : function(onStart, onEnd, duration, delay) {
-	duration = duration || 500;
-	delay = delay || 0;
-
-	if (this.instantaneousMode) {
-		delay = Math.min(1, delay);
-		duration = Math.min(1, duration);
-	}
-
-	var launch = () => {
-		onStart();
-		if (onEnd)
-			setTimeout(onEnd, duration);
-	};
-
-	if (delay)	setTimeout(launch, delay);
-	else				launch();
-},
-
-
-/*
  * createPiece:
- * 	TODO description ?
+ * 	add a piece to the board (with falldown animation)
  * params:
- *  - piece: TODO
- *  - location: TODO
+ *  - object piece: main infos are type, x,y,z
  */
 createPiece: function(piece) {
 	piece.name = piece.type;
@@ -207,44 +160,28 @@ createPiece: function(piece) {
 		piece.name = piece.type_arg + piece.type;
 
 	this.board.addPiece(piece);
-/*
-	location = location || 'sky';
-
-	if (piece.type.startsWith("worker")){
-		var piecetype = "woman";
-		if ( piece.type_arg == "1" ) { piecetype = "man"; };
-		thispieceEL = dojo.place(this.format_block('jstpl_'+piecetype, {
-		id: piece.id,
-		color: piece.type,
-		player: piece.location_arg
-		}), location );
-		} else {
-
-	//TODO : random rotation
-rand= Math.floor(Math.random() * 4);
-angles = [0,90,180,270];
-thispieceEL = dojo.place(this.format_block('jstpl_'+piece.type, {
-id: piece.id,
-angle: angles[rand]
-}), location );
-}
-
-return thispieceEL;
-*/
 },
 
 
-
+/*
+ * clearPossible:
+ * 	clear every clickable space and any selected worker
+ */
 clearPossible: function() {
 	this.removeActionButtons();
 	this._selectedWorker = null;
 	this.board.clearClickable();
 },
 
+
 //////////////////////////////////////////////////
 //////////////   Player's action   ///////////////
 //////////////////////////////////////////////////
 
+/*
+ * onClickPlaceWorker:
+ * 	triggered after a click on a space to place new worker
+ */
 onClickPlaceWorker: function(space) {
 	// Check that this action is possible at this moment
 	if(! this.checkAction( 'placeWorker' ) )
@@ -255,10 +192,15 @@ onClickPlaceWorker: function(space) {
 	this.ajaxcall( "/santorini/santorini/placeWorker.html", space, this, res => {} );
 },
 
-/////
-// Tile actions
-/////
 
+//////////
+// Move //
+//////////
+
+/*
+ * onClickSelectWorker:
+ * 	triggered after a click on a worker
+ */
 onClickSelectWorker: function(worker) {
 	this.clearPossible();
 	this._selectedWorker = worker;
@@ -267,12 +209,22 @@ onClickSelectWorker: function(worker) {
 	this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 },
 
+/*
+ * onClickCancelSelect:
+ * 	triggered after a click on the action button "buttonReset".
+ *  unselect the previously selected worker and make every worker selectable
+ */
 onClickCancelSelect: function(evt) {
 	dojo.stopEvent(evt);
 	this.clearPossible();
 	this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
 },
 
+/*
+ * onClickMoveWorker:
+ * 	triggered after a click on a space to move the worker
+ *  this shoud happen only if a worker is already selected (this._selectedWorker != null)
+ */
 onClickMoveWorker: function(space) {
 	if( !this.checkAction( 'moveWorker' ) )
 		return;
@@ -288,10 +240,14 @@ onClickMoveWorker: function(space) {
 
 
 
-/////
-// Building actions
-/////
+///////////
+// Build //
+///////////
 
+/*
+ * onClickBuild:
+ * 	triggered after a click on a space to build
+ */
 onClickBuild: function(space) {
 	if( !this.checkAction( 'build' ) )
 		return;
@@ -299,6 +255,7 @@ onClickBuild: function(space) {
 	this.clearPossible();
 	this.ajaxcall( "/santorini/santorini/build.html", space, this, res => {} );
 },
+
 
 ///////////////////////////////////////////////////
 //////   Reaction to cometD notifications   ///////
@@ -317,9 +274,8 @@ setupNotifications: function() {
 
 	dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
 	this.notifqueue.setSynchronous('blockBuilt', 2000);
-
-
 },
+
 
 /*
  * notif_workerPlaced:
