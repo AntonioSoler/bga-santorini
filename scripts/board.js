@@ -20,6 +20,9 @@ const fallAnimation = {
 	duration : 2000
 };
 
+const basicColor 		= 0xfc1645;
+const hoveringColor = 0x000000;
+
 const lvlHeights = [0, 1.24, 2.44, 3.25];
 const xCenters = [-4.2, -2.12, -0.04, 2.12, 4.2];
 const zCenters = [-4.2, -2.12, 0, 2.13, 4.15];
@@ -268,11 +271,15 @@ Board.prototype.raycasting = function(hover){
 		return;
 
 	if(hover){
+		if(space == this._hoveringSpace)
+			return;
+
 		this._hoveringSpace = space;
 		var cell = this._board[space.x][space.y][space.z];
-		cell.planeHover.children[0].material.color.setHex(0xFF0000);
+		this._originalHex = cell.planeHover.children[0].material.color.getHex();
+		cell.planeHover.children[0].material.color.setHex(hoveringColor);
 		if(cell.piece != null)
-			cell.piece.material.emissive.setHex(0xFF0000);
+			cell.piece.material.emissive.setHex(0x333333);
 		document.body.style.cursor = "pointer";
 	}
 	else {
@@ -291,7 +298,7 @@ Board.prototype.clearHovering = function(space){
 		return;
 
 	var cell = this._board[this._hoveringSpace.x][this._hoveringSpace.y][this._hoveringSpace.z];
-	cell.planeHover.children[0].material.color.setHex(0xFFFFFF);
+	cell.planeHover.children[0].material.color.setHex(this._originalHex);
 	if(cell.piece != null)
 		cell.piece.material.emissive.setHex(0x000000);
 	document.body.style.cursor = "default";
@@ -318,7 +325,7 @@ Board.prototype.clearClickable = function(){
 /*
  * Make several spaces/pieces clickable to allow space selection (for placement/moving/building)
  */
-Board.prototype.makeClickable = function(objects, callback){
+Board.prototype.makeClickable = function(objects, callback, action){
 	objects.forEach(o => {
 		// Store the callback into the board
 		this._board[o.x][o.y][o.z].onclick = () => callback(o);
@@ -337,27 +344,51 @@ Board.prototype.makeClickable = function(objects, callback){
 		this._clickable.push(mesh);
 		this._board[o.x][o.y][o.z].planeHover = mesh;
 
-		// Ring animation
-		var ring = new THREE.Mesh(
-			new THREE.CircleGeometry( 0.53, 32 ).rotateX(-Math.PI/2),
-			new THREE.MeshPhongMaterial({
-//					alphaMap: new THREE.TextureLoader().load(this._url + "img/aRing.jpg"),
-					color: 0xFFFFFF,
-					opacity:0.7,
-					transparent: true,
-			})
-		);
-		ring.position.set(0, 0.05, 0);
-		ring.space = mesh.space;
-		this._clickable.push(ring);
-		mesh.add(ring);
-		Tween.get(ring.scale, {	loop:-1, bounce:true }).to({ x: 1.3, z: 1.3, }, 700, Ease.cubicInOut);
 
-		// If there a piece at this location, make it interactive
+		// Create a marker depending on the action and whether there is a piece at this location
 		var piece = this._board[o.x][o.y][o.z].piece;
+		var mark = null;
 		if(piece !== null){
 			piece.space = mesh.space;
 			this._clickable.push(piece);
+
+			// Disk animation
+			mark = new THREE.Mesh(
+				new THREE.CircleGeometry( 0.56, 32 ).rotateX(-Math.PI/2),
+				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.7,	transparent: true, })
+			);
+		}
+		// Show square
+		else if(action == "build"){
+			mark = new THREE.Mesh(
+				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
+				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.3,	transparent: true, })
+			);
+		}
+		// Ring animation
+		else {
+			mark = new THREE.Mesh(
+				new THREE.RingGeometry( 0.4, 0.53, 32 ).rotateX(-Math.PI/2),
+				new THREE.MeshPhongMaterial({	color: basicColor, opacity:1,	transparent: true,	})
+			);
+		}
+
+		// Add the marker as a planeHover child
+		mark.position.set(0, 0.05, 0);
+		mark.space = mesh.space;
+		this._clickable.push(mark);
+		mesh.add(mark);
+
+		// Animate the mark
+		if(piece !== null){
+			Tween.get(mark.scale, {	loop:-1, bounce:true }).to({ x: 1.3, z: 1.3, }, 700, Ease.cubicInOut);
+		}
+		else if (action == "build"){
+			Tween.get(mark.material, {	loop:-1, bounce:true }).to({ opacity:0.7 }, 700, Ease.cubicInOut);
+		}
+		else {
+			Tween.get(mark.position, {	loop:-1, bounce:true }).to({ y:0.2 }, 500, Ease.linear);
+			Tween.get(mark.material, {	loop:-1, bounce:true }).to({ opacity:0.6}, 500, Ease.cubicInOut);
 		}
 	})
 };
