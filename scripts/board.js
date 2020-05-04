@@ -20,7 +20,7 @@ const fallAnimation = {
 	duration : 2000
 };
 
-const basicColor 		= 0xfc1645;
+const basicColor 		= 0xff0034;
 const hoveringColor = 0x000000;
 
 const lvlHeights = [0, 1.24, 2.44, 3.25];

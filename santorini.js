@@ -1,7 +1,7 @@
 /**
 	*------
 	* BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
-	* santorini implementation : (c) Morgalad & 
+	* santorini implementation : (c) Morgalad &
 	*
 	* This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
 	* See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -104,16 +104,16 @@ onEnteringState: function(stateName, args) {
 			throw new Error("No available spaces to place worker");
 
 		this.worker = args.args.worker;
-		this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this));
+		this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
 	}
 	// Move a worker
 	else if(stateName == "playerMove"){
 		this._movableWorkers = args.args.workers.filter(worker => worker.accessibleSpaces.length > 0);
-		this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this));
+		this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
 	}
 	// Build a block
 	else if (stateName == 'playerBuild') {
-		this.board.makeClickable(args.args.accessibleSpaces, this.onClickBuild.bind(this));
+		this.board.makeClickable(args.args.accessibleSpaces, this.onClickBuild.bind(this), 'build');
 	}
 },
 
@@ -263,14 +263,14 @@ onClickSelectWorker: function(worker) {
 	this.clearPossible();
 	this._selectedWorker = worker;
 	console.log(this._selectedWorker);
-	this.board.makeClickable(worker.accessibleSpaces, this.onClickMoveWorker.bind(this));
+	this.board.makeClickable(worker.accessibleSpaces, this.onClickMoveWorker.bind(this), 'move');
 	this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 },
 
 onClickCancelSelect: function(evt) {
 	dojo.stopEvent(evt);
 	this.clearPossible();
-	this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this));
+	this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
 },
 
 onClickMoveWorker: function(space) {
