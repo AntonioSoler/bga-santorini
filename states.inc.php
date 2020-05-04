@@ -51,101 +51,128 @@
 
 
 $machinestates = array(
-    // The initial state. Please do not modify.
-    1 => array(
-        'name' => 'gameSetup',
-        'description' => '',
-        'type' => 'manager',
-        'action' => 'stGameSetup',
-        'transitions' => array(
-            '' => 2,
-        ),
-    ),
+/*
+ * The initial state.
+ * Please do not modify.
+ */
+1 => [
+  'name' => 'gameSetup',
+  'description' => '',
+  'type' => 'manager',
+  'action' => 'stGameSetup',
+  'transitions' => [
+    '' => 2,
+  ],
+],
+
+/*
+ * The gods setup state.
+ * TODO: game state for the moment, but depending on game mode, might be different
+ */
+2 => [
+  'name' => 'godsSetup',
+  'description' => '',
+  'type' => 'game',
+  'action' => 'stGodsSetup',
+  'transitions' => [
+    'done' => 3,
+  ],
+],
+
 
 /*
  * Worker placement
  *  - nextPlayerPlaceWorker : automatically determined the next player who has to place his workers, and if all workers are placed, start the game
  *  - playerPlaceWorker : allow a player to place a worker
  */
-    2 => array(
-        'name' => 'nextPlayerPlaceWorker',
-        'description' => '',
-        'type' => 'game',
-        'action' => 'stNextPlayerPlaceWorker',
-        'transitions' => array(
-            'next' => 3,
-            'done' => 5,
-        ),
-        'updateGameProgression' => true,
-    ),
+3 => [
+  'name' => 'nextPlayerPlaceWorker',
+  'description' => '',
+  'type' => 'game',
+  'action' => 'stNextPlayerPlaceWorker',
+  'transitions' => [
+    'next' => 4,
+    'done' => 6,
+  ],
+  'updateGameProgression' => true,
+],
 
-    3 => array(
-        'name' => 'playerPlaceWorker',
-        'description' => clienttranslate('${actplayer} must place a worker'),
-        'descriptionmyturn' => clienttranslate('${you} must place a worker'),
-        'type' => 'activeplayer',
-        'args' => 'argPlaceWorker',
-        'possibleactions' => array( 'placeWorker' ),
-        'transitions' => array(
-            'zombiePass' => 2,
-            'workerPlaced' => 2,
-        ),
-    ),
+4 => [
+  'name' => 'playerPlaceWorker',
+  'description' => clienttranslate('${actplayer} must place a worker'),
+  'descriptionmyturn' => clienttranslate('${you} must place a worker'),
+  'type' => 'activeplayer',
+  'args' => 'argPlaceWorker',
+  'possibleactions' => ['placeWorker'],
+  'transitions' => [
+    'zombiePass' => 3,
+    'workerPlaced' => 3,
+  ],
+],
 
 
 /*
- * Worker move TODO
+ * TODO description
  */
-
-    4 => array(
-        'name' => 'nextPlayer',
-        'description' => '',
-        'type' => 'game',
-        'action' => 'stNextPlayer',
-        'transitions' => array(
-            'next' => 5
-        ),
-        'updateGameProgression' => true,
-    ),
-
-    5 => array(
-        'name' => 'playerMove',
-        'description' => clienttranslate('${actplayer} must move a worker'),
-        'descriptionmyturn' => clienttranslate('${you} must move a worker'),
-        'type' => 'activeplayer',
-        'args' => 'argPlayerMove',
-        'action' => 'stCheckEndOfGame',
-        'possibleactions' => array( 'moveWorker', 'endgame' ),
-        'transitions' => array(
-            'zombiePass' => 4,
-            'moved' => 6,
-            'endgame' => 99,
-        ),
-    ),
+5 => [
+  'name' => 'nextPlayer',
+  'description' => '',
+  'type' => 'game',
+  'action' => 'stNextPlayer',
+  'transitions' => [
+    'next' => 6
+  ],
+  'updateGameProgression' => true,
+],
 
 
-    6 => array(
-        'name' => 'playerBuild',
-        'description' => clienttranslate('${actplayer} must build'),
-        'descriptionmyturn' => clienttranslate('${you} must build'),
-        'type' => 'activeplayer',
-        'args' => 'argPlayerBuild',
-        'action' => 'stCheckEndOfGame',
-        'possibleactions' => array( 'build' , 'endgame' ),
-        'transitions' => array(
-            'zombiePass' => 4,
-            'built' => 4,
-            'endgame' => 99,
-        ),
-    ),
+/*
+ * Worker move TODO description
+ */
+6 => [
+  'name' => 'playerMove',
+  'description' => clienttranslate('${actplayer} must move a worker'),
+  'descriptionmyturn' => clienttranslate('${you} must move a worker'),
+  'type' => 'activeplayer',
+  'args' => 'argPlayerMove',
+  'action' => 'stCheckEndOfGame',
+  'possibleactions' => [ 'moveWorker', 'endgame' ],
+  'transitions' => [
+    'zombiePass' => 5,
+    'moved' => 7,
+    'endgame' => 99,
+  ],
+],
 
-    // Final state.
-    // Please do not modify.
-    99 => array(
-        'name' => 'gameEnd',
-        'description' => clienttranslate('End of game'),
-        'type' => 'manager',
-        'action' => 'stGameEnd',
-        'args' => 'argGameEnd'
-    )
+/*
+ * Build TODO description
+ */
+7 => [
+  'name' => 'playerBuild',
+  'description' => clienttranslate('${actplayer} must build'),
+  'descriptionmyturn' => clienttranslate('${you} must build'),
+  'type' => 'activeplayer',
+  'args' => 'argPlayerBuild',
+  'action' => 'stCheckEndOfGame',
+  'possibleactions' => [ 'build' , 'endgame' ],
+  'transitions' => [
+    'zombiePass' => 5,
+    'built' => 5,
+    'endgame' => 99,
+  ],
+],
+
+
+/*
+ * Final state.
+ * Please do not modify.
+ */
+99 => [
+  'name' => 'gameEnd',
+  'description' => clienttranslate('End of game'),
+  'type' => 'manager',
+  'action' => 'stGameEnd',
+  'args' => 'argGameEnd'
+]
+
 );

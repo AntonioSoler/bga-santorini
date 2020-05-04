@@ -19,6 +19,45 @@
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 
 
+// TODO : try to put this into the material.inc.php
+abstract class Gods
+{
+    // Simple gods
+   const Apollo     = 1;
+   const Artemis    = 2;
+   const Athena     = 3;
+   const Atlas      = 4;
+   const Demeter    = 5;
+   const Hephaestus = 6;
+   const Hermes     = 7;
+   const Minotaur   = 8;
+   const Pan        = 9;
+   const Prometheus = 10;
+
+   // Advanced gods
+   const Aphrodite  = 11;
+   const Ares       = 12;
+   const Bia        = 13;
+   const Chaos      = 14;
+   const Charon     = 15;
+   const Chronus    = 16;
+   const Circe      = 17;
+   const Dionysos   = 18;
+   const Eros       = 19;
+   const Hera       = 20;
+   const Hestia     = 21;
+   const Hypnus     = 22;
+   const Limus      = 23;
+   const Medusa     = 24;
+   const Morpheus   = 25;
+   const Persephone = 26;
+   const Poseidon   = 27;
+   const Selene     = 28;
+   const Triton     = 29;
+   const Zeus       = 30;
+}
+
+
 class santorini extends Table
 {
   public function __construct()
@@ -30,10 +69,10 @@ class santorini extends Table
     // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
     parent::__construct();
 
-    self::initGameStateLabels(array(
-    'moved_worker' => 13,
-    'variant_powers' => 100,
-    ));
+    self::initGameStateLabels([
+      'movedWorker' => 13,
+      'variantPowers' => 100,
+    ]);
   }
 
   protected function getGameName()
@@ -50,7 +89,7 @@ class santorini extends Table
  */
 protected function setupNewGame($players, $options = array())
 {
-  self::setGameStateInitialValue('moved_worker', 0);
+  self::setGameStateInitialValue('movedWorker', 0);
 
 
   // Create players
@@ -87,7 +126,7 @@ protected function getAllDatas()
   return [
     'players' => $this->getPlayers(),
     'placedPieces' => $this->getPlacedPieces(),
-    'movedWorker' => self::getGamestateValue('moved_worker'),
+    'movedWorker' => self::getGamestateValue('movedWorker'),
   ];
 }
 
@@ -331,7 +370,7 @@ public function moveWorker($wId, $x, $y, $z)
   self::DbQuery( "UPDATE piece SET x = '$x', y = '$y', z = '$z' WHERE id = '$wId'" );
 
   // Set moved worker
-  self::setGamestateValue( 'moved_worker', $wId );
+  self::setGamestateValue( 'movedWorker', $wId );
 
   // Notify
   $args = [
@@ -355,7 +394,7 @@ public function build($x, $y, $z)
   self::checkAction('build');
 
   $pId = self::getActivePlayerId();
-  $wId = self::getGamestateValue( 'moved_worker' );
+  $wId = self::getGamestateValue( 'movedWorker' );
 
   // Get information about the piece
   $worker = $this->getPiece($wId);
@@ -376,7 +415,7 @@ public function build($x, $y, $z)
   self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '$x', '$y', '$z') ");
 
   // Reset moved worker
-  self::setGamestateValue( 'moved_worker', 0 );
+  self::setGamestateValue( 'movedWorker', 0 );
 
   // Notify
   $piece = self::getObjectFromDB("SELECT * FROM piece WHERE id = LAST_INSERT_ID()");
@@ -435,7 +474,7 @@ public function argPlayerMove()
 public function argPlayerBuild()
 {
   // Return available spaces neighbouring the moved player
-  $worker = self::getPiece(self::getGamestateValue('moved_worker') );
+  $worker = self::getPiece(self::getGamestateValue('movedWorker') );
   return [
     'worker' => $worker,
     'accessibleSpaces' => self::getNeighbouringSpaces($worker, 'build')
@@ -450,6 +489,24 @@ public function argPlayerBuild()
 // Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
 // The action method of state X is called everytime the current game state is set to X.
 ////////////////////////////////////////////////
+
+/*
+ * stGodsSetup:
+ *   called right after the board setup, should give a god to each player unless basic mode
+ */
+public function stGodsSetup()
+{
+  $players = self::getPlayers();
+  foreach($players as $player){
+    $god = rand(1,10);
+    $pId = $player['id'];
+    self::DbQuery("UPDATE player SET player_god = '$god' WHERE player_id = '$pId'");
+  }
+
+  $this->gamestate->nextState('done');
+}
+
+
 
 /*
  * stNextPlayerPlaceWorker:
