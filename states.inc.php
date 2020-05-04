@@ -62,6 +62,11 @@ $machinestates = array(
         ),
     ),
 
+/*
+ * Worker placement
+ *  - nextPlayerPlaceWorker : automatically determined the next player who has to place his workers, and if all workers are placed, start the game
+ *  - playerPlaceWorker : allow a player to place a worker
+ */
     2 => array(
         'name' => 'nextPlayerPlaceWorker',
         'description' => '',
@@ -80,12 +85,17 @@ $machinestates = array(
         'descriptionmyturn' => clienttranslate('${you} must place a worker'),
         'type' => 'activeplayer',
         'args' => 'argPlaceWorker',
-        'possibleactions' => array( 'place' ),
+        'possibleactions' => array( 'placeWorker' ),
         'transitions' => array(
             'zombiePass' => 2,
-            'placed' => 2,
+            'workerPlaced' => 2,
         ),
     ),
+
+
+/*
+ * Worker move TODO
+ */
 
     4 => array(
         'name' => 'nextPlayer',
@@ -105,13 +115,14 @@ $machinestates = array(
         'type' => 'activeplayer',
         'args' => 'argPlayerMove',
         'action' => 'stCheckEndOfGame',
-        'possibleactions' => array( 'move', 'endgame' ),
+        'possibleactions' => array( 'moveWorker', 'endgame' ),
         'transitions' => array(
             'zombiePass' => 4,
             'moved' => 6,
             'endgame' => 99,
         ),
     ),
+
 
     6 => array(
         'name' => 'playerBuild',

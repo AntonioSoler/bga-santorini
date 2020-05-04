@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>three.js webgl - STL</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	</head>
+	<body>
+    <div id="container"></div>
+    <div id="sliderX"></div>
+    <div id="sliderY"></div>
+    <div id="log"></div>
+<script type="module">
+import { Board } from '../scripts/board.js';
+
+var	container = document.getElementById("container");
+window.board = new Board(container, "http://127.0.0.1/" );
+
+var piece = {
+  id:1,
+  name : 'lvl0',
+  x:0,
+  y:0,
+  z:0,
+};
+
+var piece2 = {
+  id:2,
+  name : 'lvl1',
+  x:0,
+  y:0,
+  z:1,
+};
+
+var piece3 = {
+  id:3,
+  name : 'lvl2',
+  x:0,
+  y:0,
+  z:2,
+};
+
+var piece4 = {
+  id:4,
+  name : 'lvl3',
+  x:0,
+  y:0,
+  z:3,
+};
+
+var space = {
+  x:2,
+  y:1,
+  z:1
+};
+
+board.addPiece(piece).then(() => {
+//  board.movePiece(piece, space);
+});
+board.addPiece(piece2)
+board.addPiece(piece3)
+board.addPiece(piece4)
+/*
+var click = (pos) => {
+	board.clearClickable();
+
+  pos.id = 1;
+  pos.name = "fWorker0"
+	board.addPiece(pos);
+  board.makeClickable([pos], () => console.log("test") );
+};
+
+var tPos = [];
+for(var i = 0; i < 5; i++)
+for(var j = 0; j < 5; j++)
+  tPos.push({x:i, y:j, z:0});
+
+board.makeClickable(tPos, click);
+*/
+</script>
+	</body>
+</html>

@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * santorini implementation : (c) morgalad
+ * santorini implementation : © quietmint
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -42,5 +42,6 @@
           // Get players & players number
           $players = $this->game->loadPlayersBasicInfos();
           $players_nbr = count($players);
+
       }
   }

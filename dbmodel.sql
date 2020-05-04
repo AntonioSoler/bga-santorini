@@ -8,20 +8,13 @@
 -- -----
 
 CREATE TABLE IF NOT EXISTS `piece` (
-   `card_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-   `card_type` varchar(16) NOT NULL,
-   `card_type_arg` int(11) NOT NULL,
-   `card_location` varchar(16) NOT NULL,
-   `card_location_arg` int(11) NOT NULL,
-   PRIMARY KEY (`card_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
-
-CREATE TABLE IF NOT EXISTS `board` (
-   `space_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-   `x` int(2) NOT NULL,
-   `y` int(2) NOT NULL,
-   `z` int(2) NOT NULL,
-   `piece_id` int(10) unsigned NULL,
-   PRIMARY KEY (`space_id`),
-   UNIQUE KEY `xyz` (`x`, `y`, `z`)
+   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+   `player_id` int(11),
+   `type` varchar(16) NOT NULL,
+   `type_arg` varchar(16),
+   `location` varchar(16) NOT NULL,
+   `x` int(2),
+   `y` int(2),
+   `z` int(2),
+   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;

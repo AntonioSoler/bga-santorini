@@ -36,24 +36,25 @@ class action_santorini extends APP_GameAction
         }
     }
 
-    public function place()
+    public function placeWorker()
     {
         self::setAjaxMode();
+        $workerId = (int) self::getArg('workerId', AT_int, true);
         $x = (int) self::getArg('x', AT_int, true);
         $y = (int) self::getArg('y', AT_int, true);
         $z = (int) self::getArg('z', AT_posint, true);
-        $this->game->place($x, $y, $z);
+        $this->game->placeWorker($workerId, $x, $y, $z);
         self::ajaxResponse();
     }
 
-    public function move()
+    public function moveWorker()
     {
         self::setAjaxMode();
         $x = (int) self::getArg('x', AT_int, true);
         $y = (int) self::getArg('y', AT_int, true);
         $z = (int) self::getArg('z', AT_posint, true);
-        $worker_id = (int) self::getArg('worker_id', AT_posint, true);
-        $this->game->move($worker_id, $x, $y, $z);
+        $workerId = (int) self::getArg('workerId', AT_posint, true);
+        $this->game->moveWorker($workerId, $x, $y, $z);
         self::ajaxResponse();
     }
 
@@ -66,5 +67,5 @@ class action_santorini extends APP_GameAction
         $this->game->build($x, $y, $z);
         self::ajaxResponse();
     }
-    
+
 }
