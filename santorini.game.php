@@ -61,9 +61,9 @@ protected function setupNewGame($players, $options = array())
   $sql = 'INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar, player_team) VALUES ';
   $values = array();
   $no = 1;
-  $nTeam = count($players) == 3 ? 3 : 2;
+  $nTeams = count($players) == 3 ? 3 : 2;
   foreach ($players as $pId => $player) {
-    $team = $no % $nTeam;
+    $team = $no % $nTeams;
     $color = $defaultColors[$team];
     $values[] = "('".$pId."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."', '$team')";
     $no++;
@@ -116,7 +116,7 @@ public function getGameProgression()
  */
 public function getPlayers()
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team FROM player");
+  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team, player_no no FROM player");
 }
 
 /*
@@ -125,7 +125,7 @@ public function getPlayers()
  */
 public function getPlayer($pId)
 {
-  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team FROM player WHERE player_id = $player_id");
+  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team, player_no no FROM player WHERE player_id = $player_id");
 }
 
 /*
@@ -133,7 +133,7 @@ public function getPlayer($pId)
  */
 public function getTeammates($pId)
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team FROM player
+  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team, player_no no FROM player
     WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
 }
 
@@ -504,7 +504,6 @@ public function stGodsSetup()
   // Gather information about number of players
   $players = self::getPlayers();
   $nPlayers = count($players);
-  $nTeams = ($nPlayers == 3) ? 3 : 2;
 
   // Filter gods depending on the number of players and game option
   $possibleGods = array_filter($this->gods, function($god, $godId) use ($nPlayers, $optionGods) {
@@ -536,6 +535,11 @@ public function stGodsSetup()
   }
 
   foreach ($players as $player) {
+    // Don't create worker for second player of the team
+    // TODO make a more robust way to do so ?
+    if($player["no"] != $player["team"])
+      continue;
+
     // TODO: some gods grant extra workers
     self::addWorker($player, 'f');
     self::addWorker($player, 'm');
