@@ -49,7 +49,7 @@ setup: function(gamedatas) {
 	console.info('SETUP', gamedatas);
 
 	// Setup the board (3d scene using threejs)
-	var	container = document.getElementById('sceneContainer');
+	var	container = document.getElementById('scene-container');
 	this.board = new Board(container, URL);
 
 	for (var pId in gamedatas.players) {

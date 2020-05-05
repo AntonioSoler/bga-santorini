@@ -26,22 +26,28 @@
 
   require_once(APP_BASE_PATH."view/common/game.view.php");
 
-  class view_santorini_santorini extends game_view
+class view_santorini_santorini extends game_view
+{
+  public function getGameName()
   {
-      public function getGameName()
-      {
-          return 'santorini';
-      }
-
-      public function build_page($viewArgs)
-      {
-          global $g_user;
-          $current_player_id = $g_user->get_id();
-          $template = self::getGameName() . '_' . self::getGameName();
-
-          // Get players & players number
-          $players = $this->game->loadPlayersBasicInfos();
-          $players_nbr = count($players);
-
-      }
+    return 'santorini';
   }
+
+  public function build_page($viewArgs)
+  {
+    global $g_user;
+    $current_player_id = $g_user->get_id();
+    $template = self::getGameName() . '_' . self::getGameName();
+
+    // Get players & players number
+    $players = $this->game->getPlayers();
+
+    $this->page->begin_block( "santorini_santorini", "card" );
+    foreach($players as $player){
+      $this->page->insert_block( "card", [
+        'GOD_ID' => $player['god'],
+        'GOD_NAME' => $this->game->gods[$player['god']]['name'],
+      ]);
+    }
+  }
+}

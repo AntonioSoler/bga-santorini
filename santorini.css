@@ -15,15 +15,92 @@
 
 @import url(../../../css/csslayer.css);
 
-#playArea {
-  /* margin: 15px; */
+#play-area {
   height: 1100px;
-  width: 1200px;
-  display: block;
-  /* background-position: center; */
-  /* background-repeat: no-repeat; */
+/*  width: 1200px; */
+  display: flex;
   pointer-events: visible;
 }
+
+#play-area #powers-container {
+  display:flex;
+}
+
+#play-area #powers-container div.power-card {
+  width:270px;
+  height:407px;
+  position:relative;
+}
+
+div.power-card div.power-card-background {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-image:url("./img/gods_simple.jpg");
+  background-repeat:no-repeat;
+  background-size:cover;
+  z-index:1;
+}
+div.power-1 div.power-card-background { background-position:-0px 0px; }
+div.power-2 div.power-card-background { background-position:-260px 0px; }
+div.power-3 div.power-card-background { background-position:-520px 0px; }
+div.power-4 div.power-card-background { background-position:-780px 0px; }
+div.power-5 div.power-card-background { background-position:-1040px 0px; }
+div.power-6 div.power-card-background { background-position:-1300px 0px; }
+div.power-7 div.power-card-background { background-position:-1560px 0px; }
+div.power-8 div.power-card-background { background-position:-1820px 0px; }
+div.power-9 div.power-card-background { background-position:-2080px 0px; }
+div.power-10 div.power-card-background { background-position:-2340px 0px; }
+
+
+div.power-card div.power-card-overlay {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background-image:url("./img/card.png");
+  background-repeat:no-repeat;
+  background-size:cover;
+  z-index:2;
+}
+
+div.power-card div.power-card-name {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  color: #333;
+  text-align: center;
+  font-variant: small-caps;
+  line-height: 31px;
+  font-size: 18px;
+  z-index:3;
+}
+
+div.power-card div.power-card-power {
+  position: absolute;
+  bottom: 25px;
+  left:10%;
+  width: 80%;
+  z-index:4;
+  height:100px;
+  background-position:center center;
+  background-repeat:no-repeat;
+  background-size:contain;
+}
+
+div.power-1 div.power-card-power { background-image:url('./img/powers/1.png'); }
+div.power-2 div.power-card-power { background-image:url('./img/powers/2.png'); }
+div.power-3 div.power-card-power { background-image:url('./img/powers/3.png'); }
+div.power-4 div.power-card-power { background-image:url('./img/powers/4.png'); }
+div.power-5 div.power-card-power { background-image:url('./img/powers/5.png'); }
+div.power-6 div.power-card-power { background-image:url('./img/powers/6.png'); }
+div.power-7 div.power-card-power { background-image:url('./img/powers/7.png'); }
+div.power-8 div.power-card-power { background-image:url('./img/powers/8.png'); }
+div.power-9 div.power-card-power { background-image:url('./img/powers/9.png'); }
+div.power-10 div.power-card-power { background-image:url('./img/powers/10.png'); }
 
 
 .player-board {
