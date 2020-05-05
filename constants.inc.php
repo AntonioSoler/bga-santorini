@@ -1,0 +1,100 @@
+<?php
+/*
+ * Gods and heroes constants
+ */
+
+// Simple gods
+define('APOLLO', 1);
+define('ARTEMIS', 2);
+define('ATHENA', 3);
+define('ATLAS', 4);
+define('DEMETER', 5);
+define('HEPHAESTUS', 6);
+define('HERMES', 7);
+define('MINOTAUR', 8);
+define('PAN', 9);
+define('PROMETHEUS', 10);
+
+// Advanced gods
+define('APHRODITE', 11);
+define('ARES', 12);
+define('BIA', 13);
+define('CHAOS', 14);
+define('CHARON', 15);
+define('CHRONUS', 16);
+define('CIRCE', 17);
+define('DIONYSUS', 18);
+define('EROS', 19);
+define('HERA', 20);
+define('HESTIA', 21);
+define('HYPNUS', 22);
+define('LIMUS', 23);
+define('MEDUSA', 24);
+define('MORPHEUS', 25);
+define('PERSEPHONE', 26);
+define('POSEIDON', 27);
+define('SELENE', 28);
+define('TRITON', 29);
+define('ZEUS', 30);
+
+// Golden Fleece gods
+define('AEOLUS', 31);
+define('CHARYBDIS', 32);
+define('CLIO', 33);
+define('EUROPA', 34);
+define('GAEA', 35);
+define('GRAEAE', 36);
+define('HADES', 37);
+define('HARPIES', 38);
+define('HECATE', 39);
+define('MOERAE', 40);
+define('NEMESIS', 41);
+define('SIREN', 42);
+define('TARTARUS', 43);
+define('TERPSICHORE', 44);
+define('URANIA', 45);
+
+// Hero Power gods
+define('ACHILLES', 46);
+define('ADONIS', 47);
+define('ATALANTA', 48);
+define('BELLEROPHON', 49);
+define('HERACLES', 50);
+define('JASON', 51);
+define('MEDEA', 52);
+define('ODYSSEUS', 53);
+define('POLYPHEMUS', 54);
+define('THESEUS', 55);
+
+
+/*
+ * State constants
+ */
+define('ST_GAME_SETUP', 1);
+define('ST_GODS_SETUP', 10);
+define('ST_HEROES_SETUP', 11);
+define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
+define('ST_PLACE_WORKER', 4);
+define('ST_NEXT_PLAYER', 5);
+define('ST_MOVE', 6);
+define('ST_BUILD', 7);
+define('ST_GAME_END', 99);
+
+/*
+ * Options constants
+ */
+define('OPTION_GODS', 100);
+  define('NO_POWER', 0);
+  define('SIMPLE', 1);
+  define('ADVANCED', 2);
+  define('GOLDEN_FLEECE', 3);
+
+define('OPTION_HEROES', 101);
+  define('HERO_OFF', 0);
+  define('HERO_ON', 1);
+
+define('OPTION_SETUP', 102);
+  define('RANDOM', 0);
+  define('DIVIDE_CHOOSE', 1);
+
+?>
