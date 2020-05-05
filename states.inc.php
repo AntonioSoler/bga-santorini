@@ -55,49 +55,62 @@ $machinestates = array(
  * The initial state.
  * Please do not modify.
  */
-1 => [
+ST_GAME_SETUP => [
   'name' => 'gameSetup',
   'description' => '',
   'type' => 'manager',
   'action' => 'stGameSetup',
   'transitions' => [
-    '' => 2,
+    '' => ST_GODS_SETUP,
   ],
 ],
 
 /*
- * The gods setup state.
+ * The God Powers setup state.
  * TODO: game state for the moment, but depending on game mode, might be different
  */
-2 => [
+ST_GODS_SETUP => [
   'name' => 'godsSetup',
   'description' => '',
   'type' => 'game',
   'action' => 'stGodsSetup',
   'transitions' => [
-    'done' => 3,
+    'done' => ST_HEROES_SETUP,
   ],
 ],
 
+/*
+ * The Hero Powers setup state.
+ * TODO: game state for the moment, but depending on game mode, might be different
+ */
+ST_HEROES_SETUP => [
+  'name' => 'heroesSetup',
+  'description' => '',
+  'type' => 'game',
+  'action' => 'stHeroesSetup',
+  'transitions' => [
+    'done' => ST_NEXT_PLAYER_PLACE_WORKER,
+  ],
+],
 
 /*
  * Worker placement
  *  - nextPlayerPlaceWorker : automatically determined the next player who has to place his workers, and if all workers are placed, start the game
  *  - playerPlaceWorker : allow a player to place a worker
  */
-3 => [
+ST_NEXT_PLAYER_PLACE_WORKER => [
   'name' => 'nextPlayerPlaceWorker',
   'description' => '',
   'type' => 'game',
   'action' => 'stNextPlayerPlaceWorker',
   'transitions' => [
-    'next' => 4,
-    'done' => 6,
+    'next' => ST_PLACE_WORKER,
+    'done' => ST_NEXT_PLAYER,
   ],
   'updateGameProgression' => true,
 ],
 
-4 => [
+ST_PLACE_WORKER => [
   'name' => 'playerPlaceWorker',
   'description' => clienttranslate('${actplayer} must place a worker'),
   'descriptionmyturn' => clienttranslate('${you} must place a worker'),
@@ -105,8 +118,8 @@ $machinestates = array(
   'args' => 'argPlaceWorker',
   'possibleactions' => ['placeWorker'],
   'transitions' => [
-    'zombiePass' => 3,
-    'workerPlaced' => 3,
+    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+    'workerPlaced' => ST_NEXT_PLAYER_PLACE_WORKER,
   ],
 ],
 
@@ -114,13 +127,13 @@ $machinestates = array(
 /*
  * TODO description
  */
-5 => [
+ST_NEXT_PLAYER => [
   'name' => 'nextPlayer',
   'description' => '',
   'type' => 'game',
   'action' => 'stNextPlayer',
   'transitions' => [
-    'next' => 6
+    'next' => ST_MOVE
   ],
   'updateGameProgression' => true,
 ],
@@ -129,7 +142,7 @@ $machinestates = array(
 /*
  * Worker move TODO description
  */
-6 => [
+ST_MOVE => [
   'name' => 'playerMove',
   'description' => clienttranslate('${actplayer} must move a worker'),
   'descriptionmyturn' => clienttranslate('${you} must move a worker'),
@@ -138,16 +151,16 @@ $machinestates = array(
   'action' => 'stCheckEndOfGame',
   'possibleactions' => [ 'moveWorker', 'endgame' ],
   'transitions' => [
-    'zombiePass' => 5,
-    'moved' => 7,
-    'endgame' => 99,
+    'zombiePass' => ST_NEXT_PLAYER,
+    'moved' => ST_BUILD,
+    'endgame' => ST_GAME_END,
   ],
 ],
 
 /*
  * Build TODO description
  */
-7 => [
+ST_BUILD => [
   'name' => 'playerBuild',
   'description' => clienttranslate('${actplayer} must build'),
   'descriptionmyturn' => clienttranslate('${you} must build'),
@@ -156,9 +169,9 @@ $machinestates = array(
   'action' => 'stCheckEndOfGame',
   'possibleactions' => [ 'build' , 'endgame' ],
   'transitions' => [
-    'zombiePass' => 5,
-    'built' => 5,
-    'endgame' => 99,
+    'zombiePass' => ST_NEXT_PLAYER,
+    'built' => ST_NEXT_PLAYER,
+    'endgame' => ST_GAME_END,
   ],
 ],
 
@@ -167,7 +180,7 @@ $machinestates = array(
  * Final state.
  * Please do not modify.
  */
-99 => [
+ST_GAME_END => [
   'name' => 'gameEnd',
   'description' => clienttranslate('End of game'),
   'type' => 'manager',

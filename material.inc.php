@@ -21,7 +21,7 @@
  */
 
 $this->gods = array(
-    // Simple gods
+    // Simple Gods
     APOLLO => array(
         'name'   => clienttranslate('Apollo'),
         'title'  => clienttranslate('God Of Music'),
@@ -31,7 +31,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     ARTEMIS => array(
@@ -43,7 +42,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     ATHENA => array(
@@ -55,7 +53,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     ATLAS => array(
@@ -67,7 +64,6 @@ $this->gods = array(
         'banned'  => array(GAEA),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     DEMETER => array(
@@ -79,7 +75,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     HEPHAESTUS => array(
@@ -91,7 +86,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     HERMES => array(
@@ -103,7 +97,6 @@ $this->gods = array(
         'banned'  => array(HARPIES),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     MINOTAUR => array(
@@ -115,7 +108,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     PAN => array(
@@ -127,7 +119,6 @@ $this->gods = array(
         'banned'  => array(HADES),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     PROMETHEUS => array(
@@ -139,10 +130,9 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
-    // Advanced gods
+    // Advanced Gods
     APHRODITE => array(
         'name'   => clienttranslate('Aphrodite'),
         'title'  => clienttranslate('Goddess of Love'),
@@ -152,7 +142,6 @@ $this->gods = array(
         'banned'  => array(NEMESIS, URANIA),
         'players' => array(2, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     ARES => array(
@@ -164,7 +153,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     BIA => array(
@@ -177,7 +165,6 @@ $this->gods = array(
         'banned'  => array(NEMESIS, TARTARUS),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     CHAOS => array(
@@ -190,7 +177,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     CHARON => array(
@@ -202,7 +188,6 @@ $this->gods = array(
         'banned'  => array(HECATE),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     CHRONUS => array(
@@ -214,7 +199,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     CIRCE => array(
@@ -226,7 +210,6 @@ $this->gods = array(
         'banned'  => array(CLIO, HECATE),
         'players' => array(2),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     DIONYSUS => array(
@@ -238,7 +221,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     EROS => array(
@@ -251,7 +233,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     HERA => array(
@@ -263,7 +244,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     HESTIA => array(
@@ -275,7 +255,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     HYPNUS => array(
@@ -287,7 +266,6 @@ $this->gods = array(
         'banned'  => array(TERPSICHORE),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     LIMUS => array(
@@ -299,7 +277,6 @@ $this->gods = array(
         'banned'  => array(TERPSICHORE),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     MEDUSA => array(
@@ -311,7 +288,6 @@ $this->gods = array(
         'banned'  => array(NEMESIS),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     MORPHEUS => array(
@@ -324,7 +300,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     PERSEPHONE => array(
@@ -336,7 +311,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     POSEIDON => array(
@@ -348,7 +322,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     SELENE => array(
@@ -360,7 +333,6 @@ $this->gods = array(
         'banned'  => array(GAEA),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     TRITON => array(
@@ -372,7 +344,6 @@ $this->gods = array(
         'banned'  => array(HARPIES),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     ZEUS => array(
@@ -384,10 +355,9 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
-    // Golden Fleece gods
+    // Golden Fleece Gods
     AEOLUS => array(
         'name'   => clienttranslate('Aeolus'),
         'title'  => clienttranslate('God of the Winds'),
@@ -399,7 +369,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     CHARYBDIS => array(
@@ -413,7 +382,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     CLIO => array(
@@ -426,7 +394,6 @@ $this->gods = array(
         'banned'  => array(CIRCE, NEMESIS),
         'players' => array(2, 3),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     EUROPA => array(
@@ -440,7 +407,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     GAEA => array(
@@ -453,7 +419,6 @@ $this->gods = array(
         'banned'  => array(ATLAS, NEMESIS, SELENE),
         'players' => array(2, 3),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     GRAEAE => array(
@@ -466,7 +431,6 @@ $this->gods = array(
         'banned'  => array(NEMESIS),
         'players' => array(2, 3),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     HADES => array(
@@ -478,7 +442,6 @@ $this->gods = array(
         'banned'  => array(PAN),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     HARPIES => array(
@@ -490,7 +453,6 @@ $this->gods = array(
         'banned'  => array(HERMES, TRITON),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     HECATE => array(
@@ -504,7 +466,6 @@ $this->gods = array(
         'banned'  => array(CHARON, CIRCE, MOERAE, TARTARUS),
         'players' => array(2, 3),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     MOERAE => array(
@@ -517,7 +478,6 @@ $this->gods = array(
         'banned'  => array(HECATE, NEMESIS, TARTARUS),
         'players' => array(2, 3),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     NEMESIS => array(
@@ -529,7 +489,6 @@ $this->gods = array(
         'banned'  => array(CLIO, GAEA, GRAEAE, MOERAE, APHRODITE, BIA, MEDUSA, TERPSICHORE, THESEUS),
         'players' => array(2, 3, 4),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     SIREN => array(
@@ -542,7 +501,6 @@ $this->gods = array(
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     TARTARUS => array(
@@ -555,7 +513,6 @@ $this->gods = array(
         'banned'  => array(BIA, HECATE, MOERAE, TERPSICHORE),
         'players' => array(2),
         'golden'  => false,
-        'hero'    => false,
     ),
 
     TERPSICHORE => array(
@@ -567,7 +524,6 @@ $this->gods = array(
         'banned'  => array(NEMESIS, HYPNUS, LIMUS, TARTARUS),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
 
     URANIA => array(
@@ -579,10 +535,12 @@ $this->gods = array(
         'banned'  => array(APHRODITE),
         'players' => array(2, 3, 4),
         'golden'  => true,
-        'hero'    => false,
     ),
+);
 
-    // Hero Power gods
+
+// Hero Powers
+$this->heroes = array(
     ACHILLES => array(
         'name'   => clienttranslate('Achilles'),
         'title'  => clienttranslate('Volatile Warrior'),
@@ -591,8 +549,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     ADONIS => array(
@@ -603,8 +559,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     ATALANTA => array(
@@ -615,8 +569,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     BELLEROPHON => array(
@@ -627,8 +579,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     HERACLES => array(
@@ -639,8 +589,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     JASON => array(
@@ -652,8 +600,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     MEDEA => array(
@@ -664,8 +610,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     ODYSSEUS => array(
@@ -676,8 +620,6 @@ $this->gods = array(
         ),
         'banned'  => array(),
         'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     POLYPHEMUS => array(
@@ -687,9 +629,6 @@ $this->gods = array(
             clienttranslate('End of Your Turn: Once, your Worker builds up to 2 domes at any level on any unoccupied spaces on the board.'),
         ),
         'banned'  => array(),
-        'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     ),
 
     THESEUS => array(
@@ -699,8 +638,5 @@ $this->gods = array(
             clienttranslate('End of Your Turn: Once, if any of your Workers is exactly 2 levels below any neighboring opponent Workers, remove one of those opponent Workers from play.'),
         ),
         'banned'  => array(NEMESIS),
-        'players' => array(2),
-        'golden'  => false,
-        'hero'    => true,
     )
 );

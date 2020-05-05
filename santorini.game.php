@@ -83,43 +83,21 @@ define('ODYSSEUS', 53);
 define('POLYPHEMUS', 54);
 define('THESEUS', 55);
 
-// TODO : try to put this into the material.inc.php
-abstract class Gods
-{
-    // Simple gods
-   const Apollo     = 1;
-   const Artemis    = 2;
-   const Athena     = 3;
-   const Atlas      = 4;
-   const Demeter    = 5;
-   const Hephaestus = 6;
-   const Hermes     = 7;
-   const Minotaur   = 8;
-   const Pan        = 9;
-   const Prometheus = 10;
+// State constants
+define('ST_GAME_SETUP', 1);
+define('ST_GODS_SETUP', 10);
+define('ST_HEROES_SETUP', 11);
+define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
+define('ST_PLACE_WORKER', 4);
+define('ST_NEXT_PLAYER', 5);
+define('ST_MOVE', 6);
+define('ST_BUILD', 7);
+define('ST_GAME_END', 99);
 
-   // Advanced gods
-   const Aphrodite  = 11;
-   const Ares       = 12;
-   const Bia        = 13;
-   const Chaos      = 14;
-   const Charon     = 15;
-   const Chronus    = 16;
-   const Circe      = 17;
-   const Dionysos   = 18;
-   const Eros       = 19;
-   const Hera       = 20;
-   const Hestia     = 21;
-   const Hypnus     = 22;
-   const Limus      = 23;
-   const Medusa     = 24;
-   const Morpheus   = 25;
-   const Persephone = 26;
-   const Poseidon   = 27;
-   const Selene     = 28;
-   const Triton     = 29;
-   const Zeus       = 30;
-}
+// Options constants
+define('SIMPLE', 1);
+define('ADVANCED', 2);
+define('GOLDEN_FLEECE', 3);
 
 
 class santorini extends Table
@@ -135,7 +113,9 @@ class santorini extends Table
 
     self::initGameStateLabels([
       'movedWorker' => 13,
-      'variantPowers' => 100,
+      'optionGods' => 100,
+      'optionHeroes' => 101,
+      'optionSetup' => 102,
     ]);
   }
 
@@ -155,25 +135,22 @@ protected function setupNewGame($players, $options = array())
 {
   self::setGameStateInitialValue('movedWorker', 0);
 
-
   // Create players
   self::DbQuery('DELETE FROM player');
   $gameInfos = self::getGameinfos();
   $defaultColors = $gameInfos['player_colors'];
-  $sql = 'INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ';
+  $sql = 'INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar, player_team) VALUES ';
   $values = array();
   $no = 1;
+  $team_count = count($players) == 3 ? 3 : 2;
   foreach ($players as $pId => $player) {
-    $color = array_shift($defaultColors);
-    $values[] = "('".$pId."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."')";
-
-    // Add the two workers to deck
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$pId', 'worker', 'f$no', 'desk'), ('$pId', 'worker', 'm$no', 'desk')");
+    $team = $no % $team_count;
+    $color = $defaultColors[$team];
+    $values[] = "('".$pId."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."',$team)";
     $no++;
   }
   self::DbQuery($sql . implode($values, ','));
 
-  self::reattributeColorsBasedOnPreferences($players, $gameInfos['player_colors']);
   self::reloadPlayersBasicInfos();
 
   // Active first player to play
@@ -352,6 +329,12 @@ public function getNeighbouringSpaces($piece, $action)
   });
 
   return array_values($neighbouring);
+}
+
+public function addWorkers($pId, $count) {
+  for ($no = 0; $no < $count; $no++) {
+    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$pId', 'worker', 'f$no', 'desk'), ('$pId', 'worker', 'm$no', 'desk')");
+  }
 }
 
 
@@ -555,17 +538,85 @@ public function argPlayerBuild()
 ////////////////////////////////////////////////
 
 /*
- * stGodsSetup:
+ * stPowersSetup:
  *   called right after the board setup, should give a god to each player unless basic mode
  */
 public function stGodsSetup()
 {
   $players = self::getPlayers();
-  foreach($players as $player){
-    $god = rand(1,10);
-    $pId = $player['id'];
-    self::DbQuery("UPDATE player SET player_god = '$god' WHERE player_id = '$pId'");
+  $player_count = count($players);
+  $team_count = $player_count == 3 ? 3 : 2;
+
+  $optionGods = intval(self::getGameStateValue('optionGods'));
+  if ($optionGods > 0) {
+    $possibleGods = array_filter($this->gods, function($god, $godId) use ($player_count, $optionGods) {
+      return in_array($player_count, $god['players']) && 
+        ( $optionGods == ADVANCED
+          || ($optionGods == GOLDEN_FLEECE && $god['golden'])
+          || ($optionGods == SIMPLE && $godId <= 10)
+        );
+    }, ARRAY_FILTER_USE_BOTH);
+
+    $optionSetup = intval(self::getGameStateValue('optionSetup'));
+    if ($optionSetup == 1) { // divide and choose
+      throw new BgaVisibleSystemException('God Powers: Divide and Choose not yet implemented!');
+
+    } else { // random
+      for ($team = 0; $team < $team_count; $team++) {
+        // Assign a random god to this team
+        $godId = array_rand($possibleGods);
+        self::DbQuery("UPDATE player SET player_god = $godId WHERE player_team = $team");
+        self::notifyAllPlayers('message', "Team $team assigned god $godId", array());
+        // Remove this god and any banned gods
+        unset($possibleGods[$godId]);
+        foreach ($this->gods[$godId]['banned'] as $bannedId) {
+          unset($possibleGods[$bannedId]);
+        }
+      }
+    }
   }
+
+  foreach ($players as $pId => $player) {
+    $worker_count = $player_count == 4 ? 1 : 2;
+    // TODO: some gods grant extra workers
+    self::addWorkers($pId, $worker_count);
+  }
+
+  $this->gamestate->nextState('done');
+}
+
+
+public function stHeroesSetup()
+{
+  $players = self::getPlayers();
+  $player_count = count($players);
+  $team_count = $player_count == 3 ? 3 : 2;
+
+  $optionHeroes = intval(self::getGameStateValue('optionHeroes'));
+  if ($optionHeroes > 0) {
+    $possibleHeroes = array_filter($this->heroes, function($hero, $heroId) {
+      // TODO: filter banned heroes
+      return true;
+    }, ARRAY_FILTER_USE_BOTH);
+
+    $optionSetup = intval(self::getGameStateValue('optionSetup'));
+    if ($optionSetup == 1) { // divide and choose
+      throw new BgaVisibleSystemException('Hero Powers: Divide and Choose not yet implemented!');
+
+    } else { // random
+      for ($team = 0; $team < $team_count; $team++) {
+        $heroId = array_rand($possibleHeroes);
+        self::DbQuery("UPDATE player SET player_hero = $heroId WHERE player_team = $team");
+        self::notifyAllPlayers('message', "Team $team assigned hero $heroId", array());
+        unset($possibleHeroes[$heroId]);
+        foreach ($this->heroes[$heroId]['banned'] as $bannedId) {
+          unset($possibleHeroes[$bannedId]);
+        }
+      }
+    }
+  }
+
+  // TODO: some heroes (JASON) grant extra workers
 
   $this->gamestate->nextState('done');
 }
