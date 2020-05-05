@@ -111,6 +111,7 @@ $this->gods = array(
         'title'  => clienttranslate('Bull-headed Monster'),
         'power'  => array(
             clienttranslate('Your Move: Your Worker may move into an opponent Worker\'s space, if their Worker can be forced one space straight backwards to an unoccupied space at any level.'),
+        ),
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
@@ -134,6 +135,7 @@ $this->gods = array(
         'title'  => clienttranslate('Titan Benefactor of Mankind'),
         'power'  => array(
             clienttranslate('Your Turn: If your Worker does not move up, it may build both before and after moving.'),
+        ),
         'banned'  => array(),
         'players' => array(2, 3, 4),
         'golden'  => true,
