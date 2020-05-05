@@ -25,3 +25,28 @@
   pointer-events: visible;
 }
 
+
+.player-board {
+  position:relative;
+}
+
+.player-board .santorini-god {
+  width:80px;
+  height:80px;
+  background-image:url("./img/avatars_simple.png");
+  background-repeat:no-repeat;
+  background-size:cover;
+  margin-top:-20px;
+  float:right;
+}
+
+.santorini-god-1 { background-position:-0px 0px; }
+.santorini-god-2 { background-position:-80px 0px; }
+.santorini-god-3 { background-position:-160px 0px; }
+.santorini-god-4 { background-position:-240px 0px; }
+.santorini-god-5 { background-position:-320px 0px; }
+.santorini-god-6 { background-position:-400px 0px; }
+.santorini-god-7 { background-position:-480px 0px; }
+.santorini-god-8 { background-position:-560px 0px; }
+.santorini-god-9 { background-position:-640px 0px; }
+.santorini-god-10 { background-position:-720px 0px; }

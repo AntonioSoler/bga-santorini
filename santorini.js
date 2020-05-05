@@ -52,12 +52,14 @@ setup: function(gamedatas) {
 	var	container = document.getElementById('sceneContainer');
 	this.board = new Board(container, URL);
 
-		// TODO remove ?
-		/*
-		for (var player_id in gamedatas.players) {
-			var player = gamedatas.players[player_id];
-			player.colorName = colorNames[player.color];
-		}*/
+	for (var pId in gamedatas.players) {
+		var player = gamedatas.players[pId];
+		var player_board_div = $('player_board_' + pId);
+		dojo.place( this.format_block('jstpl_player_board', player ), player_board_div );
+
+		// TODO : remove ?
+		//		player.colorName = colorNames[player.color];
+	}
 
 	// Setup workers and buildings
 	gamedatas.placedPieces.forEach(this.createPiece.bind(this));
