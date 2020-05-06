@@ -85,16 +85,16 @@ define('ST_GAME_END', 99);
  */
 define('OPTION_GODS', 100);
   define('NO_POWER', 0);
-  define('SIMPLE', 1);
-  define('ADVANCED', 2);
+  define('SIMPLE_GODS', 1);
+  define('ALL_GODS', 2);
   define('GOLDEN_FLEECE', 3);
 
 define('OPTION_HEROES', 101);
-  define('HERO_OFF', 0);
-  define('HERO_ON', 1);
+  define('OFF', 0);
+  define('ON', 1);
 
 define('OPTION_SETUP', 102);
   define('RANDOM', 0);
-  define('DIVIDE_CHOOSE', 1);
+  define('FAIR_DIVISION', 1);
 
 ?>

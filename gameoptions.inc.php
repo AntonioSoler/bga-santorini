@@ -34,11 +34,11 @@ $game_options = [
         'name' => totranslate('Off'),
         'tmdisplay' => totranslate('No God Powers'),
       ],
-      SIMPLE => [
+      SIMPLE_GODS => [
         'name' => totranslate('Simple Gods'),
         'tmdisplay' => totranslate('Simple Gods'),
       ],
-      ADVANCED => [
+      ALL_GODS => [
         'name' => totranslate('All Gods'),
         'tmdisplay' => totranslate('All Gods'),
         'nobeginner' => true,
@@ -68,17 +68,17 @@ $game_options = [
   OPTION_HEROES => [
     'name' => totranslate('Hero Powers'),
     'values' => [
-      HERO_OFF => [
+      OFF => [
         'name' => totranslate('Off')
       ],
-      HERO_ON => [
+      ON => [
         'name' => totranslate('On'),
         'tmdisplay' => totranslate('Hero Powers'),
         'nobeginner' => true,
       ],
     ],
     'startcondition' => [
-      HERO_ON => [
+      ON => [
         [
           'type' => 'minplayers',
           'value' => 2,
@@ -99,9 +99,9 @@ $game_options = [
       RANDOM => [
         'name' => totranslate('Random'),
       ],
-      DIVIDE_CHOOSE => [
-        'name' => totranslate('Divide and Choose'),
-        'tmdisplay' => totranslate('Divide and Choose'),
+      FAIR_DIVISION => [
+        'name' => totranslate('Fair Division'),
+        'tmdisplay' => totranslate('Fair Division'),
       ],
     ],
     'displayconditionoperand' => 'or',
@@ -109,12 +109,12 @@ $game_options = [
       [
         'type' => 'otheroption',
         'id' => OPTION_GODS,
-        'value' => [SIMPLE, ADVANCED, GOLDEN_FLEECE],
+        'value' => [SIMPLE_GODS, ALL_GODS, GOLDEN_FLEECE],
       ],
       [
         'type' => 'otheroption',
         'id' => OPTION_HEROES,
-        'value' => [HERO_ON],
+        'value' => [ON],
       ],
     ],
   ],

@@ -14,6 +14,7 @@
  */
 
 @import url(../../../css/csslayer.css);
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
 
 #play-area {
   height: 1100px;
@@ -73,9 +74,8 @@ div.power-card div.power-card-name {
   width: 100%;
   color: #333;
   text-align: center;
-  font-variant: small-caps;
-  line-height: 31px;
-  font-size: 18px;
+  font: 20px/32px 'Caveat Brush', cursive;
+  text-transform: uppercase;
   z-index:3;
 }
 
