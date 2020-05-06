@@ -9,6 +9,13 @@ abstract class God extends APP_GameClass {
         }
     }
 
+    public static $id;
+    public static $name;
+    public static $title;
+    public static $power;
+    public static $banned;
+    public static $players;
+
     protected $game;
 
     public function __construct($game) {

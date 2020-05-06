@@ -591,17 +591,6 @@ $this->heroes = array(
         'players' => array(2),
     ),
 
-    JASON => array(
-        'name'   => clienttranslate('Jason'),
-        'title'  => clienttranslate('Leader of the Argonauts'),
-        'power'  => array(
-            clienttranslate('Setup: Take one extra Worker of your color. This is kept on your God Power card until needed.'),
-            clienttranslate('Your Turn: Once, instead of your normal turn, place your extra Worker on an unoccupied ground-level perimeter space. This Worker then builds.'),
-        ),
-        'banned'  => array(),
-        'players' => array(2),
-    ),
-
     MEDEA => array(
         'name'   => clienttranslate('Medea'),
         'title'  => clienttranslate('Powerful Sorceress'),
@@ -640,3 +629,15 @@ $this->heroes = array(
         'banned'  => array(NEMESIS),
     )
 );
+
+$test = ["Jason"];
+foreach($test as $className){
+  require_once("modules/$className.class.php");
+  $this->heroes[$className::$id] = [
+    'name'    => clienttranslate($className::$name),
+    'title'   => clienttranslate($className::$title),
+    'power'   => array_map('clienttranslate', $className::$power),
+    'banned'  => $className::$banned,
+    'players' => $className::$players,
+  ];
+}

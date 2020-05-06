@@ -92,6 +92,7 @@ protected function getAllDatas()
     'players' => $this->getPlayers(),
     'placedPieces' => $this->getPlacedPieces(),
     'movedWorker' => self::getGamestateValue('movedWorker'),
+    'heroes' => $this->heroes
   ];
 }
 
