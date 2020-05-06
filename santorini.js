@@ -53,9 +53,10 @@ setup: function(gamedatas) {
 	this.board = new Board(container, URL);
 
 	for (var pId in gamedatas.players) {
-		var player = gamedatas.players[pId];
-		var player_board_div = $('player_board_' + pId);
-		dojo.place( this.format_block('jstpl_player_board', player ), player_board_div );
+		// TODO remove or replace with name of power
+		//var player = gamedatas.players[pId];
+		//var player_board_div = $('player_board_' + pId);
+		//dojo.place( this.format_block('jstpl_player_board', player ), player_board_div );
 
 		// TODO : remove ?
 		//		player.colorName = colorNames[player.color];
