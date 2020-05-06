@@ -195,6 +195,14 @@ Board.prototype.render = function() {
 
 
 /*
+ * Add a mesh to a given (abstract) position (useful for raycasting)
+ */
+Board.prototype.addMeshToBoard = function(mesh, space){
+	mesh.space = { x : space.x, y : space.y, z : space.z };
+	this._board[space.x][space.y][space.z].piece = mesh;
+}
+
+/*
  * Add a piece to a given position
  * - str name : name of the mesh
  * - mixed space : contains the location
@@ -207,12 +215,11 @@ Board.prototype.addPiece = function(piece){
 
 	var mesh = this._meshManager.createMesh(piece.name);
 	mesh.name = piece.name;
-	mesh.space = { x : piece.x, y : piece.y, z : piece.z };
 	mesh.position.copy(sky);
 	mesh.rotation.set(0, Math.floor(Math.random() * 4)*Math.PI/2, 0);
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;
-	this._board[piece.x][piece.y][piece.z].piece = mesh;
+	this.addMeshToBoard(mesh, piece);
 
 	return new Promise(function(resolve, reject){
 		Tween.get(mesh.position)
@@ -231,8 +238,7 @@ Board.prototype.movePiece = function(piece, space){
 	// Update location on (abstract) board
 	var mesh = this._board[piece.x][piece.y][piece.z].piece;
 	this._board[piece.x][piece.y][piece.z].piece = null;
-	this._board[space.x][space.y][space.z].piece = mesh;
-	mesh.space = space;
+	this.addMeshToBoard(mesh, space);
 
 	// Animate
 	var target = new THREE.Vector3(xCenters[space.x], lvlHeights[space.z], zCenters[space.y]);
@@ -249,6 +255,35 @@ Board.prototype.movePiece = function(piece, space){
 		.to(target, 600,  Ease.cubicInOut)
 };
 
+/*
+ * Switch two pieces
+ * - mixed piece1
+ * - mixed piece2
+ */
+Board.prototype.switchPiece = function(piece1, piece2){
+	// Update location on (abstract) board
+	var mesh1 = this._board[piece1.x][piece1.y][piece1.z].piece;
+	var mesh2 = this._board[piece2.x][piece2.y][piece2.z].piece;
+	this.addMeshToBoard(mesh1, piece2);
+	this.addMeshToBoard(mesh2, piece1);
+
+	// Animate
+	var maxZ = Math.max(piece1.z, piece2.z);
+	var tmp1 = mesh1.position.clone();
+	tmp1.setY(lvlHeights[maxZ] + 1);
+	var tmp2 = mesh2.position.clone();
+	tmp2.setY(lvlHeights[maxZ] + 1);
+
+	Tween.get(mesh1.position)
+		.to(tmp1, 700,  Ease.cubicInOut)
+		.to(tmp2, 600,  Ease.cubicInOut)
+		.to(mesh2.position, 600,  Ease.cubicInOut)
+
+	Tween.get(mesh2.position)
+		.to(tmp2, 700,  Ease.cubicInOut)
+		.to(tmp1, 600,  Ease.cubicInOut)
+		.to(mesh1.position, 600,  Ease.cubicInOut)
+};
 
 
 

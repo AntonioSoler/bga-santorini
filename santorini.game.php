@@ -113,6 +113,17 @@ public function getGameProgression()
 ///////////////////////////////////////////
 
 /*
+ * getPower: return the power of a player (current if optionnal parameter not given)
+ */
+public function getPower($pId = -1){
+  if($pId == -1)
+    $pId = self::getActivePlayerId();
+  $player = self::getPlayer($pId);
+
+  return Power::getPower($this, $player['power']);
+}
+
+/*
  * getPlayers: return all basic infos about all players
  */
 public function getPlayers()
@@ -126,7 +137,7 @@ public function getPlayers()
  */
 public function getPlayer($pId)
 {
-  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player WHERE player_id = $player_id");
+  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player WHERE player_id = $pId");
 }
 
 /*
@@ -134,7 +145,7 @@ public function getPlayer($pId)
  */
 public function getTeammates($pId)
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_hero hero, player_team team, player_no no FROM player
+  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player
     WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
 }
 
@@ -346,6 +357,10 @@ public function moveWorker($wId, $x, $y, $z)
 {
   self::checkAction('moveWorker');
 
+  // Check if power apply
+  if(self::getPower()->playerMove($wId, $x, $y, $z))
+    return;
+
   // Get information about the piece
   $worker = $this->getPiece($wId);
 
@@ -462,6 +477,9 @@ public function argPlayerMove()
   foreach ($workers as &$worker)
     $worker["accessibleSpaces"] = self::getNeighbouringSpaces($worker, 'moving');
 
+  // Apply power
+  self::getPower()->argPlayerMove($workers);
+
   return ['workers' => $workers];
 }
 
@@ -539,11 +557,12 @@ public function stGodsSetup()
     }
   }
 
+  $assignedTeams = [];
   foreach ($players as $player) {
     // Don't create worker for second player of the team
-    // TODO make a more robust way to do so ?
-    if($player["no"] != $player["team"])
+    if(isset($assignedTeams[$player["team"]]))
       continue;
+    $assignedTeams[$player["team"]] = true;
 
     // TODO: some gods grant extra workers
     self::addWorker($player, 'f');
@@ -591,7 +610,7 @@ public function stHeroesSetup()
       }
 
       // Invoke hero-specific setup
-      God::getGod($this, $heroId)->setup($player);
+      Power::getPower($this, $heroId)->setup($player);
     }
   }
 

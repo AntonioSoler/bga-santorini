@@ -48,6 +48,16 @@ const Meshes = [
 
 /* Workers */
 	{
+		n:'f0worker',
+		g:'fWorker',
+		s:0.9
+	},
+	{
+		n:'m0worker',
+		g:'mWorker',
+		s:0.9
+	},
+	{
 		n:'f1worker',
 		g:'fWorker',
 		s:0.9

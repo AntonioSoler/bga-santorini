@@ -755,8 +755,15 @@ $heroes = array(
     )
 );
 
+echo "\$rpowers = [<br />";
+foreach($gods as $id => $god){
+  echo "  ".$r[$id]." => '".ucfirst(strtolower($r[$id]))."', <br />";
+}
+foreach($heroes as $id => $god){
+  echo "  ".$r[$id]." => '".ucfirst(strtolower($r[$id]))."', <br />";
+}
 
-
+/*
 foreach($gods as $id => $god){
   $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
   fwrite($fp, "<?php
@@ -804,5 +811,5 @@ class ".$god['name']." extends Power
   ");
   fclose($fp);
 }
-
+*/
  ?>

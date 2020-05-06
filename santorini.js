@@ -277,6 +277,11 @@ setupNotifications: function() {
 
 	dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
 	this.notifqueue.setSynchronous('blockBuilt', 2000);
+
+	// Happens with Apollo
+	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
+	this.notifqueue.setSynchronous('workerSwitched', 2000);
+
 },
 
 
@@ -309,6 +314,15 @@ notif_blockBuilt: function(n) {
 	this.createPiece(n.args.piece);
 },
 
+
+/*
+ * notif_workerSwitched:
+ *   called whenever two workers are switched using Apollo
+ */
+notif_workerSwitched : function(n) {
+	console.info('Notif: worker switched', n.args);
+	this.board.switchPiece(n.args.piece1, n.args.piece2);
+},
 
 });
 });
