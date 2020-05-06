@@ -19,6 +19,11 @@
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 require_once('constants.inc.php');
 
+// TODO autoload, use spl_autoload_register ???
+require_once('modules/God.class.php');
+require_once('modules/DummyGod.class.php');
+require_once('modules/Jason.class.php');
+
 class santorini extends Table
 {
   public function __construct()
@@ -281,10 +286,10 @@ public function getNeighbouringSpaces($piece, $action)
  *   TODO
  * params: TODO
  */
-public function addWorker($player, $type) {
+public function addWorker($player, $type, $location='desk') {
   $pId = $player['id'];
   $type_arg = $type.$player['team'];
-  self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$pId', 'worker', '$type_arg', 'desk')");
+  self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$pId', 'worker', '$type_arg', '$location')");
 }
 
 
@@ -508,16 +513,16 @@ public function stGodsSetup()
   // Filter gods depending on the number of players and game option
   $possibleGods = array_filter($this->gods, function($god, $godId) use ($nPlayers, $optionGods) {
     return in_array($nPlayers, $god['players']) &&
-      (    ($optionGods == SIMPLE && $godId <= 10)
-        || ($optionGods == ADVANCED && !$god['golden'])
-        || ($optionGods == GOLDEN_FLEECE)
+      (    ($optionGods == SIMPLE_GODS && $godId <= 10)
+        || ($optionGods == ALL_GODS)
+        || ($optionGods == GOLDEN_FLEECE && $god['golden'])
       );
   }, ARRAY_FILTER_USE_BOTH);
 
   // Depending on the option setup
   $optionSetup = intval(self::getGameStateValue('optionSetup'));
-  if ($optionSetup == DIVIDE_CHOOSE) {
-    throw new BgaVisibleSystemException('God Powers: Divide and Choose not yet implemented!');
+  if ($optionSetup == FAIR_DIVISION) {
+    throw new BgaVisibleSystemException('God Powers: Fair Division algorithm not yet implemented!');
   }
   else if ($optionSetup == RANDOM) {
     foreach ($players as $pId => $player) {
@@ -529,8 +534,12 @@ public function stGodsSetup()
 
       // Remove this god and any banned gods
       unset($possibleGods[$godId]);
-      foreach ($this->gods[$godId]['banned'] as $bannedId)
+      foreach ($this->gods[$godId]['banned'] as $bannedId) {
         unset($possibleGods[$bannedId]);
+      }
+
+      // Invoke god-specific setup
+      God::getGod($this, $godId)->setup($player);
     }
   }
 
@@ -553,7 +562,7 @@ public function stHeroesSetup()
 {
   // Check first if we are playing with powers or not
   $optionHeroes = intval(self::getGameStateValue('optionHeroes'));
-  if ($optionHeroes == HERO_OFF) {
+  if ($optionHeroes == OFF) {
     $this->gamestate->nextState('done');
     return;
   }
@@ -561,8 +570,6 @@ public function stHeroesSetup()
   // Gather information about number of players
   $players = self::getPlayers();
   $nPlayers = count($players);
-  $nTeams = ($nPlayers == 3) ? 3 : 2;
-
 
   $possibleHeroes = array_filter($this->heroes, function($hero, $heroId) {
     // TODO: filter banned heroes
@@ -570,25 +577,27 @@ public function stHeroesSetup()
   }, ARRAY_FILTER_USE_BOTH);
 
   $optionSetup  = intval(self::getGameStateValue('optionSetup'));
-  if ($optionSetup == DIVIDE_CHOOSE) {
-    throw new BgaVisibleSystemException('Hero Powers: Divide and Choose not yet implemented!');
+  if ($optionSetup == FAIR_DIVISION) {
+    throw new BgaVisibleSystemException('Hero Powers: Fair Division algorithm not yet implemented!');
   }
   else if ($optionSetup == RANDOM){
     foreach ($players as $pId => $player) {
-      $heroId = array_rand($possibleHeroes);
-      $hreoName = $this->heros[$heroId]['name'];
+      $heroId = JASON; //array_rand($possibleHeroes);
+      $heroName = $this->heroes[$heroId]['name'];
       $playerName = $player['name'];
       self::DbQuery("UPDATE player SET player_hero = $heroId WHERE player_id = $pId");
-      self::notifyAllPlayers('message', "Player $playerName assigned hero $godName", []);
+      self::notifyAllPlayers('message', "Player $playerName assigned hero $heroName", []);
 
-      // Remove this hero and any banned hero
+      // Remove this hero and any banned heroes
       unset($possibleHeroes[$heroId]);
-      foreach ($this->heroes[$heroId]['banned'] as $bannedId)
+      foreach ($this->heroes[$heroId]['banned'] as $bannedId) {
         unset($possibleHeroes[$bannedId]);
+      }
+
+      // Invoke hero-specific setup
+      God::getGod($this, $heroId)->setup($player);
     }
   }
-
-  // TODO: some heroes (JASON) grant extra workers
 
   $this->gamestate->nextState('done');
 }
