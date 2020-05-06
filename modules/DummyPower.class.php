@@ -1,6 +1,6 @@
 <?php
 
-class DummyGod extends God
+class DummyPower extends Power
 {
     public function setup($player)
     {

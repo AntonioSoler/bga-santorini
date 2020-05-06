@@ -19,11 +19,6 @@
 require_once(APP_GAMEMODULE_PATH.'module/table/table.game.php');
 require_once('constants.inc.php');
 
-// TODO autoload, use spl_autoload_register ???
-require_once('modules/God.class.php');
-require_once('modules/DummyGod.class.php');
-require_once('modules/Jason.class.php');
-
 class santorini extends Table
 {
   public function __construct()
@@ -92,7 +87,7 @@ protected function getAllDatas()
     'players' => $this->getPlayers(),
     'placedPieces' => $this->getPlacedPieces(),
     'movedWorker' => self::getGamestateValue('movedWorker'),
-    'heroes' => $this->heroes
+    'powers' => $this->powers // TODO : to remove, useful only for debug
   ];
 }
 
@@ -122,7 +117,7 @@ public function getGameProgression()
  */
 public function getPlayers()
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team, player_no no FROM player");
+  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player");
 }
 
 /*
@@ -131,7 +126,7 @@ public function getPlayers()
  */
 public function getPlayer($pId)
 {
-  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team, player_no no FROM player WHERE player_id = $player_id");
+  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player WHERE player_id = $player_id");
 }
 
 /*
@@ -139,7 +134,7 @@ public function getPlayer($pId)
  */
 public function getTeammates($pId)
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_god god, player_hero hero, player_team team, player_no no FROM player
+  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_hero hero, player_team team, player_no no FROM player
     WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
 }
 
@@ -512,11 +507,11 @@ public function stGodsSetup()
   $nPlayers = count($players);
 
   // Filter gods depending on the number of players and game option
-  $possibleGods = array_filter($this->gods, function($god, $godId) use ($nPlayers, $optionGods) {
-    return in_array($nPlayers, $god['players']) &&
-      (    ($optionGods == SIMPLE_GODS && $godId <= 10)
+  $possibleGods = array_filter($this->powers, function($power, $id) use ($nPlayers, $optionGods) {
+    return !$power['hero'] && in_array($nPlayers, $power['players']) &&
+      (    ($optionGods == SIMPLE_GODS && $id <= 10)
         || ($optionGods == ALL_GODS)
-        || ($optionGods == GOLDEN_FLEECE && $god['golden'])
+        || ($optionGods == GOLDEN_FLEECE && $power['golden'])
       );
   }, ARRAY_FILTER_USE_BOTH);
 
@@ -528,19 +523,19 @@ public function stGodsSetup()
   else if ($optionSetup == RANDOM) {
     foreach ($players as $pId => $player) {
       $godId = array_rand($possibleGods);
-      $godName = $this->gods[$godId]['name'];
+      $godName = $this->powers[$godId]['name'];
       $playerName = $player['name'];
-      self::DbQuery("UPDATE player SET player_god = $godId WHERE player_id = $pId");
+      self::DbQuery("UPDATE player SET player_power = $godId WHERE player_id = $pId");
       self::notifyAllPlayers('message', "Player $playerName assigned god $godName", []);
 
       // Remove this god and any banned gods
       unset($possibleGods[$godId]);
-      foreach ($this->gods[$godId]['banned'] as $bannedId) {
+      foreach ($this->powers[$godId]['banned'] as $bannedId) {
         unset($possibleGods[$bannedId]);
       }
 
       // Invoke god-specific setup
-      God::getGod($this, $godId)->setup($player);
+      Power::getPower($this, $godId)->setup($player);
     }
   }
 
@@ -572,9 +567,9 @@ public function stHeroesSetup()
   $players = self::getPlayers();
   $nPlayers = count($players);
 
-  $possibleHeroes = array_filter($this->heroes, function($hero, $heroId) {
+  $possibleHeroes = array_filter($this->powers, function($power, $id) {
     // TODO: filter banned heroes
-    return true;
+    return $power['hero'];
   }, ARRAY_FILTER_USE_BOTH);
 
   $optionSetup  = intval(self::getGameStateValue('optionSetup'));
@@ -584,14 +579,14 @@ public function stHeroesSetup()
   else if ($optionSetup == RANDOM){
     foreach ($players as $pId => $player) {
       $heroId = JASON; //array_rand($possibleHeroes);
-      $heroName = $this->heroes[$heroId]['name'];
+      $heroName = $this->powers[$heroId]['name'];
       $playerName = $player['name'];
-      self::DbQuery("UPDATE player SET player_hero = $heroId WHERE player_id = $pId");
+      self::DbQuery("UPDATE player SET player_power = $heroId WHERE player_id = $pId");
       self::notifyAllPlayers('message', "Player $playerName assigned hero $heroName", []);
 
       // Remove this hero and any banned heroes
       unset($possibleHeroes[$heroId]);
-      foreach ($this->heroes[$heroId]['banned'] as $bannedId) {
+      foreach ($this->powers[$heroId]['banned'] as $bannedId) {
         unset($possibleHeroes[$bannedId]);
       }
 

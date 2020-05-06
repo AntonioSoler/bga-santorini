@@ -1,17 +1,19 @@
 <?php
 
-abstract class God extends APP_GameClass {
-    /* Factory function to create a god by ID */
-    public static function getGod($game, $godId) {
+abstract class Power extends APP_GameClass {
+    /* Factory function to create a power by ID */
+    public static function getPower($game, $godId) {
         switch($godId) {
             case JASON:     return new Jason($game);
-            default:        return new DummyGod($game);
+            default:        return new DummyPower($game);
         }
     }
 
     public static $id;
     public static $name;
     public static $title;
+    public static $golden;
+    public static $hero;
     public static $power;
     public static $banned;
     public static $players;
