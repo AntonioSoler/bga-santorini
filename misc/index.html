@@ -35,10 +35,11 @@ for(var j = 0; j < 5; j++)
 board.makeClickable(tPos, click, 'move');
 
 
-for(var i = 1; i <= 10; i++){
+for(var i = 1; i <= 55; i++){
 //	document.write(".santorini-god-"+i+" { background-position:-"+ (80*(i-1)) +"px 0px; }<br />");
 //	document.write("div.power-"+i+" div.power-card-background { background-position:-"+ (260*(i-1)) +"px 0px; }<br />");
-	document.write("div.power-"+i+" div.power-card-power { background-image:url('./img/powers/"+i+".png'); }<br />");
+//	document.write("div.power-"+i+" div.power-card-power { background-image:url('./img/powers/"+ String(i).padStart(3, '0')+".png'); }<br />");
+	document.write("div.power-"+i+" div.power-card-background { background-image:url('./img/gods/"+ String(i).padStart(3, '0')+".png'); }<br />");
 
 
 }
