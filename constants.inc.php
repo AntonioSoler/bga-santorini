@@ -71,8 +71,11 @@ define('THESEUS', 55);
  * State constants
  */
 define('ST_GAME_SETUP', 1);
-define('ST_GODS_SETUP', 10);
-define('ST_HEROES_SETUP', 11);
+define('ST_POWERS_SETUP', 10);
+define('ST_POWERS_DIVIDE', 12);
+define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
+define('ST_POWERS_CHOOSE', 14);
+
 define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);
 define('ST_NEXT_PLAYER', 5);
@@ -83,15 +86,13 @@ define('ST_GAME_END', 99);
 /*
  * Options constants
  */
-define('OPTION_GODS', 100);
+define('OPTION_POWERS', 100);
   define('NO_POWER', 0);
   define('SIMPLE_GODS', 1);
   define('ALL_GODS', 2);
-  define('GOLDEN_FLEECE', 3);
-
-define('OPTION_HEROES', 101);
-  define('OFF', 0);
-  define('ON', 1);
+  define('ONLY_HEROES', 3);
+  define('GODS_AND_HEROES', 4);
+  define('GOLDEN_FLEECE', 5);
 
 define('OPTION_SETUP', 102);
   define('RANDOM', 0);

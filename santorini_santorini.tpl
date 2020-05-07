@@ -4,10 +4,10 @@
 		<div id="scene-container"></div>
 		<div id="powers-container">
 			<!-- BEGIN card -->
-				<div class="power-card power-{GOD_ID}">
+				<div class="power-card power-{POWER_ID}">
 					<div class="power-card-background"></div>
 					<div class="power-card-overlay"></div>
-					<div class="power-card-name">{GOD_NAME}</div>
+					<div class="power-card-name">{POWER_NAME}</div>
 					<div class="power-card-power"></div>
 				</div>
 			<!-- END card -->

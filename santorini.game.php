@@ -32,8 +32,7 @@ class santorini extends Table
 
     self::initGameStateLabels([
       'movedWorker' => 13,
-      'optionGods' => OPTION_GODS,
-      'optionHeroes' => OPTION_HEROES,
+      'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
     ]);
   }
@@ -510,12 +509,11 @@ public function argPlayerBuild()
  * stPowersSetup:
  *   called right after the board setup, should give a god/hero to each player unless basic mode
  */
- // TODO when hero is on, we should skip this step ?
-public function stGodsSetup()
+public function stPowersSetup()
 {
   // Check first if we are playing with powers or not
-  $optionGods = intval(self::getGameStateValue('optionGods'));
-  if ($optionGods == NO_POWER) {
+  $optionPowers = intval(self::getGameStateValue('optionPowers'));
+  if ($optionPowers == NO_POWER) {
     $this->gamestate->nextState('done');
     return;
   }
@@ -524,12 +522,14 @@ public function stGodsSetup()
   $players = self::getPlayers();
   $nPlayers = count($players);
 
-  // Filter gods depending on the number of players and game option
-  $possibleGods = array_filter($this->powers, function($power, $id) use ($nPlayers, $optionGods) {
-    return !$power['hero'] && in_array($nPlayers, $power['players']) &&
-      (    ($optionGods == SIMPLE_GODS && $id <= 10)
-        || ($optionGods == ALL_GODS)
-        || ($optionGods == GOLDEN_FLEECE && $power['golden'])
+  // Filter powers depending on the number of players and game option
+  $possiblePowers = array_filter($this->powers, function($power, $id) use ($nPlayers, $optionPowers) {
+    return in_array($nPlayers, $power['players']) &&
+      (    ($optionPowers == SIMPLE_GODS && $id <= 10)
+        || ($optionPowers == ALL_GODS && !$power['hero'])
+        || ($optionPowers == ONLY_HEROES && $power['hero'])
+        || ($optionPowers == GODS_AND_HEROES)
+        || ($optionPowers == GOLDEN_FLEECE && $power['golden'] && !$power['hero'])
       );
   }, ARRAY_FILTER_USE_BOTH);
 
@@ -540,20 +540,20 @@ public function stGodsSetup()
   }
   else if ($optionSetup == RANDOM) {
     foreach ($players as $pId => $player) {
-      $godId = array_rand($possibleGods);
-      $godName = $this->powers[$godId]['name'];
+      $powerId = array_rand($possiblePowers);
+      $powerName = $this->powers[$powerId]['name'];
       $playerName = $player['name'];
-      self::DbQuery("UPDATE player SET player_power = $godId WHERE player_id = $pId");
-      self::notifyAllPlayers('message', "Player $playerName assigned god $godName", []);
+      self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = $pId");
+      self::notifyAllPlayers('message', "Player $playerName assigned $powerName", []); // TODO translate ?
 
-      // Remove this god and any banned gods
-      unset($possibleGods[$godId]);
-      foreach ($this->powers[$godId]['banned'] as $bannedId) {
-        unset($possibleGods[$bannedId]);
+      // Remove this power and any banned powers
+      unset($possiblePowers[$powerId]);
+      foreach ($this->powers[$powerId]['banned'] as $bannedId) {
+        unset($possiblePowers[$bannedId]);
       }
 
-      // Invoke god-specific setup
-      Power::getPower($this, $godId)->setup($player);
+      // Invoke power-specific setup
+      Power::getPower($this, $powerId)->setup($player);
     }
   }
 
@@ -571,52 +571,6 @@ public function stGodsSetup()
 
   $this->gamestate->nextState('done');
 }
-
-
-public function stHeroesSetup()
-{
-  // Check first if we are playing with powers or not
-  $optionHeroes = intval(self::getGameStateValue('optionHeroes'));
-  if ($optionHeroes == OFF) {
-    $this->gamestate->nextState('done');
-    return;
-  }
-
-  // Gather information about number of players
-  $players = self::getPlayers();
-  $nPlayers = count($players);
-
-  $possibleHeroes = array_filter($this->powers, function($power, $id) {
-    // TODO: filter banned heroes
-    return $power['hero'];
-  }, ARRAY_FILTER_USE_BOTH);
-
-  $optionSetup  = intval(self::getGameStateValue('optionSetup'));
-  if ($optionSetup == FAIR_DIVISION) {
-    throw new BgaVisibleSystemException('Hero Powers: Fair Division algorithm not yet implemented!');
-  }
-  else if ($optionSetup == RANDOM){
-    foreach ($players as $pId => $player) {
-      $heroId = JASON; //array_rand($possibleHeroes);
-      $heroName = $this->powers[$heroId]['name'];
-      $playerName = $player['name'];
-      self::DbQuery("UPDATE player SET player_power = $heroId WHERE player_id = $pId");
-      self::notifyAllPlayers('message', "Player $playerName assigned hero $heroName", []);
-
-      // Remove this hero and any banned heroes
-      unset($possibleHeroes[$heroId]);
-      foreach ($this->powers[$heroId]['banned'] as $bannedId) {
-        unset($possibleHeroes[$bannedId]);
-      }
-
-      // Invoke hero-specific setup
-      Power::getPower($this, $heroId)->setup($player);
-    }
-  }
-
-  $this->gamestate->nextState('done');
-}
-
 
 
 /*

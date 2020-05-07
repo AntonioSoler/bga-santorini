@@ -27,12 +27,12 @@
 require_once("constants.inc.php");
 
 $game_options = [
-  OPTION_GODS => [
-    'name' => totranslate('God Powers'),
+  OPTION_POWERS => [
+    'name' => totranslate('Powers'),
     'values' => [
       NO_POWER => [
         'name' => totranslate('Off'),
-        'tmdisplay' => totranslate('No God Powers'),
+        'tmdisplay' => totranslate('No Powers'),
       ],
       SIMPLE_GODS => [
         'name' => totranslate('Simple Gods'),
@@ -41,6 +41,16 @@ $game_options = [
       ALL_GODS => [
         'name' => totranslate('All Gods'),
         'tmdisplay' => totranslate('All Gods'),
+        'nobeginner' => true,
+      ],
+      ONLY_HEROES => [
+        'name' => totranslate('Only Heroes'),
+        'tmdisplay' => totranslate('Only Heroes'),
+        'nobeginner' => true,
+      ],
+      GODS_AND_HEROES => [
+        'name' => totranslate('All gods and heroes'),
+        'tmdisplay' => totranslate('All gods and heroes'),
         'nobeginner' => true,
       ],
       GOLDEN_FLEECE => [
@@ -62,23 +72,19 @@ $game_options = [
           'message' => totranslate('Golden Fleece Variant requires exactly 2 players.'),
         ],
       ],
-    ],
-  ],
-
-  OPTION_HEROES => [
-    'name' => totranslate('Hero Powers'),
-    'values' => [
-      OFF => [
-        'name' => totranslate('Off')
+      ONLY_HEROES => [
+        [
+          'type' => 'minplayers',
+          'value' => 2,
+          'message' => totranslate('Hero Powers requires exactly 2 players.'),
+        ],
+        [
+          'type' => 'maxplayers',
+          'value' => 2,
+          'message' => totranslate('Hero Powers requires exactly 2 players.'),
+        ],
       ],
-      ON => [
-        'name' => totranslate('On'),
-        'tmdisplay' => totranslate('Hero Powers'),
-        'nobeginner' => true,
-      ],
-    ],
-    'startcondition' => [
-      ON => [
+      GODS_AND_HEROES => [
         [
           'type' => 'minplayers',
           'value' => 2,
@@ -108,13 +114,8 @@ $game_options = [
     'displaycondition' => [
       [
         'type' => 'otheroption',
-        'id' => OPTION_GODS,
-        'value' => [SIMPLE_GODS, ALL_GODS, GOLDEN_FLEECE],
-      ],
-      [
-        'type' => 'otheroption',
-        'id' => OPTION_HEROES,
-        'value' => [ON],
+        'id' => OPTION_POWERS,
+        'value' => [SIMPLE_GODS, ALL_GODS, ONLY_HEROES, GODS_AND_HEROES, GOLDEN_FLEECE],
       ],
     ],
   ],

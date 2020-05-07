@@ -61,37 +61,65 @@ ST_GAME_SETUP => [
   'type' => 'manager',
   'action' => 'stGameSetup',
   'transitions' => [
-    '' => ST_GODS_SETUP,
+    '' => ST_POWERS_SETUP,
   ],
 ],
 
 /*
- * The God Powers setup state.
- * TODO: game state for the moment, but depending on game mode, might be different
+ * The God/Hero Powers setup state.
  */
-ST_GODS_SETUP => [
-  'name' => 'godsSetup',
+ST_POWERS_SETUP => [
+  'name' => 'powersSetup',
   'description' => '',
   'type' => 'game',
-  'action' => 'stGodsSetup',
-  'transitions' => [
-    'done' => ST_HEROES_SETUP,
-  ],
-],
-
-/*
- * The Hero Powers setup state.
- * TODO: game state for the moment, but depending on game mode, might be different
- */
-ST_HEROES_SETUP => [
-  'name' => 'heroesSetup',
-  'description' => '',
-  'type' => 'game',
-  'action' => 'stHeroesSetup',
+  'action' => 'stPowersSetup',
   'transitions' => [
     'done' => ST_NEXT_PLAYER_PLACE_WORKER,
+    'divide' => ST_POWERS_DIVIDE
   ],
 ],
+
+/*
+ * The following is for divide/choose mode.
+ *
+ */
+ST_POWERS_DIVIDE => [
+  'name' => 'powersDivide',
+  'description' => clienttranslate('${actplayer} must choose powers'),
+  'descriptionmyturn' => clienttranslate('${you} must choose powers'),
+  'type' => 'activeplayer',
+  'args' => 'argPowersDivide',
+  'possibleactions' => ['divide'],
+  'transitions' => [
+//TODO:    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+    'divide' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+  ],
+],
+
+ST_POWERS_NEXT_PLAYER_CHOOSE => [
+  'name' => 'powersNextPlayerChoose',
+  'description' => '',
+  'type' => 'game',
+  'action' => 'stPowersNextPlayerChoose',
+  'transitions' => [
+    'next' => ST_POWERS_CHOOSE,
+    'done' => ST_NEXT_PLAYER_PLACE_WORKER, // TODO should add a state with choose of first player
+  ],
+],
+
+ST_POWERS_CHOOSE => [
+  'name' => 'powersPlayerChoose',
+  'description' => clienttranslate('${actplayer} must choose a power'),
+  'descriptionmyturn' => clienttranslate('${you} must choose a power'),
+  'type' => 'activeplayer',
+  'args' => 'argPowersChoose',
+  'possibleactions' => ['choose'],
+  'transitions' => [
+// TODO    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+    'workerPlaced' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+  ],
+],
+
 
 /*
  * Worker placement
