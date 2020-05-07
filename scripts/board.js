@@ -50,10 +50,10 @@ var Board = function(container, url){
 	}
 	this._ids = [];
 	this._clickable = [];
+	this._animated = false;
 
 	this.initScene();
 	this.initBoard();
-	this.animate();
 };
 
 
@@ -174,13 +174,24 @@ Board.prototype.initBoard = function(){
 /*
  * Infinite loop for rendering
  */
-var animate = true; // Useful to turn off the animation
 Board.prototype.animate = function(){
-	if(animate)
+	if(this._animated)
 		requestAnimationFrame(this.animate.bind(this));
 	this.render();
 	this._stats.update();
 }
+
+Board.prototype.display = function(){
+	if(this._animated)
+		return;
+
+	this._animated = true;
+	this.animate();
+};
+
+Board.prototype.hide = function(){
+	this._animated = false;
+};
 
 
 /*

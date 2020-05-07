@@ -299,12 +299,54 @@ public function addWorker($player, $type, $location='desk') {
 }
 
 
+
+
+/*
+ * Get possible powers:
+ *   TODO
+ * params: TODO
+ */
+public function getPlayablePowers(){
+  $optionPowers = intval(self::getGameStateValue('optionPowers'));
+  if ($optionPowers == NO_POWER) {
+    return [];
+  }
+
+  // Gather information about number of players
+  $players = self::getPlayers();
+  $nPlayers = count($players);
+
+  // Filter powers depending on the number of players and game option
+  return array_filter($this->powers, function($power, $id) use ($nPlayers, $optionPowers) {
+    return in_array($nPlayers, $power['players']) &&
+      (    ($optionPowers == SIMPLE_GODS && $id <= 10)
+        || ($optionPowers == ALL_GODS && !$power['hero'])
+        || ($optionPowers == ONLY_HEROES && $power['hero'])
+        || ($optionPowers == GODS_AND_HEROES)
+        || ($optionPowers == GOLDEN_FLEECE && $power['golden'] && !$power['hero'])
+      );
+  }, ARRAY_FILTER_USE_BOTH);
+}
+
+
 ///////////////////////////////////////
 //////////   Player actions   /////////
 ///////////////////////////////////////
 // Each time a player is doing some game action, one of the methods below is called.
 //   (note: each method below must match an input method in santorini.action.php)
 ///////////////////////////////////////
+
+
+/*
+ * dividePowers: TODO
+ */
+public function dividePowers()
+{
+  self::checkAction('dividePowers');
+
+}
+
+
 
 /*
  * placeWorker: place a new worker on the board
@@ -455,6 +497,17 @@ public function build($x, $y, $z)
 /*
  * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
  */
+public function argDividePowers()
+{
+  return [
+    'powers' =>  array_values($this->getPlayablePowers())
+  ];
+}
+
+
+/*
+ * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
+ */
 public function argPlaceWorker()
 {
   $pId = self::getActivePlayerId();
@@ -518,43 +571,34 @@ public function stPowersSetup()
     return;
   }
 
-  // Gather information about number of players
-  $players = self::getPlayers();
-  $nPlayers = count($players);
-
-  // Filter powers depending on the number of players and game option
-  $possiblePowers = array_filter($this->powers, function($power, $id) use ($nPlayers, $optionPowers) {
-    return in_array($nPlayers, $power['players']) &&
-      (    ($optionPowers == SIMPLE_GODS && $id <= 10)
-        || ($optionPowers == ALL_GODS && !$power['hero'])
-        || ($optionPowers == ONLY_HEROES && $power['hero'])
-        || ($optionPowers == GODS_AND_HEROES)
-        || ($optionPowers == GOLDEN_FLEECE && $power['golden'] && !$power['hero'])
-      );
-  }, ARRAY_FILTER_USE_BOTH);
-
-  // Depending on the option setup
   $optionSetup = intval(self::getGameStateValue('optionSetup'));
   if ($optionSetup == FAIR_DIVISION) {
-    throw new BgaVisibleSystemException('God Powers: Fair Division algorithm not yet implemented!');
+    $this->gamestate->nextState('divide');
+    return;
   }
-  else if ($optionSetup == RANDOM) {
-    foreach ($players as $pId => $player) {
-      $powerId = array_rand($possiblePowers);
-      $powerName = $this->powers[$powerId]['name'];
-      $playerName = $player['name'];
-      self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = $pId");
-      self::notifyAllPlayers('message', "Player $playerName assigned $powerName", []); // TODO translate ?
 
-      // Remove this power and any banned powers
-      unset($possiblePowers[$powerId]);
-      foreach ($this->powers[$powerId]['banned'] as $bannedId) {
-        unset($possiblePowers[$bannedId]);
-      }
+  // Should be RANDOM at this point
+  if ($optionSetup != RANDOM)
+    throw new BgaVisibleSystemException( 'Error with powers game option' );
 
-      // Invoke power-specific setup
-      Power::getPower($this, $powerId)->setup($player);
+
+  $players = self::getPlayers();
+  $possiblePowers = $this->getPlayablePowers();
+  foreach ($players as $pId => $player) {
+    $powerId = array_rand($possiblePowers);
+    $powerName = $this->powers[$powerId]['name'];
+    $playerName = $player['name'];
+    self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = $pId");
+    self::notifyAllPlayers('message', "Player $playerName assigned $powerName", []); // TODO translate ?
+
+    // Remove this power and any banned powers
+    unset($possiblePowers[$powerId]);
+    foreach ($this->powers[$powerId]['banned'] as $bannedId) {
+      unset($possiblePowers[$bannedId]);
     }
+
+    // Invoke power-specific setup
+    Power::getPower($this, $powerId)->setup($player);
   }
 
   $assignedTeams = [];

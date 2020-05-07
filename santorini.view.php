@@ -46,7 +46,7 @@ class view_santorini_santorini extends game_view
     foreach($players as $player){
       $this->page->insert_block( "card", [
         'POWER_ID' => $player['power'],
-        'POWER_NAME' => $this->game->powers[$player['power']]['name'],
+        'POWER_NAME' => ($player['power'] == 0)? '' : $this->game->powers[$player['power']]['name'],
       ]);
     }
   }

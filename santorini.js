@@ -91,13 +91,26 @@ setup: function(gamedatas) {
 onEnteringState: function(stateName, args) {
 	console.info('Entering state: ' + stateName, args.args);
 
+	if(['powersDivide'].includes(stateName))
+		this.focusContainer('powers');
+	else
+		this.focusContainer('board');
+
 	if(!this.isCurrentPlayerActive())
 		return;
 
 	this.clearPossible();
 
+	// Divide powers
+	if (stateName == 'powersDivide') {
+		$("play-area").style.display = "none";
+		var container = $('power-select-container');
+		args.args.powers.forEach(power => {
+			dojo.place( this.format_block('jstpl_powerSelect', power ), container );
+		})
+
 	// Place a worker
-	if (stateName == 'playerPlaceWorker') {
+	} else if (stateName == 'playerPlaceWorker') {
 		// TODO possible to be true ?
 		if (args.args.accessibleSpaces.length == 0)
 			throw new Error("No available spaces to place worker");
@@ -150,6 +163,21 @@ onUpdateActionButtons: function(stateName, args) {
 ///////////////////////////////////////
 ////////    Utility methods    ////////
 ///////////////////////////////////////
+
+/*
+ * focusContainer:
+ * 	show and hide containers depending on state
+ */
+focusContainer: function(container){
+	dojo.style( 'power-select-container', 'display', container == 'powers'? 'none' : 'block');
+	dojo.style( 'scene-container', 				'display', container == 'board'? 'none' : 'block');
+
+	if(container == "board")
+		this.board.display();
+	else
+		this.board.hide();
+},
+
 
 /*
  * createPiece:

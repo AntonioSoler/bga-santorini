@@ -88,11 +88,11 @@ ST_POWERS_DIVIDE => [
   'description' => clienttranslate('${actplayer} must choose powers'),
   'descriptionmyturn' => clienttranslate('${you} must choose powers'),
   'type' => 'activeplayer',
-  'args' => 'argPowersDivide',
-  'possibleactions' => ['divide'],
+  'args' => 'argDividePowers',
+  'possibleactions' => ['dividePowers'],
   'transitions' => [
 //TODO:    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'divide' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    'dividePowers' => ST_POWERS_NEXT_PLAYER_CHOOSE,
   ],
 ],
 
@@ -112,11 +112,11 @@ ST_POWERS_CHOOSE => [
   'description' => clienttranslate('${actplayer} must choose a power'),
   'descriptionmyturn' => clienttranslate('${you} must choose a power'),
   'type' => 'activeplayer',
-  'args' => 'argPowersChoose',
-  'possibleactions' => ['choose'],
+  'args' => 'argChoosePower',
+  'possibleactions' => ['choosePower'],
   'transitions' => [
 // TODO    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'workerPlaced' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    'choosePower' => ST_POWERS_NEXT_PLAYER_CHOOSE,
   ],
 ],
 

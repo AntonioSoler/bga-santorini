@@ -27,6 +27,7 @@ foreach(Power::$powersClasses as $id => $className) {
   require_once("modules/$className.class.php");
 
   $this->powers[$className::getId()] = [
+    'id'      => $className::getId(),
     'name'    => $className::getName(),
     'title'   => $className::getTitle(),
     'text'    => $className::getText(),
