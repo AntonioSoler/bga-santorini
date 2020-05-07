@@ -1,26 +1,18 @@
 <?php
+
 abstract class Power extends APP_GameClass {
     /* Factory function to create a power by ID */
     public static function getPower($game, $powerId) {
-      if(isset(Power::$powersClasses[$powerId]))
-        return new Power::$powersClasses[$powerId]($game);
-      else
-        return new DummyPower($game);
+      if(!isset(Power::$powersClasses[$powerId])) {
+        throw new BgaVisibleSystemException( "Power $powerId is not implemented" );
+      }
+      return new Power::$powersClasses[$powerId]($game);
     }
-
-    public static $id;
-    public static $name;
-    public static $title;
-    public static $golden;
-    public static $hero;
-    public static $power;
-    public static $banned;
-    public static $players;
 
     protected $game;
 
     public function __construct($game) {
-        $this->game = $game;
+      $this->game = $game;
     }
 
     public function setup($player) {}

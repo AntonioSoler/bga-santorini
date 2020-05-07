@@ -1,17 +1,30 @@
 <?php
 
-class Medea extends Power
+class Medea extends HeroPower
 {
-  public static $id     = MEDEA;
-  public static $name   = 'Medea';
-  public static $title  = 'Powerful Sorceress';
-  public static $hero   = true;
-  public static $golden = false;
-  public static $power  = [
-   "End of Your Turn: Once, remove one block from under any number of Workers neighboring your unmoved Worker. You also remove any Tokens on the blocks."
-  ];
-  public static $banned  = [];
-  public static $players = [2];
+  public static function getId() {
+    return MEDEA;
+  }
+
+  public static function getName() {
+    return clienttranslate('Medea');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Powerful Sorceress');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("End of Your Turn: Once, remove one block from under any number of Workers neighboring your unmoved Worker. You also remove any Tokens on the blocks.")
+    ];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  /* * */
 
 }
   

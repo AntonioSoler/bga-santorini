@@ -2,16 +2,37 @@
 
 class Persephone extends Power
 {
-  public static $id     = PERSEPHONE;
-  public static $name   = 'Persephone';
-  public static $title  = 'Goddess of Spring Growth';
-  public static $hero   = false;
-  public static $golden = true;
-  public static $power  = [
-   "Opponent's Turn: If possible, at least one Worker must move up this turn."
-  ];
-  public static $banned  = [];
-  public static $players = [2, 3, 4];
+  public static function getId() {
+    return PERSEPHONE;
+  }
+
+  public static function getName() {
+    return clienttranslate('Persephone');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Goddess of Spring Growth');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Opponent's Turn: If possible, at least one Worker must move up this turn.")
+    ];
+  }
+
+  public static function getPlayers() {
+    return [2, 3, 4];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  public static function isGoldenFleece() {
+    return true; 
+  }
+
+  /* * */
 
 }
   

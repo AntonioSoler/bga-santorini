@@ -1,17 +1,30 @@
 <?php
 
-class Achilles extends Power
+class Achilles extends HeroPower
 {
-  public static $id     = ACHILLES;
-  public static $name   = 'Achilles';
-  public static $title  = 'Volatile Warrior';
-  public static $hero   = true;
-  public static $golden = false;
-  public static $power  = [
-   "Your Turn: Once, your Worker builds both before and after moving."
-  ];
-  public static $banned  = [];
-  public static $players = [2];
+  public static function getId() {
+    return ACHILLES;
+  }
+
+  public static function getName() {
+    return clienttranslate('Achilles');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Volatile Warrior');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Your Turn: Once, your Worker builds both before and after moving.")
+    ];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  /* * */
 
 }
   

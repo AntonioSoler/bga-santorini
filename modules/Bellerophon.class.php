@@ -1,17 +1,30 @@
 <?php
 
-class Bellerophon extends Power
+class Bellerophon extends HeroPower
 {
-  public static $id     = BELLEROPHON;
-  public static $name   = 'Bellerophon';
-  public static $title  = 'Tamer of Pegasus';
-  public static $hero   = true;
-  public static $golden = false;
-  public static $power  = [
-   "Your Move: Once, your Worker moves up two levels."
-  ];
-  public static $banned  = [];
-  public static $players = [2];
+  public static function getId() {
+    return BELLEROPHON;
+  }
+
+  public static function getName() {
+    return clienttranslate('Bellerophon');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Tamer of Pegasus');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Your Move: Once, your Worker moves up two levels.")
+    ];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  /* * */
 
 }
   

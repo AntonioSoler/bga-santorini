@@ -1,17 +1,30 @@
 <?php
 
-class Odysseus extends Power
+class Odysseus extends HeroPower
 {
-  public static $id     = ODYSSEUS;
-  public static $name   = 'Odysseus';
-  public static $title  = 'Cunning Leader';
-  public static $hero   = true;
-  public static $golden = false;
-  public static $power  = [
-   "Start of Your Turn: Once, force to unoccupied corner spaces any number of opponent Workers that neighbor your Workers."
-  ];
-  public static $banned  = [];
-  public static $players = [2];
+  public static function getId() {
+    return ODYSSEUS;
+  }
+
+  public static function getName() {
+    return clienttranslate('Odysseus');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Cunning Leader');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Start of Your Turn: Once, force to unoccupied corner spaces any number of opponent Workers that neighbor your Workers.")
+    ];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  /* * */
 
 }
   

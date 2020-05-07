@@ -2,16 +2,37 @@
 
 class Apollo extends Power
 {
-  public static $id     = APOLLO;
-  public static $name   = 'Apollo';
-  public static $title  = 'God Of Music';
-  public static $hero   = false;
-  public static $golden = true;
-  public static $power  = [
-   "Your Move: Your Worker may move into an opponent Worker's space by forcing their Worker to the space yours just vacated."
-  ];
-  public static $banned  = [];
-  public static $players = [2, 3, 4];
+  public static function getId() {
+    return APOLLO;
+  }
+
+  public static function getName() {
+    return clienttranslate('Apollo');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('God Of Music');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Your Move: Your Worker may move into an opponent Worker's space by forcing their Worker to the space yours just vacated.")
+    ];
+  }
+
+  public static function getPlayers() {
+    return [2, 3, 4];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  public static function isGoldenFleece() {
+    return true; 
+  }
+
+  /* * */
 
   public static function checkDistances($a, $b){
     return abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1 && $b['z'] <= $a['z'] + 1;
@@ -29,7 +50,6 @@ class Apollo extends Power
         $worker['accessibleSpaces'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
     }
   }
-
 
   public function playerMove($wId, $x, $y, $z)
   {
@@ -72,3 +92,4 @@ class Apollo extends Power
   }
 
 }
+  

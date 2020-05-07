@@ -2,16 +2,37 @@
 
 class Chronus extends Power
 {
-  public static $id     = CHRONUS;
-  public static $name   = 'Chronus';
-  public static $title  = 'God of Time';
-  public static $hero   = false;
-  public static $golden = false;
-  public static $power  = [
-   "Win Condition: You also win when there are at least five Complete Towers on the board."
-  ];
-  public static $banned  = [];
-  public static $players = [2];
+  public static function getId() {
+    return CHRONUS;
+  }
+
+  public static function getName() {
+    return clienttranslate('Chronus');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('God of Time');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Win Condition: You also win when there are at least five Complete Towers on the board.")
+    ];
+  }
+
+  public static function getPlayers() {
+    return [2];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  public static function isGoldenFleece() {
+    return false; 
+  }
+
+  /* * */
 
 }
   

@@ -20,39 +20,19 @@
  *
  */
 
-
-$classes = [
-  'Achilles', 'Adonis', 'Aeolus', 'Aphrodite', 'Apollo', 'Ares', 'Artemis', 'Atalanta', 'Athena', 'Atlas',
-  'Bellerophon', 'Bia',
-  'Chaos', 'Charon', 'Charybdis', 'Chronus', 'Circe', 'Clio', 'Demeter',
-  'Dionysus',
-  'Eros', 'Europa',
-  'Gaea', 'Graeae',
-  'Hades', 'Harpies', 'Hecate', 'Hephaestus', 'Hera', 'Heracles', 'Hermes', 'Hestia', 'Hypnus',
-  'Jason',
-  'Limus',
-  'Medea', 'Medusa', 'Minotaur', 'Moerae', 'Morpheus', 'Nemesis',
-  'Odysseus',
-  'Pan', 'Persephone', 'Polyphemus', 'Poseidon', 'Prometheus',
-  'Selene', 'Siren',
-  'Tartarus', 'Terpsichore', 'Theseus', 'Triton',
-  'Urania',
-  'Zeus'
-];
-
 require_once("modules/Power.class.php");
-require_once("modules/DummyPower.class.php");
+require_once("modules/HeroPower.class.php");
 
-foreach($classes as $className){
+foreach(Power::$powersClasses as $id => $className) {
   require_once("modules/$className.class.php");
 
-  $this->powers[$className::$id] = [
-    'name'    => clienttranslate($className::$name),
-    'title'   => clienttranslate($className::$title),
-    'golden'  => $className::$golden,
-    'hero'    => $className::$hero,
-    'power'   => array_map('clienttranslate', $className::$power),
-    'banned'  => $className::$banned,
-    'players' => $className::$players,
+  $this->powers[$className::getId()] = [
+    'name'    => $className::getName(),
+    'title'   => $className::getTitle(),
+    'text'    => $className::getText(),
+    'banned'  => $className::getBannedIds(),
+    'players' => $className::getPlayers(),
+    'golden'  => $className::isGoldenFleece(),
+    'hero'    => get_parent_class($className) == 'HeroPower',
   ];
 }

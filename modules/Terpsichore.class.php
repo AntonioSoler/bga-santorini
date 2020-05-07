@@ -2,16 +2,37 @@
 
 class Terpsichore extends Power
 {
-  public static $id     = TERPSICHORE;
-  public static $name   = 'Terpsichore';
-  public static $title  = 'Muse of Dancing';
-  public static $hero   = false;
-  public static $golden = true;
-  public static $power  = [
-   "Your Turn: All of your Workers must move, and then all must build."
-  ];
-  public static $banned  = [NEMESIS, HYPNUS, LIMUS, TARTARUS];
-  public static $players = [2, 3, 4];
+  public static function getId() {
+    return TERPSICHORE;
+  }
+
+  public static function getName() {
+    return clienttranslate('Terpsichore');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Muse of Dancing');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("Your Turn: All of your Workers must move, and then all must build.")
+    ];
+  }
+
+  public static function getPlayers() {
+    return [2, 3, 4];
+  }
+
+  public static function getBannedIds() {
+    return [NEMESIS, HYPNUS, LIMUS, TARTARUS];
+  }
+
+  public static function isGoldenFleece() {
+    return true; 
+  }
+
+  /* * */
 
 }
   

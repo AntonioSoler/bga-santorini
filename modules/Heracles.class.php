@@ -1,17 +1,30 @@
 <?php
 
-class Heracles extends Power
+class Heracles extends HeroPower
 {
-  public static $id     = HERACLES;
-  public static $name   = 'Heracles';
-  public static $title  = 'Doer of Great Deeds';
-  public static $hero   = true;
-  public static $golden = false;
-  public static $power  = [
-   "End of Your Turn: Once, both your Workers build any number of domes (even zero) at any level."
-  ];
-  public static $banned  = [];
-  public static $players = [2];
+  public static function getId() {
+    return HERACLES;
+  }
+
+  public static function getName() {
+    return clienttranslate('Heracles');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('Doer of Great Deeds');
+  }
+
+  public static function getText() {
+    return [
+      clienttranslate("End of Your Turn: Once, both your Workers build any number of domes (even zero) at any level.")
+    ];
+  }
+
+  public static function getBannedIds() {
+    return [];
+  }
+
+  /* * */
 
 }
   

@@ -360,7 +360,7 @@ $gods = array(
 
     HESTIA => array(
         'name'   => clienttranslate('Hestia'),
-        'title'  => clienttranslate('Goddess of Hear th and Home'),
+        'title'  => clienttranslate('Goddess of Hearth and Home'),
         'power'  => array(
             clienttranslate('Your Build: Your Worker may build one additional time, but this cannot be on a perimeter space.'),
         ),
@@ -754,7 +754,7 @@ $heroes = array(
         'players' => array(2),
     )
 );
-
+/*
 echo "\$rpowers = [<br />";
 foreach($gods as $id => $god){
   echo "  ".$r[$id]." => '".ucfirst(strtolower($r[$id]))."', <br />";
@@ -762,54 +762,88 @@ foreach($gods as $id => $god){
 foreach($heroes as $id => $god){
   echo "  ".$r[$id]." => '".ucfirst(strtolower($r[$id]))."', <br />";
 }
+*/
 
 /*
 foreach($gods as $id => $god){
-  $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
-  fwrite($fp, "<?php
+    $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
+    fwrite($fp, "<?php
 
 class ".$god['name']." extends Power
 {
-  public static \$id     = ".$r[$id].";
-  public static \$name   = '".$god['name']."';
-  public static \$title  = '".$god['title']."';
-  public static \$hero   = false;
-  public static \$golden = ".($god['golden']? "true":"false").";
-  public static \$power  = [
+  public static function getId() {
+    return ".$r[$id].";
+  }
+
+  public static function getName() {
+    return clienttranslate('".$god['name']."');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('".$god['title']."');
+  }
+
+  public static function getText() {
+    return [
 ".
-    implode(",\n", array_map(function($a){ return '   "'.$a.'"'; }, $god['power']))
+        implode(",\n", array_map(function($a){ return '      clienttranslate("'.$a.'")'; }, $god['power']))
 ."
-  ];
-  public static \$banned  = [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
-  public static \$players = [".implode(', ', $god['players'])."];
+    ];
+  }
 
-}
-  ");
-  fclose($fp);
-}
+  public static function getPlayers() {
+    return [".implode(', ', $god['players'])."];
+  }
 
-foreach($heroes as $id => $god){
-  $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
-  fwrite($fp, "<?php
+  public static function getBannedIds() {
+    return [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
+  }
 
-class ".$god['name']." extends Power
-{
-  public static \$id     = ".$r[$id].";
-  public static \$name   = '".$god['name']."';
-  public static \$title  = '".$god['title']."';
-  public static \$hero   = true;
-  public static \$golden = false;
-  public static \$power  = [
-".
-    implode(",\n", array_map(function($a){ return '   "'.$a.'"'; }, $god['power']))
-."
-  ];
-  public static \$banned  = [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
-  public static \$players = [".implode(', ', $god['players'])."];
+  public static function isGoldenFleece() {
+    return ".($god['golden']? "true":"false")."; 
+  }
+
+  / * * * /
 
 }
   ");
   fclose($fp);
 }
 */
- ?>
+
+foreach($heroes as $id => $god){
+    $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
+    fwrite($fp, "<?php
+
+class ".$god['name']." extends HeroPower
+{
+  public static function getId() {
+    return ".$r[$id].";
+  }
+
+  public static function getName() {
+    return clienttranslate('".$god['name']."');
+  }
+
+  public static function getTitle() {
+    return clienttranslate('".$god['title']."');
+  }
+
+  public static function getText() {
+    return [
+".
+        implode(",\n", array_map(function($a){ return '      clienttranslate("'.$a.'")'; }, $god['power']))
+."
+    ];
+  }
+
+  public static function getBannedIds() {
+    return [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
+  }
+
+  /* * */
+
+}
+  ");
+  fclose($fp);
+}
