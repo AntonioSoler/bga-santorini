@@ -61,10 +61,10 @@ protected function setupNewGame($players, $options = array())
   $values = array();
   $no = 1;
   $nTeams = count($players) == 3 ? 3 : 2;
-  foreach ($players as $pId => $player) {
+  foreach ($players as $player) {
     $team = $no % $nTeams;
     $color = $defaultColors[$team];
-    $values[] = "('".$pId."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."', '$team')";
+    $values[] = "('".$player['id']."','$color','".$player['player_canal']."','".addslashes($player['player_name'])."','".addslashes($player['player_avatar'])."', '$team')";
     $no++;
   }
   self::DbQuery($sql . implode($values, ','));
@@ -83,7 +83,7 @@ protected function setupNewGame($players, $options = array())
 protected function getAllDatas()
 {
   return [
-    'players' => $this->getPlayers(),
+    'fplayers' => $this->getPlayers(), // Must not use players as it is already filled by bga
     'placedPieces' => $this->getPlacedPieces(),
     'movedWorker' => self::getGamestateValue('movedWorker'),
     'powers' => $this->powers // TODO : to remove, useful only for debug
@@ -127,7 +127,7 @@ public function getPower($pId = -1){
  */
 public function getPlayers()
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player");
+  return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player");
 }
 
 /*
@@ -136,7 +136,7 @@ public function getPlayers()
  */
 public function getPlayer($pId)
 {
-  return self::getNonEmptyObjectFromDB("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player WHERE player_id = $pId");
+  return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player WHERE player_id = $pId");
 }
 
 /*
@@ -144,7 +144,7 @@ public function getPlayer($pId)
  */
 public function getTeammates($pId)
 {
-  return self::getCollectionFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player
+  return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_power power, player_team team, player_no no FROM player
     WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
 }
 
@@ -584,11 +584,11 @@ public function stPowersSetup()
 
   $players = self::getPlayers();
   $possiblePowers = $this->getPlayablePowers();
-  foreach ($players as $pId => $player) {
+  foreach ($players as $player) {
     $powerId = array_rand($possiblePowers);
     $powerName = $this->powers[$powerId]['name'];
     $playerName = $player['name'];
-    self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = $pId");
+    self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = ".$player['id']);
     self::notifyAllPlayers('message', "Player $playerName assigned $powerName", []); // TODO translate ?
 
     // Remove this power and any banned powers

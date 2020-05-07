@@ -22,20 +22,30 @@
   display: flex;
 }
 
+#power-select-container div#grid-powers {
+  width:50%;
+  display:flex;
+  flex-direction:row;
+  flex-wrap:wrap;
+  overflow:auto;
+  align-content:flex-start;
+}
+
 #power-select-container .power-select {
-  width:95px;
+  width:105px;
   height:150px;
   margin:2px;
   position: relative;
+  cursor:pointer;
 }
 
 
 #power-select-container .power-select .power-select-background {
   position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
+  top: 6%;
+  left: 8%;
+  width: 84%;
+  height: 88%;
   background-repeat:no-repeat;
   background-size:cover;
   background-position: center center;
@@ -48,13 +58,18 @@
   left:0;
   width:100%;
   height:100%;
-/*  background-image:url("./img/card.png");*/
+  background-image:url("./img/frame_white.png");
   background-repeat:no-repeat;
   background-size:cover;
   background-position: center center;
   z-index:2;
 }
-
+#power-select-container .power-select.displayed .power-select-overlay {
+  background-image:url("./img/frame_blue.png");
+}
+#power-select-container .power-select.selected .power-select-overlay {
+  background-image:url("./img/frame_coral.png");
+}
 
 
 
@@ -73,11 +88,15 @@
   padding-left:20px;
 }
 
-#play-area #powers-container div.power-card {
+div.power-card {
   width: 232px;
   height: 350px;
   position: relative;
   margin-bottom: 42px;
+  display:block;
+}
+div.power-card.power-0 {
+  display:none;
 }
 
 div.power-card div.power-card-background {
@@ -99,6 +118,7 @@ div.power-card div.power-card-overlay {
   left:0;
   width:100%;
   height:100%;
+  border-radius:10px;
   background-image:url("./img/card.png");
   background-repeat:no-repeat;
   background-size:cover;
@@ -112,19 +132,19 @@ div.power-card div.power-card-name {
   width: 100%;
   color: #333;
   text-align: center;
-  font: 20px/32px 'Caveat Brush', cursive;
+  font: 16px/22px 'Caveat Brush', cursive;
   text-transform: uppercase;
   z-index:3;
 }
 
 div.power-card div.power-card-power {
   position: absolute;
-  bottom: 6%;
-  left:10%;
-  width: 80%;
-  z-index:4;
-  height:25%;
+  bottom: 1.5%;
+  left: 15%;
+  width: 70%;
+  height: 16%;
   background-position:center center;
   background-repeat:no-repeat;
   background-size:contain;
+  z-index: 4;
 }

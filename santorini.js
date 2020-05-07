@@ -52,7 +52,8 @@ setup: function(gamedatas) {
 	var	container = document.getElementById('scene-container');
 	this.board = new Board(container, URL);
 
-	for (var pId in gamedatas.players) {
+	gamedatas.fplayers.forEach(player => {
+		return;
 		// TODO remove or replace with name of power
 		//var player = gamedatas.players[pId];
 		//var player_board_div = $('player_board_' + pId);
@@ -60,7 +61,7 @@ setup: function(gamedatas) {
 
 		// TODO : remove ?
 		//		player.colorName = colorNames[player.color];
-	}
+	});
 
 	// Setup workers and buildings
 	gamedatas.placedPieces.forEach(this.createPiece.bind(this));
@@ -103,10 +104,10 @@ onEnteringState: function(stateName, args) {
 
 	// Divide powers
 	if (stateName == 'powersDivide') {
-		$("play-area").style.display = "none";
-		var container = $('power-select-container');
+		this._selectedPowers = [];
 		args.args.powers.forEach(power => {
-			dojo.place( this.format_block('jstpl_powerSelect', power ), container );
+			var div = dojo.place( this.format_block('jstpl_powerSelect', power ), $('grid-powers') );
+			dojo.connect(div, 'onclick', e => this.onClickSelectPower(power) );
 		})
 
 	// Place a worker
@@ -169,8 +170,9 @@ onUpdateActionButtons: function(stateName, args) {
  * 	show and hide containers depending on state
  */
 focusContainer: function(container){
-	dojo.style( 'power-select-container', 'display', container == 'powers'? 'none' : 'block');
-	dojo.style( 'scene-container', 				'display', container == 'board'? 'none' : 'block');
+console.log(container);
+	dojo.style( 'power-select-container', 'display', container == 'powers'? 'flex' : 'none');
+	dojo.style( 'play-area',			 				'display', container == 'board'? 	'block' : 'none');
 
 	if(container == "board")
 		this.board.display();
@@ -208,6 +210,79 @@ clearPossible: function() {
 //////////////////////////////////////////////////
 //////////////   Player's action   ///////////////
 //////////////////////////////////////////////////
+
+
+/*
+ * onClickSelectPower:
+ * 	triggered after a click on a power (for "fair division" process)
+ */
+onClickSelectPower: function(power) {
+	if(dojo.hasClass(dojo.query('.power-select.power-'+power.id)[0], 'selected'))
+		return;
+
+	this._displayedPower = power;
+
+	// Change color of selected power
+	dojo.query('.power-select').removeClass('displayed');
+	dojo.query('.power-select.power-'+power.id).addClass('displayed');
+
+	// Update details
+	var detail = $('power-detail');
+	dojo.query('#power-detail').removeClass().addClass('power-card power-'+power.id);
+	$('power-detail-name').innerHTML = power.name;
+	this.addTooltip( 'power-detail', power.text.join('\n'), '' );
+
+	// Update action button
+	this.removeActionButtons();
+	this.addActionButton('buttonAddToSelection', _('Add to selection'), 'onClickAddPowerToSelection', null, false, 'gray');
+	if(this._selectedPowers.length > 0)
+		this.addActionButton('buttonCancelSelection', _('Cancel'), 'onClickCancelSelection', null, false, 'gray');
+},
+
+
+/*
+ * onClickAddPowerToSelection:
+ * 	triggered after a click on a button to add selected power
+ */
+onClickAddPowerToSelection: function() {
+	this._selectedPowers.push(this._displayedPower);
+	dojo.query('.power-select.power-'+this._displayedPower.id).removeClass('displayed').addClass('selected');
+	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
+	// TODO : remove banned
+
+	this.removeActionButtons();
+	this.addActionButton('buttonCancelSelection', _('Cancel'), 'onClickCancelSelection', null, false, 'gray');
+	if(this._selectedPowers.length == this.gamedatas.fplayers.length)
+		this.addActionButton('buttonValidateSelection', _('Validate'), 'onClickValidateSelection', null, false, 'blue');
+},
+
+
+/*
+ * onClickCancelSelection:
+ * 	triggered after a click on a button to cancel last selected power
+ */
+onClickCancelSelection: function() {
+	var power = this._selectedPowers.pop();
+	dojo.query('.power-select.power-'+power.id).removeClass('selected')
+	// TODO : update banned
+
+	this.removeActionButtons();
+	dojo.query('.power-select.power-'+this._displayedPower.id).removeClass('displayed');
+	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
+	if(this._selectedPowers.length > 0)
+		this.addActionButton('buttonCancelSelection', _('Cancel'), 'onClickCancelSelection', null, false, 'gray');
+},
+
+
+/*
+ * onClickValidateSelection:
+ * 	triggered after a click on a button to validate the selected powers
+ */
+onClickValidateSelection: function() {
+	console.log(this._selectedPowers);
+},
+
+
 
 /*
  * onClickPlaceWorker:
