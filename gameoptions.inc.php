@@ -30,32 +30,36 @@ $game_options = [
   OPTION_POWERS => [
     'name' => totranslate('Powers'),
     'values' => [
-      NO_POWER => [
-        'name' => totranslate('Off'),
+      NONE => [
+        'name' => totranslate('No Powers'),
         'tmdisplay' => totranslate('No Powers'),
       ],
-      SIMPLE_GODS => [
+      SIMPLE => [
         'name' => totranslate('Simple Gods'),
         'tmdisplay' => totranslate('Simple Gods'),
+        'description' => totranslate('Each player receives a powerful ongoing ability')
       ],
-      ALL_GODS => [
+      GODS => [
         'name' => totranslate('All Gods'),
         'tmdisplay' => totranslate('All Gods'),
+        'description' => totranslate('Each player receives a powerful ongoing ability'),
         'nobeginner' => true,
       ],
-      ONLY_HEROES => [
-        'name' => totranslate('Only Heroes'),
-        'tmdisplay' => totranslate('Only Heroes'),
+      HEROES => [
+        'name' => totranslate('Hero Powers'),
+        'tmdisplay' => totranslate('Hero Powers'),
+        'description' => totranslate('Each player receives a once-per-game ability'),
         'nobeginner' => true,
       ],
       GODS_AND_HEROES => [
-        'name' => totranslate('All gods and heroes'),
-        'tmdisplay' => totranslate('All gods and heroes'),
-        'nobeginner' => true,
+        'name' => totranslate('All Gods and Hero Powers'),
+        'tmdisplay' => totranslate('All Gods and Hero Powers'),
+        'description' => totranslate('Allows for balanced games between 2 players of unequal skill, with the more experienced choosing a Hero Power and the less experienced choosing a God Power'),
       ],
       GOLDEN_FLEECE => [
         'name' => totranslate('Golden Fleece Variant'),
         'tmdisplay' => totranslate('Golden Fleece Variant'),
+        'description' => totranslate('One powerful ability is available to any player touching the Ram figure'),
         'nobeginner' => true,
       ],
     ],
@@ -64,36 +68,36 @@ $game_options = [
         [
           'type' => 'minplayers',
           'value' => 2,
-          'message' => totranslate('Golden Fleece Variant requires exactly 2 players.'),
+          'message' => totranslate('Golden Fleece Variant requires exactly 2 players'),
         ],
         [
           'type' => 'maxplayers',
           'value' => 2,
-          'message' => totranslate('Golden Fleece Variant requires exactly 2 players.'),
+          'message' => totranslate('Golden Fleece Variant requires exactly 2 players'),
         ],
       ],
-      ONLY_HEROES => [
+      HEROES => [
         [
           'type' => 'minplayers',
           'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players.'),
+          'message' => totranslate('Hero Powers requires exactly 2 players'),
         ],
         [
           'type' => 'maxplayers',
           'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players.'),
+          'message' => totranslate('Hero Powers requires exactly 2 players'),
         ],
       ],
       GODS_AND_HEROES => [
         [
           'type' => 'minplayers',
           'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players.'),
+          'message' => totranslate('Hero Powers requires exactly 2 players'),
         ],
         [
           'type' => 'maxplayers',
           'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players.'),
+          'message' => totranslate('Hero Powers requires exactly 2 players'),
         ],
       ],
     ],
@@ -108,14 +112,14 @@ $game_options = [
       FAIR_DIVISION => [
         'name' => totranslate('Fair Division'),
         'tmdisplay' => totranslate('Fair Division'),
+        'description' => totranslate('First player chooses all possible Powers, last player chooses first among these'),
       ],
     ],
-    'displayconditionoperand' => 'or',
     'displaycondition' => [
       [
         'type' => 'otheroption',
         'id' => OPTION_POWERS,
-        'value' => [SIMPLE_GODS, ALL_GODS, ONLY_HEROES, GODS_AND_HEROES, GOLDEN_FLEECE],
+        'value' => [SIMPLE, GODS, HEROES, GOLDEN_FLEECE],
       ],
     ],
   ],

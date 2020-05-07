@@ -87,10 +87,10 @@ define('ST_GAME_END', 99);
  * Options constants
  */
 define('OPTION_POWERS', 100);
-  define('NO_POWER', 0);
-  define('SIMPLE_GODS', 1);
-  define('ALL_GODS', 2);
-  define('ONLY_HEROES', 3);
+  define('NONE', 0);
+  define('SIMPLE', 1);
+  define('GODS', 2);
+  define('HEROES', 3);
   define('GODS_AND_HEROES', 4);
   define('GOLDEN_FLEECE', 5);
 

@@ -319,11 +319,11 @@ public function getPlayablePowers(){
   // Filter powers depending on the number of players and game option
   return array_filter($this->powers, function($power, $id) use ($nPlayers, $optionPowers) {
     return in_array($nPlayers, $power['players']) &&
-      (    ($optionPowers == SIMPLE_GODS && $id <= 10)
-        || ($optionPowers == ALL_GODS && !$power['hero'])
-        || ($optionPowers == ONLY_HEROES && $power['hero'])
+      (    ($optionPowers == SIMPLE && $id <= 10)
+        || ($optionPowers == GODS && !$power['hero'])
+        || ($optionPowers == HEROES && $power['hero'])
         || ($optionPowers == GODS_AND_HEROES)
-        || ($optionPowers == GOLDEN_FLEECE && $power['golden'] && !$power['hero'])
+        || ($optionPowers == GOLDEN_FLEECE && $power['golden'])
       );
   }, ARRAY_FILTER_USE_BOTH);
 }
@@ -381,9 +381,9 @@ public function placeWorker($workerId, $x, $y, $z)
   $args = [
     'i18n' => [],
     'piece' => $piece,
-    'playerName' => self::getActivePlayerName(),
+    'player_name' => self::getActivePlayerName(),
   ];
-  self::notifyAllPlayers('workerPlaced', clienttranslate('${playerName} places a worker'), $args);
+  self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places a worker'), $args);
 
   $this->gamestate->nextState('workerPlaced');
 }
@@ -431,9 +431,9 @@ public function moveWorker($wId, $x, $y, $z)
     'i18n' => [],
     'piece' => $worker,
     'space' => $space,
-    'playerName' => self::getActivePlayerName(),
+    'player_name' => self::getActivePlayerName(),
   ];
-  self::notifyAllPlayers('workerMoved', clienttranslate('${playerName} moves a worker'), $args);
+  self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
 
   $this->gamestate->nextState('moved');
 }
@@ -464,8 +464,9 @@ public function build($x, $y, $z)
   if (!in_array($space, $neighbouring))
     throw new BgaUserException( _("You cannot build on this space with this worker") );
 
-  // Build block
+  // Build piece
   $type = 'lvl'.$z;
+  $piece_name = $type == 'lvl3' ? clienttranslate('dome') : clienttranslate('block');
   self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '$x', '$y', '$z') ");
 
   // Reset moved worker
@@ -474,13 +475,14 @@ public function build($x, $y, $z)
   // Notify
   $piece = self::getObjectFromDB("SELECT * FROM piece WHERE id = LAST_INSERT_ID()");
   $args = [
-    'i18n' => [],
-    'playerName' => self::getActivePlayerName(),
+    'i18n' => ['piece_name'],
+    'player_name' => self::getActivePlayerName(),
+    'piece_name' => $piece_name,
     'piece' => $piece,
     'level' => $z,
   ];
-  $msg = ($z == 0) ? clienttranslate('${playerName} builds at ground level')
-                   : clienttranslate('${playerName} builds at level ${level}');
+  $msg = ($z == 0) ? clienttranslate('${player_name} builds a ${piece_name} at ground level')
+                   : clienttranslate('${player_name} builds a ${piece_name} at level ${level}');
   self::notifyAllPlayers('blockBuilt', $msg, $args);
 
   $this->gamestate->nextState('built');
@@ -566,30 +568,32 @@ public function stPowersSetup()
 {
   // Check first if we are playing with powers or not
   $optionPowers = intval(self::getGameStateValue('optionPowers'));
-  if ($optionPowers == NO_POWER) {
+  if ($optionPowers == NONE) {
     $this->gamestate->nextState('done');
     return;
   }
 
+  // Determine the assignment method
   $optionSetup = intval(self::getGameStateValue('optionSetup'));
-  if ($optionSetup == FAIR_DIVISION) {
+  if ($optionSetup == FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
     $this->gamestate->nextState('divide');
     return;
   }
-
-  // Should be RANDOM at this point
-  if ($optionSetup != RANDOM)
-    throw new BgaVisibleSystemException( 'Error with powers game option' );
-
 
   $players = self::getPlayers();
   $possiblePowers = $this->getPlayablePowers();
   foreach ($players as $player) {
     $powerId = array_rand($possiblePowers);
-    $powerName = $this->powers[$powerId]['name'];
-    $playerName = $player['name'];
-    self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = ".$player['id']);
-    self::notifyAllPlayers('message', "Player $playerName assigned $powerName", []); // TODO translate ?
+    self::DbQuery("UPDATE player SET player_power = $powerId WHERE player_id = $pId");
+
+    $args = array(
+      'i18n' => array('power_name', 'power_title'),
+      'player_id' => $pId,
+      'player_name' => $player['name'],
+      'power_name' => $this->powers[$powerId]['name'],
+      'power_title' => $this->powers[$powerId]['title'],
+    );
+    self::notifyAllPlayers('message', clienttranslate('${player_name} receives ${power_name}, ${power_title}'), $args);
 
     // Remove this power and any banned powers
     unset($possiblePowers[$powerId]);
