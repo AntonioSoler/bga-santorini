@@ -92,11 +92,12 @@ setup: function(gamedatas) {
 onEnteringState: function(stateName, args) {
 	console.info('Entering state: ' + stateName, args.args);
 
-	if(['powersDivide'].includes(stateName))
+	if(['powersDivide', 'powersPlayerChoose'].includes(stateName))
 		this.focusContainer('powers');
 	else
 		this.focusContainer('board');
 
+	// Check if player has something to do
 	if(!this.isCurrentPlayerActive())
 		return;
 
@@ -108,6 +109,13 @@ onEnteringState: function(stateName, args) {
 		args.args.powers.forEach(power => {
 			var div = dojo.place( this.format_block('jstpl_powerSelect', power ), $('grid-powers') );
 			dojo.connect(div, 'onclick', e => this.onClickSelectPower(power) );
+		})
+
+	// Choose power
+	} else if (stateName == 'powersPlayerChoose') {
+		args.args.powers.forEach(power => {
+			var div = dojo.place( this.format_block('jstpl_power', power ), $('grid-powers') );
+			dojo.connect(div, 'onclick', e => console.log(power) );
 		})
 
 	// Place a worker
@@ -170,7 +178,6 @@ onUpdateActionButtons: function(stateName, args) {
  * 	show and hide containers depending on state
  */
 focusContainer: function(container){
-console.log(container);
 	dojo.style( 'power-select-container', 'display', container == 'powers'? 'flex' : 'none');
 	dojo.style( 'play-area',			 				'display', container == 'board'? 	'block' : 'none');
 
@@ -276,7 +283,12 @@ onClickAddPowerToSelection: function() {
  * 	triggered after a click on a button to validate the selected powers
  */
 onClickValidateSelection: function() {
-	console.log(this._selectedPowers);
+	// Check that this action is possible at this moment
+	if(! this.checkAction( 'dividePowers' ) )
+		return false;
+
+	var ids = this._selectedPowers.map(power => power.id).join(',');
+	this.ajaxcall( "/santorini/santorini/dividePowers.html", { ids : ids }, this, res => {} );
 },
 
 

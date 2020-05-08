@@ -48,12 +48,12 @@ class santorini extends Table
   }
 
   /*
- * setupNewGame:
- *  This method is called only once, when a new game is launched.
- * params:
- *  - array $players
- *  - mixed $players :
- */
+   * setupNewGame:
+   *  This method is called only once, when a new game is launched.
+   * params:
+   *  - array $players
+   *  - mixed $players :
+   */
   protected function setupNewGame($players, $options = array())
   {
     self::setGameStateInitialValue('movedWorker', 0);
@@ -85,10 +85,10 @@ class santorini extends Table
   }
 
   /*
- * getAllDatas:
- *  Gather all informations about current game situation (visible by the current player).
- *  The method is called each time the game interface is displayed to a player, ie: when the game starts and when a player refreshes the game page (F5)
- */
+   * getAllDatas:
+   *  Gather all informations about current game situation (visible by the current player).
+   *  The method is called each time the game interface is displayed to a player, ie: when the game starts and when a player refreshes the game page (F5)
+   */
   protected function getAllDatas()
   {
     return [
@@ -103,10 +103,10 @@ class santorini extends Table
   }
 
   /*
- * getGameProgression:
- *  Compute and return the current game progression approximation
- *  This method is called each time we are in a game state with the "updateGameProgression" property set to true
- */
+   * getGameProgression:
+   *  Compute and return the current game progression approximation
+   *  This method is called each time we are in a game state with the "updateGameProgression" property set to true
+   */
   public function getGameProgression()
   {
     // TODO
@@ -124,8 +124,23 @@ class santorini extends Table
   ///////////////////////////////////////////
 
   /*
- * getPower: return the Power object for the active/a specific player
- */
+   * getPowersInLocation: return all the power cards in a given location
+   */
+  public function getPowersInLocation($location)
+  {
+    $cards = $this->cards->getCardsInLocation($location);
+    $powers = array_map(function($card) {
+      return $this->powers[$card['type']];
+    }, $cards);
+
+    return array_values($powers);
+  }
+
+
+  /*
+   * getPower: return the Power object for the active/a specific player
+   * TODO : remove ? Seems useless with new SantoriniPlayer class ?
+   */
   public function getPower($pId = null)
   {
     if (empty($pId)) {
@@ -136,17 +151,17 @@ class santorini extends Table
   }
 
   /*
- * getPlayers: return an array of all SantoriniPlayer objects
- */
+   * getPlayers: return an array of all SantoriniPlayer objects
+   */
   public function getPlayers()
   {
     return SantoriniPlayer::getPlayers($this);
   }
 
   /*
- * getPlayer: return the SantoriniPlayer object for the active/a specific player
- * params: int $pId -> player id
- */
+   * getPlayer: return the SantoriniPlayer object for the active/a specific player
+   * params: int $pId -> player id
+   */
   public function getPlayer($pId = null)
   {
     if (empty($pId)) {
@@ -156,16 +171,16 @@ class santorini extends Table
   }
 
   /*
-  * getPlayerCount: return the number of players
-  */
+   * getPlayerCount: return the number of players
+   */
   public function getPlayerCount()
   {
     return self::getUniqueValueFromDB("SELECT COUNT(*) FROM player");
   }
 
   /*
- * getTeammates: return all players in the same team as $pId player
- */
+   * getTeammates: return all players in the same team as $pId player
+   */
   public function getTeammates($pId)
   {
     return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player
@@ -173,8 +188,8 @@ class santorini extends Table
   }
 
   /*
- * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
- */
+   * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
+   */
   public function getTeammatesIds($pId)
   {
     return array_map(function ($player) {
@@ -185,8 +200,8 @@ class santorini extends Table
 
 
   /*
- * getPlacedPieces: return all pieces on the board
- */
+   * getPlacedPieces: return all pieces on the board
+   */
   public function getPlacedPieces()
   {
     return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board'");
@@ -194,18 +209,18 @@ class santorini extends Table
 
 
   /*
- * getAvailableWorkers: return all available workers
- * opt params : int $pId -> if specified, return only available workers of corresponding player
- */
+   * getAvailableWorkers: return all available workers
+   * opt params : int $pId -> if specified, return only available workers of corresponding player
+   */
   public function getAvailableWorkers($pId = -1)
   {
     return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . ($pId == -1 ? "" : "AND player_id = '$pId'"));
   }
 
   /*
- * getPlacedWorkers: return all placed workers
- * opt params : int $pId -> if specified, return only placed workers of corresponding player
- */
+   * getPlacedWorkers: return all placed workers
+   * opt params : int $pId -> if specified, return only placed workers of corresponding player
+   */
   public function getPlacedWorkers($pId = -1)
   {
     $filter = "";
@@ -219,9 +234,9 @@ class santorini extends Table
 
 
   /*
- * getPiece: return all info about a piece
- * params : int $id
- */
+   * getPiece: return all info about a piece
+   * params : int $id
+   */
   public function getPiece($id)
   {
     return self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$id'");
@@ -230,9 +245,9 @@ class santorini extends Table
 
 
   /*
- * getBoard:
- *   return a 3d matrix reprensenting the board with all the placed pieces
- */
+   * getBoard:
+   *   return a 3d matrix reprensenting the board with all the placed pieces
+   */
   public function getBoard()
   {
     // Create an empty 5*5*4 board
@@ -255,9 +270,9 @@ class santorini extends Table
 
 
   /*
- * getAccessibleSpaces:
- *   return the list of all accessible spaces for either placing a worker, moving or building
- */
+   * getAccessibleSpaces:
+   *   return the list of all accessible spaces for either placing a worker, moving or building
+   */
   public function getAccessibleSpaces()
   {
     $board = self::getBoard();
@@ -286,12 +301,12 @@ class santorini extends Table
 
 
   /*
- * getNeighbouringSpaces:
- *   return the list of all accessible neighbouring spaces for either moving a worker or building
- * params:
- *  - mixed $piece : contains all the informations (type, location, player_id) about the piece we use to move/build
- *  - string $action : specifies what kind of action we want to do with this piece (move/build)
- */
+   * getNeighbouringSpaces:
+   *   return the list of all accessible neighbouring spaces for either moving a worker or building
+   * params:
+   *  - mixed $piece : contains all the informations (type, location, player_id) about the piece we use to move/build
+   *  - string $action : specifies what kind of action we want to do with this piece (move/build)
+   */
   public function getNeighbouringSpaces($piece, $action)
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
@@ -316,10 +331,10 @@ class santorini extends Table
 
 
   /*
- * Get possible powers:
- *   TODO
- * params: TODO
- */
+   * Get possible powers:
+   *   TODO
+   * params: TODO
+   */
   public function getPlayablePowers()
   {
     $optionPowers = intval(self::getGameStateValue('optionPowers'));
@@ -342,6 +357,7 @@ class santorini extends Table
   }
 
 
+
   ///////////////////////////////////////
   //////////   Player actions   /////////
   ///////////////////////////////////////
@@ -351,20 +367,23 @@ class santorini extends Table
 
 
   /*
- * dividePowers: TODO
- */
-  public function dividePowers()
+   * dividePowers: TODO
+   */
+  public function dividePowers($ids)
   {
     self::checkAction('dividePowers');
+
+    $this->cards->moveCards($ids, 'stack');
+    $this->gamestate->nextState('done');
   }
 
 
 
   /*
- * placeWorker: place a new worker on the board
- *  - int $id : the piece id we want to move from deck to board
- *  - int $x,$y,$z : the new location on the board
- */
+   * placeWorker: place a new worker on the board
+   *  - int $id : the piece id we want to move from deck to board
+   *  - int $x,$y,$z : the new location on the board
+   */
   public function placeWorker($workerId, $x, $y, $z)
   {
     self::checkAction('placeWorker');
@@ -402,10 +421,10 @@ class santorini extends Table
 
 
   /*
- * moveWorker: move a worker to a new location on the board
- *  - int $id : the piece id we want to move
- *  - int $x,$y,$z : the new location on the board
- */
+   * moveWorker: move a worker to a new location on the board
+   *  - int $id : the piece id we want to move
+   *  - int $x,$y,$z : the new location on the board
+   */
   public function moveWorker($wId, $x, $y, $z)
   {
     self::checkAction('moveWorker');
@@ -452,9 +471,9 @@ class santorini extends Table
 
 
   /*
- * build: build a piece to a location on the board
- *  - int $x,$y,$z : the location on the board
- */
+   * build: build a piece to a location on the board
+   *  - int $x,$y,$z : the location on the board
+   */
   public function build($x, $y, $z)
   {
     self::checkAction('build');
@@ -509,20 +528,31 @@ class santorini extends Table
   //////////////////////////////////////////////////
 
   /*
- * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
- */
+   * argDividePowers: TODO
+   */
   public function argDividePowers()
   {
     return [
       'count' => self::getPlayerCount(),
-      'powers' =>  array_values($this->getPlayablePowers())
+      'powers' => $this->getPowersInLocation('deck')
+    ];
+  }
+
+  /*
+   * argChoosePower: TODO
+   */
+  public function argChoosePower()
+  {
+    return [
+      'powers' => $this->getPowersInLocation('stack')
     ];
   }
 
 
+
   /*
- * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
- */
+   * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
+   */
   public function argPlaceWorker()
   {
     $pId = self::getActivePlayerId();
@@ -535,8 +565,8 @@ class santorini extends Table
   }
 
   /*
- * argPlayerMove: give the list of accessible unnocupied spaces for each worker
- */
+   * argPlayerMove: give the list of accessible unnocupied spaces for each worker
+   */
   public function argPlayerMove()
   {
     // Return for each worker of this player the spaces he can move to
@@ -552,8 +582,8 @@ class santorini extends Table
 
 
   /*
- * argPlayerBuild: give the list of accessible unnocupied spaces for the moved worker
- */
+   * argPlayerBuild: give the list of accessible unnocupied spaces for the moved worker
+   */
   public function argPlayerBuild()
   {
     // Return available spaces neighbouring the moved player
@@ -574,9 +604,9 @@ class santorini extends Table
   ////////////////////////////////////////////////
 
   /*
- * stPowersSetup:
- *   called right after the board setup, should give a god/hero to each player unless basic mode
- */
+   * stPowersSetup:
+   *   called right after the board setup, should give a god/hero to each player unless basic mode
+   */
   public function stPowersSetup()
   {
     // Create 2 workers for the first player of each team
@@ -625,9 +655,29 @@ class santorini extends Table
 
 
   /*
- * stNextPlayerPlaceWorker:
- *   if the active player still has no more worker to place, go to next player
- */
+   * stPowersNextPlayerChoose: TODO
+   */
+  public function stPowersNextPlayerChoose()
+  {
+    $this->activeNextPlayer();
+
+    if($this->cards->getCardsInLocation('stack') > 0)
+      $this->gamestate->nextState('next');
+    else
+      $this->gamestate->nextState('done');
+    // Get all the remeaning workers of all players
+    $workers = self::getAvailableWorkers();
+    if (count($workers) == 0) {
+      return;
+    }
+  }
+
+
+
+  /*
+   * stNextPlayerPlaceWorker:
+   *   if the active player still has no more worker to place, go to next player
+   */
   public function stNextPlayerPlaceWorker()
   {
     // Get all the remeaning workers of all players
@@ -649,9 +699,9 @@ class santorini extends Table
 
 
   /*
- * stNextPlayer:
- *   go to next player
- */
+   * stNextPlayer:
+   *   go to next player
+   */
   public function stNextPlayer()
   {
     $pId = $this->activeNextPlayer();
@@ -661,9 +711,9 @@ class santorini extends Table
 
 
   /*
- * stCheckEndOfGame:
- *   check if winning condition has been achieved by one of the player
- */
+   * stCheckEndOfGame:
+   *   check if winning condition has been achieved by one of the player
+   */
   // TODO: add the losing condition : active player player cannot build
   // TODO : the winning condition is not correct : we have to check the level 3 has been achieved by a UP movement during player turn
   // (important for some gods that can push players or swap places, ...)
@@ -707,10 +757,10 @@ $this->gamestate->nextState('endgame');
   ////////////   Zombie   ////////////
   ////////////////////////////////////
   /*
- * zombieTurn:
- *   This method is called each time it is the turn of a player who has quit the game (= "zombie" player).
- *   You can do whatever you want in order to make sure the turn of this player ends appropriately
- */
+   * zombieTurn:
+   *   This method is called each time it is the turn of a player who has quit the game (= "zombie" player).
+   *   You can do whatever you want in order to make sure the turn of this player ends appropriately
+   */
   public function zombieTurn($state, $activePlayer)
   {
     if (array_key_exists('zombiePass', $state['transitions'])) {
@@ -729,10 +779,10 @@ $this->gamestate->nextState('endgame');
   //   update the game database and allow the game to continue to run with your new version.
   /////////////////////////////////////
   /*
- * upgradeTableDb
- *  - int $from_version : current version of this game database, in numerical form.
- *      For example, if the game was running with a release of your game named "140430-1345", $from_version is equal to 1404301345
- */
+   * upgradeTableDb
+   *  - int $from_version : current version of this game database, in numerical form.
+   *      For example, if the game was running with a release of your game named "140430-1345", $from_version is equal to 1404301345
+   */
   public function upgradeTableDb($from_version)
   {
   }

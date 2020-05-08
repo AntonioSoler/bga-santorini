@@ -28,6 +28,7 @@ const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location
 document.write('<script src="' + URL + '/scripts/board.js" type="module"><\/script>');
 
 var jstpl_powerSelect = '<div class="power-select power-${id}" id="power-select-${id}"><div class="power-select-background"></div><div class="power-select-overlay"></div></div>';
+var jstpl_power = '<div class="power-card power-${id}"><div class="power-card-background"></div><div class="power-card-overlay"></div><div class="power-card-name">${name}</div><div class="power-card-power"></div></div>';
 </script>
 
 {OVERALL_GAME_FOOTER}

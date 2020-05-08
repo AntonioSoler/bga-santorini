@@ -36,6 +36,16 @@ class action_santorini extends APP_GameAction
         }
     }
 
+    public function dividePowers()
+    {
+        self::setAjaxMode();
+        $rawIds = self::getArg('ids', AT_numberlist, true);
+        $ids = explode(',', $rawIds );
+        $this->game->dividePowers($ids);
+        self::ajaxResponse();
+    }
+
+
     public function placeWorker()
     {
         self::setAjaxMode();

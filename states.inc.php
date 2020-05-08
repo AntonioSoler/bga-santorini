@@ -92,7 +92,7 @@ ST_POWERS_DIVIDE => [
   'possibleactions' => ['dividePowers'],
   'transitions' => [
 //TODO:    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'dividePowers' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
   ],
 ],
 
