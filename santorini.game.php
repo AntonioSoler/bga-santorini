@@ -74,11 +74,13 @@ class santorini extends Table
     self::reloadPlayersBasicInfos();
 
     // Create power cards
-    $cards = [];
+    $sql = 'INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ';
+    $values = [];
     foreach ($this->powers as $powerId => $power) {
-      $cards[] = ['type' => $powerId, 'type_arg' => 0, 'nbr' => 1];
+      $values[] = "('$powerId', 0, 'box', '$powerId')";
     }
-    $this->cards->createCards($cards, 'box');
+    self::DbQuery($sql . implode($values, ','));
+//    $this->cards->createCards($cards, 'box'); TODO : remove ?
 
     // Active first player to play
     $this->activeNextPlayer();
