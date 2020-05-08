@@ -217,6 +217,7 @@ clearPossible: function() {
  * 	triggered after a click on a power (for "fair division" process)
  */
 onClickSelectPower: function(power) {
+	//TODO : check if its already full !
 	if(dojo.hasClass(dojo.query('.power-select.power-'+power.id)[0], 'selected'))
 		return;
 

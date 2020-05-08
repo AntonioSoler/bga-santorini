@@ -4,6 +4,26 @@
 		<title>three.js webgl - STL</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style type="text/css">
+div.power-card {
+	width: 232px;
+  height: 350px;
+	background-repeat: no-repeat;
+	background-size: 156%;
+	background-position: -65px -60px;
+}
+
+div.power-card2 {
+	width: 232px;
+  height: 350px;
+float:right;
+  background-repeat:no-repeat;
+  background-size:cover;
+  background-position: center center;
+  z-index:1;
+}
+
+</style>
 	</head>
 	<body>
     <div id="container"></div>
@@ -13,6 +33,7 @@
 <script type="module">
 import { Board } from '../scripts/board.js';
 
+/*
 var	container = document.getElementById("container");
 window.board = new Board(container, "http://127.0.0.1/" );
 
@@ -33,13 +54,24 @@ for(var j = 0; j < 5; j++)
   tPos.push({x:i, y:j, z:0});
 
 board.makeClickable(tPos, click, 'move');
-
+*/
 
 for(var i = 1; i <= 55; i++){
 //	document.write(".santorini-god-"+i+" { background-position:-"+ (80*(i-1)) +"px 0px; }<br />");
 //	document.write("div.power-"+i+" div.power-card-background { background-position:-"+ (260*(i-1)) +"px 0px; }<br />");
 //	document.write("div.power-"+i+" div.power-card-power { background-image:url('./img/powers/"+ String(i).padStart(3, '0')+".png'); }<br />");
-	document.write("div.power-"+i+" div.power-card-background { background-image:url('./img/gods/"+ String(i).padStart(3, '0')+".png'); }<br />");
+//	document.write("div.power-"+i+" div.power-card-background { background-image:url('./img/gods/"+ String(i).padStart(3, '0')+".png'); }<br />");
+var div2 = document.createElement("div");
+div2.style.backgroundImage = 'url(../img/powers_small/'+ id +'.png)';
+div2.className = "power-card2";
+document.body.appendChild(div2);
+
+
+var id = String(i).padStart(3, '0');
+var div = document.createElement("div");
+div.style.backgroundImage = 'url(../img/powers_cards/'+ id +'.png)';
+div.className = "power-card";
+document.body.appendChild(div);
 
 
 }
