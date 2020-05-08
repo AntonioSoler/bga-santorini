@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -24,7 +25,7 @@
  *
  */
 
-  require_once(APP_BASE_PATH."view/common/game.view.php");
+require_once(APP_BASE_PATH . "view/common/game.view.php");
 
 class view_santorini_santorini extends game_view
 {
@@ -39,15 +40,17 @@ class view_santorini_santorini extends game_view
     $current_player_id = $g_user->get_id();
     $template = self::getGameName() . '_' . self::getGameName();
 
-    // Get players & players number
-    $players = $this->game->getPlayers();
+    $this->page->begin_block("santorini_santorini", "card");
 
-    $this->page->begin_block( "santorini_santorini", "card" );
-    foreach($players as $player){
-      $this->page->insert_block( "card", [
-        'POWER_ID' => $player['power'],
-        'POWER_NAME' => ($player['power'] == 0)? '' : $this->game->powers[$player['power']]['name'],
-      ]);
+    $players = $this->game->getPlayers();
+    foreach ($players as $player) {
+      $power = $player->getPower();
+      if (!empty($power)) {
+        $this->page->insert_block("card", [
+          'POWER_ID' => $power->getId(),
+          'POWER_NAME' => $power->getName(),
+        ]);
+      }
     }
   }
 }

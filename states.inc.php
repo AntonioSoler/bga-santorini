@@ -85,8 +85,8 @@ ST_POWERS_SETUP => [
  */
 ST_POWERS_DIVIDE => [
   'name' => 'powersDivide',
-  'description' => clienttranslate('${actplayer} must choose powers'),
-  'descriptionmyturn' => clienttranslate('${you} must choose powers'),
+  'description' => clienttranslate('${actplayer} must choose ${count} powers'),
+  'descriptionmyturn' => clienttranslate('${you} must choose ${count} powers'),
   'type' => 'activeplayer',
   'args' => 'argDividePowers',
   'possibleactions' => ['dividePowers'],

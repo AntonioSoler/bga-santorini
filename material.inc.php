@@ -20,10 +20,11 @@
  *
  */
 
+require_once("modules/SantoriniPlayer.class.php");
 require_once("modules/Power.class.php");
 require_once("modules/HeroPower.class.php");
 
-foreach(Power::$powersClasses as $id => $className) {
+foreach (Power::$powersClasses as $id => $className) {
   require_once("modules/$className.class.php");
 
   $this->powers[$className::getId()] = [
