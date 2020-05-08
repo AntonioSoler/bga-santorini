@@ -217,15 +217,30 @@ clearPossible: function() {
  * 	triggered after a click on a power (for "fair division" process)
  */
 onClickSelectPower: function(power) {
-	//TODO : check if its already full !
-	if(dojo.hasClass(dojo.query('.power-select.power-'+power.id)[0], 'selected'))
+	var powerDiv = $('power-select-'+power.id);
+
+	// If already selected, unselect it
+	if(powerDiv.classList.contains('selected')){
+		this._selectedPowers = this._selectedPowers.filter( p => p.id != power.id);
+		powerDiv.classList.remove('selected');
+		dojo.destroy('buttonValidateSelection');
+		return;
+	}
+
+	// If already enough powers, don't do anything
+	if(this._selectedPowers.length == this.gamedatas.fplayers.length)
 		return;
 
-	this._displayedPower = power;
+	// Re-click on a already displayed power => select it
+	if(	this._displayedPower == power){
+		this.onClickAddPowerToSelection();
+		return;
+	}
 
 	// Change color of selected power
+	this._displayedPower = power
 	dojo.query('.power-select').removeClass('displayed');
-	dojo.query('.power-select.power-'+power.id).addClass('displayed');
+	powerDiv.classList.add('displayed');
 
 	// Update details
 	var detail = $('power-detail');
@@ -236,8 +251,6 @@ onClickSelectPower: function(power) {
 	// Update action button
 	this.removeActionButtons();
 	this.addActionButton('buttonAddToSelection', _('Add to selection'), 'onClickAddPowerToSelection', null, false, 'gray');
-	if(this._selectedPowers.length > 0)
-		this.addActionButton('buttonCancelSelection', _('Cancel'), 'onClickCancelSelection', null, false, 'gray');
 },
 
 
@@ -249,29 +262,12 @@ onClickAddPowerToSelection: function() {
 	this._selectedPowers.push(this._displayedPower);
 	dojo.query('.power-select.power-'+this._displayedPower.id).removeClass('displayed').addClass('selected');
 	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
+	this._displayedPower = null;
 	// TODO : remove banned
 
 	this.removeActionButtons();
-	this.addActionButton('buttonCancelSelection', _('Cancel'), 'onClickCancelSelection', null, false, 'gray');
 	if(this._selectedPowers.length == this.gamedatas.fplayers.length)
 		this.addActionButton('buttonValidateSelection', _('Validate'), 'onClickValidateSelection', null, false, 'blue');
-},
-
-
-/*
- * onClickCancelSelection:
- * 	triggered after a click on a button to cancel last selected power
- */
-onClickCancelSelection: function() {
-	var power = this._selectedPowers.pop();
-	dojo.query('.power-select.power-'+power.id).removeClass('selected')
-	// TODO : update banned
-
-	this.removeActionButtons();
-	dojo.query('.power-select.power-'+this._displayedPower.id).removeClass('displayed');
-	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
-	if(this._selectedPowers.length > 0)
-		this.addActionButton('buttonCancelSelection', _('Cancel'), 'onClickCancelSelection', null, false, 'gray');
 },
 
 
