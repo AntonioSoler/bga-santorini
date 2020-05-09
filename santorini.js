@@ -200,7 +200,9 @@ addPowerToPlayer: function(playerId, powerId){
 			id: powerId,
 			name: this.gamedatas.powers[powerId].name
 	};
-	dojo.place(this.format_block('jstpl_powerCard', data), 'power_container_' + playerId);
+	var card = dojo.place(this.format_block('jstpl_powerCard', data), 'power_container_' + playerId);
+	card.id = "power-card-" + playerId + "-" + powerId;
+	this.addTooltip( card.id, this.gamedatas.powers[powerId].text.join('\n'), '' );
 },
 
 
