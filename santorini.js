@@ -51,30 +51,19 @@ setup: function(gamedatas) {
 	// Setup the board (3d scene using threejs)
 	var	container = document.getElementById('scene-container');
     this.board = new Board(container, URL);
-    
-    // Setup player boards
-    dojo.place('right-side-first-part', 'play-area', 'first');
-    gamedatas.fplayers.forEach(player => {
-        dojo.place(this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
-        player.powers.forEach(power_id => {
-            var power = {
-                id: power_id,
-                name: gamedatas.powers[power_id].name
-            };
-            dojo.place(this.format_block('jstpl_powerCard', power), 'power_container_' + player.id);
-        });
-    });
 
-	gamedatas.fplayers.forEach(player => {
-		return;
-		// TODO remove or replace with name of power
-		//var player = gamedatas.players[pId];
-		//var player_board_div = $('player_board_' + pId);
-		//dojo.place( this.format_block('jstpl_player_board', player ), player_board_div );
-
-		// TODO : remove ?
-		//		player.colorName = colorNames[player.color];
-	});
+  // Setup player boards
+  dojo.place('right-side-first-part', 'play-area-scaler', 'first');
+  gamedatas.fplayers.forEach(player => {
+      dojo.place(this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
+      player.powers.forEach(power_id => {
+          var power = {
+              id: power_id,
+              name: gamedatas.powers[power_id].name
+          };
+          dojo.place(this.format_block('jstpl_powerCard', power), 'power_container_' + player.id);
+      });
+  });
 
 	// Setup workers and buildings
 	gamedatas.placedPieces.forEach(this.createPiece.bind(this));
@@ -129,8 +118,9 @@ onEnteringState: function(stateName, args) {
 	// Choose power
 	} else if (stateName == 'powersPlayerChoose') {
 		args.args.powers.forEach(power => {
-			var div = dojo.place( this.format_block('jstpl_power', power ), $('power-choose-container') );
-			this.addTooltip( div, power.text.join('\n'), '' );
+			var div = dojo.place(this.format_block('jstpl_powerCard', power ), $('power-choose-container') );
+			div.id = "power-choose-" + power.id;
+			this.addTooltip( div.id, power.text.join('\n'), '' );
 			dojo.style(div, "cursor", "pointer");
 			dojo.connect(div, 'onclick', e => this.onClickChoosePower(power) );
 		});
@@ -290,7 +280,7 @@ onClickSelectPower: function(power) {
  */
 onClickAddPowerToSelection: function() {
 	this._selectedPowers.push(this._displayedPower);
-	dojo.query('.power-select.power-'+this._displayedPower.id).removeClass('displayed').addClass('selected');
+	dojo.query('#power-select-'+this._displayedPower.id).removeClass('displayed').addClass('selected');
 	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
 	this._displayedPower = null;
 	// TODO : remove banned

@@ -17,7 +17,7 @@
 const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
 document.write('<script src="' + URL + '/scripts/board.js" type="module"><\/script>');
 
-var jstpl_powerSelect = '<div id="power-select-${id}" class="power-select power-${id}"><div class="power-select-overlay"></div></div>';
+var jstpl_powerSelect = '<div id="power-select-${id}" class="power-select"><div class="power-select-background power-${id}"></div><div class="power-select-overlay"></div></div>';
 
 var jstpl_powerContainer = '<div id="power_container_${id}" class="power-container"></div>';
 

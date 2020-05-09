@@ -72,10 +72,19 @@
     margin: 2px;
     position: relative;
     cursor: pointer;
-    background-repeat: no-repeat;
-    background-size: 156%;
-    background-position: 50% 25%;
     border-radius: 15px;
+}
+
+#power-select-container .power-select .power-select-background {
+  position:absolute;
+  top: 6%;
+  left: 8%;
+  width: 84%;
+  height: 88%;
+  background-repeat:no-repeat;
+  background-size:156%;
+  background-position:50% 25%;
+  z-index:1;
 }
 
 #power-select-container .power-select .power-select-overlay {
@@ -98,6 +107,19 @@
 #power-select-container .power-select.selected .power-select-overlay {
     background-image: url("./img/frame_coral.png");
 }
+
+
+#power-choose-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#power-choose-container div.power-card {
+  margin:0 20px;
+}
+
+
 
 #play-area {
     /* height: 1100px; */
@@ -129,7 +151,7 @@
     border-radius: 15px;
 }
 
-.power-card+.power-card {
+div.player_board .power-card+.power-card {
     position: absolute;
     margin-left: -190px;
     z-index: 4;
