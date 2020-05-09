@@ -16,135 +16,162 @@
 @import url(../../../css/csslayer.css);
 @import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
 @import url(./santorini.powers.css);
+/* Begin player boards */
 
+#player_boards {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.player-board {
+    flex: 1 0 300px;
+    margin: 10px;
+    border-radius: 8px;
+    float: none;
+    clear: none;
+}
+
+.power-container {
+    text-align: center;
+}
+
+/* Cancel "logs on the additional column" */
+
+.logs_on_additional_column #left-side {
+    margin-right: 245px;
+}
+
+.logs_on_additional_column #right-side {
+    width: 240px;
+    margin-left: -240px;
+}
+
+.logs_on_additional_column #right-side-first-part {
+    width: auto;
+    float: none;
+}
+
+/* End player boards */
 
 #power-select-container {
-  display: flex;
+    display: flex;
 }
 
 #power-select-container div#grid-powers {
-  width:50%;
-  display:flex;
-  flex-direction:row;
-  flex-wrap:wrap;
-  overflow:auto;
-  align-content:flex-start;
+    width: 50%;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow: auto;
+    align-content: flex-start;
 }
 
 #power-select-container .power-select {
-  width:105px;
-  height:150px;
-  margin:2px;
-  position: relative;
-  cursor:pointer;
-}
-
-
-#power-select-container .power-select .power-select-background {
-  position:absolute;
-  top: 6%;
-  left: 8%;
-  width: 84%;
-  height: 88%;
-  background-repeat:no-repeat;
-  background-size:156%;
-  background-position:50% 25%;
-  z-index:1;
+    width: 105px;
+    height: 150px;
+    margin: 2px;
+    position: relative;
+    cursor: pointer;
+    background-repeat: no-repeat;
+    background-size: 156%;
+    background-position: 50% 25%;
+    border-radius: 15px;
 }
 
 #power-select-container .power-select .power-select-overlay {
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background-image:url("./img/frame_white.png");
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position: center center;
-  z-index:2;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("./img/frame_white.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    z-index: 2;
 }
+
 #power-select-container .power-select.displayed .power-select-overlay {
-  background-image:url("./img/frame_blue.png");
+    background-image: url("./img/frame_blue.png");
 }
+
 #power-select-container .power-select.selected .power-select-overlay {
-  background-image:url("./img/frame_coral.png");
+    background-image: url("./img/frame_coral.png");
 }
-
-
 
 #play-area {
-  height: 1100px;
-/*  width: 1200px; */
-  display: flex;
-  pointer-events: visible;
+    /* height: 1100px; */
+    /*  width: 1200px; */
+    display: flex;
+    pointer-events: visible;
 }
 
-#play-area #powers-container {
-  display:flex;
-  flex-direction: column;
-  height:100%;
-  flex-wrap:wrap;
-  padding-left:20px;
+#scene-container {
+    text-align: center;
 }
 
-div.power-card {
-  width: 232px;
-  height: 350px;
-  position: relative;
-  margin-bottom: 42px;
-  display:block;
-}
-div.power-card.power-0 {
-  display:none;
+#powers-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-wrap: wrap;
+    padding-left: 20px;
 }
 
-div.power-card div.power-card-background {
-  position:absolute;
-  top:1%;
-  left:4%;
-  width:92%;
-  height:92%;
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position: center center;
-  z-index:1;
+.power-card {
+    width: 193px;
+    height: 300px;
+    position: relative;
+    display: inline-block;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    border-radius: 15px;
 }
 
-
-div.power-card div.power-card-overlay {
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  border-radius:10px;
-  background-image:url("./img/card.png");
-  background-repeat:no-repeat;
-  background-size:cover;
-  background-position: center center;
-  z-index:2;
+.power-card+.power-card {
+    position: absolute;
+    margin-left: -190px;
+    z-index: 4;
 }
 
-div.power-card div.power-card-name {
-  position: absolute;
-  top: 0;
-  width: 100%;
-  color: #333;
-  text-align: center;
-  font: 16px/22px 'Caveat Brush', cursive;
-  text-transform: uppercase;
-  z-index:3;
+.power-card.power-0 {
+    display: none;
 }
 
-div.power-card div.power-card-power {
-  position: absolute;
-  bottom: 1.5%;
-  left: 15%;
-  width: 70%;
-  height: 16%;
-  background-position:center center;
-  background-repeat:no-repeat;
-  background-size:contain;
-  z-index: 4;
+.power-card .power-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    background-image: url("./img/card.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    z-index: 2;
+}
+
+.power-card .power-card-name {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    color: #333;
+    text-align: center;
+    font: 16px/22px 'Caveat Brush', cursive;
+    text-transform: uppercase;
+    z-index: 3;
+}
+
+.power-card .power-card-power {
+    position: absolute;
+    bottom: 1.5%;
+    left: 15%;
+    width: 70%;
+    height: 16%;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    z-index: 4;
 }

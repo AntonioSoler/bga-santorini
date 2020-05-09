@@ -109,7 +109,7 @@ $gameinfos = array(
     'max' => null
 ),
 
-'enable_3d' => true, 
+'enable_3d' => false, 
 
 // Games categories
 //  You can attribute a maximum of FIVE "tags" for your game.

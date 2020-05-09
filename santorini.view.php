@@ -39,18 +39,5 @@ class view_santorini_santorini extends game_view
     global $g_user;
     $current_player_id = $g_user->get_id();
     $template = self::getGameName() . '_' . self::getGameName();
-
-    $this->page->begin_block("santorini_santorini", "card");
-
-    $players = $this->game->getPlayers();
-    foreach ($players as $player) {
-      $power = $player->getPower();
-      if (!empty($power)) {
-        $this->page->insert_block("card", [
-          'POWER_ID' => $power->getId(),
-          'POWER_NAME' => $power->getName(),
-        ]);
-      }
-    }
   }
 }
