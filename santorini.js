@@ -56,13 +56,7 @@ setup: function(gamedatas) {
   dojo.place('right-side-first-part', 'play-area-scaler', 'first');
   gamedatas.fplayers.forEach(player => {
       dojo.place(this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
-      player.powers.forEach(power_id => {
-          var power = {
-              id: power_id,
-              name: gamedatas.powers[power_id].name
-          };
-          dojo.place(this.format_block('jstpl_powerCard', power), 'power_container_' + player.id);
-      });
+      player.powers.forEach(powerId => this.addPowerToPlayer(player.id, powerId) );
   });
 
 	// Setup workers and buildings
@@ -193,6 +187,20 @@ focusContainer: function(container){
 		this.board.display();
 	else
 		this.board.hide();
+},
+
+/*
+ * addPowerToPlayer:
+ * 	add a power card to given player
+ * params:
+ *  - object piece: main infos are type, x,y,z
+ */
+addPowerToPlayer: function(playerId, powerId){
+	var data = {
+			id: powerId,
+			name: this.gamedatas.powers[powerId].name
+	};
+	dojo.place(this.format_block('jstpl_powerCard', data), 'power_container_' + playerId);
 },
 
 
@@ -406,6 +414,9 @@ onClickBuild: function(space) {
  *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
  */
 setupNotifications: function() {
+	dojo.subscribe( 'powerAdded', this, "notif_powerAdded" );
+	this.notifqueue.setSynchronous('powerAdded', 2000);
+
 	dojo.subscribe('workerPlaced', this, 'notif_workerPlaced');
 	this.notifqueue.setSynchronous('workerPlaced', 2000);
 
@@ -419,6 +430,16 @@ setupNotifications: function() {
 	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
 	this.notifqueue.setSynchronous('workerSwitched', 2000);
 
+},
+
+
+/*
+ * notif_powerAdded:
+ *   called whenever a player choose a power on a Fair Division process
+ */
+notif_powerAdded: function(n) {
+	console.info('Notif: a power was chosen', n.args);
+	this.addPowerToPlayer(n.args.player_id, n.args.power_id);
 },
 
 

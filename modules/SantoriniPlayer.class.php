@@ -103,7 +103,7 @@ class SantoriniPlayer extends APP_GameClass
         ];
     }
 
-    /* 
+    /*
      * Powers
      */
 
@@ -138,7 +138,7 @@ class SantoriniPlayer extends APP_GameClass
             'power_name' => $power->getName(),
             'power_title' => $power->getTitle(),
         );
-        $this->game->notifyAllPlayers('message', clienttranslate('${player_name} receives ${power_name}, ${power_title}'), $args);
+        $this->game->notifyAllPlayers('powerAdded', clienttranslate('${player_name} receives ${power_name}, ${power_title}'), $args);
 
         return $power;
     }
