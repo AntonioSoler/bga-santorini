@@ -77,7 +77,7 @@ class santorini extends Table
     $sql = 'INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ';
     $values = [];
     foreach ($this->powers as $powerId => $power) {
-      $values[] = "('$powerId', 0, 'box', '$powerId')";
+      $values[] = "('$powerId', 0, 'box', 0)";
     }
     self::DbQuery($sql . implode($values, ','));
 //    $this->cards->createCards($cards, 'box'); TODO : remove ?
@@ -375,10 +375,34 @@ class santorini extends Table
   {
     self::checkAction('dividePowers');
 
+    // Move selected powers to stack
     $this->cards->moveCards($ids, 'stack');
+
+    // Notify other players
+    $powers = array_map(function($id){ return $this->powers[$id]['name']; }, $ids);
+    $args = [
+      'i18n' => [],
+      'powers_names' => implode(', ', $powers),
+      'player_name' => self::getActivePlayerName(),
+    ];
+    self::notifyAllPlayers('powersDivided', clienttranslate('${player_name} selects ${powers_names}'), $args);
+
     $this->gamestate->nextState('done');
   }
 
+
+  /*
+   * choosePower: TODO
+   */
+  public function choosePower($id)
+  {
+    self::checkAction('choosePower');
+
+    // Add choosed power to player
+    SantoriniPlayer::getPlayer($this, self::getActivePlayerId())->addPower($id);
+
+    $this->gamestate->nextState('done');
+  }
 
 
   /*
@@ -661,16 +685,17 @@ class santorini extends Table
    */
   public function stPowersNextPlayerChoose()
   {
-    $this->activeNextPlayer();
+    $pId = $this->activeNextPlayer();
 
-    if($this->cards->getCardsInLocation('stack') > 0)
+    $remainingPowers = $this->cards->getCardsInLocation('stack');
+    if(count($remainingPowers) > 1)
       $this->gamestate->nextState('next');
-    else
+    else {
+      // If only one power left, automatically assign it to the last player
+      if(count($remainingPowers) == 1)
+        SantoriniPlayer::getPlayer($this, $pId)->addPower(reset($remainingPowers)['id']);
+
       $this->gamestate->nextState('done');
-    // Get all the remeaning workers of all players
-    $workers = self::getAvailableWorkers();
-    if (count($workers) == 0) {
-      return;
     }
   }
 

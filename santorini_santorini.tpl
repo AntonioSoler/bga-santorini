@@ -9,6 +9,7 @@
 			<div class="power-card-power"></div>
 		</div>
 	</div>
+	<div id="power-choose-container"></div>
 	<div id="play-area">
 		<div id="scene-container"></div>
 		<div id="powers-container">

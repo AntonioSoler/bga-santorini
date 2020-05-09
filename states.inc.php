@@ -116,7 +116,7 @@ ST_POWERS_CHOOSE => [
   'possibleactions' => ['choosePower'],
   'transitions' => [
 // TODO    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'choosePower' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
   ],
 ],
 

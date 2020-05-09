@@ -92,8 +92,10 @@ setup: function(gamedatas) {
 onEnteringState: function(stateName, args) {
 	console.info('Entering state: ' + stateName, args.args);
 
-	if(['powersDivide', 'powersPlayerChoose'].includes(stateName))
-		this.focusContainer('powers');
+	if(stateName == 'powersDivide')
+		this.focusContainer('powers-select');
+	else if(stateName == 'powersPlayerChoose')
+		this.focusContainer('powers-choose');
 	else
 		this.focusContainer('board');
 
@@ -114,9 +116,11 @@ onEnteringState: function(stateName, args) {
 	// Choose power
 	} else if (stateName == 'powersPlayerChoose') {
 		args.args.powers.forEach(power => {
-			var div = dojo.place( this.format_block('jstpl_power', power ), $('grid-powers') );
-			dojo.connect(div, 'onclick', e => console.log(power) );
-		})
+			var div = dojo.place( this.format_block('jstpl_power', power ), $('power-choose-container') );
+			this.addTooltip( div, power.text.join('\n'), '' );
+			dojo.style(div, "cursor", "pointer");
+			dojo.connect(div, 'onclick', e => this.onClickChoosePower(power) );
+		});
 
 	// Place a worker
 	} else if (stateName == 'playerPlaceWorker') {
@@ -178,7 +182,8 @@ onUpdateActionButtons: function(stateName, args) {
  * 	show and hide containers depending on state
  */
 focusContainer: function(container){
-	dojo.style( 'power-select-container', 'display', container == 'powers'? 'flex' : 'none');
+	dojo.style( 'power-select-container', 'display', container == 'powers-select'? 'flex' : 'none');
+	dojo.style( 'power-choose-container', 'display', container == 'powers-choose'? 'flex' : 'none');
 	dojo.style( 'play-area',			 				'display', container == 'board'? 	'block' : 'none');
 
 	if(container == "board")
@@ -209,7 +214,12 @@ createPiece: function(piece) {
  */
 clearPossible: function() {
 	this.removeActionButtons();
+
 	this._selectedWorker = null;
+	dojo.empty('grid-powers');
+	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
+	dojo.empty('power-choose-container');
+
 	this.board.clearClickable();
 },
 
@@ -289,6 +299,18 @@ onClickValidateSelection: function() {
 
 	var ids = this._selectedPowers.map(power => power.id).join(',');
 	this.ajaxcall( "/santorini/santorini/dividePowers.html", { ids : ids }, this, res => {} );
+},
+
+
+/*
+ * onClickChoosePower:
+ * 	triggered after a click on a card for choosing a power (in the Fair Division process)
+ */
+onClickChoosePower: function(power) {
+	if(! this.checkAction( 'choosePower' ) )
+		return false;
+
+	this.ajaxcall( "/santorini/santorini/choosePower.html", { id : power.id }, this, res => {} );
 },
 
 
