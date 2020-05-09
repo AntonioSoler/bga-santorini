@@ -50,7 +50,20 @@ setup: function(gamedatas) {
 
 	// Setup the board (3d scene using threejs)
 	var	container = document.getElementById('scene-container');
-	this.board = new Board(container, URL);
+    this.board = new Board(container, URL);
+    
+    // Setup player boards
+    dojo.place('right-side-first-part', 'play-area', 'first');
+    gamedatas.fplayers.forEach(player => {
+        dojo.place(this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
+        player.powers.forEach(power_id => {
+            var power = {
+                id: power_id,
+                name: gamedatas.powers[power_id].name
+            };
+            dojo.place(this.format_block('jstpl_powerCard', power), 'power_container_' + player.id);
+        });
+    });
 
 	gamedatas.fplayers.forEach(player => {
 		return;
