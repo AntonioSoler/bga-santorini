@@ -16,54 +16,86 @@
 @import url(../../../css/csslayer.css);
 @import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
 @import url(./santorini.powers.css);
-/* Begin player boards */
 
-#player_boards {
-    display: flex;
-    justify-content: space-evenly;
-}
-
-.player-board {
-    flex: 1 0 300px;
-    margin: 10px;
-    border-radius: 8px;
-    float: none;
-    clear: none;
-}
-
+/* Player boards */
 .power-container {
     text-align: center;
 }
 
-/* Cancel "logs on the additional column" */
-
-.logs_on_additional_column #left-side {
-    margin-right: 245px;
-}
-
-.logs_on_additional_column #right-side {
+.mini-card {
+    position: relative;
+    margin-left: -3px;
     width: 240px;
-    margin-left: -240px;
+    height: 120px;
+    background-image: url(img/mini-card.png);
+    background-repeat: no-repeat;
+    background-size: contain;
+    overflow: hidden;
 }
 
-.logs_on_additional_column #right-side-first-part {
-    width: auto;
-    float: none;
+.mini-card .power-avatar {
+    position: absolute;
+    width: 65px;
+    height: 67px;
+    top: 26px;
+    left: -9px;
+    border-radius: 100%;
+    background-size: cover;
+    background-position: top;
+    background-repeat: no-repeat;
 }
 
-/* End player boards */
+.mini-card .power-pictogram {
+    position: absolute;
+    width: 160px;
+    height: 80px;
+    left: 60px;
+    top: 20px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.power-detail {
+    width: 300px;
+}
+
+.power-name {
+    font: 20px 'Caveat Brush', cursive;
+    text-transform: uppercase;
+}
+
+.power-title {
+    font-style: italic;
+    margin-bottom: .5em;
+}
+
+.power-text li {
+    list-style: square;
+    margin-left: 1.5em;
+    margin-bottom: 1em;
+}
+
+#power-select-container .power-detail,
+#power-choose-container .power-detail {
+    margin: 0 15px;
+}
 
 #power-select-container {
     display: flex;
 }
 
-#power-select-container div#grid-powers {
-    width: 50%;
+#grid-powers {
+    flex: 1 1 auto;
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
     overflow: auto;
     align-content: flex-start;
+}
+
+#grid-detail {
+    flex: 1 0 330px;
 }
 
 #power-select-container .power-select {
@@ -108,18 +140,10 @@
     background-image: url("./img/frame_coral.png");
 }
 
-
 #power-choose-container {
     display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: space-evenly;
 }
-
-#power-choose-container div.power-card {
-  margin:0 20px;
-}
-
-
 
 #play-area {
     /* height: 1100px; */
@@ -141,27 +165,23 @@
 }
 
 .power-card {
-    width: 193px;
-    height: 300px;
+    margin: 0 auto 10px;
+    width: 300px;
+    height: 465px;
     position: relative;
-    display: inline-block;
     background-repeat: no-repeat;
     background-size: cover;
-    background-position: center center;
+    background-position: center;
     border-radius: 15px;
-}
-
-div.player_board .power-card+.power-card {
-    position: absolute;
-    margin-left: -190px;
-    z-index: 4;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
 }
 
 .power-card.power-0 {
     display: none;
 }
 
-.power-card .power-card-overlay {
+.power-card::before {
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -175,18 +195,18 @@ div.player_board .power-card+.power-card {
     z-index: 2;
 }
 
-.power-card .power-card-name {
+.power-card .power-name {
     position: absolute;
     top: 0;
     width: 100%;
     color: #333;
     text-align: center;
-    font: 16px/22px 'Caveat Brush', cursive;
-    text-transform: uppercase;
+    font-size: 20px;
+    line-height: 32px;
     z-index: 3;
 }
 
-.power-card .power-card-power {
+.power-card .power-pictogram {
     position: absolute;
     bottom: 1.5%;
     left: 15%;

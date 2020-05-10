@@ -2,11 +2,7 @@
 <div id="play-area-scaler">
 	<div id="power-select-container">
 		<div id="grid-powers"></div>
-		<div id="power-detail" class="power-card power-0">
-			<div class="power-card-overlay"></div>
-			<div id="power-detail-name" class="power-card-name"></div>
-			<div class="power-card-power"></div>
-		</div>
+		<div id="grid-detail"></div>
 	</div>
 	<div id="power-choose-container"></div>
 	<div id="play-area">
@@ -21,10 +17,21 @@ var jstpl_powerSelect = '<div id="power-select-${id}" class="power-select"><div 
 
 var jstpl_powerContainer = '<div id="power_container_${id}" class="power-container"></div>';
 
-var jstpl_powerCard = `<div class="power-card power-\${id}">
-	<div class="power-card-overlay"></div>
-	<div class="power-card-name">\${name}</div>
-	<div class="power-card-power"></div>
+var jstpl_miniCard = `<div class="mini-card power-\${id}">
+	<div class="power-avatar"></div>
+	<div class="power-pictogram"></div>
+</div>`;
+
+var jstpl_powerDetail = `<div class="power-detail">
+	<div class="power-card power-\${id}">
+		<div class="power-name">\${name}</div>
+		<div class="power-pictogram"></div>
+	</div>
+	<div class="power-info">
+		<div class="power-name">\${name}</div>
+		<div class="power-title">\${title}</div>
+		<ul class="power-text"><li>\${textList}</li></ul>
+	</div>
 </div>`;
 
 </script>

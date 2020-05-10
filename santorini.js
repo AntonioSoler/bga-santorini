@@ -50,14 +50,13 @@ setup: function(gamedatas) {
 
 	// Setup the board (3d scene using threejs)
 	var	container = document.getElementById('scene-container');
-    this.board = new Board(container, URL);
+	this.board = new Board(container, URL);
 
-  // Setup player boards
-  dojo.place('right-side-first-part', 'play-area-scaler', 'first');
-  gamedatas.fplayers.forEach(player => {
-      dojo.place(this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
-      player.powers.forEach(powerId => this.addPowerToPlayer(player.id, powerId) );
-  });
+	// Setup player boards
+	gamedatas.fplayers.forEach(player => {
+		dojo.place(this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
+		player.powers.forEach(powerId => this.addPowerToPlayer(player.id, powerId) );
+	});
 
 	// Setup workers and buildings
 	gamedatas.placedPieces.forEach(this.createPiece.bind(this));
@@ -71,6 +70,11 @@ setup: function(gamedatas) {
 
 	// Setup game notifications
 	this.setupNotifications();
+},
+
+getPowerDetail : function(power) {
+	power.textList = power.text.join('</li><li>');
+	return this.format_block('jstpl_powerDetail', power);
 },
 
 ///////////////////////////////////////
@@ -112,9 +116,8 @@ onEnteringState: function(stateName, args) {
 	// Choose power
 	} else if (stateName == 'powersPlayerChoose') {
 		args.args.powers.forEach(power => {
-			var div = dojo.place(this.format_block('jstpl_powerCard', power ), $('power-choose-container') );
+			var div = dojo.place(this.getPowerDetail(power), $('power-choose-container') );
 			div.id = "power-choose-" + power.id;
-			this.addTooltip( div.id, power.text.join('\n'), '' );
 			dojo.style(div, "cursor", "pointer");
 			dojo.connect(div, 'onclick', e => this.onClickChoosePower(power) );
 		});
@@ -181,7 +184,7 @@ onUpdateActionButtons: function(stateName, args) {
 focusContainer: function(container){
 	dojo.style( 'power-select-container', 'display', container == 'powers-select'? 'flex' : 'none');
 	dojo.style( 'power-choose-container', 'display', container == 'powers-choose'? 'flex' : 'none');
-	dojo.style( 'play-area',			 				'display', container == 'board'? 	'block' : 'none');
+	dojo.style( 'play-area', 'display', container == 'board'?  'block' : 'none');
 
 	if(container == "board")
 		this.board.display();
@@ -196,13 +199,10 @@ focusContainer: function(container){
  *  - object piece: main infos are type, x,y,z
  */
 addPowerToPlayer: function(playerId, powerId){
-	var data = {
-			id: powerId,
-			name: this.gamedatas.powers[powerId].name
-	};
-	var card = dojo.place(this.format_block('jstpl_powerCard', data), 'power_container_' + playerId);
-	card.id = "power-card-" + playerId + "-" + powerId;
-	this.addTooltip( card.id, this.gamedatas.powers[powerId].text.join('\n'), '' );
+	var power = this.gamedatas.powers[powerId];
+	var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
+	card.id = "mini-card-" + playerId + "-" + powerId;	
+	this.addTooltipHtml( card.id, this.getPowerDetail(power) );
 },
 
 
@@ -268,15 +268,13 @@ onClickSelectPower: function(power) {
 	}
 
 	// Change color of selected power
-	this._displayedPower = power
+	this._displayedPower = power;
 	dojo.query('.power-select').removeClass('displayed');
 	powerDiv.classList.add('displayed');
 
 	// Update details
 	var detail = $('power-detail');
-	dojo.query('#power-detail').removeClass().addClass('power-card power-'+power.id);
-	$('power-detail-name').innerHTML = power.name;
-	this.addTooltip( 'power-detail', power.text.join('\n'), '' );
+	dojo.place(this.getPowerDetail(power), 'grid-detail', 'only');
 
 	// Update action button
 	this.removeActionButtons();

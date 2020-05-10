@@ -1,112 +1,169 @@
-.power-1 .power-card-power { background-image:url('./img/powers_descriptions/001.png'); }
-.power-2 .power-card-power { background-image:url('./img/powers_descriptions/002.png'); }
-.power-3 .power-card-power { background-image:url('./img/powers_descriptions/003.png'); }
-.power-4 .power-card-power { background-image:url('./img/powers_descriptions/004.png'); }
-.power-5 .power-card-power { background-image:url('./img/powers_descriptions/005.png'); }
-.power-6 .power-card-power { background-image:url('./img/powers_descriptions/006.png'); }
-.power-7 .power-card-power { background-image:url('./img/powers_descriptions/007.png'); }
-.power-8 .power-card-power { background-image:url('./img/powers_descriptions/008.png'); }
-.power-9 .power-card-power { background-image:url('./img/powers_descriptions/009.png'); }
-.power-10 .power-card-power { background-image:url('./img/powers_descriptions/010.png'); }
-.power-11 .power-card-power { background-image:url('./img/powers_descriptions/011.png'); }
-.power-12 .power-card-power { background-image:url('./img/powers_descriptions/012.png'); }
-.power-13 .power-card-power { background-image:url('./img/powers_descriptions/013.png'); }
-.power-14 .power-card-power { background-image:url('./img/powers_descriptions/014.png'); }
-.power-15 .power-card-power { background-image:url('./img/powers_descriptions/015.png'); }
-.power-16 .power-card-power { background-image:url('./img/powers_descriptions/016.png'); }
-.power-17 .power-card-power { background-image:url('./img/powers_descriptions/017.png'); }
-.power-18 .power-card-power { background-image:url('./img/powers_descriptions/018.png'); }
-.power-19 .power-card-power { background-image:url('./img/powers_descriptions/019.png'); }
-.power-20 .power-card-power { background-image:url('./img/powers_descriptions/020.png'); }
-.power-21 .power-card-power { background-image:url('./img/powers_descriptions/021.png'); }
-.power-22 .power-card-power { background-image:url('./img/powers_descriptions/022.png'); }
-.power-23 .power-card-power { background-image:url('./img/powers_descriptions/023.png'); }
-.power-24 .power-card-power { background-image:url('./img/powers_descriptions/024.png'); }
-.power-25 .power-card-power { background-image:url('./img/powers_descriptions/025.png'); }
-.power-26 .power-card-power { background-image:url('./img/powers_descriptions/026.png'); }
-.power-27 .power-card-power { background-image:url('./img/powers_descriptions/027.png'); }
-.power-28 .power-card-power { background-image:url('./img/powers_descriptions/028.png'); }
-.power-29 .power-card-power { background-image:url('./img/powers_descriptions/029.png'); }
-.power-30 .power-card-power { background-image:url('./img/powers_descriptions/030.png'); }
-.power-31 .power-card-power { background-image:url('./img/powers_descriptions/031.png'); }
-.power-32 .power-card-power { background-image:url('./img/powers_descriptions/032.png'); }
-.power-33 .power-card-power { background-image:url('./img/powers_descriptions/033.png'); }
-.power-34 .power-card-power { background-image:url('./img/powers_descriptions/034.png'); }
-.power-35 .power-card-power { background-image:url('./img/powers_descriptions/035.png'); }
-.power-36 .power-card-power { background-image:url('./img/powers_descriptions/036.png'); }
-.power-37 .power-card-power { background-image:url('./img/powers_descriptions/037.png'); }
-.power-38 .power-card-power { background-image:url('./img/powers_descriptions/038.png'); }
-.power-39 .power-card-power { background-image:url('./img/powers_descriptions/039.png'); }
-.power-40 .power-card-power { background-image:url('./img/powers_descriptions/040.png'); }
-.power-41 .power-card-power { background-image:url('./img/powers_descriptions/041.png'); }
-.power-42 .power-card-power { background-image:url('./img/powers_descriptions/042.png'); }
-.power-43 .power-card-power { background-image:url('./img/powers_descriptions/043.png'); }
-.power-44 .power-card-power { background-image:url('./img/powers_descriptions/044.png'); }
-.power-45 .power-card-power { background-image:url('./img/powers_descriptions/045.png'); }
-.power-46 .power-card-power { background-image:url('./img/powers_descriptions/046.png'); }
-.power-47 .power-card-power { background-image:url('./img/powers_descriptions/047.png'); }
-.power-48 .power-card-power { background-image:url('./img/powers_descriptions/048.png'); }
-.power-49 .power-card-power { background-image:url('./img/powers_descriptions/049.png'); }
-.power-50 .power-card-power { background-image:url('./img/powers_descriptions/050.png'); }
-.power-51 .power-card-power { background-image:url('./img/powers_descriptions/051.png'); }
-.power-52 .power-card-power { background-image:url('./img/powers_descriptions/052.png'); }
-.power-53 .power-card-power { background-image:url('./img/powers_descriptions/053.png'); }
-.power-54 .power-card-power { background-image:url('./img/powers_descriptions/054.png'); }
-.power-55 .power-card-power { background-image:url('./img/powers_descriptions/055.png'); }
+.power-1 .power-pictogram { background-image:url('img/pictograms/001.png'); }
+.power-2 .power-pictogram { background-image:url('img/pictograms/002.png'); }
+.power-3 .power-pictogram { background-image:url('img/pictograms/003.png'); }
+.power-4 .power-pictogram { background-image:url('img/pictograms/004.png'); }
+.power-5 .power-pictogram { background-image:url('img/pictograms/005.png'); }
+.power-6 .power-pictogram { background-image:url('img/pictograms/006.png'); }
+.power-7 .power-pictogram { background-image:url('img/pictograms/007.png'); }
+.power-8 .power-pictogram { background-image:url('img/pictograms/008.png'); }
+.power-9 .power-pictogram { background-image:url('img/pictograms/009.png'); }
+.power-10 .power-pictogram { background-image:url('img/pictograms/010.png'); }
+.power-11 .power-pictogram { background-image:url('img/pictograms/011.png'); }
+.power-12 .power-pictogram { background-image:url('img/pictograms/012.png'); }
+.power-13 .power-pictogram { background-image:url('img/pictograms/013.png'); }
+.power-14 .power-pictogram { background-image:url('img/pictograms/014.png'); }
+.power-15 .power-pictogram { background-image:url('img/pictograms/015.png'); }
+.power-16 .power-pictogram { background-image:url('img/pictograms/016.png'); }
+.power-17 .power-pictogram { background-image:url('img/pictograms/017.png'); }
+.power-18 .power-pictogram { background-image:url('img/pictograms/018.png'); }
+.power-19 .power-pictogram { background-image:url('img/pictograms/019.png'); }
+.power-20 .power-pictogram { background-image:url('img/pictograms/020.png'); }
+.power-21 .power-pictogram { background-image:url('img/pictograms/021.png'); }
+.power-22 .power-pictogram { background-image:url('img/pictograms/022.png'); }
+.power-23 .power-pictogram { background-image:url('img/pictograms/023.png'); }
+.power-24 .power-pictogram { background-image:url('img/pictograms/024.png'); }
+.power-25 .power-pictogram { background-image:url('img/pictograms/025.png'); }
+.power-26 .power-pictogram { background-image:url('img/pictograms/026.png'); }
+.power-27 .power-pictogram { background-image:url('img/pictograms/027.png'); }
+.power-28 .power-pictogram { background-image:url('img/pictograms/028.png'); }
+.power-29 .power-pictogram { background-image:url('img/pictograms/029.png'); }
+.power-30 .power-pictogram { background-image:url('img/pictograms/030.png'); }
+.power-31 .power-pictogram { background-image:url('img/pictograms/031.png'); }
+.power-32 .power-pictogram { background-image:url('img/pictograms/032.png'); }
+.power-33 .power-pictogram { background-image:url('img/pictograms/033.png'); }
+.power-34 .power-pictogram { background-image:url('img/pictograms/034.png'); }
+.power-35 .power-pictogram { background-image:url('img/pictograms/035.png'); }
+.power-36 .power-pictogram { background-image:url('img/pictograms/036.png'); }
+.power-37 .power-pictogram { background-image:url('img/pictograms/037.png'); }
+.power-38 .power-pictogram { background-image:url('img/pictograms/038.png'); }
+.power-39 .power-pictogram { background-image:url('img/pictograms/039.png'); }
+.power-40 .power-pictogram { background-image:url('img/pictograms/040.png'); }
+.power-41 .power-pictogram { background-image:url('img/pictograms/041.png'); }
+.power-42 .power-pictogram { background-image:url('img/pictograms/042.png'); }
+.power-43 .power-pictogram { background-image:url('img/pictograms/043.png'); }
+.power-44 .power-pictogram { background-image:url('img/pictograms/044.png'); }
+.power-45 .power-pictogram { background-image:url('img/pictograms/045.png'); }
+.power-46 .power-pictogram { background-image:url('img/pictograms/046.png'); }
+.power-47 .power-pictogram { background-image:url('img/pictograms/047.png'); }
+.power-48 .power-pictogram { background-image:url('img/pictograms/048.png'); }
+.power-49 .power-pictogram { background-image:url('img/pictograms/049.png'); }
+.power-50 .power-pictogram { background-image:url('img/pictograms/050.png'); }
+.power-51 .power-pictogram { background-image:url('img/pictograms/051.png'); }
+.power-52 .power-pictogram { background-image:url('img/pictograms/052.png'); }
+.power-53 .power-pictogram { background-image:url('img/pictograms/053.png'); }
+.power-54 .power-pictogram { background-image:url('img/pictograms/054.png'); }
+.power-55 .power-pictogram { background-image:url('img/pictograms/055.png'); }
 
 
-.power-1 { background-image:url('./img/powers_cards/001.jpg'); }
-.power-2 { background-image:url('./img/powers_cards/002.jpg'); }
-.power-3 { background-image:url('./img/powers_cards/003.jpg'); }
-.power-4 { background-image:url('./img/powers_cards/004.jpg'); }
-.power-5 { background-image:url('./img/powers_cards/005.jpg'); }
-.power-6 { background-image:url('./img/powers_cards/006.jpg'); }
-.power-7 { background-image:url('./img/powers_cards/007.jpg'); }
-.power-8 { background-image:url('./img/powers_cards/008.jpg'); }
-.power-9 { background-image:url('./img/powers_cards/009.jpg'); }
-.power-10 { background-image:url('./img/powers_cards/010.jpg'); }
-.power-11 { background-image:url('./img/powers_cards/011.jpg'); }
-.power-12 { background-image:url('./img/powers_cards/012.jpg'); }
-.power-13 { background-image:url('./img/powers_cards/013.jpg'); }
-.power-14 { background-image:url('./img/powers_cards/014.jpg'); }
-.power-15 { background-image:url('./img/powers_cards/015.jpg'); }
-.power-16 { background-image:url('./img/powers_cards/016.jpg'); }
-.power-17 { background-image:url('./img/powers_cards/017.jpg'); }
-.power-18 { background-image:url('./img/powers_cards/018.jpg'); }
-.power-19 { background-image:url('./img/powers_cards/019.jpg'); }
-.power-20 { background-image:url('./img/powers_cards/020.jpg'); }
-.power-21 { background-image:url('./img/powers_cards/021.jpg'); }
-.power-22 { background-image:url('./img/powers_cards/022.jpg'); }
-.power-23 { background-image:url('./img/powers_cards/023.jpg'); }
-.power-24 { background-image:url('./img/powers_cards/024.jpg'); }
-.power-25 { background-image:url('./img/powers_cards/025.jpg'); }
-.power-26 { background-image:url('./img/powers_cards/026.jpg'); }
-.power-27 { background-image:url('./img/powers_cards/027.jpg'); }
-.power-28 { background-image:url('./img/powers_cards/028.jpg'); }
-.power-29 { background-image:url('./img/powers_cards/029.jpg'); }
-.power-30 { background-image:url('./img/powers_cards/030.jpg'); }
-.power-31 { background-image:url('./img/powers_cards/031.jpg'); }
-.power-32 { background-image:url('./img/powers_cards/032.jpg'); }
-.power-33 { background-image:url('./img/powers_cards/033.jpg'); }
-.power-34 { background-image:url('./img/powers_cards/034.jpg'); }
-.power-35 { background-image:url('./img/powers_cards/035.jpg'); }
-.power-36 { background-image:url('./img/powers_cards/036.jpg'); }
-.power-37 { background-image:url('./img/powers_cards/037.jpg'); }
-.power-38 { background-image:url('./img/powers_cards/038.jpg'); }
-.power-39 { background-image:url('./img/powers_cards/039.jpg'); }
-.power-40 { background-image:url('./img/powers_cards/040.jpg'); }
-.power-41 { background-image:url('./img/powers_cards/041.jpg'); }
-.power-42 { background-image:url('./img/powers_cards/042.jpg'); }
-.power-43 { background-image:url('./img/powers_cards/043.jpg'); }
-.power-44 { background-image:url('./img/powers_cards/044.jpg'); }
-.power-45 { background-image:url('./img/powers_cards/045.jpg'); }
-.power-46 { background-image:url('./img/powers_cards/046.jpg'); }
-.power-47 { background-image:url('./img/powers_cards/047.jpg'); }
-.power-48 { background-image:url('./img/powers_cards/048.jpg'); }
-.power-49 { background-image:url('./img/powers_cards/049.jpg'); }
-.power-50 { background-image:url('./img/powers_cards/050.jpg'); }
-.power-51 { background-image:url('./img/powers_cards/051.jpg'); }
-.power-52 { background-image:url('./img/powers_cards/052.jpg'); }
-.power-53 { background-image:url('./img/powers_cards/053.jpg'); }
-.power-54 { background-image:url('./img/powers_cards/054.jpg'); }
-.power-55 { background-image:url('./img/powers_cards/055.jpg'); }
+.power-1 { background-image:url('img/cards/001.jpg'); }
+.power-2 { background-image:url('img/cards/002.jpg'); }
+.power-3 { background-image:url('img/cards/003.jpg'); }
+.power-4 { background-image:url('img/cards/004.jpg'); }
+.power-5 { background-image:url('img/cards/005.jpg'); }
+.power-6 { background-image:url('img/cards/006.jpg'); }
+.power-7 { background-image:url('img/cards/007.jpg'); }
+.power-8 { background-image:url('img/cards/008.jpg'); }
+.power-9 { background-image:url('img/cards/009.jpg'); }
+.power-10 { background-image:url('img/cards/010.jpg'); }
+.power-11 { background-image:url('img/cards/011.jpg'); }
+.power-12 { background-image:url('img/cards/012.jpg'); }
+.power-13 { background-image:url('img/cards/013.jpg'); }
+.power-14 { background-image:url('img/cards/014.jpg'); }
+.power-15 { background-image:url('img/cards/015.jpg'); }
+.power-16 { background-image:url('img/cards/016.jpg'); }
+.power-17 { background-image:url('img/cards/017.jpg'); }
+.power-18 { background-image:url('img/cards/018.jpg'); }
+.power-19 { background-image:url('img/cards/019.jpg'); }
+.power-20 { background-image:url('img/cards/020.jpg'); }
+.power-21 { background-image:url('img/cards/021.jpg'); }
+.power-22 { background-image:url('img/cards/022.jpg'); }
+.power-23 { background-image:url('img/cards/023.jpg'); }
+.power-24 { background-image:url('img/cards/024.jpg'); }
+.power-25 { background-image:url('img/cards/025.jpg'); }
+.power-26 { background-image:url('img/cards/026.jpg'); }
+.power-27 { background-image:url('img/cards/027.jpg'); }
+.power-28 { background-image:url('img/cards/028.jpg'); }
+.power-29 { background-image:url('img/cards/029.jpg'); }
+.power-30 { background-image:url('img/cards/030.jpg'); }
+.power-31 { background-image:url('img/cards/031.jpg'); }
+.power-32 { background-image:url('img/cards/032.jpg'); }
+.power-33 { background-image:url('img/cards/033.jpg'); }
+.power-34 { background-image:url('img/cards/034.jpg'); }
+.power-35 { background-image:url('img/cards/035.jpg'); }
+.power-36 { background-image:url('img/cards/036.jpg'); }
+.power-37 { background-image:url('img/cards/037.jpg'); }
+.power-38 { background-image:url('img/cards/038.jpg'); }
+.power-39 { background-image:url('img/cards/039.jpg'); }
+.power-40 { background-image:url('img/cards/040.jpg'); }
+.power-41 { background-image:url('img/cards/041.jpg'); }
+.power-42 { background-image:url('img/cards/042.jpg'); }
+.power-43 { background-image:url('img/cards/043.jpg'); }
+.power-44 { background-image:url('img/cards/044.jpg'); }
+.power-45 { background-image:url('img/cards/045.jpg'); }
+.power-46 { background-image:url('img/cards/046.jpg'); }
+.power-47 { background-image:url('img/cards/047.jpg'); }
+.power-48 { background-image:url('img/cards/048.jpg'); }
+.power-49 { background-image:url('img/cards/049.jpg'); }
+.power-50 { background-image:url('img/cards/050.jpg'); }
+.power-51 { background-image:url('img/cards/051.jpg'); }
+.power-52 { background-image:url('img/cards/052.jpg'); }
+.power-53 { background-image:url('img/cards/053.jpg'); }
+.power-54 { background-image:url('img/cards/054.jpg'); }
+.power-55 { background-image:url('img/cards/055.jpg'); }
+
+
+.power-1 .power-avatar { background-image:url('img/avatars/001.png'); }
+.power-2 .power-avatar { background-image:url('img/avatars/002.png'); }
+.power-3 .power-avatar { background-image:url('img/avatars/003.png'); }
+.power-4 .power-avatar { background-image:url('img/avatars/004.png'); }
+.power-5 .power-avatar { background-image:url('img/avatars/005.png'); }
+.power-6 .power-avatar { background-image:url('img/avatars/006.png'); }
+.power-7 .power-avatar { background-image:url('img/avatars/007.png'); }
+.power-8 .power-avatar { background-image:url('img/avatars/008.png'); }
+.power-9 .power-avatar { background-image:url('img/avatars/009.png'); }
+.power-10 .power-avatar { background-image:url('img/avatars/010.png'); }
+.power-11 .power-avatar { background-image:url('img/avatars/011.png'); }
+.power-12 .power-avatar { background-image:url('img/avatars/012.png'); }
+.power-13 .power-avatar { background-image:url('img/avatars/013.png'); }
+.power-14 .power-avatar { background-image:url('img/avatars/014.png'); }
+.power-15 .power-avatar { background-image:url('img/avatars/015.png'); }
+.power-16 .power-avatar { background-image:url('img/avatars/016.png'); }
+.power-17 .power-avatar { background-image:url('img/avatars/017.png'); }
+.power-18 .power-avatar { background-image:url('img/avatars/018.png'); }
+.power-19 .power-avatar { background-image:url('img/avatars/019.png'); }
+.power-20 .power-avatar { background-image:url('img/avatars/020.png'); }
+.power-21 .power-avatar { background-image:url('img/avatars/021.png'); }
+.power-22 .power-avatar { background-image:url('img/avatars/022.png'); }
+.power-23 .power-avatar { background-image:url('img/avatars/023.png'); }
+.power-24 .power-avatar { background-image:url('img/avatars/024.png'); }
+.power-25 .power-avatar { background-image:url('img/avatars/025.png'); }
+.power-26 .power-avatar { background-image:url('img/avatars/026.png'); }
+.power-27 .power-avatar { background-image:url('img/avatars/027.png'); }
+.power-28 .power-avatar { background-image:url('img/avatars/028.png'); }
+.power-29 .power-avatar { background-image:url('img/avatars/029.png'); }
+.power-30 .power-avatar { background-image:url('img/avatars/030.png'); }
+.power-31 .power-avatar { background-image:url('img/avatars/031.png'); }
+.power-32 .power-avatar { background-image:url('img/avatars/032.png'); }
+.power-33 .power-avatar { background-image:url('img/avatars/033.png'); }
+.power-34 .power-avatar { background-image:url('img/avatars/034.png'); }
+.power-35 .power-avatar { background-image:url('img/avatars/035.png'); }
+.power-36 .power-avatar { background-image:url('img/avatars/036.png'); }
+.power-37 .power-avatar { background-image:url('img/avatars/037.png'); }
+.power-38 .power-avatar { background-image:url('img/avatars/038.png'); }
+.power-39 .power-avatar { background-image:url('img/avatars/039.png'); }
+.power-40 .power-avatar { background-image:url('img/avatars/040.png'); }
+.power-41 .power-avatar { background-image:url('img/avatars/041.png'); }
+.power-42 .power-avatar { background-image:url('img/avatars/042.png'); }
+.power-43 .power-avatar { background-image:url('img/avatars/043.png'); }
+.power-44 .power-avatar { background-image:url('img/avatars/044.png'); }
+.power-45 .power-avatar { background-image:url('img/avatars/045.png'); }
+.power-46 .power-avatar { background-image:url('img/avatars/046.png'); }
+.power-47 .power-avatar { background-image:url('img/avatars/047.png'); }
+.power-48 .power-avatar { background-image:url('img/avatars/048.png'); }
+.power-49 .power-avatar { background-image:url('img/avatars/049.png'); }
+.power-50 .power-avatar { background-image:url('img/avatars/050.png'); }
+.power-51 .power-avatar { background-image:url('img/avatars/051.png'); }
+.power-52 .power-avatar { background-image:url('img/avatars/052.png'); }
+.power-53 .power-avatar { background-image:url('img/avatars/053.png'); }
+.power-54 .power-avatar { background-image:url('img/avatars/054.png'); }
+.power-55 .power-avatar { background-image:url('img/avatars/055.png'); }
