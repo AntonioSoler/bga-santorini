@@ -1,0 +1,37 @@
+.token {
+    margin: 10px;
+    width: 70px;
+    height: 70px;
+    background: center / contain no-repeat;
+    transition: transform 1s cubic-bezier(.4, 1.8, .7, 1.1);
+}
+
+.token-wind {
+    background-image: url(img/token-wind.png);
+}
+
+.token-arrow {
+    background-image: url(img/token-arrow.png);
+}
+
+.token.rotate-2 {
+    transform: rotate(45deg);
+}
+.token.rotate-3 {
+    transform: rotate(90deg);
+}
+.token.rotate-4 {
+    transform: rotate(135deg);
+}
+.token.rotate-5 {
+    transform: rotate(180deg);
+}
+.token.rotate-6 {
+    transform: rotate(225deg);
+}
+.token.rotate-7 {
+    transform: rotate(270deg);
+}
+.token.rotate-8 {
+    transform: rotate(315deg);
+}

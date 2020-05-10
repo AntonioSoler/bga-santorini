@@ -98,4 +98,14 @@ define('OPTION_SETUP', 102);
   define('RANDOM', 0);
   define('FAIR_DIVISION', 1);
 
-?>
+/*
+ * Variable constants
+ */
+define('ROTATE_N', 1);
+define('ROTATE_NE', 2);
+define('ROTATE_E', 3);
+define('ROTATE_SE', 4);
+define('ROTATE_S', 5);
+define('ROTATE_SW', 6);
+define('ROTATE_W', 7);
+define('ROTATE_NN', 8);

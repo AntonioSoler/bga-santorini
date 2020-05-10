@@ -1,4 +1,5 @@
 {OVERALL_GAME_HEADER}
+
 <div id="play-area-scaler">
 	<div id="power-select-container">
 		<div id="grid-powers"></div>
@@ -6,9 +7,12 @@
 	</div>
 	<div id="power-choose-container"></div>
 	<div id="play-area">
+		<div id="prompt-container"></div>
+		<div id="token-container"></div>
 		<div id="scene-container"></div>
 	</div>
 </div>
+
 <script type="text/javascript">
 const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
 document.write('<script src="' + URL + '/scripts/board.js" type="module"><\/script>');
@@ -33,6 +37,25 @@ var jstpl_powerDetail = `<div class="power-detail">
 		<ul class="power-text"><li>\${textList}</li></ul>
 	</div>
 </div>`;
+
+var jstpl_token = '<div id="token-\${token}" class="token token-\${token}"></div>';
+var jstpl_tokenPrompt = `<table class="token-prompt">
+	<tr>
+		<td><div class="token token-\${token} token-choose-rotation rotate-8" data-rotation="8"></div></td>
+		<td><div class="token token-\${token} token-choose-rotation rotate-1"  data-rotation="1"></div></td>
+		<td><div class="token token-\${token} token-choose-rotation rotate-2"  data-rotation="2"></div></td>
+	</tr>
+	<tr>
+		<td><div class="token token-\${token} token-choose-rotation rotate-7" data-rotation="7"></div></td>
+		<td>&nbsp;</td>
+		<td><div class="token token-\${token} token-choose-rotation rotate-3" data-rotation="3"></div></td>
+	</tr>
+	<tr>
+		<td><div class="token token-\${token} token-choose-rotation rotate-6" data-rotation="6"></div></td>
+		<td><div class="token token-\${token} token-choose-rotation rotate-5" data-rotation="5"></div></td>
+		<td><div class="token token-\${token} token-choose-rotation rotate-4" data-rotation="4"></div></td>
+	</tr>
+</table>`;
 
 </script>
 

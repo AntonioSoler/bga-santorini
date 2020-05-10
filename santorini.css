@@ -16,6 +16,7 @@
 @import url(../../../css/csslayer.css);
 @import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&display=swap');
 @import url(./santorini.powers.css);
+@import url(./santorini.tokens.css);
 
 /* Player boards */
 .power-container {
@@ -150,6 +151,38 @@
     /*  width: 1200px; */
     display: flex;
     pointer-events: visible;
+}
+
+#prompt-container {
+    background: #f0f0f0;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
+    padding: 5px;
+    margin-bottom: 5px;
+}
+
+.token-prompt {
+    margin: 0 auto;
+    border-style: hidden;
+    border-collapse: collapse;
+}
+
+.token-prompt td {
+    border: 1px dotted #ccc;
+}
+
+.token-choose-rotation {
+    cursor: pointer;
+}
+
+#token-container {
+    float: left;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, .33);
+    margin: 10px;
+}
+
+#prompt-container:empty, #token-container:empty {
+    display: none;
 }
 
 #scene-container {
