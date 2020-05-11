@@ -603,7 +603,10 @@ class santorini extends Table
     // Apply power
     self::getPower()->argPlayerMove($workers);
 
-    return ['workers' => $workers];
+    return [
+      'verb'    => clienttranslate('must'),
+      'workers' => $workers,
+    ];
   }
 
 

@@ -28,4 +28,15 @@ CREATE TABLE IF NOT EXISTS `card` (
   PRIMARY KEY (`card_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+CREATE TABLE IF NOT EXISTS `log` (
+  `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `round` int(11) NOT NULL,
+  `player_id` int(11) NOT NULL,
+  `piece_id` int(11) NOT NULL,
+  `action` varchar(16) NOT NULL,
+  `action_arg` varchar(255) NOT NULL,
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+
+
 ALTER TABLE `player` ADD `player_team` INT(1) UNSIGNED NOT NULL;

@@ -21,6 +21,7 @@
  */
 
 require_once("modules/SantoriniPlayer.class.php");
+require_once("modules/SantoriniLog.class.php");
 require_once("modules/Power.class.php");
 require_once("modules/HeroPower.class.php");
 

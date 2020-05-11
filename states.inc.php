@@ -170,10 +170,29 @@ ST_NEXT_PLAYER => [
 /*
  * Worker move TODO description
  */
+ST_USE_POWER => [
+  'name' => 'playerUsePower',
+  'description' => clienttranslate('${actplayer} can use its power'),
+  'descriptionmyturn' => clienttranslate('${you} can use your power'),
+  'type' => 'activeplayer',
+  'args' => 'argUsePower',
+  'possibleactions' => [ 'use', 'skip' ],
+  'transitions' => [
+    'next' => ST_NEXT_PLAYER,
+    'move' => ST_MOVE,
+    'build' => ST_BUILD,
+    'endgame' => ST_GAME_END,
+  ],
+],
+
+
+/*
+ * Worker move TODO description
+ */
 ST_MOVE => [
   'name' => 'playerMove',
-  'description' => clienttranslate('${actplayer} must move a worker'),
-  'descriptionmyturn' => clienttranslate('${you} must move a worker'),
+  'description' => clienttranslate('${actplayer} ${verb} move a worker'),
+  'descriptionmyturn' => clienttranslate('${you} ${verb} move a worker'),
   'type' => 'activeplayer',
   'args' => 'argPlayerMove',
   'action' => 'stCheckEndOfGame',
@@ -182,6 +201,7 @@ ST_MOVE => [
     'zombiePass' => ST_NEXT_PLAYER,
     'moved' => ST_BUILD,
     'endgame' => ST_GAME_END,
+    'moveAgain' => ST_MOVE,
   ],
 ],
 
