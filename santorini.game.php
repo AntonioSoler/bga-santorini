@@ -141,7 +141,7 @@ class santorini extends Table
 
   /*
    * getPower: return the Power object for the active/a specific player
-   * TODO : remove ? Seems useless with new SantoriniPlayer class ?
+   * TODO : what if several power ?
    */
   public function getPower($pId = null)
   {

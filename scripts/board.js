@@ -6,9 +6,12 @@ import Hammer 						from './hammer.js';
 import { Tween, Ease } 		from './tweenjs.js';
 
 
-const canvasHeight = () => window.innerHeight*0.8;
+//const canvasHeight = () => window.innerHeight*0.8;
 const ratio = 1.2;
-const canvasWidth = () => ratio*canvasHeight();
+//const canvasWidth = () => ratio*canvasHeight();
+
+const canvasHeight = () => 600; //Math.min(600, document.getElementById("page-content").offsetHeight);
+const canvasWidth = () => document.getElementById("page-content").offsetWidth;
 
 // Zoom limits
 const ZOOM_MIN = 20;
@@ -75,7 +78,7 @@ Board.prototype.initScene = function(){
 	this._scene.background.convertLinearToGamma( 2 );
 
 	// Camera
-	this._camera = new THREE.PerspectiveCamera( 35, ratio, 1, 150 );
+	this._camera = new THREE.PerspectiveCamera( 35, canvasWidth() / canvasHeight(), 1, 150 );
 	this._camera.position.set( 20, 14, 20 );
 	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
@@ -85,11 +88,15 @@ Board.prototype.initScene = function(){
 	// Renderer
 	this._renderer = new THREE.WebGLRenderer({ antialias: true });
 	this._renderer.setPixelRatio( window.devicePixelRatio );
-	this._renderer.setSize( ratio*canvasHeight(), canvasHeight() );
+	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;
 	this._renderer.shadowMap.enabled = true;
 	this._container.appendChild(this._renderer.domElement);
-	window.addEventListener( 'resize', () => this._renderer.setSize( ratio*canvasHeight(), canvasHeight() ), false );
+	window.addEventListener( 'resize', () => {
+		this._camera.aspect = canvasWidth() / canvasHeight();
+		this._camera.updateProjectionMatrix();
+		this._renderer.setSize( canvasWidth(), canvasHeight() )
+	}, false );
 
 	const getRealMouseCoords = (px,py) => {
 		var rect = this._renderer.domElement.getBoundingClientRect()
@@ -167,6 +174,15 @@ Board.prototype.initBoard = function(){
 
 	var board = this._meshManager.createMesh('board');
 	this._scene.add(board);
+
+	var outerWall = this._meshManager.createMesh('outerWall1');
+	outerWall.position.set(0,-0.1,0);
+	this._scene.add(outerWall);
+
+	var wall = this._meshManager.createMesh('innerWall');
+	wall.position.set(0,-0.1,0);
+	this._scene.add(wall);
+
 };
 
 
@@ -198,7 +214,7 @@ Board.prototype.hide = function(){
  * Render the scene
  */
 Board.prototype.render = function() {
-	if(!this._mouseDown)
+	if(!this._mouseDown && this._clickable.length > 0)
 		this.raycasting(true);
 
 	this._renderer.render( this._scene, this._camera );
@@ -294,25 +310,6 @@ Board.prototype.switchPiece = function(piece1, piece2){
 
 	this.moveMesh(mesh1, piece2);
 	this.moveMesh(mesh2, piece1);
-
-/*
-	// Animate
-	var maxZ = Math.max(piece1.z, piece2.z);
-	var tmp1 = mesh1.position.clone();
-	tmp1.setY(lvlHeights[maxZ] + 1);
-	var tmp2 = mesh2.position.clone();
-	tmp2.setY(lvlHeights[maxZ] + 1);
-
-	Tween.get(mesh1.position)
-		.to(tmp1, 700,  Ease.cubicInOut)
-		.to(tmp2, 600,  Ease.cubicInOut)
-		.to(mesh2.position, 600,  Ease.cubicInOut)
-
-	Tween.get(mesh2.position)
-		.to(tmp2, 700,  Ease.cubicInOut)
-		.to(tmp1, 600,  Ease.cubicInOut)
-		.to(mesh1.position, 600,  Ease.cubicInOut)
-*/
 };
 
 

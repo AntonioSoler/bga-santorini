@@ -18,6 +18,11 @@
 @import url(./santorini.powers.css);
 @import url(./santorini.tokens.css);
 
+html {
+  background-image:none !important;
+  background-color:#76cfe9;
+}
+
 /* Player boards */
 .power-container {
     text-align: center;
@@ -187,6 +192,11 @@
 
 #scene-container {
     text-align: center;
+    outline:none;
+}
+
+#scene-container canvas {
+  outline:none;
 }
 
 #powers-container {
