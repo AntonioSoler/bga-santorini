@@ -33,10 +33,22 @@ float:right;
 <script type="module">
 import { Board } from '../scripts/board.js';
 
-/*
+
 var	container = document.getElementById("container");
 window.board = new Board(container, "http://127.0.0.1/" );
+board.display();
 
+var piece1 = {
+	x:4,y:2,z:0, name:'f1worker',
+};
+var piece2 = {
+	x:1,y:4,z:0, name:'f0worker',
+}
+
+board.addPiece(piece1);
+board.addPiece(piece2).then(() => board.switchPiece(piece2, piece1));
+
+/*
 var click = (pos) => {
 	board.clearClickable();
 
@@ -56,6 +68,7 @@ for(var j = 0; j < 5; j++)
 board.makeClickable(tPos, click, 'move');
 */
 
+/*
 for(var i = 1; i <= 55; i++){
 //	document.write(".santorini-god-"+i+" { background-position:-"+ (80*(i-1)) +"px 0px; }<br />");
 //	document.write("div.power-"+i+" div.power-card-background { background-position:-"+ (260*(i-1)) +"px 0px; }<br />");
@@ -74,7 +87,7 @@ div.className = "power-card";
 document.body.appendChild(div);
 
 
-}
+}*/
 </script>
 	</body>
 </html>

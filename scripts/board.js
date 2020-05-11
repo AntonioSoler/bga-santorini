@@ -227,7 +227,7 @@ Board.prototype.addPiece = function(piece){
 	var mesh = this._meshManager.createMesh(piece.name);
 	mesh.name = piece.name;
 	mesh.position.copy(sky);
-	mesh.rotation.set(0, Math.floor(Math.random() * 4)*Math.PI/2, 0);
+	mesh.rotation.set(0, (Math.floor(Math.random() * 4) - 1)*Math.PI/2, 0);
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);
@@ -237,6 +237,32 @@ Board.prototype.addPiece = function(piece){
 			.to(center, fallAnimation.duration,  Ease.cubicInOut)
 			.call(resolve);
 	});
+};
+
+
+/*
+ * Move a mesh to a new position
+ * - mixed mesh :
+ * - mixed space : contains the location
+ */
+Board.prototype.moveMesh = function(mesh, space){
+	// Animate
+	var target = new THREE.Vector3(xCenters[space.x], lvlHeights[space.z], zCenters[space.y]);
+
+	var maxZ = Math.max(mesh.position.y, lvlHeights[space.z]) + 1;
+	var tmp1 = mesh.position.clone();
+	tmp1.setY(maxZ);
+	var tmp2 = target.clone();
+	tmp2.setY(maxZ);
+
+	var theta = Math.atan2(target.x - mesh.position.x, target.z - mesh.position.z) + 3*Math.PI/2;
+	Tween.get(mesh.rotation)
+		.to({y:theta}, 300,  Ease.cubicInOut)
+
+	Tween.get(mesh.position)
+		.to(tmp1, 700,  Ease.cubicInOut)
+		.to(tmp2, 600,  Ease.cubicInOut)
+		.to(target, 600,  Ease.cubicInOut)
 };
 
 
@@ -251,19 +277,7 @@ Board.prototype.movePiece = function(piece, space){
 	this._board[piece.x][piece.y][piece.z].piece = null;
 	this.addMeshToBoard(mesh, space);
 
-	// Animate
-	var target = new THREE.Vector3(xCenters[space.x], lvlHeights[space.z], zCenters[space.y]);
-
-	var maxZ = Math.max(piece.z, space.z);
-	var tmp1 = mesh.position.clone();
-	tmp1.setY(lvlHeights[maxZ] + 1);
-	var tmp2 = target.clone();
-	tmp2.setY(lvlHeights[maxZ] + 1);
-
-	Tween.get(mesh.position)
-		.to(tmp1, 700,  Ease.cubicInOut)
-		.to(tmp2, 600,  Ease.cubicInOut)
-		.to(target, 600,  Ease.cubicInOut)
+	this.moveMesh(mesh, space);
 };
 
 /*
@@ -278,6 +292,10 @@ Board.prototype.switchPiece = function(piece1, piece2){
 	this.addMeshToBoard(mesh1, piece2);
 	this.addMeshToBoard(mesh2, piece1);
 
+	this.moveMesh(mesh1, piece2);
+	this.moveMesh(mesh2, piece1);
+
+/*
 	// Animate
 	var maxZ = Math.max(piece1.z, piece2.z);
 	var tmp1 = mesh1.position.clone();
@@ -294,6 +312,7 @@ Board.prototype.switchPiece = function(piece1, piece2){
 		.to(tmp2, 700,  Ease.cubicInOut)
 		.to(tmp1, 600,  Ease.cubicInOut)
 		.to(mesh1.position, 600,  Ease.cubicInOut)
+*/
 };
 
 
