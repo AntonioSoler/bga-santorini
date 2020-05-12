@@ -22,11 +22,14 @@
 
 require_once("modules/SantoriniPlayer.class.php");
 require_once("modules/SantoriniLog.class.php");
-require_once("modules/Power.class.php");
-require_once("modules/HeroPower.class.php");
+require_once("modules/SantoriniBoard.class.php");
+require_once("modules/PlayerManager.class.php");
+require_once("modules/PowerManager.class.php");
+require_once("modules/powers/Power.class.php");
+require_once("modules/powers/HeroPower.class.php");
 
 foreach (Power::$powersClasses as $id => $className) {
-  require_once("modules/$className.class.php");
+  require_once("modules/powers/$className.class.php");
 
   $this->powers[$className::getId()] = [
     'id'      => $className::getId(),

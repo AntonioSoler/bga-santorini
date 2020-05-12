@@ -43,8 +43,11 @@ class santorini extends Table
     $this->cards = self::getNew('module.common.deck');
     $this->cards->init('card');
 
-    // Initialize logger
-    $this->log = new SantoriniLog($this);
+    // Initialize logger, board and power manager
+    $this->log   = new SantoriniLog($this);
+    $this->board = new SantoriniBoard($this);
+    $this->powerManager = new PowerManager($this);
+    $this->playerManager = new PlayerManager($this);
   }
 
   protected function getGameName()
@@ -86,7 +89,6 @@ class santorini extends Table
       $values[] = "('$powerId', 0, 'box', 0)";
     }
     self::DbQuery($sql . implode($values, ','));
-//    $this->cards->createCards($cards, 'box'); TODO : remove ?
 
     // Active first player to play
     $pId = $this->activeNextPlayer();
@@ -101,12 +103,8 @@ class santorini extends Table
   protected function getAllDatas()
   {
     return [
-      // Must not use players as it is already filled by bga
-      'fplayers' => array_map(function ($player) {
-        return $player->getUiData();
-      }, $this->getPlayers()),
-      'placedPieces' => $this->getPlacedPieces(),
-      'movedWorker' => self::getGamestateValue('movedWorker'),
+      'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
+      'placedPieces' => $this->board->getPlacedPieces(),
       'powers' => $this->powers,
     ];
   }
@@ -119,11 +117,7 @@ class santorini extends Table
   public function getGameProgression()
   {
     // TODO
-    // Number of pieces on the board / total number of pieces
-    $nbr_placed = count(self::getPlacedPieces());
-
     return 0.3;
-    //    return $nbr_placed / ($nbr_placed+$nbr_available);
   }
 
 
@@ -132,256 +126,6 @@ class santorini extends Table
   //////////// Utility functions ////////////
   ///////////////////////////////////////////
 
-  /*
-   * getPowersInLocation: return all the power cards in a given location
-   */
-  public function getPowersInLocation($location)
-  {
-    $cards = $this->cards->getCardsInLocation($location);
-    $powers = array_map(function($card) {
-      return $this->powers[$card['type']];
-    }, $cards);
-
-    return array_values($powers);
-  }
-
-
-  /*
-   * getPower: return the Power object for the active/a specific player
-   * TODO : what if several power ?
-   */
-  public function getPower($pId = null)
-  {
-    if (empty($pId)) {
-      $pId = self::getActivePlayerId();
-    }
-    $player = self::getPlayer($pId);
-    return $player->getPower();
-  }
-
-  /*
-   * getPlayers: return an array of all SantoriniPlayer objects
-   */
-  public function getPlayers()
-  {
-    return SantoriniPlayer::getPlayers($this);
-  }
-
-  /*
-   * getPlayer: return the SantoriniPlayer object for the active/a specific player
-   * params: int $pId -> player id
-   */
-  public function getPlayer($pId = null)
-  {
-    if (empty($pId)) {
-      $pId = self::getActivePlayerId();
-    }
-    return SantoriniPlayer::getPlayer($this, $pId);
-  }
-
-  /*
-   * getPlayerCount: return the number of players
-   */
-  public function getPlayerCount()
-  {
-    return self::getUniqueValueFromDB("SELECT COUNT(*) FROM player");
-  }
-
-  /*
-   * getTeammates: return all players in the same team as $pId player
-   */
-  public function getTeammates($pId)
-  {
-    return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player
-    WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
-  }
-
-  /*
-   * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
-   */
-  public function getTeammatesIds($pId)
-  {
-    return array_map(function ($player) {
-      return $player['id'];
-    }, self::getTeammates($pId));
-  }
-
-
-
-  /*
-   * getPlacedPieces: return all pieces on the board
-   */
-  public function getPlacedPieces()
-  {
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board'");
-  }
-
-
-  /*
-   * getAvailableWorkers: return all available workers
-   * opt params : int $pId -> if specified, return only available workers of corresponding player
-   */
-  public function getAvailableWorkers($pId = -1)
-  {
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . ($pId == -1 ? "" : "AND player_id = '$pId'"));
-  }
-
-  /*
-   * getPlacedWorkers: return all placed workers
-   * opt params : int $pId -> if specified, return only placed workers of corresponding player
-   */
-  public function getPlacedWorkers($pId = -1)
-  {
-    $filter = "";
-    if ($pId != -1) {
-      $ids = implode(',', self::getTeammatesIds($pId));
-      $filter = " AND player_id IN ($ids)";
-    }
-
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter");
-  }
-
-
-  /*
-   * getPiece: return all info about a piece
-   * params : int $id
-   */
-  public function getPiece($id)
-  {
-    return self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$id'");
-  }
-
-
-
-  /*
-   * getBoard:
-   *   return a 3d matrix reprensenting the board with all the placed pieces
-   */
-  public function getBoard()
-  {
-    // Create an empty 5*5*4 board
-    $board = [];
-    for ($x = 0; $x < 5; $x++) {
-      $board[$x] = [];
-      for ($y = 0; $y < 5; $y++)
-        $board[$x][$y] = [];
-    }
-
-    // Add all placed pieces
-    $pieces = self::getPlacedPieces();
-    for ($i = 0; $i < count($pieces); $i++) {
-      $p = $pieces[$i];
-      $board[$p['x']][$p['y']][$p['z']] = $p;
-    }
-
-    return $board;
-  }
-
-
-  /*
-   * getAccessibleSpaces:
-   *   return the list of all accessible spaces for either placing a worker, moving or building
-   */
-  public function getAccessibleSpaces()
-  {
-    $board = self::getBoard();
-
-    $accessible = [];
-    for ($x = 0; $x < 5; $x++)
-      for ($y = 0; $y < 5; $y++) {
-        $z = 0;
-        $blocked = false; // If we see a worker or a dome, the space is not accessible
-        // Find next free space above ground
-        for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
-          $p = $board[$x][$y][$z];
-          $blocked = ($p['type'] == 'worker' || $p['type'] == 'lvl3');
-        }
-
-        if (!$blocked && $z < 4)
-          $accessible[] = [
-            'x' => $x,
-            'y' => $y,
-            'z' => $z,
-          ];
-      }
-
-    return $accessible;
-  }
-
-
-  /*
-   * isSameSpace : check distance between two spaces to move/build
-   *   TODO
-   */
-  public static function isSameSpace($a, $b)
-  {
-    return ($a['x'] == $b['x'] && $a['y'] == $b['y']);
-  }
-
-  /*
-   * checkDistances : check distance between two spaces to move/build
-   *   TODO
-   */
-  public static function isNeighbour($a, $b, $action)
-  {
-    $ok = true;
-
-    // Neighbouring : can't be same place, and should be planar coordinate distant
-    $ok = $ok && !self::isSameSpace($a, $b);
-    $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
-
-    // For moving, the new height can't be more than +1
-    if ($action == 'moving')
-      $ok = $ok && $b['z'] <= $a['z'] + 1;
-
-    return $ok;
-  }
-
-  /*
-   * getNeighbouringSpaces:
-   *   return the list of all accessible neighbouring spaces for either moving a worker or building
-   * params:
-   *  - mixed $piece : contains all the informations (type, location, player_id) about the piece we use to move/build
-   *  - string $action : specifies what kind of action we want to do with this piece (move/build)
-   */
-  public function getNeighbouringSpaces($piece, $action)
-  {
-    // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
-    $neighbouring = array_filter(self::getAccessibleSpaces(), function ($space) use ($piece, $action) {
-      return self::isNeighbour($piece, $space, $action);
-    });
-
-    return array_values($neighbouring);
-  }
-
-
-
-
-  /*
-   * Get possible powers:
-   *   TODO
-   * params: TODO
-   */
-  public function getPlayablePowers()
-  {
-    $optionPowers = intval(self::getGameStateValue('optionPowers'));
-    if ($optionPowers == NONE) {
-      return [];
-    }
-
-    // Gather information about number of players
-    $nPlayers = self::getPlayerCount();
-
-    // Filter powers depending on the number of players and game option
-    return array_filter($this->powers, function ($power, $id) use ($nPlayers, $optionPowers) {
-      return in_array($nPlayers, $power['players']) &&
-        (($optionPowers == SIMPLE && $id <= 10)
-          || ($optionPowers == GODS && !$power['hero'])
-          || ($optionPowers == HEROES && $power['hero'])
-          || ($optionPowers == GODS_AND_HEROES)
-          || ($optionPowers == GOLDEN_FLEECE && $power['golden']));
-    }, ARRAY_FILTER_USE_BOTH);
-  }
 
 
 
@@ -399,19 +143,7 @@ class santorini extends Table
   public function dividePowers($ids)
   {
     self::checkAction('dividePowers');
-
-    // Move selected powers to stack
-    $this->cards->moveCards($ids, 'stack');
-
-    // Notify other players
-    $powers = array_map(function($id){ return $this->powers[$id]['name']; }, $ids);
-    $args = [
-      'i18n' => [],
-      'powers_names' => implode(', ', $powers),
-      'player_name' => self::getActivePlayerName(),
-    ];
-    self::notifyAllPlayers('powersDivided', clienttranslate('${player_name} selects ${powers_names}'), $args);
-
+    $this->powerManager->dividePowers($ids);
     $this->gamestate->nextState('done');
   }
 
@@ -422,10 +154,7 @@ class santorini extends Table
   public function choosePower($id)
   {
     self::checkAction('choosePower');
-
-    // Add choosed power to player
-    SantoriniPlayer::getPlayer($this, self::getActivePlayerId())->addPower($id);
-
+    $this->powerManager->choosePower($id);
     $this->gamestate->nextState('done');
   }
 
@@ -441,7 +170,7 @@ class santorini extends Table
 
     // Get unplaced workers of given type for the active player to make sure at least one is remeaning
     $pId = self::getActivePlayerId();
-    $workers = self::getAvailableWorkers($pId);
+    $workers = $this->board->getAvailableWorkers($pId);
     if (count($workers) == 0)
       throw new BgaVisibleSystemException('No more workers to place');
 
@@ -481,11 +210,11 @@ class santorini extends Table
     self::checkAction('moveWorker');
 
     // Check if power apply
-    if (self::getPower()->playerMove($wId, $x, $y, $z))
+    if ($this->powerManager->playerMove($wId, $x, $y, $z))
       return;
 
     // Get information about the piece
-    $worker = $this->getPiece($wId);
+    $worker = $this->board->getPiece($wId);
 
     // Check if it's belong to active player
     if ($worker['player_id'] != self::getActivePlayerId())
@@ -497,7 +226,7 @@ class santorini extends Table
       throw new BgaUserException(_("This space is not free"));
 
     // Check if worker can move to this space
-    $neighbouring = self::getNeighbouringSpaces($worker, 'move');
+    $neighbouring = $this->board->getNeighbouringSpaces($worker, 'move');
     $space = ['x' => $x, 'y' => $y, 'z' => $z];
     if (!in_array($space, $neighbouring))
       throw new BgaUserException(_("You cannot reach this space with this worker"));
@@ -519,7 +248,7 @@ class santorini extends Table
     self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
 
     // Apply power
-    $state = self::getPower()->stateAfterMove() ?: 'moved';
+    $state = $this->powerManager->stateAfterMove() ?: 'moved';
     $this->gamestate->nextState($state);
   }
 
@@ -552,7 +281,7 @@ class santorini extends Table
     $wId = self::getGamestateValue('movedWorker');
 
     // Get information about the piece
-    $worker = $this->getPiece($wId);
+    $worker = $this->board->getPiece($wId);
 
     // Check if space is free
     $spaceContent = self::getObjectListFromDB("SELECT id FROM piece WHERE x = '$x' AND y = '$y' AND z = '$z'");
@@ -560,7 +289,7 @@ class santorini extends Table
       throw new BgaUserException(_("This space is not free"));
 
     // Check if worker can move to this space
-    $neighbouring = self::getNeighbouringSpaces($worker, 'move');
+    $neighbouring = $this->board->getNeighbouringSpaces($worker, 'move');
     $space = ['x' => $x, 'y' => $y, 'z' => $z];
     if (!in_array($space, $neighbouring))
       throw new BgaUserException(_("You cannot build on this space with this worker"));
@@ -604,7 +333,7 @@ class santorini extends Table
   {
     return [
       'count' => self::getPlayerCount(),
-      'powers' => $this->getPowersInLocation('deck')
+      'powers' => $this->powerManager->getPowersInLocation('deck')
     ];
   }
 
@@ -614,10 +343,9 @@ class santorini extends Table
   public function argChoosePower()
   {
     return [
-      'powers' => $this->getPowersInLocation('stack')
+      'powers' => $this->powerManager->getPowersInLocation('stack')
     ];
   }
-
 
 
   /*
@@ -626,11 +354,11 @@ class santorini extends Table
   public function argPlaceWorker()
   {
     $pId = self::getActivePlayerId();
-    $workers = self::getAvailableWorkers($pId);
+    $workers = $this->board->getAvailableWorkers($pId);
 
     return [
       'worker' => $workers[0],
-      'accessibleSpaces' => self::getAccessibleSpaces()
+      'accessibleSpaces' => $this->board->getAccessibleSpaces()
     ];
   }
 
@@ -640,9 +368,9 @@ class santorini extends Table
   public function argPlayerMove()
   {
     // Return for each worker of this player the spaces he can move to
-    $workers = $this->getPlacedWorkers(self::getActivePlayerId());
+    $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
     foreach ($workers as &$worker)
-      $worker["accessibleSpaces"] = self::getNeighbouringSpaces($worker, 'moving');
+      $worker["accessibleSpaces"] = $this->board->getNeighbouringSpaces($worker, 'moving');
 
     $arg = [
       'skippable' => false,
@@ -651,7 +379,7 @@ class santorini extends Table
     ];
 
     // Apply power
-    self::getPower()->argPlayerMove($arg);
+    $this->powerManager->argPlayerMove($arg);
 
     return $arg;
   }
@@ -663,10 +391,10 @@ class santorini extends Table
   public function argPlayerBuild()
   {
     // Return available spaces neighbouring the moved player
-    $worker = self::getPiece(self::getGamestateValue('movedWorker'));
+    $worker = $this->board->getPiece(self::getGamestateValue('movedWorker'));
     return [
       'worker' => $worker,
-      'accessibleSpaces' => self::getNeighbouringSpaces($worker, 'build')
+      'accessibleSpaces' => $this->board->getNeighbouringSpaces($worker, 'build')
     ];
   }
 
@@ -703,7 +431,7 @@ class santorini extends Table
     }
 
     // Make a deck of possible powers
-    $possiblePowers = $this->getPlayablePowers();
+    $possiblePowers = $this->powerManager->getPlayablePowers();
     $this->cards->moveCards(array_keys($possiblePowers), 'deck');
     $this->cards->shuffle('deck');
 
@@ -743,7 +471,7 @@ class santorini extends Table
     else {
       // If only one power left, automatically assign it to the last player
       if(count($remainingPowers) == 1)
-        SantoriniPlayer::getPlayer($this, $pId)->addPower(reset($remainingPowers)['id']);
+        $this->powerManager->choosePower(reset($remainingPowers)['id'], $pId);
 
       $this->gamestate->nextState('done');
     }
@@ -758,7 +486,7 @@ class santorini extends Table
   public function stNextPlayerPlaceWorker()
   {
     // Get all the remeaning workers of all players
-    $workers = self::getAvailableWorkers();
+    $workers = $this->board->getAvailableWorkers();
     if (count($workers) == 0) {
       $this->gamestate->nextState('done');
       return;
@@ -767,7 +495,7 @@ class santorini extends Table
 
     // Get unplaced workers for the active player
     $pId = self::getActivePlayerId();
-    $workers = self::getAvailableWorkers($pId);
+    $workers = $this->board->getAvailableWorkers($pId);
     if (count($workers) == 0)  // No more workers to place => move on to the other player
       $pId = $this->activeNextPlayer();
     self::giveExtraTime($pId);

@@ -36,13 +36,13 @@ class Apollo extends Power
 
   public function argPlayerMove(&$arg)
   {
-    $allWorkers = $this->game->getPlacedWorkers();
+    $allWorkers = $this->game->board->getPlacedWorkers();
     foreach($arg["workers"] as &$worker)
     foreach($allWorkers as $worker2){
       if($worker['player_id'] == $worker2['player_id'])
         continue;
 
-      if($this->game->isNeighbour($worker, $worker2, 'moving'))
+      if($this->game->board->isNeighbour($worker, $worker2, 'moving'))
         $worker['accessibleSpaces'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
     }
   }
@@ -56,7 +56,7 @@ class Apollo extends Power
       return false;
 
     // Get information about the piece
-    $worker = $this->game->getPiece($wId);
+    $worker = $this->game->board->getPiece($wId);
 
     // Check if it's belong to active player
     if ($worker['player_id'] != $this->game->getActivePlayerId())
@@ -64,7 +64,7 @@ class Apollo extends Power
 
     // Check if worker can move to this space
     $space = [  'x' => $x, 'y' => $y, 'z' => $z ];
-    if (!$this->game->isNeighbour($worker, $space, 'moving'))
+    if (!$this->game->board->isNeighbour($worker, $space, 'moving'))
       throw new BgaUserException( _("You cannot reach this space with this worker") );
 
     // Switch workers

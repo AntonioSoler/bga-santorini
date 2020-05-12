@@ -10,7 +10,31 @@ class SantoriniPlayer extends APP_GameClass
         return $players[0];
     }
 
-    /* Returns array of SantoriniPlayer objects for all/specified player IDs */
+    /*
+TODO: update
+     * getTeammates: return all players in the same team as $pId player
+     *
+    public function getTeammates($pId)
+    {
+      return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player
+      WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
+    }
+
+    *
+     * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
+     *
+    public function getTeammatesIds($pId)
+    {
+      return array_map(function ($player) {
+        return $player['id'];
+      }, self::getTeammates($pId));
+    }
+*/
+
+
+    /*
+     * getPlayers : Returns array of SantoriniPlayer objects for all/specified player IDs
+     */
     public static function getPlayers($game, $ids = null)
     {
         $players = [];
@@ -38,10 +62,22 @@ class SantoriniPlayer extends APP_GameClass
         return $players;
     }
 
-    public function __construct($game, $id)
+    public function __construct($game, $row)
     {
         $this->game = $game;
-        $this->id = (int) $id;
+        $this->id = (int) $row['id'];
+        $this->no = (int) $row['no'];
+        $this->name = $row['name'];
+        $this->team = (int) $row['team'];
+        $this->color = $row['color'];
+        $this->eliminated = $row['eliminated'] == 1;
+        $this->zombie = $row['zombie'] == 1;
+
+        // Load powers
+        $cards = $this->game->cards->getCardsInLocation('hand', $this->id);
+        foreach ($cards as $powerId => $card) {
+            $this->powers[] = Power::getPower($this->game, $powerId);
+        }
     }
 
     private $game;

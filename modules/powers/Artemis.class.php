@@ -50,7 +50,7 @@ class Artemis extends Power
 
     foreach($arg['workers'] as &$worker){
       $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($move){
-        return !$this->game->isSameSpace($space, $move['from']);
+        return !$this->game->board->isSameSpace($space, $move['from']);
       }));
     }
   }
