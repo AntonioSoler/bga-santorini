@@ -29,28 +29,25 @@ class Apollo extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
 
-  public static function checkDistances($a, $b){
-    return abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1 && $b['z'] <= $a['z'] + 1;
-  }
-
-  public function argPlayerMove(&$workers)
+  public function argPlayerMove(&$arg)
   {
     $allWorkers = $this->game->getPlacedWorkers();
-    foreach($workers as &$worker)
+    foreach($arg["workers"] as &$worker)
     foreach($allWorkers as $worker2){
       if($worker['player_id'] == $worker2['player_id'])
         continue;
 
-      if(self::checkDistances($worker, $worker2))
+      if($this->game->isNeighbour($worker, $worker2, 'moving'))
         $worker['accessibleSpaces'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
     }
   }
 
+  // TODO : reuse argPlayerMove from game
   public function playerMove($wId, $x, $y, $z)
   {
     // If space is free, we can do a classic move -> return false
@@ -67,7 +64,7 @@ class Apollo extends Power
 
     // Check if worker can move to this space
     $space = [  'x' => $x, 'y' => $y, 'z' => $z ];
-    if (!self::checkDistances($worker, $space))
+    if (!$this->game->isNeighbour($worker, $space, 'moving'))
       throw new BgaUserException( _("You cannot reach this space with this worker") );
 
     // Switch workers
@@ -92,4 +89,3 @@ class Apollo extends Power
   }
 
 }
-  

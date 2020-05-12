@@ -29,10 +29,34 @@ class Artemis extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  public function argPlayerMove(&$arg)
+  {
+    $move = $this->game->log->getLastMove();
+    // No move before => usual rule
+    if($move == null)
+      return;
 
+    // Otherwise, let the player do a second move (not mandatory)
+    $arg['skippable'] = true;
+    $arg['verb'] = clienttranslate('can');
+    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($move){
+      return $worker['id'] == $move['pieceId'];
+    }));
+    // TODO : handle the case where $arg[workers] is empty ?
+
+    foreach($arg['workers'] as &$worker){
+      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($move){
+        return !$this->game->isSameSpace($space, $move['from']);
+      }));
+    }
+  }
+
+  public function stateAfterMove()
+  {
+    return count($this->game->log->getLastMoves()) == 1? 'moveAgain' : null;
+  }
 }
-  

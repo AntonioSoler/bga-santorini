@@ -310,6 +310,34 @@ class santorini extends Table
 
 
   /*
+   * isSameSpace : check distance between two spaces to move/build
+   *   TODO
+   */
+  public static function isSameSpace($a, $b)
+  {
+    return ($a['x'] == $b['x'] && $a['y'] == $b['y']);
+  }
+
+  /*
+   * checkDistances : check distance between two spaces to move/build
+   *   TODO
+   */
+  public static function isNeighbour($a, $b, $action)
+  {
+    $ok = true;
+
+    // Neighbouring : can't be same place, and should be planar coordinate distant
+    $ok = $ok && !self::isSameSpace($a, $b);
+    $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
+
+    // For moving, the new height can't be more than +1
+    if ($action == 'moving')
+      $ok = $ok && $b['z'] <= $a['z'] + 1;
+
+    return $ok;
+  }
+
+  /*
    * getNeighbouringSpaces:
    *   return the list of all accessible neighbouring spaces for either moving a worker or building
    * params:
@@ -320,17 +348,7 @@ class santorini extends Table
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
     $neighbouring = array_filter(self::getAccessibleSpaces(), function ($space) use ($piece, $action) {
-      $ok = true;
-
-      // Neighbouring : can't be same place, and should be planar coordinate distant
-      $ok = $ok && !($piece['x'] == $space['x'] && $piece['y'] == $space['y']);
-      $ok = $ok && abs($piece['x'] - $space['x']) <= 1 && abs($piece['y'] - $space['y']) <= 1;
-
-      // For moving, the new height can't be more than +1
-      if ($action == 'moving')
-        $ok = $ok && $space['z'] <= $piece['z'] + 1;
-
-      return $ok;
+      return self::isNeighbour($piece, $space, $action);
     });
 
     return array_values($neighbouring);
@@ -500,7 +518,9 @@ class santorini extends Table
     ];
     self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
 
-    $this->gamestate->nextState('moved');
+    // Apply power
+    $state = self::getPower()->stateAfterMove() ?: 'moved';
+    $this->gamestate->nextState($state);
   }
 
 
@@ -608,13 +628,16 @@ class santorini extends Table
     foreach ($workers as &$worker)
       $worker["accessibleSpaces"] = self::getNeighbouringSpaces($worker, 'moving');
 
-    // Apply power
-    self::getPower()->argPlayerMove($workers);
-
-    return [
+    $arg = [
+      'skippable' => false,
       'verb'    => clienttranslate('must'),
       'workers' => $workers,
     ];
+
+    // Apply power
+    self::getPower()->argPlayerMove($arg);
+
+    return $arg;
   }
 
 

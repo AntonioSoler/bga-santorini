@@ -16,9 +16,12 @@ abstract class Power extends APP_GameClass {
     }
 
     public function setup($player) {}
+
     public function beforeMove() {}
-    public function argPlayerMove(&$workers) { }
+    public function argPlayerMove(&$arg) { }
     public function playerMove($wId, $x, $y, $z) { return false; }
+    public function stateAfterMove(){ return null; }
+
     public function beforeBuild() {}
     public function argBuild() {}
     public function build() {}
