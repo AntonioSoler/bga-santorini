@@ -103,8 +103,6 @@ onEnteringState: function(stateName, args) {
 	if(!this.isCurrentPlayerActive())
 		return;
 
-	this.clearPossible();
-
 	// Divide powers
 	if (stateName == 'powersDivide') {
 		this._selectedPowers = [];
@@ -134,7 +132,10 @@ onEnteringState: function(stateName, args) {
 	// Move a worker
 	else if(stateName == "playerMove"){
 		this._movableWorkers = args.args.workers.filter(worker => worker.accessibleSpaces.length > 0);
-		this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
+		if(this._movableWorkers.length > 1)
+			this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
+		else
+			this.onClickSelectWorker(this._movableWorkers[0]);
 	}
 	// Build a block
 	else if (stateName == 'playerBuild') {
@@ -168,6 +169,11 @@ onUpdateActionButtons: function(stateName, args) {
 	// Make sure it the player's turn
 	if (!this.isCurrentPlayerActive())
 		return;
+
+	if(stateName == "playerMove"){
+		if(args.skippable)
+			this.addActionButton('buttonSkipMove', _('Skip'), 'onClickSkipMove', null, false, 'gray');
+	}
 },
 
 
@@ -201,7 +207,7 @@ focusContainer: function(container){
 addPowerToPlayer: function(playerId, powerId){
 	var power = this.gamedatas.powers[powerId];
 	var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
-	card.id = "mini-card-" + playerId + "-" + powerId;	
+	card.id = "mini-card-" + playerId + "-" + powerId;
 	this.addTooltipHtml( card.id, this.getPowerDetail(power) );
 },
 
@@ -227,6 +233,7 @@ createPiece: function(piece) {
  */
 clearPossible: function() {
 	this.removeActionButtons();
+	this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
 
 	this._selectedWorker = null;
 	dojo.empty('grid-powers');
@@ -352,9 +359,9 @@ onClickPlaceWorker: function(space) {
 onClickSelectWorker: function(worker) {
 	this.clearPossible();
 	this._selectedWorker = worker;
-	console.log(this._selectedWorker);
 	this.board.makeClickable(worker.accessibleSpaces, this.onClickMoveWorker.bind(this), 'move');
-	this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
+	if(this._movableWorkers.length > 1)
+		this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 },
 
 /*
@@ -384,6 +391,19 @@ onClickMoveWorker: function(space) {
 		z: space.z
 	}, this, res => {} );
 	this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null
+},
+
+
+/*
+ * onClickSkipMove:
+ * 	TODO
+ */
+onClickSkipMove: function() {
+	if( !this.checkAction( 'skipMove' ) )
+		return;
+
+	this.ajaxcall( "/santorini/santorini/skipMove.html", {}, this, res => {} );
+	this.clearPossible();
 },
 
 

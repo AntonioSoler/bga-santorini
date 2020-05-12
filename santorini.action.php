@@ -24,66 +24,90 @@
 
 class action_santorini extends APP_GameAction
 {
-    // Constructor: please do not modify
-    public function __default()
-    {
-        if (self::isArg('notifwindow')) {
-            $this->view = 'common_notifwindow';
-            $this->viewArgs['table'] = self::getArg('table', AT_posint, true);
-        } else {
-            $this->view = 'santorini_santorini';
-            self::trace('Complete reinitialization of board game');
-        }
+  // Constructor: please do not modify
+  public function __default()
+  {
+    if (self::isArg('notifwindow')) {
+      $this->view = 'common_notifwindow';
+      $this->viewArgs['table'] = self::getArg('table', AT_posint, true);
+    } else {
+      $this->view = 'santorini_santorini';
+      self::trace('Complete reinitialization of board game');
     }
+  }
 
-    public function dividePowers()
-    {
-        self::setAjaxMode();
-        $rawIds = self::getArg('ids', AT_numberlist, true);
-        $ids = explode(',', $rawIds );
-        $this->game->dividePowers($ids);
-        self::ajaxResponse();
-    }
+  /*
+   * TODO
+   */
+  public function dividePowers()
+  {
+    self::setAjaxMode();
+    $rawIds = self::getArg('ids', AT_numberlist, true);
+    $ids = explode(',', $rawIds );
+    $this->game->dividePowers($ids);
+    self::ajaxResponse();
+  }
 
-    public function choosePower()
-    {
-        self::setAjaxMode();
-        $id = (int) self::getArg('id', AT_int, true);
-        $this->game->choosePower($id);
-        self::ajaxResponse();
-    }
+  /*
+   * TODO
+   */
+  public function choosePower()
+  {
+    self::setAjaxMode();
+    $id = (int) self::getArg('id', AT_int, true);
+    $this->game->choosePower($id);
+    self::ajaxResponse();
+  }
 
 
-    public function placeWorker()
-    {
-        self::setAjaxMode();
-        $workerId = (int) self::getArg('workerId', AT_int, true);
-        $x = (int) self::getArg('x', AT_int, true);
-        $y = (int) self::getArg('y', AT_int, true);
-        $z = (int) self::getArg('z', AT_posint, true);
-        $this->game->placeWorker($workerId, $x, $y, $z);
-        self::ajaxResponse();
-    }
+  /*
+   * TODO
+   */
+  public function placeWorker()
+  {
+    self::setAjaxMode();
+    $workerId = (int) self::getArg('workerId', AT_int, true);
+    $x = (int) self::getArg('x', AT_int, true);
+    $y = (int) self::getArg('y', AT_int, true);
+    $z = (int) self::getArg('z', AT_posint, true);
+    $this->game->placeWorker($workerId, $x, $y, $z);
+    self::ajaxResponse();
+  }
 
-    public function moveWorker()
-    {
-        self::setAjaxMode();
-        $x = (int) self::getArg('x', AT_int, true);
-        $y = (int) self::getArg('y', AT_int, true);
-        $z = (int) self::getArg('z', AT_posint, true);
-        $workerId = (int) self::getArg('workerId', AT_posint, true);
-        $this->game->moveWorker($workerId, $x, $y, $z);
-        self::ajaxResponse();
-    }
+  /*
+   * TODO
+   */
+  public function moveWorker()
+  {
+    self::setAjaxMode();
+    $x = (int) self::getArg('x', AT_int, true);
+    $y = (int) self::getArg('y', AT_int, true);
+    $z = (int) self::getArg('z', AT_posint, true);
+    $workerId = (int) self::getArg('workerId', AT_posint, true);
+    $this->game->moveWorker($workerId, $x, $y, $z);
+    self::ajaxResponse();
+  }
 
-	public function build()
-    {
-        self::setAjaxMode();
-        $x = (int) self::getArg('x', AT_int, true);
-        $y = (int) self::getArg('y', AT_int, true);
-        $z = (int) self::getArg('z', AT_posint, true);
-        $this->game->build($x, $y, $z);
-        self::ajaxResponse();
-    }
+  /*
+   * TODO
+   */
+  public function skipMove()
+  {
+    self::setAjaxMode();
+    $this->game->skipMove();
+    self::ajaxResponse();
+  }
 
+  /*
+   * TODO
+   */
+  public function build()
+  {
+    self::setAjaxMode();
+    $x = (int) self::getArg('x', AT_int, true);
+    $y = (int) self::getArg('y', AT_int, true);
+    $z = (int) self::getArg('z', AT_posint, true);
+    $this->game->build($x, $y, $z);
+    self::ajaxResponse();
+  }
 }

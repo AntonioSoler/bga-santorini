@@ -525,6 +525,22 @@ class santorini extends Table
 
 
   /*
+   * skipMove: // TODO
+   */
+  public function skipMove()
+  {
+    self::checkAction('skipMove');
+
+    $args = $this->argPlayerMove();
+    if (!$args['skippable'])
+      throw new BgaUserException(_("You must move"));
+
+    // TODO might need to call power to know which is the next state (for move post build for instance)
+    $this->gamestate->nextState('moved');
+  }
+
+
+  /*
    * build: build a piece to a location on the board
    *  - int $x,$y,$z : the location on the board
    */
