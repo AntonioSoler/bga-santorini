@@ -35,11 +35,16 @@ class santorini extends Table
       'movedWorker' => 13,
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
+      'currentRound' => CURRENT_ROUND,
+      'firstPlayer' => FIRST_PLAYER,
     ]);
 
     // Initialize power deck
     $this->cards = self::getNew('module.common.deck');
     $this->cards->init('card');
+
+    // Initialize logger
+    $this->log = new SantoriniLog($this);
   }
 
   protected function getGameName()
@@ -57,6 +62,7 @@ class santorini extends Table
   protected function setupNewGame($players, $options = array())
   {
     self::setGameStateInitialValue('movedWorker', 0);
+    self::setGameStateInitialValue('currentRound', 0);
 
     // Create players and assign teams
     self::DbQuery('DELETE FROM player');
@@ -83,7 +89,8 @@ class santorini extends Table
 //    $this->cards->createCards($cards, 'box'); TODO : remove ?
 
     // Active first player to play
-    $this->activeNextPlayer();
+    $pId = $this->activeNextPlayer();
+    self::setGameStateInitialValue('firstPlayer', $pId);
   }
 
   /*
@@ -100,7 +107,7 @@ class santorini extends Table
       }, $this->getPlayers()),
       'placedPieces' => $this->getPlacedPieces(),
       'movedWorker' => self::getGamestateValue('movedWorker'),
-      'powers' => $this->powers
+      'powers' => $this->powers,
     ];
   }
 
@@ -479,6 +486,7 @@ class santorini extends Table
 
     // Move worker
     self::DbQuery("UPDATE piece SET x = '$x', y = '$y', z = '$z' WHERE id = '$wId'");
+    $this->log->addMove($worker, $space);
 
     // Set moved worker
     self::setGamestateValue('movedWorker', $wId);
@@ -736,6 +744,10 @@ class santorini extends Table
   {
     $pId = $this->activeNextPlayer();
     self::giveExtraTime($pId);
+    if(self::getGamestateValue("firstPlayer") == $pId){
+      $n = (int) self::getGamestateValue('currentRound') + 1;
+      self::setGamestateValue("currentRound", $n);
+    }
     $this->gamestate->nextState('next');
   }
 

@@ -112,3 +112,9 @@ define('ROTATE_S', 5);
 define('ROTATE_SW', 6);
 define('ROTATE_W', 7);
 define('ROTATE_NN', 8);
+
+/*
+ * Global game variables
+ */
+define('CURRENT_ROUND', 20);
+define('FIRST_PLAYER', 21);

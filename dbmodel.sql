@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `player_id` int(11) NOT NULL,
   `piece_id` int(11) NOT NULL,
   `action` varchar(16) NOT NULL,
-  `action_arg` varchar(255) NOT NULL,
+  `action_arg` json,
   PRIMARY KEY (`log_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
