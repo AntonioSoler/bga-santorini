@@ -210,8 +210,8 @@ ST_MOVE => [
  */
 ST_BUILD => [
   'name' => 'playerBuild',
-  'description' => clienttranslate('${actplayer} must build'),
-  'descriptionmyturn' => clienttranslate('${you} must build'),
+  'description' => clienttranslate('${actplayer} ${verb} build'),
+  'descriptionmyturn' => clienttranslate('${you} ${verb} build'),
   'type' => 'activeplayer',
   'args' => 'argPlayerBuild',
   'action' => 'stCheckEndOfGame',
@@ -220,6 +220,7 @@ ST_BUILD => [
     'zombiePass' => ST_NEXT_PLAYER,
     'built' => ST_NEXT_PLAYER,
     'endgame' => ST_GAME_END,
+    'buildAgain' => ST_BUILD,
   ],
 ],
 

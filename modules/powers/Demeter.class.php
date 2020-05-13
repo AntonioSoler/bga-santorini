@@ -29,10 +29,34 @@ class Demeter extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  public function argPlayerBuild(&$arg)
+  {
+    $build = $this->game->log->getLastBuild();
+    // No build before => usual rule
+    if($build == null)
+      return;
 
+    // Otherwise, let the player do a second build (not mandatory)
+    $arg['skippable'] = true;
+    $arg['verb'] = clienttranslate('can');
+    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($move){
+      return $worker['id'] == $build['pieceId'];
+    }));
+
+    foreach($arg['workers'] as &$worker){
+      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($move){
+        return !$this->game->board->isSameSpace($space, $move['to']);
+      }));
+    }
+  }
+
+
+  public function stateAfterBuild()
+  {
+    return count($this->game->log->getLastBuilds()) == 1? 'buildAgain' : null;
+  }
 }
-  

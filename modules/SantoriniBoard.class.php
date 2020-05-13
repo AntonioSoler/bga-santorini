@@ -10,6 +10,13 @@ class SantoriniBoard extends APP_GameClass
     $this->game = $game;
   }
 
+  /*
+   * TODO
+   */
+  public static getCoords($mixed)
+  {
+    return ['x' => (int) $mixed['x'], 'y' => (int) $mixed['y'], 'z' => (int) $mixed['z']];
+  }
 
   /*
    * getAvailableWorkers: return all available workers

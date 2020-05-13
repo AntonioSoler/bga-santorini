@@ -107,7 +107,8 @@ class action_santorini extends APP_GameAction
     $x = (int) self::getArg('x', AT_int, true);
     $y = (int) self::getArg('y', AT_int, true);
     $z = (int) self::getArg('z', AT_posint, true);
-    $this->game->build($x, $y, $z);
+    $workerId = (int) self::getArg('workerId', AT_posint, true);
+    $this->game->build($workerId,$x, $y, $z);
     self::ajaxResponse();
   }
 }

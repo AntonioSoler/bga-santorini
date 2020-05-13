@@ -129,17 +129,14 @@ onEnteringState: function(stateName, args) {
 		this.worker = args.args.worker;
 		this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
 	}
-	// Move a worker
-	else if(stateName == "playerMove"){
-		this._movableWorkers = args.args.workers.filter(worker => worker.accessibleSpaces.length > 0);
-		if(this._movableWorkers.length > 1)
-			this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
+	// Move a worker or build
+	else if(stateName == "playerMove" || stateName == "playerBuild"){
+		this._action = (stateName == 'playerMove')? 'move' : 'build';
+		this._selectableWorkers = args.args.workers.filter(worker => worker.accessibleSpaces.length > 0);
+		if(this._selectableWorkers.length > 1)
+			this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
 		else
-			this.onClickSelectWorker(this._movableWorkers[0]);
-	}
-	// Build a block
-	else if (stateName == 'playerBuild') {
-		this.board.makeClickable(args.args.accessibleSpaces, this.onClickBuild.bind(this), 'build');
+			this.onClickSelectWorker(this._selectableWorkers[0]);
 	}
 },
 
@@ -359,8 +356,8 @@ onClickPlaceWorker: function(space) {
 onClickSelectWorker: function(worker) {
 	this.clearPossible();
 	this._selectedWorker = worker;
-	this.board.makeClickable(worker.accessibleSpaces, this.onClickMoveWorker.bind(this), 'move');
-	if(this._movableWorkers.length > 1)
+	this.board.makeClickable(worker.accessibleSpaces, this.onClickSpace.bind(this), this._action);
+	if(this._selectableWorkers.length > 1)
 		this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 },
 
@@ -372,7 +369,17 @@ onClickSelectWorker: function(worker) {
 onClickCancelSelect: function(evt) {
 	dojo.stopEvent(evt);
 	this.clearPossible();
-	this.board.makeClickable(this._movableWorkers, this.onClickSelectWorker.bind(this), 'select');
+	this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
+},
+
+
+/*
+ * onClickSpace:
+ * 	triggered after a click on a space to either move/build/...
+ */
+onClickSpace: function(space) {
+	if(this._action == 'move')  this.onClickMoveWorker(space);
+	if(this._action == 'build') this.onClickBuild(space);
 },
 
 /*
@@ -380,6 +387,7 @@ onClickCancelSelect: function(evt) {
  * 	triggered after a click on a space to move the worker
  *  this shoud happen only if a worker is already selected (this._selectedWorker != null)
  */
+// TODO : refactor with build ?
 onClickMoveWorker: function(space) {
 	if( !this.checkAction( 'moveWorker' ) )
 		return;
@@ -420,8 +428,13 @@ onClickBuild: function(space) {
 	if( !this.checkAction( 'build' ) )
 		return;
 
+	this.ajaxcall( "/santorini/santorini/build.html", {
+		workerId: this._selectedWorker.id,
+		x: space.x,
+		y: space.y,
+		z: space.z
+	}, this, res => {} );
 	this.clearPossible();
-	this.ajaxcall( "/santorini/santorini/build.html", space, this, res => {} );
 },
 
 

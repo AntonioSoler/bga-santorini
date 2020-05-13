@@ -273,12 +273,12 @@ class santorini extends Table
    * build: build a piece to a location on the board
    *  - int $x,$y,$z : the location on the board
    */
-  public function build($x, $y, $z)
+  public function build($wId, $x, $y, $z)
   {
     self::checkAction('build');
 
     $pId = self::getActivePlayerId();
-    $wId = self::getGamestateValue('movedWorker');
+    // TODO reuse argPlayerBuild to check condition ?
 
     // Get information about the piece
     $worker = $this->board->getPiece($wId);
@@ -288,7 +288,7 @@ class santorini extends Table
     if (count($spaceContent) > 0)
       throw new BgaUserException(_("This space is not free"));
 
-    // Check if worker can move to this space
+    // Check if worker can build to this space
     $neighbouring = $this->board->getNeighbouringSpaces($worker, 'move');
     $space = ['x' => $x, 'y' => $y, 'z' => $z];
     if (!in_array($space, $neighbouring))
@@ -315,7 +315,9 @@ class santorini extends Table
       : clienttranslate('${player_name} builds a ${piece_name} at level ${level}');
     self::notifyAllPlayers('blockBuilt', $msg, $args);
 
-    $this->gamestate->nextState('built');
+    // Apply power
+    $state = $this->powerManager->stateAfterBuild() ?: 'built';
+    $this->gamestate->nextState($state);
   }
 
 
@@ -378,9 +380,7 @@ class santorini extends Table
       'workers' => $workers,
     ];
 
-    // Apply power
     $this->powerManager->argPlayerMove($arg);
-
     return $arg;
   }
 
@@ -391,11 +391,18 @@ class santorini extends Table
   public function argPlayerBuild()
   {
     // Return available spaces neighbouring the moved player
-    $worker = $this->board->getPiece(self::getGamestateValue('movedWorker'));
-    return [
-      'worker' => $worker,
-      'accessibleSpaces' => $this->board->getNeighbouringSpaces($worker, 'build')
+    $move = $this->log->getLastMove();
+    $worker = $this->board->getPiece($move['pieceId']);
+    $worker['accessibleSpaces'] = $this->board->getNeighbouringSpaces($worker, 'build');
+    $arg = [
+      'skippable' => false,
+      'verb'    => clienttranslate('must'),
+      'workers' => [$worker],
     ];
+
+    // Apply power
+    $this->powerManager->argPlayerBuild($arg);
+    return $arg;
   }
 
 

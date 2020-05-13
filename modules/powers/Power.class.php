@@ -19,8 +19,11 @@ abstract class Power extends APP_GameClass {
     public function stateAfterMove(){ return null; }
 
     public function beforeBuild() {}
-    public function argBuild() {}
+    public function argPlayerBuild(&$arg) { }
+    public function argOpponentBuild(&$arg) { }
+    public function stateAfterBuild(){ return null; }
     public function build() {}
+
     public function endTurn() {}
     public function winCondition() {}
 }

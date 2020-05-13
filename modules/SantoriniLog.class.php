@@ -18,13 +18,23 @@ class SantoriniLog extends APP_GameClass
     self::DbQuery("INSERT INTO log (`round`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$playerId', '$pieceId', '$action', '$actionArgs')");
   }
 
-  public function addMove($piece, $space)
+  private function addFromTo($piece, $to, $action)
   {
     $args = [
-      'from' => ['x' => (int) $piece['x'], 'y' => (int) $piece['y'], 'z' => (int) $piece['z']],
-      'to'   => ['x' => (int) $space['x'], 'y' => (int) $space['y'], 'z' => (int) $space['z']],
+      'from' => $this->game->board->getCoords($piece),
+      'to'   => $this->game->board->getCoords($space),
     ];
-    $this->insert(-1, $piece['id'], 'move', $args);
+    $this->insert(-1, $piece['id'], $action, $args);
+  }
+
+  public function addMove($piece, $space)
+  {
+    $this->addFromTo($piece, $space, 'move');
+  }
+
+  public function addBuild($piece, $space)
+  {
+    $this->addFromTo($piece, $space, 'build');
   }
 
 

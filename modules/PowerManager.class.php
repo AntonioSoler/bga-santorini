@@ -204,4 +204,35 @@ class PowerManager extends APP_GameClass
   }
 
 
+
+  public function argPlayerBuild(&$arg)
+  {
+    // First apply current user power(s)
+    $pId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($pId);
+    foreach($player->getPowers() as $power)
+      $power->argPlayerBuild($arg);
+
+    // Then apply oponnents power(s)
+    foreach($this->game->playerManager->getOpponents($pId) as $opponent)
+    foreach($opponent->getPowers() as $power)
+      $power->argOpponentBuild($arg);
+  }
+
+
+  public function stateAfterBuild()
+  {
+    $pId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($pId);
+    $r = array_filter(array_map(function($power){
+      return $power->stateAfterBuild();
+    }, $player->getPowers()));
+    if(count($r) > 1)
+      throw new BgaUserException(_("Can't figure next state after build"));
+
+    if(count($r) == 1)
+      return $r[0];
+    else
+      return null;
+  }
 }
