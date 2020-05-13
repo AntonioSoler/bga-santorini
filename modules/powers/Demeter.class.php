@@ -43,13 +43,13 @@ class Demeter extends Power
     // Otherwise, let the player do a second build (not mandatory)
     $arg['skippable'] = true;
     $arg['verb'] = clienttranslate('can');
-    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($move){
+    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($build){
       return $worker['id'] == $build['pieceId'];
     }));
 
     foreach($arg['workers'] as &$worker){
-      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($move){
-        return !$this->game->board->isSameSpace($space, $move['to']);
+      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($build){
+        return !$this->game->board->isSameSpace($space, $build['to']);
       }));
     }
   }

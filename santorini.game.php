@@ -32,7 +32,6 @@ class santorini extends Table
     parent::__construct();
 
     self::initGameStateLabels([
-      'movedWorker' => 13,
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
       'currentRound' => CURRENT_ROUND,
@@ -64,7 +63,6 @@ class santorini extends Table
    */
   protected function setupNewGame($players, $options = array())
   {
-    self::setGameStateInitialValue('movedWorker', 0);
     self::setGameStateInitialValue('currentRound', 0);
 
     // Create players and assign teams
@@ -235,9 +233,6 @@ class santorini extends Table
     self::DbQuery("UPDATE piece SET x = '$x', y = '$y', z = '$z' WHERE id = '$wId'");
     $this->log->addMove($worker, $space);
 
-    // Set moved worker
-    self::setGamestateValue('movedWorker', $wId);
-
     // Notify
     $args = [
       'i18n' => [],
@@ -298,12 +293,10 @@ class santorini extends Table
     $type = 'lvl' . $z;
     $piece_name = $type == 'lvl3' ? clienttranslate('dome') : clienttranslate('block');
     self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '$x', '$y', '$z') ");
-
-    // Reset moved worker
-    self::setGamestateValue('movedWorker', 0);
+    $this->log->addBuild($worker, $space);
 
     // Notify
-    $piece = self::getObjectFromDB("SELECT * FROM piece WHERE id = LAST_INSERT_ID()");
+    $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
     $args = [
       'i18n' => ['piece_name'],
       'player_name' => self::getActivePlayerName(),

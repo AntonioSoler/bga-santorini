@@ -13,7 +13,7 @@ class SantoriniBoard extends APP_GameClass
   /*
    * TODO
    */
-  public static getCoords($mixed)
+  public static function getCoords($mixed)
   {
     return ['x' => (int) $mixed['x'], 'y' => (int) $mixed['y'], 'z' => (int) $mixed['z']];
   }

@@ -18,54 +18,66 @@ class SantoriniLog extends APP_GameClass
     self::DbQuery("INSERT INTO log (`round`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$playerId', '$pieceId', '$action', '$actionArgs')");
   }
 
-  private function addFromTo($piece, $to, $action)
+  private function addWork($piece, $to, $action)
   {
     $args = [
       'from' => $this->game->board->getCoords($piece),
-      'to'   => $this->game->board->getCoords($space),
+      'to'   => $this->game->board->getCoords($to),
     ];
     $this->insert(-1, $piece['id'], $action, $args);
   }
 
   public function addMove($piece, $space)
   {
-    $this->addFromTo($piece, $space, 'move');
+    $this->addWork($piece, $space, 'move');
   }
 
   public function addBuild($piece, $space)
   {
-    $this->addFromTo($piece, $space, 'build');
+    $this->addWork($piece, $space, 'build');
   }
 
 
-  public function getLastMoves($pId = null, $limit = -1)
+  public function getLastWorks($action, $pId = null, $limit = -1)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
     $limitClause = ($limit == -1)? '' : "LIMIT $limit";
     $round = $this->game->getGameStateValue("currentRound");
     if(!$this->game->playerManager->isPlayingBefore($pId))
       $round -= 1;
-    $rawMoves = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = 'move' AND `player_id` = '$pId' AND `round` = $round ORDER BY log_id DESC ".$limitClause);
+    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = '$action' AND `player_id` = '$pId' AND `round` = $round ORDER BY log_id DESC ".$limitClause);
 
-    $moves = array_map(function($move){
-      $args = json_decode($move['action_arg'], true);
+    return array_map(function($work){
+      $args = json_decode($work['action_arg'], true);
       return [
-        'pieceId' => $move['piece_id'],
+        'pieceId' => $work['piece_id'],
         'from' => $args['from'],
         'to' => $args['to'],
       ];
-    }, $rawMoves);
-
-    return $moves;
+    }, $works);
   }
 
+
+  public function getLastMoves($pId = null, $limit = -1)
+  {
+    return $this->getLastWorks('move', $pId, $limit);
+  }
 
   public function getLastMove($pId = null)
   {
     $moves = $this->getLastMoves($pId, 1);
-    if(count($moves) == 1)
-      return $moves[0];
-    else
-      return null;
+    return (count($moves) == 1)? $moves[0] : null;
   }
+
+  public function getLastBuilds($pId = null, $limit = -1)
+  {
+    return $this->getLastWorks('build', $pId, $limit);
+  }
+
+  public function getLastBuild($pId = null)
+  {
+    $builds = $this->getLastBuilds($pId, 1);
+    return (count($builds) == 1)? $builds[0] : null;
+  }
+
 }
