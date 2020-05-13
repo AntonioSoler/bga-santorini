@@ -49,7 +49,7 @@ class Athena extends Power
 
 
     foreach($arg["workers"] as &$worker)
-      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($worker){
+      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($worker){
         return $space['z'] <= $worker['z'];
       }));
   }

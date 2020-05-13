@@ -158,28 +158,44 @@ class PowerManager extends APP_GameClass
   public function winCondition() {}
 */
 
-  public function argPlayerMove(&$arg)
+  public function argPlayerWork(&$arg, $action)
   {
     // First apply current user power(s)
+    $name = "argPlayer".$action;
     $pId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($pId);
     foreach($player->getPowers() as $power)
-      $power->argPlayerMove($arg);
+      $power->$name($arg);
 
     // Then apply oponnents power(s)
+    $name = "argOpponent".$action;
     foreach($this->game->playerManager->getOpponents($pId) as $opponent)
     foreach($opponent->getPowers() as $power)
-      $power->argOpponentMove($arg);
+      $power->$name($arg);
   }
 
 
-  public function playerMove($wId, $x, $y, $z)
+
+  public function argPlayerMove(&$arg)
+  {
+    $this->argPlayerWork($arg, 'Move');
+  }
+
+  public function argPlayerBuild(&$arg)
+  {
+    $this->argPlayerWork($arg, 'Build');
+  }
+
+
+
+  public function playerWork($worker, $work, $action)
   {
     // First apply current user power(s)
+    $name = "player".$action;
     $pId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($pId);
-    $r = array_map(function($power) use ($wId, $x, $y, $z){
-      return $power->playerMove($wId, $x, $y, $z);
+    $r = array_map(function($power) use ($worker, $work, $name){
+      return $power->$name($worker, $work);
     }, $player->getPowers());
     return max($r);
 
@@ -187,15 +203,28 @@ class PowerManager extends APP_GameClass
   }
 
 
-  public function stateAfterMove()
+  public function playerMove($worker, $work)
   {
+    return $this->playerWork($worker, $work, 'Move');
+  }
+
+  public function playerBuild($worker, $work)
+  {
+    return $this->playerWork($worker, $work, 'Build');
+  }
+
+
+
+  public function stateAfterWork($action)
+  {
+    $name = "stateAfter".$action;
     $pId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($pId);
-    $r = array_filter(array_map(function($power){
-      return $power->stateAfterMove();
+    $r = array_filter(array_map(function($power) use ($name) {
+      return $power->$name();
     }, $player->getPowers()));
     if(count($r) > 1)
-      throw new BgaUserException(_("Can't figure next state after move"));
+      throw new BgaUserException(_("Can't figure next state after action"));
 
     if(count($r) == 1)
       return $r[0];
@@ -204,35 +233,13 @@ class PowerManager extends APP_GameClass
   }
 
 
-
-  public function argPlayerBuild(&$arg)
+  public function stateAfterMove()
   {
-    // First apply current user power(s)
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    foreach($player->getPowers() as $power)
-      $power->argPlayerBuild($arg);
-
-    // Then apply oponnents power(s)
-    foreach($this->game->playerManager->getOpponents($pId) as $opponent)
-    foreach($opponent->getPowers() as $power)
-      $power->argOpponentBuild($arg);
+    return $this->stateAfterWork('Move');
   }
-
 
   public function stateAfterBuild()
   {
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    $r = array_filter(array_map(function($power){
-      return $power->stateAfterBuild();
-    }, $player->getPowers()));
-    if(count($r) > 1)
-      throw new BgaUserException(_("Can't figure next state after build"));
-
-    if(count($r) == 1)
-      return $r[0];
-    else
-      return null;
+    return $this->stateAfterWork('Build');
   }
 }

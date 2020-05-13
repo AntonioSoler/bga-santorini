@@ -24,10 +24,6 @@ define([
 	"ebg/stock",
 	"ebg/scrollmap"
 ], function(dojo, declare) {
-	// Player colors
-	const BLUE = "0000ff";
-	const WHITE = "ffffff";
-
 	return declare("bgagame.santorini", ebg.core.gamegui, {
 
 /*
@@ -60,13 +56,6 @@ setup: function(gamedatas) {
 
 	// Setup workers and buildings
 	gamedatas.placedPieces.forEach(this.createPiece.bind(this));
-
-	// TODO remove ?
-	// Setup player boards
-	colorNames = {
-		'0000ff': 'blue',
-		'ffffff': 'white'
-	};
 
 	// Setup game notifications
 	this.setupNotifications();
@@ -131,8 +120,8 @@ onEnteringState: function(stateName, args) {
 	}
 	// Move a worker or build
 	else if(stateName == "playerMove" || stateName == "playerBuild"){
-		this._action = (stateName == 'playerMove')? 'move' : 'build';
-		this._selectableWorkers = args.args.workers.filter(worker => worker.accessibleSpaces.length > 0);
+		this._action = stateName;
+		this._selectableWorkers = args.args.workers.filter(worker => worker.works.length > 0);
 		if(this._selectableWorkers.length > 1)
 			this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
 		else
@@ -167,9 +156,8 @@ onUpdateActionButtons: function(stateName, args) {
 	if (!this.isCurrentPlayerActive())
 		return;
 
-	if(stateName == "playerMove"){
-		if(args.skippable)
-			this.addActionButton('buttonSkipMove', _('Skip'), 'onClickSkipMove', null, false, 'gray');
+	if((stateName == "playerMove" || stateName == "playerBuild") && args.skippable){
+		this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
 	}
 },
 
@@ -346,7 +334,7 @@ onClickPlaceWorker: function(space) {
 
 
 //////////
-// Move //
+// Work //
 //////////
 
 /*
@@ -356,7 +344,7 @@ onClickPlaceWorker: function(space) {
 onClickSelectWorker: function(worker) {
 	this.clearPossible();
 	this._selectedWorker = worker;
-	this.board.makeClickable(worker.accessibleSpaces, this.onClickSpace.bind(this), this._action);
+	this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
 	if(this._selectableWorkers.length > 1)
 		this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 },
@@ -378,62 +366,35 @@ onClickCancelSelect: function(evt) {
  * 	triggered after a click on a space to either move/build/...
  */
 onClickSpace: function(space) {
-	if(this._action == 'move')  this.onClickMoveWorker(space);
-	if(this._action == 'build') this.onClickBuild(space);
-},
-
-/*
- * onClickMoveWorker:
- * 	triggered after a click on a space to move the worker
- *  this shoud happen only if a worker is already selected (this._selectedWorker != null)
- */
-// TODO : refactor with build ?
-onClickMoveWorker: function(space) {
-	if( !this.checkAction( 'moveWorker' ) )
+	if( !this.checkAction( this._action ) )
 		return;
 
-	this.ajaxcall( "/santorini/santorini/moveWorker.html", {
+	var arg = null;
+	if(space.arg){
+		if(space.arg.length == 1)
+			arg = space.arg[0];
+		// TODO : handle when space arg.length > 0
+	}
+
+	this.ajaxcall( "/santorini/santorini/work.html", {
 		workerId: this._selectedWorker.id,
 		x: space.x,
 		y: space.y,
-		z: space.z
+		z: space.z,
+		arg: arg,
 	}, this, res => {} );
 	this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null
 },
 
-
 /*
- * onClickSkipMove:
+ * onClickSkip:
  * 	TODO
  */
-onClickSkipMove: function() {
-	if( !this.checkAction( 'skipMove' ) )
+onClickSkip: function() {
+	if( !this.checkAction( 'skip' ) )
 		return;
 
-	this.ajaxcall( "/santorini/santorini/skipMove.html", {}, this, res => {} );
-	this.clearPossible();
-},
-
-
-
-///////////
-// Build //
-///////////
-
-/*
- * onClickBuild:
- * 	triggered after a click on a space to build
- */
-onClickBuild: function(space) {
-	if( !this.checkAction( 'build' ) )
-		return;
-
-	this.ajaxcall( "/santorini/santorini/build.html", {
-		workerId: this._selectedWorker.id,
-		x: space.x,
-		y: space.y,
-		z: space.z
-	}, this, res => {} );
+	this.ajaxcall( "/santorini/santorini/skipWork.html", {}, this, res => {} );
 	this.clearPossible();
 },
 

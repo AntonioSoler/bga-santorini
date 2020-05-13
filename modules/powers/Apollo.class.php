@@ -48,31 +48,18 @@ class Apollo extends Power
   }
 
   // TODO : reuse argPlayerMove from game
-  public function playerMove($wId, $x, $y, $z)
+  public function playerMove($worker, $work)
   {
     // If space is free, we can do a classic move -> return false
-    $worker2 = self::getObjectFromDB( "SELECT * FROM piece WHERE x = '$x' AND y = '$y' AND z = '$z'" );
+    $worker2 = self::getObjectFromDB( "SELECT * FROM piece WHERE x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
     if ($worker2 == null)
       return false;
 
-    // Get information about the piece
-    $worker = $this->game->board->getPiece($wId);
-
-    // Check if it's belong to active player
-    if ($worker['player_id'] != $this->game->getActivePlayerId())
-      throw new BgaUserException( _("This worker is not yours") );
-
-    // Check if worker can move to this space
-    $space = [  'x' => $x, 'y' => $y, 'z' => $z ];
-    if (!$this->game->board->isNeighbour($worker, $space, 'moving'))
-      throw new BgaUserException( _("You cannot reach this space with this worker") );
-
     // Switch workers
-    self::DbQuery( "UPDATE piece SET x = '$x', y = '$y', z = '$z' WHERE id = '$wId'" );
-    self::DbQuery( "UPDATE piece SET x = '".$worker['x']."', y = '".$worker['y']."', z = '".$worker['z']."' WHERE id = '".$worker2['id']."'" );
-
-    // Set moved worker
-    $this->game->setGamestateValue( 'movedWorker', $wId );
+    self::DbQuery( "UPDATE piece SET x = {$worker2['x']}, y = {$worker2['y']}, z = {$worker2['z']} WHERE id = {$worker['id']}" );
+    self::DbQuery( "UPDATE piece SET x = {$worker['x']}, y = {$worker['y']}, z = {$worker['z']} WHERE id = {$worker2['id']}" );
+    $this->game->log->addMove($worker, $worker2);
+    // TODO add the move of worker2 ?
 
     // Notify
     $args = [

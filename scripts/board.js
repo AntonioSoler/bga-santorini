@@ -421,7 +421,7 @@ Board.prototype.makeClickable = function(objects, callback, action){
 			);
 		}
 		// Show square
-		else if(action == "build"){
+		else if(action == "playerBuild"){
 			mark = new THREE.Mesh(
 				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
 				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.3,	transparent: true, })

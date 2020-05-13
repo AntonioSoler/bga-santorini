@@ -119,24 +119,12 @@ class santorini extends Table
   }
 
 
-
-  ////////////////////////////////////////////
-  //////////// Utility functions ////////////
-  ///////////////////////////////////////////
-
-
-
-
   ///////////////////////////////////////
   //////////   Player actions   /////////
   ///////////////////////////////////////
-  // Each time a player is doing some game action, one of the methods below is called.
-  //   (note: each method below must match an input method in santorini.action.php)
-  ///////////////////////////////////////
-
 
   /*
-   * dividePowers: TODO
+   * dividePowers: is called in the fair division setup, after the contestant chose the set of powers
    */
   public function dividePowers($ids)
   {
@@ -145,9 +133,8 @@ class santorini extends Table
     $this->gamestate->nextState('done');
   }
 
-
   /*
-   * choosePower: TODO
+   * choosePower: is called in the fair division setup, when a player picked a power from the remeaning ones
    */
   public function choosePower($id)
   {
@@ -165,12 +152,12 @@ class santorini extends Table
   public function placeWorker($workerId, $x, $y, $z)
   {
     self::checkAction('placeWorker');
-
-    // Get unplaced workers of given type for the active player to make sure at least one is remeaning
     $pId = self::getActivePlayerId();
-    $workers = $this->board->getAvailableWorkers($pId);
-    if (count($workers) == 0)
-      throw new BgaVisibleSystemException('No more workers to place');
+
+    // Get the piece and check owner
+    $worker = self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$workerId'");
+    if($worker['player_id'] != $pId)
+      throw new BgaVisibleSystemException('This worker is not yours');
 
     // Make sure the space is free
     $spaceContent = self::getObjectListFromDb("SELECT * FROM piece WHERE x = '$x' AND y = '$y' AND z = '$z' AND location ='board'");
@@ -181,56 +168,72 @@ class santorini extends Table
     if ($z > 0)
       throw new BgaVisibleSystemException('Worker placed higher than ground floor');
 
-
-    // Place one worker in this space
+    // Place the worker in this space
     self::DbQuery("UPDATE piece SET location = 'board', x = '$x', y = '$y', z = '$z' WHERE id = '$workerId'");
 
     // Notify
-    $piece = self::getObjectFromDB("SELECT * FROM piece WHERE id = '$workerId'");
+    $piece = self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$workerId'");
     $args = [
       'i18n' => [],
       'piece' => $piece,
-      'player_name' => self::getActivePlayerName(),
+      'playerName' => self::getActivePlayerName(),
     ];
-    self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places a worker'), $args);
+    self::notifyAllPlayers('workerPlaced', clienttranslate('${playerName} places a worker'), $args);
 
     $this->gamestate->nextState('workerPlaced');
   }
 
 
+
+
   /*
-   * moveWorker: move a worker to a new location on the board
+   * work: can be either a move or a build (very similar actions)
    *  - int $id : the piece id we want to move
    *  - int $x,$y,$z : the new location on the board
+   *  - int actionArg : can hold additional data for the work (e.g. the building type)
    */
-  public function moveWorker($wId, $x, $y, $z)
+  public function work($wId, $x, $y, $z, $actionArg)
   {
-    self::checkAction('moveWorker');
+    // Get state name to check action
+    $state = $this->gamestate->state();
+    $stateName = $state['name'];
+    self::checkAction($stateName);
 
-    // Check if power apply
-    if ($this->powerManager->playerMove($wId, $x, $y, $z))
-      return;
-
-    // Get information about the piece
+    // Get information about the piece and check if work is possible
     $worker = $this->board->getPiece($wId);
+    $stateArgs = $state['args']; //();
 
-    // Check if it's belong to active player
-    if ($worker['player_id'] != self::getActivePlayerId())
-      throw new BgaUserException(_("This worker is not yours"));
+    $workers = array_values(array_filter($stateArgs['workers'], function($w) use ($worker){
+      return $w['id'] == $worker['id'];
+    }));
+    if(count($workers) != 1)
+      throw new BgaUserException(_("This worker can't be used"));
 
-    // Check if space is free
-    $spaceContent = self::getObjectListFromDB("SELECT id FROM piece WHERE x = '$x' AND y = '$y' AND z = '$z'");
-    if (count($spaceContent) > 0)
-      throw new BgaUserException(_("This space is not free"));
-
-    // Check if worker can move to this space
-    $neighbouring = $this->board->getNeighbouringSpaces($worker, 'move');
-    $space = ['x' => $x, 'y' => $y, 'z' => $z];
-    if (!in_array($space, $neighbouring))
+    $works = array_values(array_filter($workers[0]['works'], function($w) use ($x,$y,$z,$actionArg){
+      return $w['x'] == $x && $w['y'] == $y && $w['z'] == $z
+        && (is_null($actionArg) || in_array($actionArg, $w['arg']) );
+    }));
+    if (count($works) != 1)
       throw new BgaUserException(_("You cannot reach this space with this worker"));
 
+    // Check if power apply
+    $work = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => $actionArg];
+    if ($this->powerManager->$stateName($worker, $work))
+      return;
+
+    // Otherwise, do the work
+    $this->$stateName($worker, $work);
+  }
+
+  /*
+   * playerMove: move a worker to a new location on the board
+   *  - obj $worker : the piece id we want to move
+   *  - obj $space : the new location on the board
+   */
+  public function playerMove($worker, $space)
+  {
     // Move worker
-    self::DbQuery("UPDATE piece SET x = '$x', y = '$y', z = '$z' WHERE id = '$wId'");
+    self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$worker['id']}");
     $this->log->addMove($worker, $space);
 
     // Notify
@@ -238,74 +241,40 @@ class santorini extends Table
       'i18n' => [],
       'piece' => $worker,
       'space' => $space,
-      'player_name' => self::getActivePlayerName(),
+      'playerName' => self::getActivePlayerName(),
     ];
-    self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
+    self::notifyAllPlayers('workerMoved', clienttranslate('${playerName} moves a worker'), $args);
 
     // Apply power
     $state = $this->powerManager->stateAfterMove() ?: 'moved';
     $this->gamestate->nextState($state);
   }
 
-
   /*
-   * skipMove: // TODO
+   * playerBuild: build a piece to a location on the board
+   *  - obj $worker : the piece id we want to use to build
+   *  - obj $space : the location and building type we want to build
    */
-  public function skipMove()
+  public function playerBuild($worker, $space)
   {
-    self::checkAction('skipMove');
-
-    $args = $this->argPlayerMove();
-    if (!$args['skippable'])
-      throw new BgaUserException(_("You must move"));
-
-    // TODO might need to call power to know which is the next state (for move post build for instance)
-    $this->gamestate->nextState('moved');
-  }
-
-
-  /*
-   * build: build a piece to a location on the board
-   *  - int $x,$y,$z : the location on the board
-   */
-  public function build($wId, $x, $y, $z)
-  {
-    self::checkAction('build');
-
-    $pId = self::getActivePlayerId();
-    // TODO reuse argPlayerBuild to check condition ?
-
-    // Get information about the piece
-    $worker = $this->board->getPiece($wId);
-
-    // Check if space is free
-    $spaceContent = self::getObjectListFromDB("SELECT id FROM piece WHERE x = '$x' AND y = '$y' AND z = '$z'");
-    if (count($spaceContent) > 0)
-      throw new BgaUserException(_("This space is not free"));
-
-    // Check if worker can build to this space
-    $neighbouring = $this->board->getNeighbouringSpaces($worker, 'move');
-    $space = ['x' => $x, 'y' => $y, 'z' => $z];
-    if (!in_array($space, $neighbouring))
-      throw new BgaUserException(_("You cannot build on this space with this worker"));
-
     // Build piece
-    $type = 'lvl' . $z;
-    $piece_name = $type == 'lvl3' ? clienttranslate('dome') : clienttranslate('block');
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '$x', '$y', '$z') ");
+    $pId = self::getActivePlayerId();
+    $type = 'lvl'.$space['arg'];
+    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$space['x']}', '{$space['y']}', '{$space['z']}') ");
     $this->log->addBuild($worker, $space);
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
+    $pieceName = ($space['arg'] == 3) ? clienttranslate('dome') : clienttranslate('block');
     $args = [
-      'i18n' => ['piece_name'],
-      'player_name' => self::getActivePlayerName(),
-      'piece_name' => $piece_name,
+      'i18n' => ['pieceName'],
+      'playerName' => self::getActivePlayerName(),
+      'pieceName' => $pieceName,
       'piece' => $piece,
-      'level' => $z,
+      'level' => $space['z'],
     ];
-    $msg = ($z == 0) ? clienttranslate('${player_name} builds a ${piece_name} at ground level')
-      : clienttranslate('${player_name} builds a ${piece_name} at level ${level}');
+    $msg = ($space['z'] == 0) ? clienttranslate('${playerName} builds a ${pieceName} at ground level')
+      : clienttranslate('${playerName} builds a ${pieceName} at level ${level}');
     self::notifyAllPlayers('blockBuilt', $msg, $args);
 
     // Apply power
@@ -314,15 +283,28 @@ class santorini extends Table
   }
 
 
+  /*
+   * skip: called when a player decide to skip a skippable work
+   */
+  public function skipWork()
+  {
+    self::checkAction('skip');
+
+    $args = $this->gamestate->state()['args'];
+    if (!$args['skippable'])
+      throw new BgaUserException(_("You can't skip this action"));
+
+    // TODO might need to call power to know which is the next state (for move post build for instance)
+    $this->gamestate->nextState('skip');
+  }
+
+
   //////////////////////////////////////////////////
   ////////////   Game state arguments   ////////////
   //////////////////////////////////////////////////
-  // Here, you can create methods defined as "game state arguments" (see "args" property in states.inc.php).
-  // These methods function is to return some additional information that is specific to the current game state.
-  //////////////////////////////////////////////////
 
   /*
-   * argDividePowers: TODO
+   * argDividePowers: in the fair division setup, list the possible powers depending on game option
    */
   public function argDividePowers()
   {
@@ -333,7 +315,7 @@ class santorini extends Table
   }
 
   /*
-   * argChoosePower: TODO
+   * argChoosePower: in the fair division setup, list the remeaing powers for a player to choose
    */
   public function argChoosePower()
   {
@@ -365,7 +347,7 @@ class santorini extends Table
     // Return for each worker of this player the spaces he can move to
     $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
     foreach ($workers as &$worker)
-      $worker["accessibleSpaces"] = $this->board->getNeighbouringSpaces($worker, 'moving');
+      $worker["works"] = $this->board->getNeighbouringSpaces($worker, 'move');
 
     $arg = [
       'skippable' => false,
@@ -383,10 +365,11 @@ class santorini extends Table
    */
   public function argPlayerBuild()
   {
-    // Return available spaces neighbouring the moved player
+    // Return available spaces neighbouring the moved worker
     $move = $this->log->getLastMove();
     $worker = $this->board->getPiece($move['pieceId']);
-    $worker['accessibleSpaces'] = $this->board->getNeighbouringSpaces($worker, 'build');
+    $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
+
     $arg = [
       'skippable' => false,
       'verb'    => clienttranslate('must'),

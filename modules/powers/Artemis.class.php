@@ -49,7 +49,7 @@ class Artemis extends Power
     // TODO : handle the case where $arg[workers] is empty ?
 
     foreach($arg['workers'] as &$worker){
-      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($move){
+      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($move){
         return !$this->game->board->isSameSpace($space, $move['from']);
       }));
     }

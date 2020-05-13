@@ -67,7 +67,7 @@ class SantoriniBoard extends APP_GameClass
    * getBoard:
    *   return a 3d matrix reprensenting the board with all the placed pieces
    */
-  public static function getBoard()
+  public function getBoard()
   {
     // Create an empty 5*5*4 board
     $board = [];
@@ -78,7 +78,7 @@ class SantoriniBoard extends APP_GameClass
     }
 
     // Add all placed pieces
-    $pieces = self::getPlacedPieces();
+    $pieces = $this->getPlacedPieces();
     for ($i = 0; $i < count($pieces); $i++) {
       $p = $pieces[$i];
       $board[$p['x']][$p['y']][$p['z']] = $p;
@@ -92,35 +92,43 @@ class SantoriniBoard extends APP_GameClass
    * getAccessibleSpaces:
    *   return the list of all accessible spaces for either placing a worker, moving or building
    */
-  public static function getAccessibleSpaces()
+  public function getAccessibleSpaces($action = null)
   {
-    $board = self::getBoard();
+    $board = $this->getBoard();
 
     $accessible = [];
     for ($x = 0; $x < 5; $x++)
-      for ($y = 0; $y < 5; $y++) {
-        $z = 0;
-        $blocked = false; // If we see a worker or a dome, the space is not accessible
-        // Find next free space above ground
-        for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
-          $p = $board[$x][$y][$z];
-          $blocked = ($p['type'] == 'worker' || $p['type'] == 'lvl3');
-        }
-
-        if (!$blocked && $z < 4)
-          $accessible[] = [
-            'x' => $x,
-            'y' => $y,
-            'z' => $z,
-          ];
+    for ($y = 0; $y < 5; $y++) {
+      $z = 0;
+      $blocked = false; // If we see a worker or a dome, the space is not accessible
+      // Find next free space above ground
+      for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
+        $p = $board[$x][$y][$z];
+        $blocked = ($p['type'] == 'worker' || $p['type'] == 'lvl3');
       }
+
+      if ($blocked || $z > 3)
+        continue;
+
+      // Add the space to accessible
+      $space = [
+        'x' => $x,
+        'y' => $y,
+        'z' => $z,
+        'arg' => null,
+      ];
+      if($action == "build")
+        $space['arg'] = [$z];
+
+      $accessible[] = $space;
+    }
 
     return $accessible;
   }
 
 
   /*
-   * isSameSpace : check distance between two spaces to move/build
+   * isSameSpace :
    *   TODO
    */
   public static function isSameSpace($a, $b)
@@ -132,7 +140,7 @@ class SantoriniBoard extends APP_GameClass
    * checkDistances : check distance between two spaces to move/build
    *   TODO
    */
-  public static function isNeighbour($a, $b, $action)
+  public function isNeighbour($a, $b, $action)
   {
     $ok = true;
 
@@ -141,7 +149,7 @@ class SantoriniBoard extends APP_GameClass
     $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
 
     // For moving, the new height can't be more than +1
-    if ($action == 'moving')
+    if ($action == 'move')
       $ok = $ok && $b['z'] <= $a['z'] + 1;
 
     return $ok;
@@ -157,11 +165,9 @@ class SantoriniBoard extends APP_GameClass
   public function getNeighbouringSpaces($piece, $action)
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
-    $neighbouring = array_filter(self::getAccessibleSpaces(), function ($space) use ($piece, $action) {
-      return self::isNeighbour($piece, $space, $action);
-    });
-
-    return array_values($neighbouring);
+    return array_values(array_filter($this->getAccessibleSpaces($action), function ($space) use ($piece, $action) {
+      return $this->isNeighbour($piece, $space, $action);
+    }));
   }
 
 }

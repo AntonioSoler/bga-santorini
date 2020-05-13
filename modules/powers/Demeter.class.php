@@ -48,7 +48,7 @@ class Demeter extends Power
     }));
 
     foreach($arg['workers'] as &$worker){
-      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($build){
+      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($build){
         return !$this->game->board->isSameSpace($space, $build['to']);
       }));
     }

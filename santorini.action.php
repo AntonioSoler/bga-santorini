@@ -77,38 +77,25 @@ class action_santorini extends APP_GameAction
   /*
    * TODO
    */
-  public function moveWorker()
+  public function work()
   {
     self::setAjaxMode();
+    $workerId = (int) self::getArg('workerId', AT_posint, true);
     $x = (int) self::getArg('x', AT_int, true);
     $y = (int) self::getArg('y', AT_int, true);
     $z = (int) self::getArg('z', AT_posint, true);
-    $workerId = (int) self::getArg('workerId', AT_posint, true);
-    $this->game->moveWorker($workerId, $x, $y, $z);
+    $arg = self::getArg('arg', AT_int, false, null);
+    $this->game->work($workerId, $x, $y, $z, $arg);
     self::ajaxResponse();
   }
 
   /*
    * TODO
    */
-  public function skipMove()
+  public function skipWork()
   {
     self::setAjaxMode();
-    $this->game->skipMove();
-    self::ajaxResponse();
-  }
-
-  /*
-   * TODO
-   */
-  public function build()
-  {
-    self::setAjaxMode();
-    $x = (int) self::getArg('x', AT_int, true);
-    $y = (int) self::getArg('y', AT_int, true);
-    $z = (int) self::getArg('z', AT_posint, true);
-    $workerId = (int) self::getArg('workerId', AT_posint, true);
-    $this->game->build($workerId,$x, $y, $z);
+    $this->game->skipWork();
     self::ajaxResponse();
   }
 }
