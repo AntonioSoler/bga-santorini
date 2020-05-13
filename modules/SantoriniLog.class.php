@@ -32,8 +32,7 @@ class SantoriniLog extends APP_GameClass
   {
     $pId = ($pId == -1)? $this->game->getActivePlayerId() : $pId;
     $limitClause = ($limit == -1)? '' : "LIMIT $limit";
-    $round = $this->game->getGameStateValue("currentRound");
-    $rawMoves = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = 'move' AND `player_id` = '$pId' AND `round` = $round ORDER BY log_id DESC ".$limitClause);
+    $rawMoves = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = 'move' AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = '$pId' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC ".$limitClause);
 
     $moves = array_map(function($move){
       $args = json_decode($move['action_arg'], true);

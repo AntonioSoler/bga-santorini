@@ -23,7 +23,7 @@ class PowerManager extends APP_GameClass
     }
 
     // Gather information about number of players
-    $nPlayers = $this->game->getPlayerCount();
+    $nPlayers = $this->game->playerManager->getPlayerCount();
 
     // Filter powers depending on the number of players and game option
     return array_filter($this->game->powers, function ($power, $id) use ($nPlayers, $optionPowers) {

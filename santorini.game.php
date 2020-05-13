@@ -414,7 +414,7 @@ class santorini extends Table
   public function stPowersSetup()
   {
     // Create 2 workers for the first player of each team
-    $players = self::getPlayers();
+    $players = $this->playerManager->getPlayers();
     $nPlayers = count($players);
     foreach ($players as $player) {
       if ($nPlayers == 3 || $player->getNo() <= 2) {
