@@ -162,7 +162,7 @@ TODO: update
             // Draw a specific card
             $this->game->cards->moveCard($powerId, 'hand', $this->id);
         }
-        $power = Power::getPower($this->game, $powerId);
+        $power = $this->game->powerManager->getPower($powerId, $this->id);
         $this->powers[] = $power;
 
         // Send notification
