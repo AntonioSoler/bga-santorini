@@ -28,7 +28,7 @@ require_once("modules/PowerManager.class.php");
 require_once("modules/powers/Power.class.php");
 require_once("modules/powers/HeroPower.class.php");
 
-foreach (Power::$powersClasses as $id => $className) {
+foreach (PowerManager::$powersClasses as $id => $className) {
   require_once("modules/powers/$className.class.php");
 
   $this->powers[$className::getId()] = [

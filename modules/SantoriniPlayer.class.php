@@ -76,7 +76,7 @@ TODO: update
         // Load powers
         $cards = $this->game->cards->getCardsInLocation('hand', $this->id);
         foreach ($cards as $powerId => $card) {
-            $this->powers[] = Power::getPower($this->game, $powerId);
+            $this->powers[] = $this->game->powerManager->getPower($powerId, $this->id);
         }
     }
 

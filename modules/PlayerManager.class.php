@@ -96,4 +96,15 @@ class PlayerManager extends APP_GameClass
     return $this->getPlayers($this->getOpponentsIds($pId));
   }
 
+
+  /*
+   * isPlayingBefore : TODO
+   */
+  public function isPlayingBefore($pId1, $pId2 = null)
+  {
+    $pId2 = $pId2 ?: $this->game->getActivePlayerId();
+    $players = self::getObjectListFromDb("SELECT player_id id, player_no no FROM player WHERE player_id IN ($pId1, $pId2) ORDER BY no");
+    return $players[0]['id'] == $pId1;
+  }
+
 }

@@ -28,11 +28,14 @@ class SantoriniLog extends APP_GameClass
   }
 
 
-  public function getLastMoves($limit = -1, $pId = -1)
+  public function getLastMoves($pId = null, $limit = -1)
   {
-    $pId = ($pId == -1)? $this->game->getActivePlayerId() : $pId;
+    $pId = $pId ?: $this->game->getActivePlayerId();
     $limitClause = ($limit == -1)? '' : "LIMIT $limit";
-    $rawMoves = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = 'move' AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = '$pId' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC ".$limitClause);
+    $round = $this->game->getGameStateValue("currentRound");
+    if(!$this->game->playerManager->isPlayingBefore($pId))
+      $round -= 1;
+    $rawMoves = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = 'move' AND `player_id` = '$pId' AND `round` = $round ORDER BY log_id DESC ".$limitClause);
 
     $moves = array_map(function($move){
       $args = json_decode($move['action_arg'], true);
@@ -47,9 +50,9 @@ class SantoriniLog extends APP_GameClass
   }
 
 
-  public function getLastMove($pId = -1)
+  public function getLastMove($pId = null)
   {
-    $moves = $this->getLastMoves(1, $pId);
+    $moves = $this->getLastMoves($pId, 1);
     if(count($moves) == 1)
       return $moves[0];
     else

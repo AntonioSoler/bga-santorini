@@ -29,10 +29,28 @@ class Athena extends Power
   }
 
   public static function isGoldenFleece() {
-    return false; 
+    return false;
   }
 
   /* * */
 
+  public function hasMovedUp()
+  {
+    $moves = $this->game->log->getLastMoves($this->playerId);
+    return array_reduce($moves, function($movedUp, $move){
+      return $movedUp || $move['to']['z'] > $move['from']['z'];
+    }, false);
+  }
+
+  public function argOpponentMove(&$arg)
+  {
+    if(!$this->hasMovedUp())
+      return;
+
+
+    foreach($arg["workers"] as &$worker)
+      $worker['accessibleSpaces'] = array_values(array_filter($worker['accessibleSpaces'], function($space) use ($worker){
+        return $space['z'] <= $worker['z'];
+      }));
+  }
 }
-  
