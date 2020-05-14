@@ -5,6 +5,10 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 	<style type="text/css">
+div#page-content {
+	width:80%;
+}
+
 div.power-card {
 	width: 232px;
   height: 350px;
@@ -26,11 +30,14 @@ float:right;
 </style>
 	</head>
 	<body>
+<div id="page-content">
     <div id="container"></div>
     <div id="sliderX"></div>
     <div id="sliderY"></div>
     <div id="log"></div>
+</div>
 <script type="module">
+import * as THREE  from '../scripts/three.js';
 import { Board } from '../scripts/board.js';
 
 

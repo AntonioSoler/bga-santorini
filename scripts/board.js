@@ -455,6 +455,5 @@ Board.prototype.makeClickable = function(objects, callback, action){
 	})
 };
 
-
 window.Board = Board;
 export { Board };

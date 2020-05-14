@@ -65,7 +65,6 @@ getPowerDetail : function(power) {
 	power.textList = power.text.join('</li><li>');
 	return this.format_block('jstpl_powerDetail', power);
 },
-
 ///////////////////////////////////////
 ////////  Game & client states ////////
 ///////////////////////////////////////
@@ -366,15 +365,36 @@ onClickCancelSelect: function(evt) {
  * 	triggered after a click on a space to either move/build/...
  */
 onClickSpace: function(space) {
+	if(space.arg == null)
+		return this.onClickSpaceArg(space, null);
+
+	if(space.arg.length == 1)
+		return this.onClickSpaceArg(space, space.arg[0]);
+
+	return this.dialogChooseArg(space);
+},
+
+
+dialogChooseArg: function(space){
+	var dial = new ebg.popindialog();
+	dial.create( 'chooseArg' );
+	dial.setTitle( _("Choose the building block") ); // TODO : might be other choices ?
+
+	space.arg.forEach(arg => {
+		var div = dojo.place(this.format_block('jstpl_argPrompt', { arg : arg }) , $('popin_chooseArg_contents'));
+		dojo.connect(div, 'onclick', e => {
+			dial.destroy();
+			this.onClickSpaceArg(space, arg)
+		});
+	});
+	dial.show();
+},
+
+
+
+onClickSpaceArg: function(space, arg) {
 	if( !this.checkAction( this._action ) )
 		return;
-
-	var arg = null;
-	if(space.arg){
-		if(space.arg.length == 1)
-			arg = space.arg[0];
-		// TODO : handle when space arg.length > 0
-	}
 
 	this.ajaxcall( "/santorini/santorini/work.html", {
 		workerId: this._selectedWorker.id,
@@ -385,6 +405,8 @@ onClickSpace: function(space) {
 	}, this, res => {} );
 	this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null
 },
+
+
 
 /*
  * onClickSkip:

@@ -29,10 +29,17 @@ class Atlas extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  public function argPlayerBuild(&$arg)
+  {
+    foreach($arg["workers"] as &$worker)
+    foreach($worker["works"] as &$work){
+      if(!in_array(3, $work['arg']))
+        $work['arg'][] = 3;
+    }
+  }
 
 }
-  

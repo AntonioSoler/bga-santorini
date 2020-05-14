@@ -23,6 +23,58 @@ html {
   background-color:#76cfe9;
 }
 
+div#popin_chooseArg {
+  background-image:url('img/dialog.png');
+  background-size:contain;
+  background-position:center;
+  background-repeat: no-repeat;
+  background-color:transparent;
+  border:none;
+  box-shadow:none;
+  width:550px;
+  height:400px;
+}
+
+div#popin_chooseArg h2 {
+  color: white;
+  margin-top: 40px;
+  text-align: center;
+  width: 100%;
+}
+
+
+div#popin_chooseArg_contents {
+  width: 77%;
+  margin: 85px auto;
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+
+div#popin_chooseArg_contents div.arg-prompt {
+  width:150px;
+  height:150px;
+  margin:15px;
+  background-size:contain;
+  background-position:center;
+  background-repeat: no-repeat;
+  cursor:pointer;
+}
+div#popin_chooseArg_contents div.arg-prompt.arg-0 {   background-image:url('img/lvl0.svg'); }
+div#popin_chooseArg_contents div.arg-prompt.arg-1 {   background-image:url('img/lvl1.svg'); }
+div#popin_chooseArg_contents div.arg-prompt.arg-2 {   background-image:url('img/lvl2.svg'); }
+div#popin_chooseArg_contents div.arg-prompt.arg-3 {   background-image:url('img/lvl3.svg'); }
+
+
+#popin_chooseArg_close {
+  top: 25px;
+  right: -14px;
+}
+
+
+
 /* Player boards */
 .power-container {
     text-align: center;

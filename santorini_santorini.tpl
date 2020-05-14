@@ -57,6 +57,9 @@ var jstpl_tokenPrompt = `<table class="token-prompt">
 	</tr>
 </table>`;
 
+
+var jstpl_argPrompt = `<div class="arg-prompt arg-\${arg}"></div>`;
+
 </script>
 
 {OVERALL_GAME_FOOTER}
