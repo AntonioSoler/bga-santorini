@@ -29,10 +29,35 @@ class Hephaestus extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  /* * */
+  public function argPlayerBuild(&$arg)
+  {
+    $build = $this->game->log->getLastBuild();
+    // No build before => usual rule
+    if($build == null)
+      return;
+
+    // Otherwise, let the player do a second build (not mandatory)
+    $arg['skippable'] = true;
+    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($build){
+      return $worker['id'] == $build['pieceId'];
+    }));
+
+    foreach($arg['workers'] as &$worker){
+      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($build){
+        return $this->game->board->isSameSpace($space, $build['to']) && $space['z'] != 3;
+      }));
+    }
+  }
+
+
+  public function stateAfterBuild()
+  {
+    return count($this->game->log->getLastBuilds()) == 1? 'buildAgain' : null;
+  }
 
 }
-  
