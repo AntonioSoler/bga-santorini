@@ -26,5 +26,6 @@ abstract class Power extends APP_GameClass {
     public function build() {}
 
     public function endTurn() {}
-    public function winCondition() {}
+    public function checkPlayerWinning(&$arg) {}
+    public function checkOpponentWinning(&$arg) {}
 }

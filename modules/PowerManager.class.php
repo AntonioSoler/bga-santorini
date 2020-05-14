@@ -242,4 +242,21 @@ class PowerManager extends APP_GameClass
   {
     return $this->stateAfterWork('Build');
   }
+
+
+  public function checkWinning(&$arg)
+  {
+    // First apply current user power(s)
+    $pId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($pId);
+    foreach($player->getPowers() as $power)
+      $power->checkPlayerWinning($arg);
+
+    // Then apply oponnents power(s)
+    foreach($this->game->playerManager->getOpponents($pId) as $opponent)
+    foreach($opponent->getPowers() as $power)
+      $power->checkOpponentWinning($arg);
+  }
+
+
 }

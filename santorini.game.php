@@ -534,6 +534,26 @@ class santorini extends Table
   // (important for some gods that can push players or swap places, ...)
   public function stCheckEndOfGame()
   {
+    $arg = [
+      'win' => false,
+      'msg' => clienttranslate('A worker reached the top level of a building.'),
+      'pId' => self::getActivePlayerId(),
+    ];
+
+    // Basic rule
+    $move = $this->log->getLastMove();
+    if($move != null){
+      $arg['win'] = $move['from']['z'] < $move['to']['z'] && $move['to']['z'] == 3;
+    }
+
+    // Apply powers
+    $this->powerManager->checkWinning($arg);
+
+    if($arg['win']){
+      self::notifyAllPlayers('message', $arg['msg'], []);
+      self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $arg['pId'] );
+      $this->gamestate->nextState('endgame');
+    }
     /*
 $player_id = self::getActivePlayerId();
 $state=$this->gamestate->state();
@@ -542,10 +562,8 @@ $state=$this->gamestate->state();
 $positions =  self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id, card_type , card_location_arg FROM board JOIN piece on piece_id=piece.card_id WHERE piece_id is not null AND card_type like "worker%" and z=3');
 if ( sizeof( $positions ) > 0 ) {
 foreach( $positions as $space_id => $space ) {
-self::notifyAllPlayers('message', clienttranslate('A worker reached the top level of a building.'), array());
+self::notifyAllPlayers('message', , array());
 //var_dump( $space );
-self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $space['card_location_arg'] );
-$this->gamestate->nextState('endgame');
 
 }
 }

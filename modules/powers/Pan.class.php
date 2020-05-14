@@ -29,10 +29,20 @@ class Pan extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  public function checkPlayerWinning(&$arg) {
+    if($arg['win'])
+      return;
+
+    $move = $this->game->log->getLastMove();
+    if($move == null || $move['to']['z'] > $move['from']['z'] - 2)
+      return;
+
+    $arg['win'] = true;
+    $arg['msg'] = clienttranslate('Pan won by moving down.');
+  }
 
 }
-  
