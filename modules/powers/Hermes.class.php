@@ -54,8 +54,8 @@ class Hermes extends Power
 
     // Otherwise, let the player do a second move but on same height
     foreach($arg['workers'] as &$worker){
-      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($move){
-        return $space['z'] == $move['from']['z'];
+      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($worker){
+        return $space['z'] == $worker['z'];
       }));
     }
   }
