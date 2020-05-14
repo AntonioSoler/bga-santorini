@@ -11,28 +11,6 @@ class SantoriniPlayer extends APP_GameClass
     }
 
     /*
-TODO: update
-     * getTeammates: return all players in the same team as $pId player
-     *
-    public function getTeammates($pId)
-    {
-      return self::getObjectListFromDb("SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player
-      WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
-    }
-
-    *
-     * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
-     *
-    public function getTeammatesIds($pId)
-    {
-      return array_map(function ($player) {
-        return $player['id'];
-      }, self::getTeammates($pId));
-    }
-*/
-
-
-    /*
      * getPlayers : Returns array of SantoriniPlayer objects for all/specified player IDs
      */
     public static function getPlayers($game, $ids = null)

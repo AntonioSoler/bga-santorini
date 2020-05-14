@@ -1,17 +1,18 @@
 <?php
 
-// TODO : description
+/*
+ * SantoriniBoard: all utility functions concerning space on the board are here
+ */
 class SantoriniBoard extends APP_GameClass
 {
   public $game;
-
   public function __construct($game)
   {
     $this->game = $game;
   }
 
   /*
-   * TODO
+   * getCoords: return an array with only 'x', 'y', 'z' keys parsed as int
    */
   public static function getCoords($mixed)
   {
@@ -48,7 +49,7 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
-   * getPlacedWorkers: return all placed workers
+   * getPlacedWorkers: return all placed wor!kers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
   public function getPlacedWorkers($pId = -1)
@@ -128,8 +129,7 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
-   * isSameSpace :
-   *   TODO
+   * isSameSpace: check if two spaces are the same, upto z-translation
    */
   public static function isSameSpace($a, $b)
   {
@@ -137,8 +137,7 @@ class SantoriniBoard extends APP_GameClass
   }
 
   /*
-   * checkDistances : check distance between two spaces to move/build
-   *   TODO
+   * isNeighbour : check distance between two spaces to move/build
    */
   public function isNeighbour($a, $b, $action)
   {

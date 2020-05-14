@@ -2,14 +2,37 @@
 
 require_once('SantoriniPlayer.class.php');
 
+/*
+ * PlayerManager : allows to easily access players, teams, opponents, ...
+ *  a player is an instance of SantoriniPlayer class
+ */
 class PlayerManager extends APP_GameClass
 {
   public $game;
-
   public function __construct($game)
   {
     $this->game = $game;
   }
+
+  /*
+   * getPlayerCount: return the number of players
+   */
+  public function getPlayerCount()
+  {
+    return self::getUniqueValueFromDB("SELECT COUNT(*) FROM player");
+  }
+
+
+  /*
+   * getUiData : get all ui data of all players : id, no, name, team, color, powers list
+   */
+  public function getUiData()
+  {
+    return array_map(function ($player) {
+        return $player->getUiData();
+    }, $this->getPlayers());
+  }
+
 
   /*
    * getPlayers : Returns array of SantoriniPlayer objects for all/specified player IDs
@@ -32,29 +55,15 @@ class PlayerManager extends APP_GameClass
   }
 
 
-  /* Returns the SantoriniPlayer object for the given player ID */
+  /*
+   * getPlayer : returns the SantoriniPlayer object for the given player ID
+   */
   public function getPlayer($id)
   {
       $players = $this->getPlayers([$id]);
       return $players[0];
   }
 
-
-  public function getUiData()
-  {
-    return array_map(function ($player) {
-        return $player->getUiData();
-    }, $this->getPlayers());
-  }
-
-
-  /*
-   * getPlayerCount: return the number of players
-   */
-  public function getPlayerCount()
-  {
-    return self::getUniqueValueFromDB("SELECT COUNT(*) FROM player");
-  }
 
 
   /*
@@ -98,7 +107,8 @@ class PlayerManager extends APP_GameClass
 
 
   /*
-   * isPlayingBefore : TODO
+   * isPlayingBefore : check if a player $pId1 is playing before player $pId2
+   *    useful to have consistant round number when fetching lastMoves of a player (in Log class)
    */
   public function isPlayingBefore($pId1, $pId2 = null)
   {

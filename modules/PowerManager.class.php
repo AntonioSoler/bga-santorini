@@ -1,16 +1,19 @@
 <?php
 
-// TODO : description
+/*
+ * PowerManager : allow to easily create and apply powers during play
+ */
 class PowerManager extends APP_GameClass
 {
   public $game;
-
   public function __construct($game)
   {
     $this->game = $game;
   }
 
-  /* Factory function to create a power by ID */
+  /*
+   * getPower: factory function to create a power by ID
+   */
   public function getPower($powerId, $playerId = null) {
     if(!isset(self::$powersClasses[$powerId])) {
       throw new BgaVisibleSystemException( "Power $powerId is not implemented" );
@@ -18,6 +21,10 @@ class PowerManager extends APP_GameClass
     return new self::$powersClasses[$powerId]($this->game, $playerId);
   }
 
+  /*
+   * powerClasses : for each power Id, the corresponding class name
+   *  (see also constant.inc.php)
+   */
   public static $powersClasses = [
     APOLLO => 'Apollo',
     ARTEMIS => 'Artemis',
@@ -77,9 +84,7 @@ class PowerManager extends APP_GameClass
   ];
 
   /*
-   * Get possible powers:
-   *   TODO
-   * params: TODO
+   * Get playable powers: given the game option, return the list of playable power for this game
    */
   public function getPlayablePowers()
   {
@@ -118,7 +123,9 @@ class PowerManager extends APP_GameClass
 
 
   /*
-   * dividePowers: TODO
+   * dividePowers: is called after the contestant has choosed the list of powers
+   *    that will be used during this game. We put these power into the stack in
+   *    order to make them available for choosePower action.
    */
   public function dividePowers($ids)
   {
@@ -137,7 +144,7 @@ class PowerManager extends APP_GameClass
 
 
   /*
-   * choosePower: TODO
+   * choosePower: is called after a player has choosed a power from the stack.
    */
   public function choosePower($id, $pId = null)
   {
@@ -146,18 +153,17 @@ class PowerManager extends APP_GameClass
   }
 
 
-/*
-  public function setup($player) {}
+///////////////////////////////////////
+///////////////////////////////////////
+/////////    Work argument   //////////
+///////////////////////////////////////
+///////////////////////////////////////
 
-  public function beforeMove() {}
-
-  public function beforeBuild() {}
-  public function argBuild() {}
-  public function build() {}
-  public function endTurn() {}
-  public function winCondition() {}
-*/
-
+  /*
+   * argPlayerWork: is called whenever a player is going to do some work (move/build)
+   *    apply every player powers that may add new works or make the work skippable
+   *    and then apply every opponent powers that may restrict the possible works
+   */
   public function argPlayerWork(&$arg, $action)
   {
     // First apply current user power(s)
@@ -175,12 +181,17 @@ class PowerManager extends APP_GameClass
   }
 
 
-
+  /*
+   * argPlayerMove: is called whenever a player is going to do some move
+   */
   public function argPlayerMove(&$arg)
   {
     $this->argPlayerWork($arg, 'Move');
   }
 
+  /*
+   * argPlayerBuild: is called whenever a player is going to do some build
+   */
   public function argPlayerBuild(&$arg)
   {
     $this->argPlayerWork($arg, 'Build');
@@ -188,6 +199,18 @@ class PowerManager extends APP_GameClass
 
 
 
+/////////////////////////////////////
+/////////////////////////////////////
+/////////    Work action   //////////
+/////////////////////////////////////
+/////////////////////////////////////
+
+  /*
+   * argPlayerWork: is called whenever a player try to do some work (move/build).
+   *    This is called after checking that the work is valid using argPlayerWork.
+   *    This should return true if we want to bypass the usual work function:
+   *      eg, Appolo can 'switch' instead of 'move'
+   */
   public function playerWork($worker, $work, $action)
   {
     // First apply current user power(s)
@@ -203,11 +226,18 @@ class PowerManager extends APP_GameClass
   }
 
 
+  /*
+   * playerMove: is called whenever a player is moving
+   */
   public function playerMove($worker, $work)
   {
     return $this->playerWork($worker, $work, 'Move');
   }
 
+
+  /*
+   * playerBuild: is called whenever a player is building
+   */
   public function playerBuild($worker, $work)
   {
     return $this->playerWork($worker, $work, 'Build');
@@ -215,6 +245,17 @@ class PowerManager extends APP_GameClass
 
 
 
+/////////////////////////////////////
+/////////////////////////////////////
+////////   AfterWork state   ////////
+/////////////////////////////////////
+/////////////////////////////////////
+
+  /*
+   * stateAfterWork: is called whenever a player has done some work (in a regular way).
+   *    This should return null if we want to continue as usual,
+   *      or a valid transition name if we want something special.
+   */
   public function stateAfterWork($action)
   {
     $name = "stateAfter".$action;
@@ -232,18 +273,41 @@ class PowerManager extends APP_GameClass
       return null;
   }
 
-
+  /*
+   * stateAfterMove: is called after a regular move
+   */
   public function stateAfterMove()
   {
     return $this->stateAfterWork('Move');
   }
 
+  /*
+   * stateAfterBuild: is called after a regular build
+   */
   public function stateAfterBuild()
   {
     return $this->stateAfterWork('Build');
   }
 
 
+
+/////////////////////////////////////
+/////////////////////////////////////
+///////////    Winning    ///////////
+/////////////////////////////////////
+/////////////////////////////////////
+
+  /*
+   * checkWinning: is called after each work.
+   *    $arg contains info about whether some player is winning,
+   *      and what should the message be in case of win
+   *    We first apply current player power that may make it win
+   *      with some additionnal winning condition (eg Pan).
+   *   Then we apply opponents powers that may do two think:
+   *     - restrict a win : eg Aphrodite or Pegasus
+   *     - steal a win : eg Moerae
+   *     - make an opponent win : eg Chronus
+   */
   public function checkWinning(&$arg)
   {
     // First apply current user power(s)
@@ -257,6 +321,4 @@ class PowerManager extends APP_GameClass
     foreach($opponent->getPowers() as $power)
       $power->checkOpponentWinning($arg);
   }
-
-
 }

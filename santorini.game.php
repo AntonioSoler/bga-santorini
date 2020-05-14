@@ -24,13 +24,12 @@ class santorini extends Table
 {
   public function __construct()
   {
+    parent::__construct();
+
     // Your global variables labels:
     //  Here, you can assign labels to global variables you are using for this game.
     //  You can use any number of global variables with IDs between 10 and 99.
     //  If your game has options (variants), you also have to associate here a label to  the corresponding ID in gameoptions.inc.php.
-    // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
-    parent::__construct();
-
     self::initGameStateLabels([
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
@@ -42,7 +41,7 @@ class santorini extends Table
     $this->cards = self::getNew('module.common.deck');
     $this->cards->init('card');
 
-    // Initialize logger, board and power manager
+    // Initialize logger, board, power manager and player manager
     $this->log   = new SantoriniLog($this);
     $this->board = new SantoriniBoard($this);
     $this->powerManager = new PowerManager($this);
@@ -59,7 +58,7 @@ class santorini extends Table
    *  This method is called only once, when a new game is launched.
    * params:
    *  - array $players
-   *  - mixed $players :
+   *  - mixed $options
    */
   protected function setupNewGame($players, $options = array())
   {
@@ -114,23 +113,127 @@ class santorini extends Table
    */
   public function getGameProgression()
   {
-    // TODO
-    return 0.3;
+    return count($this->board->getPlacedPieces()) / 100;
   }
 
 
-  ///////////////////////////////////////
-  //////////   Player actions   /////////
-  ///////////////////////////////////////
+
+/////////////////////////////////////
+/////////////////////////////////////
+//////////    Poers setup   /////////
+/////////////////////////////////////
+/////////////////////////////////////
 
   /*
-   * dividePowers: is called in the fair division setup, after the contestant chose the set of powers
+   * stPowersSetup:
+   *   called right after the board setup, should give a god/hero to each player
+   *   unless faire division process (see next block)
+   */
+  public function stPowersSetup()
+  {
+    // Create 2 workers for the first player of each team
+    $players = $this->playerManager->getPlayers();
+    $nPlayers = count($players);
+    foreach ($players as $player) {
+      if ($nPlayers == 3 || $player->getNo() <= 2) {
+        $player->addWorker('f');
+        $player->addWorker('m');
+      }
+    }
+
+    // Stop here if not playing with powers
+    $optionPowers = intval(self::getGameStateValue('optionPowers'));
+    if ($optionPowers == NONE) {
+      $this->gamestate->nextState('done');
+      return;
+    }
+
+    // Make a deck of possible powers
+    $possiblePowers = $this->powerManager->getPlayablePowers();
+    $this->cards->moveCards(array_keys($possiblePowers), 'deck');
+    $this->cards->shuffle('deck');
+
+    // Go to fair division if ggame option is selected
+    $optionSetup = intval(self::getGameStateValue('optionSetup'));
+    if ($optionSetup == FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
+      $this->gamestate->nextState('divide');
+      return;
+    }
+
+    // Assign powers randomly
+    foreach ($players as $player) {
+      // Give the player a random power and invoke power-specific setup
+      $power = $player->addPower();
+      $power->setup($player);
+
+      // Remove banned powers
+      $this->cards->moveCards($power->getBannedIds(), 'box');
+    }
+
+    $this->gamestate->nextState('done');
+  }
+
+
+///////////////////////////////////////
+//////////    Fair division   /////////
+///////////////////////////////////////
+// As stated in the rulebook, the fair division process goes as follows :
+//  - the contestant pick n powers
+//  - each player choose one power (contestant is last to choose)
+//  - contestant choose the first player to place its worker TODO
+//////////////////////////////////////
+
+  /*
+   * argDividePowers: in the fair division setup, list the possible powers depending on game option
+   */
+  public function argDividePowers()
+  {
+    return [
+      'count' => self::getPlayerCount(),
+      'powers' => $this->powerManager->getPowersInLocation('deck')
+    ];
+  }
+
+  /*
+   * dividePowers: is called in the fair division process, after the contestant chose the set of powers
    */
   public function dividePowers($ids)
   {
     self::checkAction('dividePowers');
     $this->powerManager->dividePowers($ids);
     $this->gamestate->nextState('done');
+  }
+
+
+  /*
+   * stPowersNextPlayerChoose: is called in the fair division process
+   *  - if all player except one already have a power, automatically assign the last one and go on
+   *  - otherwise, go to next player and ask him to choose a power
+   */
+  public function stPowersNextPlayerChoose()
+  {
+    $pId = $this->activeNextPlayer();
+
+    $remainingPowers = $this->cards->getCardsInLocation('stack');
+    if(count($remainingPowers) > 1)
+      $this->gamestate->nextState('next');
+    else {
+      // If only one power left, automatically assign it to the last player
+      if(count($remainingPowers) == 1)
+        $this->powerManager->choosePower(reset($remainingPowers)['id'], $pId);
+
+      $this->gamestate->nextState('done');
+    }
+  }
+
+  /*
+   * argChoosePower: in the fair division setup, list the remeaing powers for a player to choose
+   */
+  public function argChoosePower()
+  {
+    return [
+      'powers' => $this->powerManager->getPowersInLocation('stack')
+    ];
   }
 
   /*
@@ -143,6 +246,52 @@ class santorini extends Table
     $this->gamestate->nextState('done');
   }
 
+
+
+
+///////////////////////////////////////
+///////////////////////////////////////
+////////    Worker placement   ////////
+///////////////////////////////////////
+///////////////////////////////////////
+
+  /*
+   * stNextPlayerPlaceWorker:
+   *   if the active player still has no more worker to place, go to next player
+   *   if every player is done with worker placement, start game
+   */
+  public function stNextPlayerPlaceWorker()
+  {
+    // Get all the remeaning workers of all players
+    $workers = $this->board->getAvailableWorkers();
+    if (count($workers) == 0) {
+      $this->gamestate->nextState('done');
+      return;
+    }
+
+    // Get unplaced workers for the active player
+    $pId = self::getActivePlayerId();
+    $workers = $this->board->getAvailableWorkers($pId);
+    if (count($workers) == 0)  // No more workers to place => move on to the other player
+      $pId = $this->activeNextPlayer();
+    self::giveExtraTime($pId);
+    $this->gamestate->nextState('next');
+  }
+
+
+  /*
+   * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
+   */
+  public function argPlaceWorker()
+  {
+    $pId = self::getActivePlayerId();
+    $workers = $this->board->getAvailableWorkers($pId);
+
+    return [
+      'worker' => $workers[0],
+      'accessibleSpaces' => $this->board->getAccessibleSpaces()
+    ];
+  }
 
   /*
    * placeWorker: place a new worker on the board
@@ -184,6 +333,94 @@ class santorini extends Table
   }
 
 
+
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+////////    Work : move / build  ////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+  /*
+   * argPlayerMove: give the list of accessible unnocupied spaces for each worker
+   */
+  public function argPlayerMove()
+  {
+    // Return for each worker of this player the spaces he can move to
+    $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
+    foreach ($workers as &$worker)
+      $worker["works"] = $this->board->getNeighbouringSpaces($worker, 'move');
+
+    $arg = [
+      'skippable' => false,
+      'workers' => $workers,
+    ];
+
+    $this->powerManager->argPlayerMove($arg);
+
+    $playerName = self::getActivePlayerName();
+    if($arg['skippable']){
+        $arg['description'] = clienttranslate("${playerName} may move a worker");
+        $arg['descriptionmyturn'] = clienttranslate('You may move a worker');
+    }
+    else {
+        $arg['description'] = clienttranslate("${playerName} must move a worker");
+        $arg['descriptionmyturn'] = clienttranslate('You must move a worker');
+    }
+
+    return $arg;
+  }
+
+
+  /*
+   * argPlayerBuild: give the list of accessible unnocupied spaces for builds
+   */
+  public function argPlayerBuild()
+  {
+    $arg = [
+      'skippable' => false,
+      'workers' => [],
+    ];
+
+    // Return available spaces neighbouring the moved worker
+    $move = $this->log->getLastMove();
+    if(!is_null($move)){
+      $worker = $this->board->getPiece($move['pieceId']);
+      $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
+      $arg['workers'][] = $worker;
+    }
+
+    // Apply power
+    $this->powerManager->argPlayerBuild($arg);
+
+    $playerName = self::getActivePlayerName();
+    if($arg['skippable']){
+        $arg['description'] = clienttranslate("${playerName} may build");
+        $arg['descriptionmyturn'] = clienttranslate('You may build');
+    }
+    else {
+        $arg['description'] = clienttranslate("${playerName} must build");
+        $arg['descriptionmyturn'] = clienttranslate('You must build');
+    }
+
+    return $arg;
+  }
+
+
+  /*
+   * skip: called when a player decide to skip a skippable work
+   */
+  public function skipWork()
+  {
+    self::checkAction('skip');
+
+    $args = $this->gamestate->state()['args'];
+    if (!$args['skippable'])
+      throw new BgaUserException(_("You can't skip this action"));
+
+    // TODO might need to call power to know which is the next state (for move post build for instance)
+    $this->gamestate->nextState('skip');
+  }
 
 
   /*
@@ -283,231 +520,12 @@ class santorini extends Table
   }
 
 
-  /*
-   * skip: called when a player decide to skip a skippable work
-   */
-  public function skipWork()
-  {
-    self::checkAction('skip');
-
-    $args = $this->gamestate->state()['args'];
-    if (!$args['skippable'])
-      throw new BgaUserException(_("You can't skip this action"));
-
-    // TODO might need to call power to know which is the next state (for move post build for instance)
-    $this->gamestate->nextState('skip');
-  }
-
-
-  //////////////////////////////////////////////////
-  ////////////   Game state arguments   ////////////
-  //////////////////////////////////////////////////
-
-  /*
-   * argDividePowers: in the fair division setup, list the possible powers depending on game option
-   */
-  public function argDividePowers()
-  {
-    return [
-      'count' => self::getPlayerCount(),
-      'powers' => $this->powerManager->getPowersInLocation('deck')
-    ];
-  }
-
-  /*
-   * argChoosePower: in the fair division setup, list the remeaing powers for a player to choose
-   */
-  public function argChoosePower()
-  {
-    return [
-      'powers' => $this->powerManager->getPowersInLocation('stack')
-    ];
-  }
-
-
-  /*
-   * argPlaceWorker: give the list of accessible unnocupied spaces and the id/type of worker we want to add
-   */
-  public function argPlaceWorker()
-  {
-    $pId = self::getActivePlayerId();
-    $workers = $this->board->getAvailableWorkers($pId);
-
-    return [
-      'worker' => $workers[0],
-      'accessibleSpaces' => $this->board->getAccessibleSpaces()
-    ];
-  }
-
-  /*
-   * argPlayerMove: give the list of accessible unnocupied spaces for each worker
-   */
-  public function argPlayerMove()
-  {
-    // Return for each worker of this player the spaces he can move to
-    $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
-    foreach ($workers as &$worker)
-      $worker["works"] = $this->board->getNeighbouringSpaces($worker, 'move');
-
-    $arg = [
-      'skippable' => false,
-      'workers' => $workers,
-    ];
-
-    $this->powerManager->argPlayerMove($arg);
-
-    $playerName = self::getActivePlayerName();
-    if($arg['skippable']){
-        $arg['description'] = clienttranslate("${playerName} may move a worker");
-        $arg['descriptionmyturn'] = clienttranslate('You may move a worker');
-    }
-    else {
-        $arg['description'] = clienttranslate("${playerName} must move a worker");
-        $arg['descriptionmyturn'] = clienttranslate('You must move a worker');
-    }
-
-    return $arg;
-  }
-
-
-  /*
-   * argPlayerBuild: give the list of accessible unnocupied spaces for the moved worker
-   */
-  public function argPlayerBuild()
-  {
-    $arg = [
-      'skippable' => false,
-      'workers' => [],
-    ];
-
-    // Return available spaces neighbouring the moved worker
-    $move = $this->log->getLastMove();
-    if(!is_null($move)){
-      $worker = $this->board->getPiece($move['pieceId']);
-      $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
-      $arg['workers'][] = $worker;
-    }
-
-    // Apply power
-    $this->powerManager->argPlayerBuild($arg);
-
-    $playerName = self::getActivePlayerName();
-    if($arg['skippable']){
-        $arg['description'] = clienttranslate("${playerName} may build");
-        $arg['descriptionmyturn'] = clienttranslate('You may build');
-    }
-    else {
-        $arg['description'] = clienttranslate("${playerName} must build");
-        $arg['descriptionmyturn'] = clienttranslate('You must build');
-    }
-
-    return $arg;
-  }
-
-
-
   ////////////////////////////////////////////////
   ////////////   Game state actions   ////////////
   ////////////////////////////////////////////////
   // Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
   // The action method of state X is called everytime the current game state is set to X.
   ////////////////////////////////////////////////
-
-  /*
-   * stPowersSetup:
-   *   called right after the board setup, should give a god/hero to each player unless basic mode
-   */
-  public function stPowersSetup()
-  {
-    // Create 2 workers for the first player of each team
-    $players = $this->playerManager->getPlayers();
-    $nPlayers = count($players);
-    foreach ($players as $player) {
-      if ($nPlayers == 3 || $player->getNo() <= 2) {
-        $player->addWorker('f');
-        $player->addWorker('m');
-      }
-    }
-
-    // Stop here if not playing with powers
-    $optionPowers = intval(self::getGameStateValue('optionPowers'));
-    if ($optionPowers == NONE) {
-      $this->gamestate->nextState('done');
-      return;
-    }
-
-    // Make a deck of possible powers
-    $possiblePowers = $this->powerManager->getPlayablePowers();
-    $this->cards->moveCards(array_keys($possiblePowers), 'deck');
-    $this->cards->shuffle('deck');
-
-    // Go to fair division
-    $optionSetup = intval(self::getGameStateValue('optionSetup'));
-    if ($optionSetup == FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
-      $this->gamestate->nextState('divide');
-      return;
-    }
-
-    // Assign powers randomly
-    foreach ($players as $player) {
-      // Give the player a random power
-      $power = $player->addPower();
-
-      // Remove banned powers
-      $this->cards->moveCards($power->getBannedIds(), 'box');
-
-      // Invoke power-specific setup
-      $power->setup($player);
-    }
-
-    $this->gamestate->nextState('done');
-  }
-
-
-  /*
-   * stPowersNextPlayerChoose: TODO
-   */
-  public function stPowersNextPlayerChoose()
-  {
-    $pId = $this->activeNextPlayer();
-
-    $remainingPowers = $this->cards->getCardsInLocation('stack');
-    if(count($remainingPowers) > 1)
-      $this->gamestate->nextState('next');
-    else {
-      // If only one power left, automatically assign it to the last player
-      if(count($remainingPowers) == 1)
-        $this->powerManager->choosePower(reset($remainingPowers)['id'], $pId);
-
-      $this->gamestate->nextState('done');
-    }
-  }
-
-
-
-  /*
-   * stNextPlayerPlaceWorker:
-   *   if the active player still has no more worker to place, go to next player
-   */
-  public function stNextPlayerPlaceWorker()
-  {
-    // Get all the remeaning workers of all players
-    $workers = $this->board->getAvailableWorkers();
-    if (count($workers) == 0) {
-      $this->gamestate->nextState('done');
-      return;
-    }
-
-
-    // Get unplaced workers for the active player
-    $pId = self::getActivePlayerId();
-    $workers = $this->board->getAvailableWorkers($pId);
-    if (count($workers) == 0)  // No more workers to place => move on to the other player
-      $pId = $this->activeNextPlayer();
-    self::giveExtraTime($pId);
-    $this->gamestate->nextState('next');
-  }
-
 
   /*
    * stNextPlayer:
@@ -530,8 +548,6 @@ class santorini extends Table
    *   check if winning condition has been achieved by one of the player
    */
   // TODO: add the losing condition : active player player cannot build
-  // TODO : the winning condition is not correct : we have to check the level 3 has been achieved by a UP movement during player turn
-  // (important for some gods that can push players or swap places, ...)
   public function stCheckEndOfGame()
   {
     $arg = [
