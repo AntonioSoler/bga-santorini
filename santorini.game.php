@@ -375,16 +375,18 @@ class santorini extends Table
    */
   public function argPlayerBuild()
   {
-    // Return available spaces neighbouring the moved worker
-    $move = $this->log->getLastMove();
-    $worker = $this->board->getPiece($move['pieceId']);
-    $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
-
     $arg = [
       'skippable' => false,
-      'verb'    => clienttranslate('must'),
-      'workers' => [$worker],
+      'workers' => [],
     ];
+
+    // Return available spaces neighbouring the moved worker
+    $move = $this->log->getLastMove();
+    if(!is_null($move)){
+      $worker = $this->board->getPiece($move['pieceId']);
+      $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
+      $arg['workers'][] = $worker;
+    }
 
     // Apply power
     $this->powerManager->argPlayerBuild($arg);

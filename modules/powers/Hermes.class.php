@@ -29,10 +29,55 @@ class Hermes extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  public function hasMovedUpOrDown()
+  {
+    $moves = $this->game->log->getLastMoves($this->playerId);
+    return array_reduce($moves, function($movedUp, $move){
+      return $movedUp || $move['to']['z'] != $move['from']['z'];
+    }, false);
+  }
+
+
+  /* * */
+  public function argPlayerMove(&$arg)
+  {
+    $arg['skippable'] = true;
+
+    // No move before => usual rule
+    $move = $this->game->log->getLastMove();
+    if($move == null)
+      return;
+
+    // Otherwise, let the player do a second move but on same height
+    foreach($arg['workers'] as &$worker){
+      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($move){
+        return $space['z'] == $move['from']['z'];
+      }));
+    }
+  }
+
+  public function stateAfterMove()
+  {
+    return $this->hasMovedUpOrDown()? null : 'moveAgain';
+  }
+
+
+  public function argPlayerBuild(&$arg)
+  {
+    // Moved up/down => usual rule
+    if($this->hasMovedUpOrDown())
+      return;
+
+    // Otherwise, let the player build with any worker
+    $arg['workers'] = $this->game->board->getPlacedWorkers($this->game->getActivePlayerId());
+    foreach($arg['workers'] as &$worker){
+      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
+    }
+  }
+
 
 }
-  

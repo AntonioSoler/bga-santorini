@@ -57,7 +57,8 @@ class Hephaestus extends Power
 
   public function stateAfterBuild()
   {
-    return count($this->game->log->getLastBuilds()) == 1? 'buildAgain' : null;
+    $build = $this->game->log->getLastBuild();
+    return (count($this->game->log->getLastBuilds()) == 1 && $build['to']['z'] <= 1)? 'buildAgain' : null;
   }
 
 }
