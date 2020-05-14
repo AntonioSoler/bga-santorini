@@ -47,11 +47,10 @@ class Artemis extends Power
     }));
     // TODO : handle the case where $arg[workers] is empty ?
 
-    foreach($arg['workers'] as &$worker){
-      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($move){
-        return !$this->game->board->isSameSpace($space, $move['from']);
-      }));
-    }
+    $worker = &$arg['workers'][0];
+    $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($move){
+      return !$this->game->board->isSameSpace($space, $move['from']);
+    }));
   }
 
   public function stateAfterMove()

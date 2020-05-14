@@ -42,12 +42,11 @@ class Apollo extends Power
       if($worker['player_id'] == $worker2['player_id'])
         continue;
 
-      if($this->game->board->isNeighbour($worker, $worker2, 'moving'))
+      if($this->game->board->isNeighbour($worker, $worker2, 'move'))
         $worker['works'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
     }
   }
 
-  // TODO : reuse argPlayerMove from game
   public function playerMove($worker, $work)
   {
     // If space is free, we can do a classic move -> return false

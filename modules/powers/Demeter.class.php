@@ -46,11 +46,10 @@ class Demeter extends Power
       return $worker['id'] == $build['pieceId'];
     }));
 
-    foreach($arg['workers'] as &$worker){
-      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($build){
-        return !$this->game->board->isSameSpace($space, $build['to']);
-      }));
-    }
+    $worker = &$arg['workers'][0];
+    $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($build){
+      return !$this->game->board->isSameSpace($space, $build['to']);
+    }));
   }
 
 

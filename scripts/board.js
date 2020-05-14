@@ -261,7 +261,9 @@ Board.prototype.addPiece = function(piece){
  * - mixed mesh :
  * - mixed space : contains the location
  */
-Board.prototype.moveMesh = function(mesh, space){
+Board.prototype.moveMesh = function(mesh, space, delay){
+	delay = delay || 0;
+
 	// Animate
 	var target = new THREE.Vector3(xCenters[space.x], lvlHeights[space.z], zCenters[space.y]);
 
@@ -272,10 +274,10 @@ Board.prototype.moveMesh = function(mesh, space){
 	tmp2.setY(maxZ);
 
 	var theta = Math.atan2(target.x - mesh.position.x, target.z - mesh.position.z) + 3*Math.PI/2;
-	Tween.get(mesh.rotation)
+	Tween.get(mesh.rotation).wait(delay)
 		.to({y:theta}, 300,  Ease.cubicInOut)
 
-	Tween.get(mesh.position)
+	Tween.get(mesh.position).wait(delay)
 		.to(tmp1, 700,  Ease.cubicInOut)
 		.to(tmp2, 600,  Ease.cubicInOut)
 		.to(target, 600,  Ease.cubicInOut)
@@ -287,13 +289,13 @@ Board.prototype.moveMesh = function(mesh, space){
  * - mixed pece : info about the piece
  * - mixed space : contains the location
  */
-Board.prototype.movePiece = function(piece, space){
+Board.prototype.movePiece = function(piece, space, delay){
 	// Update location on (abstract) board
 	var mesh = this._board[piece.x][piece.y][piece.z].piece;
 	this._board[piece.x][piece.y][piece.z].piece = null;
 	this.addMeshToBoard(mesh, space);
 
-	this.moveMesh(mesh, space);
+	this.moveMesh(mesh, space, delay);
 };
 
 /*

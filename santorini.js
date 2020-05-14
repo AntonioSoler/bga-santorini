@@ -446,6 +446,9 @@ setupNotifications: function() {
 	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
 	this.notifqueue.setSynchronous('workerSwitched', 2000);
 
+	// Happens with Minotaur
+	dojo.subscribe('workerPushed', this, 'notif_workerPushed');
+	this.notifqueue.setSynchronous('workerPushed', 2000);
 },
 
 
@@ -489,6 +492,7 @@ notif_blockBuilt: function(n) {
 },
 
 
+
 /*
  * notif_workerSwitched:
  *   called whenever two workers are switched using Apollo
@@ -496,6 +500,16 @@ notif_blockBuilt: function(n) {
 notif_workerSwitched : function(n) {
 	console.info('Notif: worker switched', n.args);
 	this.board.switchPiece(n.args.piece1, n.args.piece2);
+},
+
+/*
+ * notif_workerPushed:
+ *   called whenever a worker is pushed using Minotaur
+ */
+notif_workerPushed : function(n) {
+	console.info('Notif: worker pushed', n.args);
+	this.board.movePiece(n.args.piece2, n.args.space, 1500);
+	this.board.movePiece(n.args.piece1, n.args.piece2);
 },
 
 });
