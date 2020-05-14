@@ -161,7 +161,8 @@ ST_NEXT_PLAYER => [
   'type' => 'game',
   'action' => 'stNextPlayer',
   'transitions' => [
-    'next' => ST_MOVE
+    'move' => ST_MOVE,
+    'build' => ST_BUILD,
   ],
   'updateGameProgression' => true,
 ],
@@ -223,6 +224,7 @@ ST_BUILD => [
     'built' => ST_NEXT_PLAYER,
     'skip' => ST_NEXT_PLAYER,
     'buildAgain' => ST_BUILD,
+    'move' => ST_MOVE,
   ],
 ],
 

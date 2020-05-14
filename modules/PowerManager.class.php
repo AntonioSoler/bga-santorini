@@ -252,6 +252,28 @@ class PowerManager extends APP_GameClass
 /////////////////////////////////////
 
   /*
+   * getNewState: is called whenever we try to get the new state
+   *   - after a work / skip
+   *   - at the beggining of the turn
+   */
+  public function getNewState($method, $msg)
+  {
+    $pId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($pId);
+    $r = array_filter(array_map(function($power) use ($method) {
+      return $power->$method();
+    }, $player->getPowers()));
+    if(count($r) > 1)
+      throw new BgaUserException($msg);
+
+    if(count($r) == 1)
+      return $r[0];
+    else
+      return null;
+  }
+
+
+  /*
    * stateAfterWork: is called whenever a player has done some work (in a regular way).
    *    This should return null if we want to continue as usual,
    *      or a valid transition name if we want something special.
@@ -259,18 +281,7 @@ class PowerManager extends APP_GameClass
   public function stateAfterWork($action)
   {
     $name = "stateAfter".$action;
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    $r = array_filter(array_map(function($power) use ($name) {
-      return $power->$name();
-    }, $player->getPowers()));
-    if(count($r) > 1)
-      throw new BgaUserException(_("Can't figure next state after action"));
-
-    if(count($r) == 1)
-      return $r[0];
-    else
-      return null;
+    return $this->getNewState($name, _("Can't figure next state after action"));
   }
 
   /*
@@ -287,6 +298,28 @@ class PowerManager extends APP_GameClass
   public function stateAfterBuild()
   {
     return $this->stateAfterWork('Build');
+  }
+
+/////////////////////////////////////
+/////////////////////////////////////
+///////  Start/end turn state  //////
+/////////////////////////////////////
+/////////////////////////////////////
+
+  /*
+   * stateStartTurn: is called at the beginning of the player state.
+   */
+  public function stateStartTurn()
+  {
+    return $this->getNewState('stateStartTurn', _("Can't figure next state at the beginning of the turn"));
+  }
+
+  /*
+   * stateAfterSkip: is called after a skip
+   */
+  public function stateAfterSkip()
+  {
+    return $this->getNewState('stateAfterSkip', _("Can't figure next state after a skip"));
   }
 
 
@@ -321,4 +354,5 @@ class PowerManager extends APP_GameClass
     foreach($opponent->getPowers() as $power)
       $power->checkOpponentWinning($arg);
   }
+
 }

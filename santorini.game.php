@@ -418,8 +418,9 @@ class santorini extends Table
     if (!$args['skippable'])
       throw new BgaUserException(_("You can't skip this action"));
 
-    // TODO might need to call power to know which is the next state (for move post build for instance)
-    $this->gamestate->nextState('skip');
+    // Apply power
+    $state = $this->powerManager->stateAfterSkip() ?: 'skip';
+    $this->gamestate->nextState($state);
   }
 
 
@@ -539,7 +540,10 @@ class santorini extends Table
       $n = (int) self::getGamestateValue('currentRound') + 1;
       self::setGamestateValue("currentRound", $n);
     }
-    $this->gamestate->nextState('next');
+
+    // Apply power
+    $state = $this->powerManager->stateStartTurn() ?: 'move';
+    $this->gamestate->nextState($state);
   }
 
 
