@@ -43,7 +43,7 @@ class Apollo extends Power
         continue;
 
       if($this->game->board->isNeighbour($worker, $worker2, 'moving'))
-        $worker['accessibleSpaces'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
+        $worker['works'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
     }
   }
 
@@ -59,7 +59,7 @@ class Apollo extends Power
     self::DbQuery( "UPDATE piece SET x = {$worker2['x']}, y = {$worker2['y']}, z = {$worker2['z']} WHERE id = {$worker['id']}" );
     self::DbQuery( "UPDATE piece SET x = {$worker['x']}, y = {$worker['y']}, z = {$worker['z']} WHERE id = {$worker2['id']}" );
     $this->game->log->addMove($worker, $worker2);
-    // TODO add the move of worker2 ?
+    $this->game->log->addForce($worker2, $worker);
 
     // Notify
     $args = [

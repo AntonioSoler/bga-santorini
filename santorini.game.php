@@ -351,11 +351,21 @@ class santorini extends Table
 
     $arg = [
       'skippable' => false,
-      'verb'    => clienttranslate('must'),
       'workers' => $workers,
     ];
 
     $this->powerManager->argPlayerMove($arg);
+
+    $playerName = self::getActivePlayerName();
+    if($arg['skippable']){
+        $arg['description'] = clienttranslate("${playerName} may move a worker");
+        $arg['descriptionmyturn'] = clienttranslate('You may move a worker');
+    }
+    else {
+        $arg['description'] = clienttranslate("${playerName} must move a worker");
+        $arg['descriptionmyturn'] = clienttranslate('You must move a worker');
+    }
+
     return $arg;
   }
 
@@ -378,6 +388,17 @@ class santorini extends Table
 
     // Apply power
     $this->powerManager->argPlayerBuild($arg);
+
+    $playerName = self::getActivePlayerName();
+    if($arg['skippable']){
+        $arg['description'] = clienttranslate("${playerName} may build");
+        $arg['descriptionmyturn'] = clienttranslate('You may build');
+    }
+    else {
+        $arg['description'] = clienttranslate("${playerName} must build");
+        $arg['descriptionmyturn'] = clienttranslate('You must build');
+    }
+
     return $arg;
   }
 

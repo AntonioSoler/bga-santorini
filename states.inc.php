@@ -191,8 +191,8 @@ ST_USE_POWER => [
  */
 ST_MOVE => [
   'name' => 'playerMove',
-  'description' => clienttranslate('${actplayer} ${verb} move a worker'),
-  'descriptionmyturn' => clienttranslate('${you} ${verb} move a worker'),
+  'description' => clienttranslate('${description}'),
+  'descriptionmyturn' => clienttranslate('${descriptionmyturn}'),
   'type' => 'activeplayer',
   'args' => 'argPlayerMove',
   'action' => 'stCheckEndOfGame',
@@ -211,8 +211,8 @@ ST_MOVE => [
  */
 ST_BUILD => [
   'name' => 'playerBuild',
-  'description' => clienttranslate('${actplayer} ${verb} build'),
-  'descriptionmyturn' => clienttranslate('${you} ${verb} build'),
+  'description' => clienttranslate('${description}'),
+  'descriptionmyturn' => clienttranslate('${descriptionmyturn}'),
   'type' => 'activeplayer',
   'args' => 'argPlayerBuild',
   'action' => 'stCheckEndOfGame',

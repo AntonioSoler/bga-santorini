@@ -42,7 +42,6 @@ class Artemis extends Power
 
     // Otherwise, let the player do a second move (not mandatory)
     $arg['skippable'] = true;
-    $arg['verb'] = clienttranslate('can');
     $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($move){
       return $worker['id'] == $move['pieceId'];
     }));

@@ -37,6 +37,11 @@ class SantoriniLog extends APP_GameClass
     $this->addWork($piece, $space, 'build');
   }
 
+  public function addForce($piece, $space)
+  {
+    $this->addWork($piece, $space, 'force');
+  }
+
 
   public function getLastWorks($action, $pId = null, $limit = -1)
   {
