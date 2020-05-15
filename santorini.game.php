@@ -617,6 +617,7 @@ class santorini extends Table
   public function zombieTurn($state, $activePlayer)
   {
     if (array_key_exists('zombiePass', $state['transitions'])) {
+      $this->playerManager->eliminate($activePlayer);
       $this->gamestate->nextState('zombiePass');
     } else {
       throw new BgaVisibleSystemException('Zombie player ' . $activePlayer . ' stuck in unexpected state ' . $state['name']);

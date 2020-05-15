@@ -18,10 +18,12 @@
 @import url(./santorini.powers.css);
 @import url(./santorini.tokens.css);
 
+/* Looked too much like a video game
 html {
   background-image:none !important;
   background-color:#76cfe9;
 }
+*/
 
 div#popin_chooseArg {
   background-image:url('img/dialog.png');

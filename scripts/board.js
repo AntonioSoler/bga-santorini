@@ -86,7 +86,7 @@ Board.prototype.initScene = function(){
 	this._scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF, 1 ) );
 
 	// Renderer
-	this._renderer = new THREE.WebGLRenderer({ antialias: true });
+	this._renderer = new THREE.WebGLRenderer({ antialias: true, alpha : true });
 	this._renderer.setPixelRatio( window.devicePixelRatio );
 	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;

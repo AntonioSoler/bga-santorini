@@ -91,7 +91,7 @@ ST_POWERS_DIVIDE => [
   'args' => 'argDividePowers',
   'possibleactions' => ['dividePowers'],
   'transitions' => [
-//TODO:    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+    'zombiePass' => ST_GAME_END,
     'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
   ],
 ],
@@ -115,7 +115,7 @@ ST_POWERS_CHOOSE => [
   'args' => 'argChoosePower',
   'possibleactions' => ['choosePower'],
   'transitions' => [
-// TODO    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+    'zombiePass' => ST_GAME_END,
     'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
   ],
 ],
@@ -132,6 +132,7 @@ ST_NEXT_PLAYER_PLACE_WORKER => [
   'type' => 'game',
   'action' => 'stNextPlayerPlaceWorker',
   'transitions' => [
+    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
     'next' => ST_PLACE_WORKER,
     'done' => ST_NEXT_PLAYER,
   ],
@@ -172,7 +173,7 @@ ST_NEXT_PLAYER => [
 
 /*
  * Worker move TODO description
- */
+ *
 ST_USE_POWER => [
   'name' => 'playerUsePower',
   'description' => clienttranslate('${actplayer} can use its power'),
@@ -187,7 +188,7 @@ ST_USE_POWER => [
     'endgame' => ST_GAME_END,
   ],
 ],
-
+*/
 
 /*
  * Worker move TODO description
