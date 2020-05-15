@@ -206,7 +206,7 @@ class PowerManager extends APP_GameClass
 /////////////////////////////////////
 
   /*
-   * argPlayerWork: is called whenever a player try to do some work (move/build).
+   * playerWork: is called whenever a player try to do some work (move/build).
    *    This is called after checking that the work is valid using argPlayerWork.
    *    This should return true if we want to bypass the usual work function:
    *      eg, Appolo can 'switch' instead of 'move'
@@ -336,7 +336,7 @@ class PowerManager extends APP_GameClass
    *      and what should the message be in case of win
    *    We first apply current player power that may make it win
    *      with some additionnal winning condition (eg Pan).
-   *   Then we apply opponents powers that may do two think:
+   *   Then we apply opponents powers that may do two things:
    *     - restrict a win : eg Aphrodite or Pegasus
    *     - steal a win : eg Moerae
    *     - make an opponent win : eg Chronus

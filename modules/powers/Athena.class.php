@@ -47,10 +47,8 @@ class Athena extends Power
     if(!$this->hasMovedUp())
       return;
 
-
-    foreach($arg["workers"] as &$worker)
-      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($worker){
+    $this->filterWorks($arg, function($space, $worker){
         return $space['z'] <= $worker['z'];
-      }));
+    });
   }
 }

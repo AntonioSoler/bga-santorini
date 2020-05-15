@@ -40,17 +40,13 @@ class Artemis extends Power
     if($move == null)
       return;
 
-    // Otherwise, let the player do a second move (not mandatory)
+    // Otherwise, let the player do a second move (not mandatory) with same worker
     $arg['skippable'] = true;
-    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($move){
-      return $worker['id'] == $move['pieceId'];
-    }));
-    // TODO : handle the case where $arg[workers] is empty ?
-
-    $worker = &$arg['workers'][0];
-    $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($move){
+    $this->filterWorkersById($arg, $move['pieceId']);
+    $this->filterWorks($arg, function($space, $worker) use ($move){
+      // Not back to its initial space
       return !$this->game->board->isSameSpace($space, $move['from']);
-    }));
+    });
   }
 
   public function stateAfterMove()

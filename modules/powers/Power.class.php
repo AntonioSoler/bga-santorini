@@ -31,4 +31,29 @@ abstract class Power extends APP_GameClass {
     public function endTurn() {}
     public function checkPlayerWinning(&$arg) {}
     public function checkOpponentWinning(&$arg) {}
+
+    /* TODO */
+    protected function filterWorkers(&$arg, $filter){
+      $arg['workers'] = array_values(array_filter($arg['workers'], $filter));
+    }
+
+
+    protected function filterWorkersById(&$arg, $wId){
+      $this->filterWorkers($arg, function($worker) use ($wId){
+        return $worker['id'] == $wId;
+      });
+    }
+
+
+    /* TODO */
+    protected function filterWorks(&$arg, $filter){
+      foreach($arg["workers"] as &$worker){
+        $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($worker, $filter) {
+          return $filter($space, $worker);
+        }));
+      }
+
+      $this->filterWorkers($arg, function($worker){ return count($worker['works']) > 0; });
+    }
+
 }

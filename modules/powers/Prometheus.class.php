@@ -62,9 +62,10 @@ class Prometheus extends Power
       return;
 
     // Otherwise, the player has to move with the worker that built
-    $arg['workers'] = array_values(array_filter($arg['workers'], function($worker) use ($build){
-      return $worker['id'] == $build['pieceId'];
-    }));
+    $this->filterWorkersById($arg, $build['pieceId']);
+    $this->filterWorks($arg, function($space, $worker){
+      return $space['z'] <= $worker['z'];
+    });
   }
 
 
