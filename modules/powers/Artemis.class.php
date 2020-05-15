@@ -42,8 +42,8 @@ class Artemis extends Power
 
     // Otherwise, let the player do a second move (not mandatory) with same worker
     $arg['skippable'] = true;
-    $this->filterWorkersById($arg, $move['pieceId']);
-    $this->filterWorks($arg, function($space, $worker) use ($move){
+    Utils::filterWorkersById($arg, $move['pieceId']);
+    Utils::filterWorks($arg, function($space, $worker) use ($move){
       // Not back to its initial space
       return !$this->game->board->isSameSpace($space, $move['from']);
     });

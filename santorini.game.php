@@ -333,6 +333,90 @@ class santorini extends Table
   }
 
 
+////////////////////////////////////////////////
+////////////   Next player / Win   ////////////
+////////////////////////////////////////////////
+
+  /*
+   * stNextPlayer:
+   *   go to next player
+   */
+  public function stNextPlayer()
+  {
+    $pId = $this->activeNextPlayer();
+    self::giveExtraTime($pId);
+    if(self::getGamestateValue("firstPlayer") == $pId){
+      $n = (int) self::getGamestateValue('currentRound') + 1;
+      self::setGamestateValue("currentRound", $n);
+    }
+
+
+    // Apply power
+    $state = $this->powerManager->stateStartTurn() ?: 'move';
+    $this->gamestate->nextState($state);
+  }
+
+
+  /*
+   * stCheckEndOfGame:
+   *   check if winning condition has been achieved by one of the player
+   */
+  // TODO: add the losing condition : active player player cannot build
+  public function stCheckEndOfGame()
+  {
+    $arg = [
+      'win' => false,
+      'msg' => clienttranslate('A worker reached the top level of a building.'),
+      'pId' => self::getActivePlayerId(),
+    ];
+
+    // Basic rule
+    $move = $this->log->getLastMove();
+    if($move != null){
+      $arg['win'] = $move['from']['z'] < $move['to']['z'] && $move['to']['z'] == 3;
+    }
+
+    // Apply powers
+    $this->powerManager->checkWinning($arg);
+
+    if($arg['win']){
+      self::notifyAllPlayers('message', $arg['msg'], []);
+      self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $arg['pId'] );
+      $this->gamestate->nextState('endgame');
+    }
+
+
+    // Loosing condition
+    $state = $this->gamestate->state();
+
+    // No move or build => loose
+    if ($state['name']=='playerMove' || $state['name']=='playerBuild') {
+      if(count($state['args']['workers']) > 0 || $state['args']['skippable'])
+        return;
+
+      // Notify
+      $pId = self::getActivePlayerId();
+      $args = [
+        'i18n' => [],
+        'playerName' => self::getActivePlayerName(),
+      ];
+      self::notifyAllPlayers('message', clienttranslate('${playerName} looses the game because none of the workers can move/build.'), $args);
+
+      // 1v1 or 2v2 => end of the game
+      if($this->playerManager->getPlayerCount() != 3){
+        $player = $this->playerManager->getPlayer($pId);
+        self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team != {$player->getTeam()}");
+        $this->gamestate->nextState('endgame');
+      }
+      // 3 players => eliminate the player
+      else {
+        $this->playerManager->eliminate($pId);
+        $this->gamestate->nextState('next');
+      }
+    }
+  }
+
+
 
 
 /////////////////////////////////////////
@@ -357,6 +441,7 @@ class santorini extends Table
     ];
 
     $this->powerManager->argPlayerMove($arg);
+    Utils::cleanWorkers($arg);
 
     $playerName = self::getActivePlayerName();
     if($arg['skippable']){
@@ -392,6 +477,7 @@ class santorini extends Table
 
     // Apply power
     $this->powerManager->argPlayerBuild($arg);
+    Utils::cleanWorkers($arg);
 
     $playerName = self::getActivePlayerName();
     if($arg['skippable']){
@@ -518,92 +604,6 @@ class santorini extends Table
     // Apply power
     $state = $this->powerManager->stateAfterBuild() ?: 'built';
     $this->gamestate->nextState($state);
-  }
-
-
-  ////////////////////////////////////////////////
-  ////////////   Game state actions   ////////////
-  ////////////////////////////////////////////////
-  // Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
-  // The action method of state X is called everytime the current game state is set to X.
-  ////////////////////////////////////////////////
-
-  /*
-   * stNextPlayer:
-   *   go to next player
-   */
-  public function stNextPlayer()
-  {
-    $pId = $this->activeNextPlayer();
-    self::giveExtraTime($pId);
-    if(self::getGamestateValue("firstPlayer") == $pId){
-      $n = (int) self::getGamestateValue('currentRound') + 1;
-      self::setGamestateValue("currentRound", $n);
-    }
-
-    // Apply power
-    $state = $this->powerManager->stateStartTurn() ?: 'move';
-    $this->gamestate->nextState($state);
-  }
-
-
-  /*
-   * stCheckEndOfGame:
-   *   check if winning condition has been achieved by one of the player
-   */
-  // TODO: add the losing condition : active player player cannot build
-  public function stCheckEndOfGame()
-  {
-    $arg = [
-      'win' => false,
-      'msg' => clienttranslate('A worker reached the top level of a building.'),
-      'pId' => self::getActivePlayerId(),
-    ];
-
-    // Basic rule
-    $move = $this->log->getLastMove();
-    if($move != null){
-      $arg['win'] = $move['from']['z'] < $move['to']['z'] && $move['to']['z'] == 3;
-    }
-
-    // Apply powers
-    $this->powerManager->checkWinning($arg);
-
-    if($arg['win']){
-      self::notifyAllPlayers('message', $arg['msg'], []);
-      self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $arg['pId'] );
-      $this->gamestate->nextState('endgame');
-    }
-    /*
-$player_id = self::getActivePlayerId();
-$state=$this->gamestate->state();
-
-// active player has reached level 3 ->  WIN
-$positions =  self::getCollectionFromDb('SELECT space_id, x, y, z, piece_id, card_type , card_location_arg FROM board JOIN piece on piece_id=piece.card_id WHERE piece_id is not null AND card_type like "worker%" and z=3');
-if ( sizeof( $positions ) > 0 ) {
-foreach( $positions as $space_id => $space ) {
-self::notifyAllPlayers('message', , array());
-//var_dump( $space );
-
-}
-}
-
-// active player cannot move -> LOOSE
-if ($state['name']=='playerMove') {
-$workers = $this->pieces->getCardsInLocation('board', self::getActivePlayerId());
-$numberElements = 0;
-$destinations = array();
-foreach ($workers as $worker_id => $worker) {
-$destinations[$worker_id] = self::getNeighbouringSpaces($worker_id, true);
-$numberElements = $numberElements + sizeof($destinations[$worker_id]);
-}
-if ( $numberElements == 0 ) {
-self::notifyAllPlayers('message', clienttranslate('${player_name} looses the game because none of the workers can move.'), $args);
-self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id not in ( '. $player_id .')' );
-$this->gamestate->nextState('endgame');
-}
-}
-*/
   }
 
   ////////////////////////////////////

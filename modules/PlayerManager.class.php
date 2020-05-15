@@ -71,7 +71,7 @@ class PlayerManager extends APP_GameClass
    */
   public function getTeammatesIds($pId)
   {
-    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
+    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
     return array_map(function ($player) {
       return $player['id'];
     }, $players);
@@ -91,7 +91,7 @@ class PlayerManager extends APP_GameClass
    */
   public function getOpponentsIds($pId)
   {
-    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_team` <> ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
+    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` <> ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
     return array_map(function ($player) {
       return $player['id'];
     }, $players);
@@ -117,4 +117,13 @@ class PlayerManager extends APP_GameClass
     return $players[0]['id'] == $pId1;
   }
 
+
+ /*
+  * eliminate : called after a player loose in a 3 players setup
+  */
+  public function eliminate($pId)
+  {
+    self::DbQuery("UPDATE piece SET location = 'bin' WHERE type IN ('worker') AND player_id = $pId");
+    $this->game->eliminatePlayer($pId);
+  }
 }

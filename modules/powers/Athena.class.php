@@ -47,7 +47,7 @@ class Athena extends Power
     if(!$this->hasMovedUp())
       return;
 
-    $this->filterWorks($arg, function($space, $worker){
+    Utils::filterWorks($arg, function($space, $worker){
         return $space['z'] <= $worker['z'];
     });
   }

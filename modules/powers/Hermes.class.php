@@ -53,7 +53,7 @@ class Hermes extends Power
       return;
 
     // Otherwise, let the player do a second move but on same height
-    $this->filterWorks($arg, function($space, $worker){
+    Utils::filterWorks($arg, function($space, $worker){
       return $space['z'] == $worker['z'];
     });
   }

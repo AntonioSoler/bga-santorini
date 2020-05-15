@@ -42,8 +42,8 @@ class Demeter extends Power
 
     // Otherwise, let the player do a second build (not mandatory)
     $arg['skippable'] = true;
-    $this->filterWorkersById($arg, $build['pieceId']);
-    $this->filterWorks($arg, function($space, $worker) use ($build){
+    Utils::filterWorkersById($arg, $build['pieceId']);
+    Utils::filterWorks($arg, function($space, $worker) use ($build){
       return !$this->game->board->isSameSpace($space, $build['to']);
     });
   }
