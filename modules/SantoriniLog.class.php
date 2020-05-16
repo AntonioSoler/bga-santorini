@@ -37,6 +37,14 @@ class SantoriniLog extends APP_GameClass
 
 
   /*
+   * starTurn: TODO
+   */
+  public function startTurn()
+  {
+    $this->insert(-1, 0, 'startTurn', '{}');
+  }
+
+  /*
    * addWork: add a new work entry to log
    */
   private function addWork($piece, $to, $action)
@@ -87,23 +95,37 @@ class SantoriniLog extends APP_GameClass
  *    - optionnal int $pId : the player we are interested in, default is active player
  *    - optional int $limit : the number of works we want to fetched (order by most recent first), default is no-limit (-1)
  */
-  public function getLastWorks($action, $pId = null, $limit = -1)
+  public function getLastWorks($actions, $pId = null, $limit = -1)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
     $limitClause = ($limit == -1)? '' : "LIMIT $limit";
-    $round = $this->game->getGameStateValue("currentRound");
     if(!$this->game->playerManager->isPlayingBefore($pId))
       $round -= 1;
-    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` = '$action' AND `player_id` = '$pId' AND `round` = $round ORDER BY log_id DESC ".$limitClause);
+
+    if(!is_array($actions))
+      $actions = [$actions];
+    $actionsNames = "'". implode("','", $actions) ."'";
+
+    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC ".$limitClause);
 
     return array_map(function($work){
       $args = json_decode($work['action_arg'], true);
       return [
+        'action' => $work['action'],
         'pieceId' => $work['piece_id'],
         'from' => $args['from'],
         'to' => $args['to'],
       ];
     }, $works);
+  }
+
+  /*
+   * getLastWork: fetch the last move/build of player of current round if it exists, null otherwise
+   */
+  public function getLastWork($pId = null)
+  {
+    $works = $this->getLastWorks(['move', 'build'], $pId, 1);
+    return (count($works) == 1)? $works[0] : null;
   }
 
 

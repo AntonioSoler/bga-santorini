@@ -29,10 +29,19 @@ class Hera extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
   /* * */
+  public function checkOpponentWinning(&$arg){
+    if(!$arg['win'])
+      return;
 
+    $work = $this->game->log->getLastWork();
+    if($work['action'] != 'move')
+      return;
+
+    if($this->game->board->isPerimeter($work['to']))
+      $arg['win'] = false;
+  }
 }
-  

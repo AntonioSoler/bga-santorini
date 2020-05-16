@@ -31,7 +31,7 @@ class PlayerManager extends APP_GameClass
   {
     $sql = "SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player";
     if (!empty($playerIds)) {
-      $sql .= " WHERE player_id IN (" . implode(',', $playerIds) . ")";
+      $sql .= " WHERE player_id IN ('" . implode("','", $playerIds) . "')";
     }
     $rows = self::getObjectListFromDb($sql);
 

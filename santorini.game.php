@@ -386,7 +386,7 @@ class santorini extends Table
       $n = (int) self::getGamestateValue('currentRound') + 1;
       self::setGamestateValue("currentRound", $n);
     }
-
+    $this->log->startTurn();
 
     // Apply power
     $state = $this->powerManager->stateStartTurn() ?: 'move';

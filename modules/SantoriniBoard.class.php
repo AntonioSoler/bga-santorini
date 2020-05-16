@@ -137,6 +137,15 @@ class SantoriniBoard extends APP_GameClass
   }
 
   /*
+   * isPerimeter: TODO
+   */
+  public function isPerimeter($space){
+    return $space['x'] == 0 || $space['x'] == 4
+       ||  $space['y'] == 0 || $space['y'] == 4;
+  }
+
+
+  /*
    * isNeighbour : check distance between two spaces to move/build
    */
   public function isNeighbour($a, $b, $action)
