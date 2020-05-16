@@ -1,5 +1,5 @@
 import * as THREE 				from './three.js';
-import { OBJLoader } 			from './OBJLoader.js';
+import { GLTFLoader } 		from './GLTFLoader.min.js';
 
 const Meshes = [
 /* Board Components */
@@ -17,7 +17,7 @@ const Meshes = [
 		s:0.84
 	},
 	{
-		n:'outerWall1',
+		n:'outerWall',
 		t:'island',
 		s:0.84
 	},
@@ -92,7 +92,7 @@ var MeshManager = function(url){
  */
 MeshManager.prototype.loadGeometry = function(names, scales){
 	var scope = this;
-	var loader = new OBJLoader();
+	var loader = new GLTFLoader();
 
 	if(!(names instanceof Array))
 		names = [names];
@@ -102,11 +102,14 @@ MeshManager.prototype.loadGeometry = function(names, scales){
 
 	return new Promise(function(resolve, reject){
 		// Create a promise with all loading requests
-		Promise.all(names.map( (n) => loader.load(scope._url + 'geometries/' + n + '.obj') ))
+		Promise.all(names.map( (n) => loader.load(scope._url + 'geometries/' + n + '.glb') ))
 		.then( (values) => {
 			// Store them (assuming only one mesh inside the obj file
 			for(var i = 0; i < names.length; i++){
-				scope._geometries[names[i]].copy(values[i].children[0].geometry);
+				values[i].scene.traverse( child => {
+					if(child.isMesh)
+						scope._geometries[names[i]].copy(child.geometry);
+				});
 				scope._geometries[names[i]].scale(scales[i], scales[i], scales[i]);
 			}
 
@@ -184,7 +187,7 @@ MeshManager.prototype.createMesh = function(name){
 		var t = this._textures[typeof m.t == "string" ? m.t : m.n];
 		var g = this._geometries[typeof m.g == "string"? m.g : m.n];
 
-		var material = new THREE.MeshPhongMaterial({
+		var material = new THREE.MeshLambertMaterial({
 			alphaMap: m.a? new THREE.TextureLoader().load(this._url + 'img/'+m.a) : null,
 			map : m.c? null : t,
 			color: m.c || 0xDDDDDD,
@@ -192,6 +195,8 @@ MeshManager.prototype.createMesh = function(name){
 			side: THREE.DoubleSide
 		});
 		var mesh = new THREE.Mesh(g, material);
+
+
 		return mesh;
 		}
 	}
