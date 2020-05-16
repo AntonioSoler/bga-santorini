@@ -415,7 +415,7 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		else if(action == "playerBuild"){
 			mark = new THREE.Mesh(
 				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.7,	transparent: true, })
+				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.5,	transparent: true, })
 			);
 		}
 		// Ring animation

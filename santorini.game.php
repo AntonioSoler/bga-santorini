@@ -190,7 +190,7 @@ class santorini extends Table
   {
     return [
       'count' => self::getPlayerCount(),
-      'powers' => $this->powerManager->getPowersInLocation('deck')
+      'powers' => array_map(function($power){ return $power['id']; }, $this->powerManager->getPowersInLocation('deck'))
     ];
   }
 
@@ -232,7 +232,7 @@ class santorini extends Table
   public function argChoosePower()
   {
     return [
-      'powers' => $this->powerManager->getPowersInLocation('stack')
+      'powers' => array_map(function($power){ return $power['id']; }, $this->powerManager->getPowersInLocation('stack'))
     ];
   }
 

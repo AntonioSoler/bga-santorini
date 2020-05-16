@@ -1,7 +1,7 @@
 /**
 	*------
 	* BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
-	* santorini implementation : (c) Morgalad &
+	* santorini implementation : (c) Tisaac & Quietmint & Morgalad
 	*
 	* This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
 	* See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -94,51 +94,65 @@ getPower: function(powerId) {
 onEnteringState: function(stateName, args) {
 	debug('Entering state: ' + stateName, args.args);
 
-	if (stateName == 'powersDivide') {
-		this.focusContainer('powers-select');
-		this._selectedPowers = [];
-		// TODO: The argument should be only power ID
-		args.args.powers.forEach(powerxxx => {
-			var power = this.getPower(powerxxx.id);
-			var div = dojo.place(this.format_block('jstpl_powerSelect', power), $('power-select-available') );
-			dojo.connect(div, 'onclick', e => this.onClickSelectPower(power.id) );
-		});
-
-	} else if (stateName == 'powersPlayerChoose') {
-		this.focusContainer('powers-choose');
-		// TODO: The argument should be only power ID
-		args.args.powers.forEach(powerxxx => {
-			var power = this.getPower(powerxxx.id);
-			var div = dojo.place(this.format_block('jstpl_powerDetail', power), $('power-choose-container') );
-			div.id = "power-choose-" + power.id;
-			if (this.isCurrentPlayerActive()) {
-				dojo.style(div, "cursor", "pointer");
-				dojo.connect(div, 'onclick', e => this.onClickChoosePower(power.id) );
-			}
-		});
-
-	} else {
+	// Stop here if it's not the current player's turn for some states
+	if(["playerPlaceWorker", "playerMove", "playerBuild"].includes(stateName)){
 		this.focusContainer('board');
+		if(!this.isCurrentPlayerActive())
+			return;
 	}
 
-	// Stop here if it's not the current player's turn
-	if (!this.isCurrentPlayerActive()) {
-		return;
-	}
 
-	if (stateName == 'playerPlaceWorker') {
-		// Place a worker
-		this.worker = args.args.worker;
-		this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
+	switch(stateName){
+		/*
+		 * PowersDivide: in the fair division setup,the contestant can select #players powers from available powers (depending on game option)
+		 */
+		case "powersDivide":
+			this.focusContainer('powers-select');
+			this._selectedPowers = [];
+			args.args.powers.forEach(powerId => {
+				var power = this.getPower(powerId);
+				var div = dojo.place(this.format_block('jstpl_powerSelect', power), $('power-select-available') );
+				dojo.connect(div, 'onclick', e => this.onClickSelectPower(power.id) );
+			});
+			break;
 
-	} else if (stateName == "playerMove" || stateName == "playerBuild") {
-		// Move a worker or build
-		this._action = stateName;
-		this._selectableWorkers = args.args.workers.filter(worker => worker.works.length > 0);
-		if(this._selectableWorkers.length > 1)
-			this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
-		else if(this._selectableWorkers.length == 1)
-			this.onClickSelectWorker(this._selectableWorkers[0]);
+		/*
+		 * powersPlayerChoose: in the fair division setup, each player then proceed to pick one card
+		 */
+		case "powersPlayerChoose":
+			this.focusContainer('powers-choose');
+			args.args.powers.forEach(powerId => {
+				var power = this.getPower(powerId);
+				var div = dojo.place(this.format_block('jstpl_powerDetail', power), $('power-choose-container') );
+				div.id = "power-choose-" + power.id;
+
+				if (this.isCurrentPlayerActive()) {
+					dojo.style(div, "cursor", "pointer");
+					dojo.connect(div, 'onclick', e => this.onClickChoosePower(power.id) );
+				}
+			});
+			break;
+
+		/*
+		 * playerPlaceWorker: the active player can place one worker on the board
+		 */
+		case "playerPlaceWorker":
+			this.worker = args.args.worker;
+			this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
+			break;
+
+		/*
+		 * playerMove and playerBuild r: the active player can/must move/build
+		 */
+		case "playerMove":
+		case "playerBuild":
+			this._action = stateName;
+			this._selectableWorkers = args.args.workers.filter(worker => worker.works.length > 0); // TODO : this should be useless now since filtering is done on backend
+			if(this._selectableWorkers.length > 1)
+				this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
+			else if(this._selectableWorkers.length == 1)
+				this.onClickSelectWorker(this._selectableWorkers[0]);
+			break;
 	}
 },
 
@@ -199,9 +213,22 @@ focusContainer: function(container){
  */
 addPowerToPlayer: function(playerId, powerId) {
 	var power = this.getPower(powerId);
-	var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
-	card.id = "mini-card-" + playerId + "-" + powerId;
-	this.addTooltipHtml( card.id, this.format_block('jstpl_powerDetail', power) );
+
+	var addPower = () => {
+		var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
+		card.id = "mini-card-" + playerId + "-" + powerId;
+		this.addTooltipHtml( card.id, this.format_block('jstpl_powerDetail', power) );
+	};
+
+
+	var powerChooseCard = $("power-choose-" + powerId);
+	if(powerChooseCard == null)
+		addPower();
+	else {
+		var animation = this.slideToObjectPos("power-choose-" + powerId, 'power_container_' + playerId, 0, 0);
+		dojo.connect(animation, 'onEnd', () =>  addPower() );
+		animation_id.play();
+	}
 },
 
 
@@ -253,7 +280,7 @@ selectPower: function(powerId) {
 	dummy.id = 'selectPower-dummy';
 	// Slide the real card to the position of the dummy
 	var animation_id = this.slideToObject('power-select-' + powerId, 'selectPower-dummy');
-	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
+	dojo.connect(animation_id, 'onEnd', () => {
 		// Replace the dummy with the real card
 		var powerDiv = dojo.place('power-select-' + powerId, 'selectPower-dummy', 'replace');
 		powerDiv.style = '';
@@ -262,7 +289,7 @@ selectPower: function(powerId) {
 		if (this.isCurrentPlayerActive() && dojo.query('.power-card.small.selected').length == this.gamedatas.fplayers.length) {
 			this.addActionButton('buttonValidateSelection', _('Confirm'), 'onClickValidateSelection', null, false, 'blue');
 		}
-	}));
+	});
 	animation_id.play();
 },
 
@@ -272,7 +299,7 @@ unselectPower: function(powerId) {
 	dummy.id = 'unselectPower-dummy';
 	// Slide the real card to the position of the dummy
 	var animation_id = this.slideToObject('power-select-' + powerId, 'unselectPower-dummy');
-	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
+	dojo.connect(animation_id, 'onEnd', () => {
 		// Replace the dummy with the real card
 		var powerDiv = dojo.place('power-select-' + powerId, 'unselectPower-dummy', 'replace');
 		powerDiv.style = '';
