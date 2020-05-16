@@ -220,7 +220,7 @@ class PowerManager extends APP_GameClass
     $r = array_map(function($power) use ($worker, $work, $name){
       return $power->$name($worker, $work);
     }, $player->getPowers());
-    return max($r);
+    return count($r) > 0? max($r) : false;
 
     // TODO use an opponentMove function ?
   }
