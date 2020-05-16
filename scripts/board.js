@@ -192,40 +192,11 @@ Board.prototype.initBoard = function(){
 };
 
 
-
-/*
- * Infinite loop for rendering
- */
-Board.prototype.animate = function(){
-	this._animated = this._animations.length > 0
-		|| (this._animateClickable && this._clickable.length > 0);
-
-	if(this._animated)
-		requestAnimationFrame(this.animate.bind(this));
-
-	this.render();
-	this._stats.update();
-}
-
-Board.prototype.launchAnimation = function(){
-	var id = (this._animations.length > 0 ? Math.max.apply(null, this._animations) : 0) + 1;
-	this._animations.push(id);
-	if(!this._animated)
-		this.animate();
-	return id;
-};
-
-Board.prototype.stopAnimation = function(id){
-	const index = this._animations.indexOf(id);
-	if (index > -1)
-	 	this._animations.splice(index, 1);
-};
-
-
 /*
  * Render the scene
  */
 Board.prototype.render = function() {
+	this._stats.update();
 	this._renderer.render( this._scene, this._camera );
 }
 
@@ -257,14 +228,11 @@ Board.prototype.addPiece = function(piece){
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);
 
-	var animationId = this.launchAnimation();
 	return new Promise((resolve, reject) => {
 		Tween.get(mesh.position)
-			.to(center, fallAnimation.duration,  Ease.cubicInOut)
-			.call(() => {
-				this.stopAnimation(animationId);
-				resolve()
-			});
+			.to(center, fallAnimation.duration,  Ease.quadInOut)
+			.call(resolve)
+			.addEventListener('change', () => this.render())
 	});
 };
 
@@ -288,15 +256,14 @@ Board.prototype.moveMesh = function(mesh, space, delay){
 
 	var theta = Math.atan2(target.x - mesh.position.x, target.z - mesh.position.z) + 3*Math.PI/2;
 
-	var animationId = this.launchAnimation();
 	Tween.get(mesh.rotation).wait(delay)
-		.to({y:theta}, 300,  Ease.cubicInOut)
+		.to({y:theta}, 300,  Ease.quadInOut)
 
 	Tween.get(mesh.position).wait(delay)
-		.to(tmp1, 700,  Ease.cubicInOut)
-		.to(tmp2, 600,  Ease.cubicInOut)
-		.to(target, 600,  Ease.cubicInOut)
-		.call(() => this.stopAnimation(animationId));
+		.to(tmp1, 700,  Ease.quadInOut)
+		.to(tmp2, 600,  Ease.quadInOut)
+		.to(target, 600,  Ease.quadInOut)
+		.addEventListener('change', () => this.render())
 };
 
 
@@ -448,14 +415,14 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		else if(action == "playerBuild"){
 			mark = new THREE.Mesh(
 				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.3,	transparent: true, })
+				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.7,	transparent: true, })
 			);
 		}
 		// Ring animation
 		else {
 			mark = new THREE.Mesh(
 				new THREE.RingGeometry( 0.4, 0.53, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({	color: basicColor, opacity:1,	transparent: true,	})
+				new THREE.MeshPhongMaterial({	color: basicColor, opacity:0.8,	transparent: true,	})
 			);
 		}
 
@@ -464,27 +431,9 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		mark.space = mesh.space;
 		this._clickable.push(mark);
 		mesh.add(mark);
-
-		if(!this._animateClickable)
-			return;
-
-		// Animate the mark
-		if(piece !== null){
-			Tween.get(mark.scale, {	loop:-1, bounce:true }).to({ x: 0.77, z: 0.77, }, 700, Ease.cubicInOut);
-		}
-		else if (action == "playerBuild"){
-			Tween.get(mark.material, {	loop:-1, bounce:true }).to({ opacity:0.7 }, 700, Ease.cubicInOut);
-		}
-		else {
-			Tween.get(mark.position, {	loop:-1, bounce:true }).to({ y:0.2 }, 500, Ease.linear);
-			Tween.get(mark.material, {	loop:-1, bounce:true }).to({ opacity:0.6}, 500, Ease.cubicInOut);
-		}
 	})
 
-	if(!this._animated && this._animateClickable)
-		this.animate();
-	else
-		this.render();
+	this.render();
 };
 
 
