@@ -189,11 +189,6 @@ focusContainer: function(container){
 	dojo.style( 'power-select-container', 'display', container == 'powers-select'? 'flex' : 'none');
 	dojo.style( 'power-choose-container', 'display', container == 'powers-choose'? 'flex' : 'none');
 	dojo.style( 'play-area', 'display', container == 'board'?  'block' : 'none');
-
-	if(container == "board")
-		this.board.display();
-	else
-		this.board.hide();
 },
 
 /*

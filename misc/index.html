@@ -42,9 +42,10 @@ import { Board } from '../scripts/board.js';
 
 
 var	container = document.getElementById("container");
-window.board = new Board(container, "http://127.0.0.1/" );
-board.display();
+window.board = new Board(container, "http://192.168.1.29/" );
+//board.display();
 
+/*
 var piece1 = {
 	x:4,y:2,z:0, name:'f1worker',
 };
@@ -53,11 +54,11 @@ var piece2 = {
 }
 
 board.addPiece(piece1);
-board.highlightPiece(piece1);
-setTimeout(() => board.clearHighlights(), 2000);
-//board.addPiece(piece2).then(() => board.switchPiece(piece2, piece1));
+//board.highlightPiece(piece1);
+//setTimeout(() => board.clearHighlights(), 2000);
+board.addPiece(piece2).then(() => board.switchPiece(piece2, piece1));
 
-/*
+*/
 
 var click = (pos) => {
 	board.clearClickable();
@@ -67,7 +68,7 @@ var click = (pos) => {
 	board.addPiece(pos);
 	board.addPiece({x:1,y:1,z:0,name:'lvl0'});
 
-  board.makeClickable([pos, {x:1,y:1,z:1}], () => console.log("test") , 'build');
+//  board.makeClickable([pos, {x:1,y:1,z:1}], () => console.log("test") , 'build');
 };
 
 var tPos = [];

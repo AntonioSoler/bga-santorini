@@ -55,6 +55,7 @@ var Board = function(container, url){
 	this._ids = [];
 	this._clickable = [];
 	this._highlights = [];
+	this._animations = [];
 	this._animated = false;
 
 	this.initScene();
@@ -97,7 +98,8 @@ Board.prototype.initScene = function(){
 	window.addEventListener( 'resize', () => {
 		this._camera.aspect = canvasWidth() / canvasHeight();
 		this._camera.updateProjectionMatrix();
-		this._renderer.setSize( canvasWidth(), canvasHeight() )
+		this._renderer.setSize( canvasWidth(), canvasHeight() );
+		this.render();
 	}, false );
 
 	const getRealMouseCoords = (px,py) => {
@@ -124,7 +126,7 @@ Board.prototype.initScene = function(){
 	controls.mouseButtons = {
 		RIGHT: THREE.MOUSE.ROTATE
 	}
-
+  controls.addEventListener('change', this.render.bind(this));
 
 	// Raycasting
 	this._raycaster = new THREE.Raycaster();
@@ -193,22 +195,27 @@ Board.prototype.initBoard = function(){
  * Infinite loop for rendering
  */
 Board.prototype.animate = function(){
+	this._animated = this._animations.length > 0 || this._clickable.length > 0;
+
 	if(this._animated)
 		requestAnimationFrame(this.animate.bind(this));
+
 	this.render();
 	this._stats.update();
 }
 
-Board.prototype.display = function(){
-	if(this._animated)
-		return;
-
-	this._animated = true;
-	this.animate();
+Board.prototype.launchAnimation = function(){
+	var id = (this._animations.length > 0 ? Math.max.apply(null, this._animations) : 0) + 1;
+	this._animations.push(id);
+	if(!this._animated)
+		this.animate();
+	return id;
 };
 
-Board.prototype.hide = function(){
-	this._animated = false;
+Board.prototype.stopAnimation = function(id){
+	const index = this._animations.indexOf(id);
+	if (index > -1)
+	 	this._animations.splice(index, 1);
 };
 
 
@@ -250,10 +257,14 @@ Board.prototype.addPiece = function(piece){
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);
 
-	return new Promise(function(resolve, reject){
+	var animationId = this.launchAnimation();
+	return new Promise((resolve, reject) => {
 		Tween.get(mesh.position)
 			.to(center, fallAnimation.duration,  Ease.cubicInOut)
-			.call(resolve);
+			.call(() => {
+				this.stopAnimation(animationId);
+				resolve()
+			});
 	});
 };
 
@@ -276,6 +287,8 @@ Board.prototype.moveMesh = function(mesh, space, delay){
 	tmp2.setY(maxZ);
 
 	var theta = Math.atan2(target.x - mesh.position.x, target.z - mesh.position.z) + 3*Math.PI/2;
+
+	var animationId = this.launchAnimation();
 	Tween.get(mesh.rotation).wait(delay)
 		.to({y:theta}, 300,  Ease.cubicInOut)
 
@@ -283,6 +296,7 @@ Board.prototype.moveMesh = function(mesh, space, delay){
 		.to(tmp1, 700,  Ease.cubicInOut)
 		.to(tmp2, 600,  Ease.cubicInOut)
 		.to(target, 600,  Ease.cubicInOut)
+		.call(() => this.stopAnimation(animationId));
 };
 
 
@@ -456,6 +470,9 @@ Board.prototype.makeClickable = function(objects, callback, action){
 			Tween.get(mark.material, {	loop:-1, bounce:true }).to({ opacity:0.6}, 500, Ease.cubicInOut);
 		}
 	})
+
+	if(!this._animated)
+		this.animate();
 };
 
 
