@@ -462,18 +462,18 @@ setupNotifications: function() {
 	this.notifqueue.setSynchronous('workerPlaced', 1000);
 
 	dojo.subscribe('workerMoved', this, 'notif_workerMoved');
-	this.notifqueue.setSynchronous('workerMoved', 1000);
+	this.notifqueue.setSynchronous('workerMoved', 2000);
 
 	dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
 	this.notifqueue.setSynchronous('blockBuilt', 1000);
 
 	// Happens with Apollo
 	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
-	this.notifqueue.setSynchronous('workerSwitched', 1000);
+	this.notifqueue.setSynchronous('workerSwitched', 2000);
 
 	// Happens with Minotaur
 	dojo.subscribe('workerPushed', this, 'notif_workerPushed');
-	this.notifqueue.setSynchronous('workerPushed', 1000);
+	this.notifqueue.setSynchronous('workerPushed', 2000);
 },
 
 

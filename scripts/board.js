@@ -37,7 +37,7 @@ var Board = function(container, url){
 	this._url = url;
 	this._container = container;
 	this._meshManager = new MeshManager(url);
-	this._meshManager.load().then( () => console.info("Meshes loaded, rendered scene should look good") );
+	this._meshManager.load().then( () => { this.render(); console.info("Meshes loaded, rendered scene should look good") });
 
 	this._board = new Array();
 	for(var i = 0; i < 5; i++){
@@ -57,6 +57,7 @@ var Board = function(container, url){
 	this._highlights = [];
 	this._animations = [];
 	this._animated = false;
+	this._animateClickable = false;
 
 	this.initScene();
 	this.initBoard();
@@ -89,11 +90,10 @@ Board.prototype.initScene = function(){
 	this._scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF, 1 ) );
 
 	// Renderer
-	this._renderer = new THREE.WebGLRenderer({ antialias: true, precision:"lowp" });
+	this._renderer = new THREE.WebGLRenderer({ antialias: true, precision:"lowp", powerPreference: "high-performance" });
 	this._renderer.setPixelRatio( window.devicePixelRatio );
 	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;
-	this._renderer.shadowMap.enabled = true;
 	this._container.appendChild(this._renderer.domElement);
 	window.addEventListener( 'resize', () => {
 		this._camera.aspect = canvasWidth() / canvasHeight();
@@ -137,6 +137,8 @@ Board.prototype.initScene = function(){
 	document.addEventListener( 'mousemove', (event) => {
 		event.preventDefault();
 		this._mouse = getRealMouseCoords(event.clientX, event.clientY);
+		if(!this._mouseDown && this._clickable.length > 0)
+			this.raycasting(true);
 	}, false );
 
 	document.addEventListener( 'mousedown', (event) => this._mouseDown = true );
@@ -195,7 +197,8 @@ Board.prototype.initBoard = function(){
  * Infinite loop for rendering
  */
 Board.prototype.animate = function(){
-	this._animated = this._animations.length > 0 || this._clickable.length > 0;
+	this._animated = this._animations.length > 0
+		|| (this._animateClickable && this._clickable.length > 0);
 
 	if(this._animated)
 		requestAnimationFrame(this.animate.bind(this));
@@ -223,9 +226,6 @@ Board.prototype.stopAnimation = function(id){
  * Render the scene
  */
 Board.prototype.render = function() {
-	if(!this._mouseDown && this._clickable.length > 0)
-		this.raycasting(true);
-
 	this._renderer.render( this._scene, this._camera );
 }
 
@@ -343,29 +343,33 @@ Board.prototype.raycasting = function(hover){
 
 	// Try to find the corresponding space (x,y,z)
 	var space = (intersects.length > 0 && intersects[0].object.space)? intersects[0].object.space : null;
+	this._renderNeedUpdate = false;
+
 	// Clear previous hovering if needed
 	this.clearHovering(space);
 
-	if(space === null)
-		return;
-
-	if(hover){
-		if(space == this._hoveringSpace)
-			return;
-
-		this._hoveringSpace = space;
-		var cell = this._board[space.x][space.y][space.z];
-		this._originalHex = cell.planeHover.children[0].material.color.getHex();
-		cell.planeHover.children[0].material.color.setHex(hoveringColor);
-		if(cell.piece != null)
-			cell.piece.material.emissive.setHex(0x333333);
-		document.body.style.cursor = "pointer";
+	if(space !== null){
+		if(hover){
+			if(space != this._hoveringSpace){
+				this._renderNeedUpdate = true;
+				this._hoveringSpace = space;
+				var cell = this._board[space.x][space.y][space.z];
+				this._originalHex = cell.planeHover.children[0].material.color.getHex();
+				cell.planeHover.children[0].material.color.setHex(hoveringColor);
+				if(cell.piece != null)
+					cell.piece.material.emissive.setHex(0x333333);
+				document.body.style.cursor = "pointer";
+			}
+		}
+		else {
+			// Enforce clearing of hovering
+			this.clearHovering();
+			this._board[space.x][space.y][space.z].onclick();
+		}
 	}
-	else {
-		// Enforce clearing of hovering
-		this.clearHovering();
-		this._board[space.x][space.y][space.z].onclick();
-	}
+
+	if(!this._animateClickable && this._renderNeedUpdate)
+		this.render();
 };
 
 /*
@@ -376,6 +380,7 @@ Board.prototype.clearHovering = function(space){
 	if(this._hoveringSpace === null || space == this._hoveringSpace)
 		return;
 
+	this._renderNeedUpdate = true;
 	var cell = this._board[this._hoveringSpace.x][this._hoveringSpace.y][this._hoveringSpace.z];
 	cell.planeHover.children[0].material.color.setHex(this._originalHex);
 	if(cell.piece != null)
@@ -398,6 +403,8 @@ Board.prototype.clearClickable = function(){
 	});
 
 	this._clickable = [];
+	if(!this._animateClickable)
+		this.render();
 };
 
 
@@ -433,7 +440,7 @@ Board.prototype.makeClickable = function(objects, callback, action){
 
 			// Disk animation
 			mark = new THREE.Mesh(
-				new THREE.CircleGeometry( 0.56, 32 ).rotateX(-Math.PI/2),
+				new THREE.CircleGeometry( 0.728, 32 ).rotateX(-Math.PI/2),
 				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.7,	transparent: true, })
 			);
 		}
@@ -458,11 +465,14 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		this._clickable.push(mark);
 		mesh.add(mark);
 
+		if(!this._animateClickable)
+			return;
+
 		// Animate the mark
 		if(piece !== null){
-			Tween.get(mark.scale, {	loop:-1, bounce:true }).to({ x: 1.3, z: 1.3, }, 700, Ease.cubicInOut);
+			Tween.get(mark.scale, {	loop:-1, bounce:true }).to({ x: 0.77, z: 0.77, }, 700, Ease.cubicInOut);
 		}
-		else if (action == "build"){
+		else if (action == "playerBuild"){
 			Tween.get(mark.material, {	loop:-1, bounce:true }).to({ opacity:0.7 }, 700, Ease.cubicInOut);
 		}
 		else {
@@ -471,8 +481,10 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		}
 	})
 
-	if(!this._animated)
+	if(!this._animated && this._animateClickable)
 		this.animate();
+	else
+		this.render();
 };
 
 

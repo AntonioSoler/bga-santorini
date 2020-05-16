@@ -43,6 +43,7 @@ import { Board } from '../scripts/board.js';
 
 var	container = document.getElementById("container");
 window.board = new Board(container, "http://192.168.1.29/" );
+board.render();
 //board.display();
 
 /*
@@ -68,7 +69,7 @@ var click = (pos) => {
 	board.addPiece(pos);
 	board.addPiece({x:1,y:1,z:0,name:'lvl0'});
 
-//  board.makeClickable([pos, {x:1,y:1,z:1}], () => console.log("test") , 'build');
+  board.makeClickable([pos, {x:1,y:1,z:1}], () => console.log("test") , 'playerBuild');
 };
 
 var tPos = [];
