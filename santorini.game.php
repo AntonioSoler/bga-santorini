@@ -380,6 +380,10 @@ class santorini extends Table
    */
   public function stNextPlayer()
   {
+    // First check if current player has won
+    $this->stCheckEndOfGame();
+
+    // If not, go to next player
     $pId = $this->activeNextPlayer();
     self::giveExtraTime($pId);
     if(self::getGamestateValue("firstPlayer") == $pId){
@@ -408,9 +412,9 @@ class santorini extends Table
     ];
 
     // Basic rule
-    $move = $this->log->getLastMove();
-    if($move != null){
-      $arg['win'] = $move['from']['z'] < $move['to']['z'] && $move['to']['z'] == 3;
+    $work = $this->log->getLastWork();
+    if($work != null && $work['action'] == 'move'){
+      $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
     }
 
     // Apply powers

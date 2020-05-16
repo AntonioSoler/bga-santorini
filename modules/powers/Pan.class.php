@@ -37,8 +37,8 @@ class Pan extends Power
     if($arg['win'])
       return;
 
-    $move = $this->game->log->getLastMove();
-    if($move == null || $move['to']['z'] > $move['from']['z'] - 2)
+    $move = $this->game->log->getLastWork();
+    if($move == null || $move['action'] != 'move' || $move['to']['z'] > $move['from']['z'] - 2)
       return;
 
     $arg['win'] = true;
