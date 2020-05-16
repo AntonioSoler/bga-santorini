@@ -80,12 +80,7 @@ class santorini extends Table
     self::reloadPlayersBasicInfos();
 
     // Create power cards
-    $sql = 'INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ';
-    $values = [];
-    foreach ($this->powers as $powerId => $power) {
-      $values[] = "('$powerId', 0, 'box', 0)";
-    }
-    self::DbQuery($sql . implode($values, ','));
+    $this->powerManager->createCards();
 
     // Active first player to play
     $pId = $this->activeNextPlayer();
@@ -102,7 +97,7 @@ class santorini extends Table
     return [
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
       'placedPieces' => $this->board->getPlacedPieces(),
-      'powers' => $this->powers,
+      'powers' => $this->powerManager->getUiData(),
     ];
   }
 
@@ -148,15 +143,13 @@ class santorini extends Table
       return;
     }
 
-    // Make a deck of possible powers
-    $possiblePowers = $this->powerManager->getPlayablePowers();
-    $this->cards->moveCards(array_keys($possiblePowers), 'deck');
-    $this->cards->shuffle('deck');
+    // Prepare a deck with all possible powers for this game
+    $this->powerManager->preparePowers();
 
-    // Go to fair division if ggame option is selected
+    // In fair division setup player 1 must build the offer
     $optionSetup = intval(self::getGameStateValue('optionSetup'));
     if ($optionSetup == FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
-      $this->gamestate->nextState('divide');
+      $this->gamestate->nextState('offer');
       return;
     }
 
@@ -184,23 +177,70 @@ class santorini extends Table
 //////////////////////////////////////
 
   /*
-   * argDividePowers: in the fair division setup, list the possible powers depending on game option
+   * argBuildOffer:
+   *   during fair division setup, list the possible powers from the deck
    */
-  public function argDividePowers()
+  public function argBuildOffer()
   {
     return [
-      'count' => self::getPlayerCount(),
-      'powers' => array_map(function($power){ return $power['id']; }, $this->powerManager->getPowersInLocation('deck'))
+      'count' => $this->playerManager->getPlayerCount(),
+      'deck' => $this->powerManager->getPowerIdsInLocation('deck'),
+      'offer' => $this->powerManager->getPowerIdsInLocation('offer'),
     ];
   }
 
   /*
-   * dividePowers: is called in the fair division process, after the contestant chose the set of powers
+   * addOffer:
+   *   during fair division setup, when player 1 adds a power to the offer
    */
-  public function dividePowers($ids)
+  public function addOffer($powerId) {
+    self::checkAction('addOffer');
+    $this->powerManager->addOffer($powerId);
+  }
+
+  /*
+   * unselectPower:
+   *   during fair division setup, when player 1 removes a power from the offer
+   */
+  public function removeOffer($powerId) {
+    self::checkAction('removeOffer');
+    $this->powerManager->removeOffer($powerId);
+  }
+
+  /*
+   * confirmOffer:
+   *   during fair division setup, when player 1 confirms the offer is complete
+   */
+  public function confirmOffer()
   {
-    self::checkAction('dividePowers');
-    $this->powerManager->dividePowers($ids);
+    self::checkAction('confirmOffer');
+    $nPlayers = $this->playerManager->getPlayerCount();
+    $powers = $this->powerManager->getPowersInLocation('offer');
+    if (count($powers) != $nPlayers) {
+      $msg = sprintf( self::_("You must offer exactly %d powers"), $nPlayers );
+      throw new BgaUserException($msg);
+    }
+
+    // Send notification message
+    $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
+    if ($nPlayers == 3) {
+      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
+    } else if ($nPlayers == 4) {
+      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
+    }
+    $args = [
+      'i18n' => [],
+      'player_name' => self::getActivePlayerName()
+    ];
+
+    $i = 1;
+    foreach ($powers as $power) {
+      $argName = "power_name$i";
+      $args['i18n'][] = $argName;
+      $args[$argName] = $power->getName();
+      $i++;
+    }
+    self::notifyAllPlayers('buildOffer', $msg, $args);
     $this->gamestate->nextState('done');
   }
 
@@ -214,15 +254,11 @@ class santorini extends Table
   {
     $pId = $this->activeNextPlayer();
 
-    $remainingPowers = $this->cards->getCardsInLocation('stack');
-    if(count($remainingPowers) > 1)
+    $remainingPowers = $this->powerManager->getPowerIdsInLocation('offer');
+    if(count($remainingPowers) > 1) {
       $this->gamestate->nextState('next');
-    else {
-      // If only one power left, automatically assign it to the last player
-      if(count($remainingPowers) == 1)
-        $this->powerManager->choosePower(reset($remainingPowers)['id'], $pId);
-
-      $this->gamestate->nextState('done');
+    } else {
+      self::choosePower(reset($remainingPowers));
     }
   }
 
@@ -232,17 +268,18 @@ class santorini extends Table
   public function argChoosePower()
   {
     return [
-      'powers' => array_map(function($power){ return $power['id']; }, $this->powerManager->getPowersInLocation('stack'))
+      'offer' => $this->powerManager->getPowerIdsInLocation('offer')
     ];
   }
 
   /*
    * choosePower: is called in the fair division setup, when a player picked a power from the remeaning ones
    */
-  public function choosePower($id)
+  public function choosePower($powerId)
   {
-    self::checkAction('choosePower');
-    $this->powerManager->choosePower($id);
+    $player = $this->playerManager->getPlayer();
+    $power = $player->addPower($powerId);
+    $power->setup($player);
     $this->gamestate->nextState('done');
   }
 

@@ -18,8 +18,8 @@
 //@ sourceURL=santorini.js
 
 
-const isDebug = false;
-var debug = isDebug? console.info.bind(window.console) : function(){};
+const isDebug = true;
+var debug = isDebug ? console.info.bind(window.console) : function() {};
 
 define([
 	"dojo", "dojo/_base/declare",
@@ -104,16 +104,24 @@ onEnteringState: function(stateName, args) {
 
 	switch(stateName){
 		/*
-		 * PowersDivide: in the fair division setup,the contestant can select #players powers from available powers (depending on game option)
+		 * BuildOffer: in the fair division setup,the contestant can select #players powers from available powers (depending on game option)
 		 */
-		case "powersDivide":
-			this.focusContainer('powers-select');
-			this._selectedPowers = [];
-			args.args.powers.forEach(powerId => {
-				var power = this.getPower(powerId);
-				var div = dojo.place(this.format_block('jstpl_powerSelect', power), $('power-select-available') );
-				dojo.connect(div, 'onclick', e => this.onClickSelectPower(power.id) );
-			});
+		case "buildOffer":
+	 		this.focusContainer('powers-offer');
+
+	 		args.args.offer.forEach(powerId => {
+	 			var power = this.getPower(powerId);
+	 			var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('cards-offer') );
+	 			div.classList.add('selected');
+	 			dojo.connect(div, 'onclick', e => this.onClickPowerSmall(power.id) );
+	 		});
+	 		args.args.deck.forEach(powerId => {
+	 			var power = this.getPower(powerId);
+	 			console.info('card is in the DECK', powerId, power);
+	 			var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('cards-deck') );
+	 			dojo.connect(div, 'onclick', e => this.onClickPowerSmall(power.id) );
+	 		});
+	 		this.buildOfferActionButtons();
 			break;
 
 		/*
@@ -173,7 +181,7 @@ onLeavingState: function(stateName) {
 
 /*
  * onUpdateActionButtons:
- * 	TODO when is this called ?
+ * 	called by BGA framework before onEnteringState
  *  in this method you can manage "action buttons" that are displayed in the action status bar (ie: the HTML links in the status bar).
  */
 onUpdateActionButtons: function(stateName, args) {
@@ -183,12 +191,20 @@ onUpdateActionButtons: function(stateName, args) {
 	if (!this.isCurrentPlayerActive())
 		return;
 
-	if((stateName == "playerMove" || stateName == "playerBuild") && args.skippable){
+	if ((stateName == "playerMove" || stateName == "playerBuild") && args.skippable) {
 		this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
 	}
 },
 
-
+buildOfferActionButtons: function() {
+	// Show confirm button if the count is correct
+	if (this.isCurrentPlayerActive()) {
+		this.removeActionButtons();
+		if (dojo.query('.power-card.small.selected').length == this.gamedatas.fplayers.length) {
+			this.addActionButton('buttonConfirmOffer', _('Confirm'), 'onClickConfirmOffer', null, false, 'blue');
+		}
+	}
+},
 
 
 ///////////////////////////////////////
@@ -200,7 +216,7 @@ onUpdateActionButtons: function(stateName, args) {
  * 	show and hide containers depending on state
  */
 focusContainer: function(container){
-	dojo.style( 'power-select-container', 'display', container == 'powers-select'? 'flex' : 'none');
+	dojo.style( 'power-offer-container', 'display', container == 'powers-offer'? 'flex' : 'none');
 	dojo.style( 'power-choose-container', 'display', container == 'powers-choose'? 'flex' : 'none');
 	dojo.style( 'play-area', 'display', container == 'board'?  'block' : 'none');
 },
@@ -318,52 +334,57 @@ unselectPower: function(powerId) {
 
 
 /*
- * onClickSelectPower:
- * 	triggered after a click on a power (for "fair division" process)
+ * onClickPowerSmall:
+ * 	 during fair division setup, when clicking on a small card while building the offer
  */
-onClickSelectPower: function(powerId) {
-	var active = this.isCurrentPlayerActive();
-	var powerDiv = $('power-select-' + powerId);
-	if (!powerDiv.classList.contains('displayed')) {
-		// First click always displays the power
-		// Everyone can display
-		this.displayPower(powerId);
-	} else if (active && powerDiv.classList.contains('selected')) {
+onClickPowerSmall: function(powerId) {
+	var powerDiv = $('power-small-' + powerId);
+	var isActive = this.isCurrentPlayerActive();
+	var isDisplayed = powerDiv.classList.contains('displayed');
+	var isSelected = powerDiv.classList.contains('selected');
+	var isWait = powerDiv.classList.contains('wait');
+	if (!isDisplayed) {
+		// Everyone may view details on first click
+		// Mark only this card as displayed
+		dojo.query('.power-card.small.displayed').removeClass('displayed');
+		powerDiv.classList.add('displayed');
+		// Display the detail
+		var power = this.getPower(powerId);
+		dojo.place(this.format_block('jstpl_powerDetail', power), 'grid-detail', 'only');
+	} else if (!isWait && isActive && isSelected) {
 		// Active player may unselect
-		this.unselectPower(powerId);
-	} else if (active && dojo.query('.power-card.small.selected').length < this.gamedatas.fplayers.length) {
+		this.ajaxcall( "/santorini/santorini/removeOffer.html", { powerId: powerId }, this, res => {} );
+		powerDiv.classList.add('wait');
+	} else if (!isWait && isActive && dojo.query('.power-card.small.selected').length < this.gamedatas.fplayers.length) {
 		// Active player may select
-		this.selectPower(powerId);
+		this.ajaxcall( "/santorini/santorini/addOffer.html", { powerId: powerId }, this, res => {} );
+		powerDiv.classList.add('wait');
 	}
 },
 
 
 /*
- * onClickValidateSelection:
- * 	triggered after a click on a button to validate the selected powers
+ * onClickConfirmOffer:
+ *   during fair division setup, when player 1 confirms they are done building the offer
  */
-onClickValidateSelection: function() {
+onClickConfirmOffer: function() {
 	// Check that this action is possible at this moment
-	if (!this.checkAction('dividePowers')) {
+	if (!this.checkAction('confirmOffer')) {
 		return false;
 	}
-
-	var ids = dojo.query('.power-card.small.selected').map(function(node) {
-		return node.dataset.power;
-	}).join(',');
-	this.ajaxcall( "/santorini/santorini/dividePowers.html", { ids : ids }, this, res => {} );
+	this.ajaxcall( "/santorini/santorini/confirmOffer.html", {}, this, res => {} );
 },
 
 
 /*
  * onClickChoosePower:
- * 	triggered after a click on a card for choosing a power (in the Fair Division process)
+ *   during fair division, when a player claims a power
  */
 onClickChoosePower: function(powerId) {
-	if(! this.checkAction( 'choosePower' ) )
+	if (!this.checkAction('choosePower')) {
 		return false;
-
-	this.ajaxcall( "/santorini/santorini/choosePower.html", { id : powerId }, this, res => {} );
+	}
+	this.ajaxcall( "/santorini/santorini/choosePower.html", { powerId : powerId }, this, res => {} );
 },
 
 
@@ -482,6 +503,12 @@ onClickSkip: function() {
  *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
  */
 setupNotifications: function() {
+	dojo.subscribe( 'addOffer', this, "notif_addOffer" );
+	this.notifqueue.setSynchronous('selectPower', 500);
+
+	dojo.subscribe( 'removeOffer', this, "notif_removeOffer" );
+	this.notifqueue.setSynchronous('unselectPower', 500);
+
 	dojo.subscribe( 'powerAdded', this, "notif_powerAdded" );
 	this.notifqueue.setSynchronous('powerAdded', 1000);
 
@@ -501,6 +528,52 @@ setupNotifications: function() {
 	// Happens with Minotaur
 	dojo.subscribe('workerPushed', this, 'notif_workerPushed');
 	this.notifqueue.setSynchronous('workerPushed', 2000);
+},
+
+/*
+ * notif_addOffer:
+ *   called during fair division setup, when player 1 adds a power to the offer
+ */
+notif_addOffer: function(n) {
+	debug('Notif: addOffer', n.args);
+	// Create a dummy in the offer
+	var dummy = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(0)), $('cards-offer') );
+	dummy.id = 'addOffer-dummy';
+	// Slide the real card to the position of the dummy
+	var powerDivId = 'power-small-' + n.args.powerId;
+	var animation_id = this.slideToObject(powerDivId, dummy.id);
+	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
+		// Replace the dummy with the real card
+		var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
+		powerDiv.style = '';
+		powerDiv.classList.add('selected');
+		powerDiv.classList.remove('wait');
+		this.buildOfferActionButtons();
+	}));
+	animation_id.play();
+},
+
+/*
+ * notif_removeOffer:
+ *   called during fair division setup, when player 1 removes a power from the offer
+ */
+notif_removeOffer: function(n) {
+	debug('Notif: removeOffer', n.args);
+	// Create a dummy in the deck
+	var dummy = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(0)), $('cards-deck'), 'first');
+	dummy.id = 'removeOffer-dummy';
+	// Slide the real card to the position of the dummy
+	var powerDivId = 'power-small-' + n.args.powerId;
+	var animation_id = this.slideToObject(powerDivId, dummy.id);
+	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
+		// Replace the dummy with the real card
+		var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
+		powerDiv.style = '';
+		powerDiv.classList.remove('selected');
+		powerDiv.classList.remove('wait');
+		this.buildOfferActionButtons();
+	}));
+	animation_id.play();
 },
 
 

@@ -136,8 +136,8 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-name {
-    font: 18px 'Ink Blossoms', cursive;
-    text-transform: uppercase;
+    font: 24px 'Ink Blossoms', cursive;
+    letter-spacing: -0.5px;
     color: #333;
 }
 
@@ -152,7 +152,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center center;
-    vertical-align: -4px;
+    vertical-align: -3px;
     width: 1em;
     height: 1em;
     padding-right: .3em;
@@ -169,11 +169,11 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     margin-bottom: 1em;
 }
 
-#power-select-container .power-detail, #power-choose-container .power-detail {
+#power-offer-container .power-detail, #power-choose-container .power-detail {
     margin: 0 15px;
 }
 
-#power-select-container {
+#power-offer-container {
     display: flex;
 }
 
@@ -182,11 +182,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     margin: 0 10px;
 }
 
-.power-section-title {
-    font-weight: bold;
-}
-
-.power-section-cards {
+.card-container {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
@@ -196,7 +192,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     margin: 6px 0 18px;
 }
 
-.power-section-cards:empty::before {
+.card-container:empty::before {
     content: "∅";
     font-size: 100px;
     line-height: 166px;
@@ -209,6 +205,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 #power-choose-container {
     display: flex;
+    flex-flow: row wrap;
     justify-content: space-evenly;
 }
 
@@ -258,14 +255,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     outline: none;
 }
 
-#powers-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    flex-wrap: wrap;
-    padding-left: 20px;
-}
-
 .power-card {
     margin: 0 auto 10px;
     width: 300px;
@@ -298,14 +287,15 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-card .power-name {
     position: absolute;
-    top: 1px;
+    top: 0;
     left: 0;
     width: 100%;
     text-align: center;
-    line-height: 32px;
+    line-height: 34px;
     text-shadow: 1px 1px 2px white;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
     z-index: 3;
 }
 
@@ -325,12 +315,17 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 /* Fair division setup uses small cards */
 
 .power-card.small {
+    cursor: pointer;
     width: 103px;
     height: 150px;
     background-size: 135%;
     background-position: 50% 20%;
     border-radius: 8px;
     margin: 8px;
+}
+
+.power-card.small.wait {
+    cursor: wait;
 }
 
 .power-card.small::before {
@@ -343,6 +338,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-card.small .power-name {
-    font-size: 12px;
+    font-size: 15px;
     line-height: 18px;
 }

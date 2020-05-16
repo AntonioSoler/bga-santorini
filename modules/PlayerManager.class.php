@@ -15,55 +15,54 @@ class PlayerManager extends APP_GameClass
   }
 
   /*
+   * getPlayer : returns the SantoriniPlayer object for the given player ID
+   */
+  public function getPlayer($playerId = null)
+  {
+    $playerId = $playerId ?: $this->game->getActivePlayerId();
+    $players = $this->getPlayers([$playerId]);
+    return $players[0];
+  }
+
+  /*
+   * getPlayers : Returns array of SantoriniPlayer objects for all/specified player IDs
+   */
+  public function getPlayers($playerIds = null)
+  {
+    $sql = "SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player";
+    if (!empty($playerIds)) {
+      $sql .= " WHERE player_id IN (" . implode(',', $playerIds) . ")";
+    }
+    $rows = self::getObjectListFromDb($sql);
+
+    $players = [];
+    foreach ($rows as $row) {
+      $player = new SantoriniPlayer($this->game, $row);
+      $players[] = $player;
+    }
+    return $players;
+  }
+
+  /*
    * getPlayerCount: return the number of players
    */
   public function getPlayerCount()
   {
-    return self::getUniqueValueFromDB("SELECT COUNT(*) FROM player");
+    return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM player"));
   }
-
 
   /*
    * getUiData : get all ui data of all players : id, no, name, team, color, powers list
    */
   public function getUiData()
   {
-    return array_map(function ($player) {
-        return $player->getUiData();
-    }, $this->getPlayers());
-  }
-
-
-  /*
-   * getPlayers : Returns array of SantoriniPlayer objects for all/specified player IDs
-   */
-  public function getPlayers($ids = null)
-  {
-    $players = [];
-    $sql = "SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player";
-    if (!empty($ids)) {
-      $sql .= " WHERE player_id IN (" . implode(',', $ids) . ")";
+    $ui = [];
+    foreach ($this->getPlayers() as $player) {
+      // TODO associative array? $ui[$player->getId()]
+      $ui[] = $player->getUiData();
     }
-    $rows = self::getObjectListFromDb($sql);
-
-    foreach ($rows as $row) {
-      $player = new SantoriniPlayer($this->game, $row);
-      $players[] = $player;
-    }
-
-    return $players;
+    return $ui;
   }
-
-
-  /*
-   * getPlayer : returns the SantoriniPlayer object for the given player ID
-   */
-  public function getPlayer($id)
-  {
-      $players = $this->getPlayers([$id]);
-      return $players[0];
-  }
-
 
 
   /*
@@ -118,12 +117,12 @@ class PlayerManager extends APP_GameClass
   }
 
 
- /*
+  /*
   * eliminate : called after a player loose in a 3 players setup
   */
   public function eliminate($pId)
   {
-    self::DbQuery("UPDATE piece SET location = 'bin' WHERE type IN ('worker') AND player_id = $pId");
+    self::DbQuery("UPDATE piece SET location = 'box' WHERE type IN ('worker') AND player_id = $pId");
     $this->game->eliminatePlayer($pId);
   }
 }

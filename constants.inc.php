@@ -72,7 +72,7 @@ define('THESEUS', 55);
  */
 define('ST_GAME_SETUP', 1);
 define('ST_POWERS_SETUP', 10);
-define('ST_POWERS_DIVIDE', 12);
+define('ST_BUILD_OFFER', 12);
 define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
 define('ST_POWERS_CHOOSE', 14);
 

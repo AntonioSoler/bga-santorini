@@ -75,21 +75,20 @@ ST_POWERS_SETUP => [
   'action' => 'stPowersSetup',
   'transitions' => [
     'done' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'divide' => ST_POWERS_DIVIDE
+    'offer' => ST_BUILD_OFFER
   ],
 ],
 
 /*
- * The following is for divide/choose mode.
- *
+ * Fair division setup
  */
-ST_POWERS_DIVIDE => [
-  'name' => 'powersDivide',
-  'description' => clienttranslate('${actplayer} must choose ${count} powers'),
-  'descriptionmyturn' => clienttranslate('${you} must choose ${count} powers'),
+ST_BUILD_OFFER => [
+  'name' => 'buildOffer',
+  'description' => clienttranslate('${actplayer} must offer ${count} powers for selection'),
+  'descriptionmyturn' => clienttranslate('${you} must offer ${count} powers for selection'),
   'type' => 'activeplayer',
-  'args' => 'argDividePowers',
-  'possibleactions' => ['dividePowers'],
+  'args' => 'argBuildOffer',
+  'possibleactions' => ['addOffer', 'removeOffer', 'confirmOffer'],
   'transitions' => [
     'zombiePass' => ST_GAME_END,
     'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,

@@ -29,17 +29,6 @@ require_once("modules/PowerManager.class.php");
 require_once("modules/powers/Power.class.php");
 require_once("modules/powers/HeroPower.class.php");
 
-foreach (PowerManager::$powersClasses as $id => $className) {
+foreach (PowerManager::$classes as $className) {
   require_once("modules/powers/$className.class.php");
-
-  $this->powers[$className::getId()] = [
-    'id'      => $className::getId(),
-    'name'    => $className::getName(),
-    'title'   => $className::getTitle(),
-    'text'    => $className::getText(),
-    'banned'  => $className::getBannedIds(),
-    'players' => $className::getPlayers(),
-    'golden'  => $className::isGoldenFleece(),
-    'hero'    => get_parent_class($className) == 'HeroPower',
-  ];
 }

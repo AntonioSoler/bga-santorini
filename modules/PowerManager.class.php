@@ -5,27 +5,11 @@
  */
 class PowerManager extends APP_GameClass
 {
-  public $game;
-  public function __construct($game)
-  {
-    $this->game = $game;
-  }
-
-  /*
-   * getPower: factory function to create a power by ID
-   */
-  public function getPower($powerId, $playerId = null) {
-    if(!isset(self::$powersClasses[$powerId])) {
-      throw new BgaVisibleSystemException( "Power $powerId is not implemented" );
-    }
-    return new self::$powersClasses[$powerId]($this->game, $playerId);
-  }
-
   /*
    * powerClasses : for each power Id, the corresponding class name
    *  (see also constant.inc.php)
    */
-  public static $powersClasses = [
+  public static $classes = [
     APOLLO => 'Apollo',
     ARTEMIS => 'Artemis',
     ATHENA => 'Athena',
@@ -83,81 +67,133 @@ class PowerManager extends APP_GameClass
     THESEUS => 'Theseus',
   ];
 
-  /*
-   * Get playable powers: given the game option, return the list of playable power for this game
-   */
-  public function getPlayablePowers()
+
+  public $game;
+  public function __construct($game)
   {
-    $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
-    if ($optionPowers == NONE) {
-      return [];
-    }
-
-    // Gather information about number of players
-    $nPlayers = $this->game->playerManager->getPlayerCount();
-
-    // Filter powers depending on the number of players and game option
-    return array_filter($this->game->powers, function ($power, $id) use ($nPlayers, $optionPowers) {
-      return in_array($nPlayers, $power['players']) &&
-        (($optionPowers == SIMPLE && $id <= 10)
-          || ($optionPowers == GODS && !$power['hero'])
-          || ($optionPowers == HEROES && $power['hero'])
-          || ($optionPowers == GODS_AND_HEROES)
-          || ($optionPowers == GOLDEN_FLEECE && $power['golden']));
-    }, ARRAY_FILTER_USE_BOTH);
+    $this->game = $game;
   }
 
+  /*
+   * getPower: factory function to create a power by ID
+   */
+  public function getPower($powerId, $playerId = null)
+  {
+    if (!isset(self::$classes[$powerId])) {
+      throw new BgaVisibleSystemException("Power $powerId is not implemented");
+    }
+    return new self::$classes[$powerId]($this->game, $playerId);
+  }
 
   /*
-   * getPowersInLocation: return all the power cards in a given location
+   * getPowers: return all powers (even those not available in this game)
+   */
+  public function getPowers()
+  {
+    return array_map(function ($powerId) {
+      return $this->getPower($powerId);
+    }, array_keys(self::$classes));
+  }
+
+  /*
+   * getUiData : get all ui data of all powers : id, name, title, text, hero
+   */
+  public function getUiData()
+  {
+    $ui = [];
+    foreach($this->getPowers() as $power) {
+      $ui[$power->getId()] = $power->getUiData();
+    }
+    return $ui;
+  }
+
+  /*
+   * getPowersInLocation: return all the powers in a given location
    */
   public function getPowersInLocation($location)
   {
     $cards = $this->game->cards->getCardsInLocation($location);
-    $powers = array_map(function($card) {
-      return $this->game->powers[$card['type']];
-    }, $cards);
+    return array_values(array_map(function ($card) {
+      return $this->getPower($card['type']);
+    }, $cards));
+  }
 
-    return array_values($powers);
+  /*
+   * getPowerIdsInLocation: return all the power IDs in a given location
+   */
+  public function getPowerIdsInLocation($location)
+  {
+    $cards = $this->game->cards->getCardsInLocation($location);
+    return array_values(array_map(function ($card) {
+      return intval($card['type']);
+    }, $cards));
   }
 
 
   /*
-   * dividePowers: is called after the contestant has choosed the list of powers
-   *    that will be used during this game. We put these power into the stack in
-   *    order to make them available for choosePower action.
+   * createCards:
+   *   during game setup, create power card
    */
-  public function dividePowers($ids)
+  public function createCards()
   {
-    // Move selected powers to stack
-    $this->game->cards->moveCards($ids, 'stack');
-
-    // Notify other players
-    $powers = array_map(function($id){ return $this->game->powers[$id]['name']; }, $ids);
-    $args = [
-      'i18n' => [],
-      'powers_names' => implode(', ', $powers),
-      'player_name' => $this->game->getActivePlayerName(),
-    ];
-    $this->game->notifyAllPlayers('powersDivided', clienttranslate('${player_name} selects ${powers_names}'), $args);
+    $sql = 'INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ';
+    $values = [];
+    foreach (array_keys(self::$classes) as $powerId) {
+      $values[] = "('$powerId', 0, 'box', 0)";
+    }
+    self::DbQuery($sql . implode($values, ','));
   }
-
 
   /*
-   * choosePower: is called after a player has choosed a power from the stack.
+   * preparePowers: move supported power cards to the deck
    */
-  public function choosePower($id, $pId = null)
+  public function preparePowers()
   {
-    $pId = $pId ?: $this->game->getActivePlayerId();
-    $this->game->playerManager->getPlayer($pId)->addPower($id);
+    // Filter supported powers depending on the number of players and game option
+    $nPlayers = $this->game->playerManager->getPlayerCount();
+    $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
+    $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
+      return $power->isSupported($nPlayers, $optionPowers);
+    });
+    $powerIds = array_values(array_map(function ($power) {
+      return $power->getId();
+    }, $powers));
+    $this->game->cards->moveCards($powerIds, 'deck');
+    $this->game->cards->shuffle('deck');
+  }
+
+  /*
+   * addOffer:
+   *   during fair division setup, player 1 adds a power to the offer
+   */
+  public function addOffer($powerId)
+  {
+    // Move the power card to the selection
+    $this->game->cards->moveCard($powerId, 'offer');
+    $this->game->notifyAllPlayers('addOffer', '', [
+      'powerId' => $powerId
+    ]);
+  }
+
+  /*
+   * removeOffer:
+   *   during fair division setup, player 1 remove a power from the offer
+   */
+  public function removeOffer($powerId)
+  {
+    // Move the power card to the deck
+    $this->game->cards->moveCard($powerId, 'deck');
+    $this->game->notifyAllPlayers('removeOffer', '', [
+      'powerId' => $powerId
+    ]);
   }
 
 
-///////////////////////////////////////
-///////////////////////////////////////
-/////////    Work argument   //////////
-///////////////////////////////////////
-///////////////////////////////////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  /////////    Work argument   //////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
 
   /*
    * argPlayerWork: is called whenever a player is going to do some work (move/build)
@@ -167,17 +203,17 @@ class PowerManager extends APP_GameClass
   public function argPlayerWork(&$arg, $action)
   {
     // First apply current user power(s)
-    $name = "argPlayer".$action;
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    foreach($player->getPowers() as $power)
+    $name = "argPlayer" . $action;
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power)
       $power->$name($arg);
 
     // Then apply oponnents power(s)
-    $name = "argOpponent".$action;
-    foreach($this->game->playerManager->getOpponents($pId) as $opponent)
-    foreach($opponent->getPowers() as $power)
-      $power->$name($arg);
+    $name = "argOpponent" . $action;
+    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
+      foreach ($opponent->getPowers() as $power)
+        $power->$name($arg);
   }
 
 
@@ -199,11 +235,11 @@ class PowerManager extends APP_GameClass
 
 
 
-/////////////////////////////////////
-/////////////////////////////////////
-/////////    Work action   //////////
-/////////////////////////////////////
-/////////////////////////////////////
+  /////////////////////////////////////
+  /////////////////////////////////////
+  /////////    Work action   //////////
+  /////////////////////////////////////
+  /////////////////////////////////////
 
   /*
    * playerWork: is called whenever a player try to do some work (move/build).
@@ -214,13 +250,13 @@ class PowerManager extends APP_GameClass
   public function playerWork($worker, $work, $action)
   {
     // First apply current user power(s)
-    $name = "player".$action;
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    $r = array_map(function($power) use ($worker, $work, $name){
+    $name = "player" . $action;
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    $r = array_map(function ($power) use ($worker, $work, $name) {
       return $power->$name($worker, $work);
     }, $player->getPowers());
-    return count($r) > 0? max($r) : false;
+    return count($r) > 0 ? max($r) : false;
 
     // TODO use an opponentMove function ?
   }
@@ -245,11 +281,11 @@ class PowerManager extends APP_GameClass
 
 
 
-/////////////////////////////////////
-/////////////////////////////////////
-////////   AfterWork state   ////////
-/////////////////////////////////////
-/////////////////////////////////////
+  /////////////////////////////////////
+  /////////////////////////////////////
+  ////////   AfterWork state   ////////
+  /////////////////////////////////////
+  /////////////////////////////////////
 
   /*
    * getNewState: is called whenever we try to get the new state
@@ -258,15 +294,15 @@ class PowerManager extends APP_GameClass
    */
   public function getNewState($method, $msg)
   {
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    $r = array_filter(array_map(function($power) use ($method) {
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    $r = array_filter(array_map(function ($power) use ($method) {
       return $power->$method();
     }, $player->getPowers()));
-    if(count($r) > 1)
+    if (count($r) > 1)
       throw new BgaUserException($msg);
 
-    if(count($r) == 1)
+    if (count($r) == 1)
       return $r[0];
     else
       return null;
@@ -280,7 +316,7 @@ class PowerManager extends APP_GameClass
    */
   public function stateAfterWork($action)
   {
-    $name = "stateAfter".$action;
+    $name = "stateAfter" . $action;
     return $this->getNewState($name, _("Can't figure next state after action"));
   }
 
@@ -300,11 +336,11 @@ class PowerManager extends APP_GameClass
     return $this->stateAfterWork('Build');
   }
 
-/////////////////////////////////////
-/////////////////////////////////////
-///////  Start/end turn state  //////
-/////////////////////////////////////
-/////////////////////////////////////
+  /////////////////////////////////////
+  /////////////////////////////////////
+  ///////  Start/end turn state  //////
+  /////////////////////////////////////
+  /////////////////////////////////////
 
   /*
    * stateStartTurn: is called at the beginning of the player state.
@@ -324,11 +360,11 @@ class PowerManager extends APP_GameClass
 
 
 
-/////////////////////////////////////
-/////////////////////////////////////
-///////////    Winning    ///////////
-/////////////////////////////////////
-/////////////////////////////////////
+  /////////////////////////////////////
+  /////////////////////////////////////
+  ///////////    Winning    ///////////
+  /////////////////////////////////////
+  /////////////////////////////////////
 
   /*
    * checkWinning: is called after each work.
@@ -344,15 +380,14 @@ class PowerManager extends APP_GameClass
   public function checkWinning(&$arg)
   {
     // First apply current user power(s)
-    $pId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($pId);
-    foreach($player->getPowers() as $power)
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power)
       $power->checkPlayerWinning($arg);
 
     // Then apply oponnents power(s)
-    foreach($this->game->playerManager->getOpponents($pId) as $opponent)
-    foreach($opponent->getPowers() as $power)
-      $power->checkOpponentWinning($arg);
+    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
+      foreach ($opponent->getPowers() as $power)
+        $power->checkOpponentWinning($arg);
   }
-
 }

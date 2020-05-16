@@ -1,15 +1,15 @@
 {OVERALL_GAME_HEADER}
 
 <div id="play-area-scaler">
-	<div id="power-select-container">
+	<div id="power-offer-container">
 		<div id="grid-powers">
 			<div class="power-section">
-				<div class="power-section-title">Selected Powers:</div>
-				<div id="power-select-selected" class="power-section-cards"></div>
+				<div><b>{TITLE_OFFER}</b></div>
+				<div id="cards-offer" class="card-container"></div>
 			</div>
 			<div class="power-section">
-				<div class="power-section-title">Available Powers:</div>
-				<div id="power-select-available" class="power-section-cards"></div>
+				<div><b>{TITLE_DECK}</b></div>
+				<div id="cards-deck" class="card-container"></div>
 			</div>
 		</div>
 		<div id="grid-detail"></div>
@@ -26,13 +26,13 @@
 const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
 document.write('<script src="' + URL + '/scripts/board.js" type="module"><\/script>');
 
-var jstpl_powerSelect = `<div id="power-select-\${id}" class="power-card power-\${id} \${type} small" data-power="\${id}">
+var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${id} \${type} small" title="\${name}" data-power="\${id}">
 	<div class="power-name">\${name}</div>
 </div>`;
 
 var jstpl_powerContainer = '<div id="power_container_${id}" class="power-container"></div>';
 
-var jstpl_miniCard = `<div class="mini-card power-\${id} \${type}" data-power="\${id}">
+var jstpl_miniCard = `<div class="mini-card power-\${id} \${type}" title="\${name}" data-power="\${id}">
 	<div class="power-avatar"></div>
 	<div class="power-pictogram"></div>
 </div>`;
