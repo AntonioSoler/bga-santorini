@@ -36,26 +36,33 @@ class action_santorini extends APP_GameAction
     }
   }
 
-  /*
-   * TODO
-   */
-  public function dividePowers()
-  {
+  public function addOffer() {
     self::setAjaxMode();
-    $rawIds = self::getArg('ids', AT_numberlist, true);
-    $ids = explode(',', $rawIds );
-    $this->game->dividePowers($ids);
+    $powerId = (int) self::getArg('powerId', AT_int, true);
+    $this->game->addOffer($powerId);
     self::ajaxResponse();
   }
 
-  /*
-   * TODO
-   */
+  public function removeOffer() {
+    self::setAjaxMode();
+    $powerId = (int) self::getArg('powerId', AT_int, true);
+    $this->game->removeOffer($powerId);
+    self::ajaxResponse();
+  }
+
+  public function confirmOffer()
+  {
+    self::setAjaxMode();
+    $this->game->confirmOffer();
+    self::ajaxResponse();
+  }
+
   public function choosePower()
   {
     self::setAjaxMode();
-    $id = (int) self::getArg('id', AT_int, true);
-    $this->game->choosePower($id);
+    $powerId = (int) self::getArg('powerId', AT_int, true);
+    $this->game->checkAction('choosePower');
+    $this->game->choosePower($powerId);
     self::ajaxResponse();
   }
 
