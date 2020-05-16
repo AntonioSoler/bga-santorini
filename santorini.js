@@ -17,6 +17,10 @@
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
 
+
+const isDebug = false;
+var debug = isDebug? console.info.bind(window.console) : function(){};
+
 define([
 	"dojo", "dojo/_base/declare",
 	"ebg/core/gamegui",
@@ -42,7 +46,7 @@ constructor: function() {
  *  - mixed gamedatas : contains all datas retrieved by the getAllDatas PHP method.
  */
 setup: function(gamedatas) {
-	console.info('SETUP', gamedatas);
+	debug('SETUP', gamedatas);
 
 	// Setup the board (3d scene using threejs)
 	var	container = document.getElementById('scene-container');
@@ -78,7 +82,7 @@ getPowerDetail : function(power) {
  *  - mixed args : additional information
  */
 onEnteringState: function(stateName, args) {
-	console.info('Entering state: ' + stateName, args.args);
+	debug('Entering state: ' + stateName, args.args);
 
 	if(stateName == 'powersDivide')
 		this.focusContainer('powers-select');
@@ -123,7 +127,7 @@ onEnteringState: function(stateName, args) {
 		this._selectableWorkers = args.args.workers.filter(worker => worker.works.length > 0);
 		if(this._selectableWorkers.length > 1)
 			this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
-		else
+		else if(this._selectableWorkers.length == 1)
 			this.onClickSelectWorker(this._selectableWorkers[0]);
 	}
 },
@@ -137,7 +141,7 @@ onEnteringState: function(stateName, args) {
  *  - str stateName : name of the state we are leaving
  */
 onLeavingState: function(stateName) {
-	console.info('Leaving state: ' + stateName);
+	debug('Leaving state: ' + stateName);
 	this.clearPossible();
 },
 
@@ -149,7 +153,7 @@ onLeavingState: function(stateName) {
  *  in this method you can manage "action buttons" that are displayed in the action status bar (ie: the HTML links in the status bar).
  */
 onUpdateActionButtons: function(stateName, args) {
-	console.info('Update action buttons: ' + stateName, args);
+	debug('Update action buttons: ' + stateName, args);
 
 	// Make sure it the player's turn
 	if (!this.isCurrentPlayerActive())
@@ -225,6 +229,7 @@ clearPossible: function() {
 	dojo.empty('power-choose-container');
 
 	this.board.clearClickable();
+	this.board.clearHighlights();
 },
 
 
@@ -344,6 +349,7 @@ onClickSelectWorker: function(worker) {
 	this.clearPossible();
 	this._selectedWorker = worker;
 	this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
+	this.board.highlightPiece(worker);
 	if(this._selectableWorkers.length > 1)
 		this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 },
@@ -457,7 +463,7 @@ setupNotifications: function() {
  *   called whenever a player choose a power on a Fair Division process
  */
 notif_powerAdded: function(n) {
-	console.info('Notif: a power was chosen', n.args);
+	debug('Notif: a power was chosen', n.args);
 	this.addPowerToPlayer(n.args.player_id, n.args.power_id);
 },
 
@@ -467,7 +473,7 @@ notif_powerAdded: function(n) {
  *   called whenever a new worker is placed on the board
  */
 notif_workerPlaced: function(n) {
-	console.info('Notif: new worker placed', n.args);
+	debug('Notif: new worker placed', n.args);
 	this.createPiece(n.args.piece);
 },
 
@@ -477,7 +483,7 @@ notif_workerPlaced: function(n) {
  *   called whenever a worker is moved on the board
  */
 notif_workerMoved : function(n) {
-	console.info('Notif: worker moved', n.args);
+	debug('Notif: worker moved', n.args);
 	this.board.movePiece(n.args.piece, n.args.space);
 },
 

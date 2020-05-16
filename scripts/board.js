@@ -1,9 +1,9 @@
 import * as THREE 				from './three.js';
 import Stats 							from './stats.js';
-import { OrbitControls } 	from './OrbitControls.js';
+import { OrbitControls } 	from './OrbitControls.min.js';
 import { MeshManager } 	  from './meshManager.js';
-import Hammer 						from './hammer.js';
-import { Tween, Ease } 		from './tweenjs.js';
+import Hammer 						from './hammer.min.js';
+import { Tween, Ease } 		from './tweenjs.min.js';
 
 
 //const canvasHeight = () => window.innerHeight*0.8;
@@ -25,6 +25,7 @@ const fallAnimation = {
 
 const basicColor 		= 0xff0034;
 const hoveringColor = 0x000000;
+const highlightColor= 0x0012AA;
 
 const lvlHeights = [0, 1.24, 2.44, 3.25];
 const xCenters = [-4.2, -2.12, -0.04, 2.12, 4.2];
@@ -53,6 +54,7 @@ var Board = function(container, url){
 	}
 	this._ids = [];
 	this._clickable = [];
+	this._highlights = [];
 	this._animated = false;
 
 	this.initScene();
@@ -86,7 +88,7 @@ Board.prototype.initScene = function(){
 	this._scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF, 1 ) );
 
 	// Renderer
-	this._renderer = new THREE.WebGLRenderer({ antialias: true, alpha : true });
+	this._renderer = new THREE.WebGLRenderer({ antialias: true, precision:"lowp" });
 	this._renderer.setPixelRatio( window.devicePixelRatio );
 	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;
@@ -175,7 +177,7 @@ Board.prototype.initBoard = function(){
 	var board = this._meshManager.createMesh('board');
 	this._scene.add(board);
 
-	var outerWall = this._meshManager.createMesh('outerWall1');
+	var outerWall = this._meshManager.createMesh('outerWall');
 	outerWall.position.set(0,-0.1,0);
 	this._scene.add(outerWall);
 
@@ -313,7 +315,6 @@ Board.prototype.switchPiece = function(piece1, piece2){
 	this.moveMesh(mesh1, piece2);
 	this.moveMesh(mesh2, piece1);
 };
-
 
 
 
@@ -456,6 +457,33 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		}
 	})
 };
+
+
+
+/*
+ * Highlist piece
+ * - mixed piece
+ */
+Board.prototype.highlightPiece = function(piece){
+	var center = new THREE.Vector3(xCenters[piece.x], lvlHeights[piece.z] + 0.05, zCenters[piece.y]);
+	var mark = new THREE.Mesh(
+		new THREE.CircleGeometry( 0.8, 32 ).rotateX(-Math.PI/2),
+		new THREE.MeshPhongMaterial({ color: highlightColor, opacity:0.7,	transparent: true })
+	);
+	mark.position.copy(center);
+	this._scene.add(mark);
+	this._highlights.push(mark);
+};
+
+/*
+ * Clear highlight pieces
+ */
+Board.prototype.clearHighlights = function(){
+	this._highlights.map((m) => this._scene.remove(m));
+	this._highlights = [];
+};
+
+
 
 window.Board = Board;
 export { Board };
