@@ -20,7 +20,7 @@ const ZOOM_MAX = 40;
 // Fall animation
 const fallAnimation = {
 	sky : 14,
-	duration : 2000
+	duration : 1000
 };
 
 const basicColor 		= 0xff0034;

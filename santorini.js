@@ -65,10 +65,20 @@ setup: function(gamedatas) {
 	this.setupNotifications();
 },
 
-getPowerDetail : function(power) {
+getPower: function(powerId) {
+	// Gets a power object ready to use in UI templates
+	var power = this.gamedatas.powers[powerId] || {
+		id : 0,
+		name: '',
+		title: '',
+		text: [],
+	};
+	power.type = power.hero ? 'hero' : '';
+	// TODO map for translation
 	power.textList = power.text.join('</li><li>');
-	return this.format_block('jstpl_powerDetail', power);
+	return power;
 },
+
 ///////////////////////////////////////
 ////////  Game & client states ////////
 ///////////////////////////////////////
@@ -84,45 +94,45 @@ getPowerDetail : function(power) {
 onEnteringState: function(stateName, args) {
 	debug('Entering state: ' + stateName, args.args);
 
-	if(stateName == 'powersDivide')
-		this.focusContainer('powers-select');
-	else if(stateName == 'powersPlayerChoose')
-		this.focusContainer('powers-choose');
-	else
-		this.focusContainer('board');
-
-	// Check if player has something to do
-	if(!this.isCurrentPlayerActive())
-		return;
-
-	// Divide powers
 	if (stateName == 'powersDivide') {
+		this.focusContainer('powers-select');
 		this._selectedPowers = [];
-		args.args.powers.forEach(power => {
-			var div = dojo.place( this.format_block('jstpl_powerSelect', power ), $('grid-powers') );
-			dojo.connect(div, 'onclick', e => this.onClickSelectPower(power) );
-		})
-
-	// Choose power
-	} else if (stateName == 'powersPlayerChoose') {
-		args.args.powers.forEach(power => {
-			var div = dojo.place(this.getPowerDetail(power), $('power-choose-container') );
-			div.id = "power-choose-" + power.id;
-			dojo.style(div, "cursor", "pointer");
-			dojo.connect(div, 'onclick', e => this.onClickChoosePower(power) );
+		// TODO: The argument should be only power ID
+		args.args.powers.forEach(powerxxx => {
+			var power = this.getPower(powerxxx.id);
+			var div = dojo.place(this.format_block('jstpl_powerSelect', power), $('power-select-available') );
+			dojo.connect(div, 'onclick', e => this.onClickSelectPower(power.id) );
 		});
 
-	// Place a worker
-	} else if (stateName == 'playerPlaceWorker') {
-		// TODO possible to be true ?
-		if (args.args.accessibleSpaces.length == 0)
-			throw new Error("No available spaces to place worker");
+	} else if (stateName == 'powersPlayerChoose') {
+		this.focusContainer('powers-choose');
+		// TODO: The argument should be only power ID
+		args.args.powers.forEach(powerxxx => {
+			var power = this.getPower(powerxxx.id);
+			var div = dojo.place(this.format_block('jstpl_powerDetail', power), $('power-choose-container') );
+			div.id = "power-choose-" + power.id;
+			if (this.isCurrentPlayerActive()) {
+				dojo.style(div, "cursor", "pointer");
+				dojo.connect(div, 'onclick', e => this.onClickChoosePower(power.id) );
+			}
+		});
 
+	} else {
+		this.focusContainer('board');
+	}
+
+	// Stop here if it's not the current player's turn
+	if (!this.isCurrentPlayerActive()) {
+		return;
+	}
+
+	if (stateName == 'playerPlaceWorker') {
+		// Place a worker
 		this.worker = args.args.worker;
 		this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
-	}
-	// Move a worker or build
-	else if(stateName == "playerMove" || stateName == "playerBuild"){
+
+	} else if (stateName == "playerMove" || stateName == "playerBuild") {
+		// Move a worker or build
 		this._action = stateName;
 		this._selectableWorkers = args.args.workers.filter(worker => worker.works.length > 0);
 		if(this._selectableWorkers.length > 1)
@@ -192,11 +202,11 @@ focusContainer: function(container){
  * params:
  *  - object piece: main infos are type, x,y,z
  */
-addPowerToPlayer: function(playerId, powerId){
-	var power = this.gamedatas.powers[powerId];
+addPowerToPlayer: function(playerId, powerId) {
+	var power = this.getPower(powerId);
 	var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
 	card.id = "mini-card-" + playerId + "-" + powerId;
-	this.addTooltipHtml( card.id, this.getPowerDetail(power) );
+	this.addTooltipHtml( card.id, this.format_block('jstpl_powerDetail', power) );
 },
 
 
@@ -232,6 +242,53 @@ clearPossible: function() {
 	this.board.clearHighlights();
 },
 
+displayPower: function(powerId) {
+	// Mark only this card as displayed
+	dojo.query('.power-card.small.displayed').removeClass('displayed');
+	var powerDiv = $('power-select-' + powerId);
+	powerDiv.classList.add('displayed');
+	// Display the detail
+	var power = this.getPower(powerId);
+	dojo.place(this.format_block('jstpl_powerDetail', power), 'grid-detail', 'only');
+},
+
+selectPower: function(powerId) {
+	// Create a dummy
+	var dummy = dojo.place(this.format_block('jstpl_powerSelect', this.getPower(0)), $('power-select-selected') );
+	dummy.id = 'selectPower-dummy';
+	// Slide the real card to the position of the dummy
+	var animation_id = this.slideToObject('power-select-' + powerId, 'selectPower-dummy');
+	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
+		// Replace the dummy with the real card
+		var powerDiv = dojo.place('power-select-' + powerId, 'selectPower-dummy', 'replace');
+		powerDiv.style = '';
+		powerDiv.classList.add('selected');
+		// Show confirm button
+		if (this.isCurrentPlayerActive() && dojo.query('.power-card.small.selected').length == this.gamedatas.fplayers.length) {
+			this.addActionButton('buttonValidateSelection', _('Confirm'), 'onClickValidateSelection', null, false, 'blue');
+		}
+	}));
+	animation_id.play();
+},
+
+unselectPower: function(powerId) {
+	// Create a dummy
+	var dummy = dojo.place(this.format_block('jstpl_powerSelect', this.getPower(0)), $('power-select-available'), 'first');
+	dummy.id = 'unselectPower-dummy';
+	// Slide the real card to the position of the dummy
+	var animation_id = this.slideToObject('power-select-' + powerId, 'unselectPower-dummy');
+	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
+		// Replace the dummy with the real card
+		var powerDiv = dojo.place('power-select-' + powerId, 'unselectPower-dummy', 'replace');
+		powerDiv.style = '';
+		powerDiv.classList.remove('selected');
+		// Remove confirm button
+		if (this.isCurrentPlayerActive()) {
+			this.removeActionButtons();
+		}
+	}));
+	animation_id.play();
+},
 
 //////////////////////////////////////////////////
 //////////////   Player's action   ///////////////
@@ -242,56 +299,20 @@ clearPossible: function() {
  * onClickSelectPower:
  * 	triggered after a click on a power (for "fair division" process)
  */
-onClickSelectPower: function(power) {
-	var powerDiv = $('power-select-'+power.id);
-
-	// If already selected, unselect it
-	if(powerDiv.classList.contains('selected')){
-		this._selectedPowers = this._selectedPowers.filter( p => p.id != power.id);
-		powerDiv.classList.remove('selected');
-		dojo.destroy('buttonValidateSelection');
-		return;
+onClickSelectPower: function(powerId) {
+	var active = this.isCurrentPlayerActive();
+	var powerDiv = $('power-select-' + powerId);
+	if (!powerDiv.classList.contains('displayed')) {
+		// First click always displays the power
+		// Everyone can display
+		this.displayPower(powerId);
+	} else if (active && powerDiv.classList.contains('selected')) {
+		// Active player may unselect
+		this.unselectPower(powerId);
+	} else if (active && dojo.query('.power-card.small.selected').length < this.gamedatas.fplayers.length) {
+		// Active player may select
+		this.selectPower(powerId);
 	}
-
-	// If already enough powers, don't do anything
-	if(this._selectedPowers.length == this.gamedatas.fplayers.length)
-		return;
-
-	// Re-click on a already displayed power => select it
-	if(	this._displayedPower == power){
-		this.onClickAddPowerToSelection();
-		return;
-	}
-
-	// Change color of selected power
-	this._displayedPower = power;
-	dojo.query('.power-select').removeClass('displayed');
-	powerDiv.classList.add('displayed');
-
-	// Update details
-	var detail = $('power-detail');
-	dojo.place(this.getPowerDetail(power), 'grid-detail', 'only');
-
-	// Update action button
-	this.removeActionButtons();
-	this.addActionButton('buttonAddToSelection', _('Add to selection'), 'onClickAddPowerToSelection', null, false, 'gray');
-},
-
-
-/*
- * onClickAddPowerToSelection:
- * 	triggered after a click on a button to add selected power
- */
-onClickAddPowerToSelection: function() {
-	this._selectedPowers.push(this._displayedPower);
-	dojo.query('#power-select-'+this._displayedPower.id).removeClass('displayed').addClass('selected');
-	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
-	this._displayedPower = null;
-	// TODO : remove banned
-
-	this.removeActionButtons();
-	if(this._selectedPowers.length == this.gamedatas.fplayers.length)
-		this.addActionButton('buttonValidateSelection', _('Validate'), 'onClickValidateSelection', null, false, 'blue');
 },
 
 
@@ -301,10 +322,13 @@ onClickAddPowerToSelection: function() {
  */
 onClickValidateSelection: function() {
 	// Check that this action is possible at this moment
-	if(! this.checkAction( 'dividePowers' ) )
+	if (!this.checkAction('dividePowers')) {
 		return false;
+	}
 
-	var ids = this._selectedPowers.map(power => power.id).join(',');
+	var ids = dojo.query('.power-card.small.selected').map(function(node) {
+		return node.dataset.power;
+	}).join(',');
 	this.ajaxcall( "/santorini/santorini/dividePowers.html", { ids : ids }, this, res => {} );
 },
 
@@ -313,11 +337,11 @@ onClickValidateSelection: function() {
  * onClickChoosePower:
  * 	triggered after a click on a card for choosing a power (in the Fair Division process)
  */
-onClickChoosePower: function(power) {
+onClickChoosePower: function(powerId) {
 	if(! this.checkAction( 'choosePower' ) )
 		return false;
 
-	this.ajaxcall( "/santorini/santorini/choosePower.html", { id : power.id }, this, res => {} );
+	this.ajaxcall( "/santorini/santorini/choosePower.html", { id : powerId }, this, res => {} );
 },
 
 
@@ -437,24 +461,24 @@ onClickSkip: function() {
  */
 setupNotifications: function() {
 	dojo.subscribe( 'powerAdded', this, "notif_powerAdded" );
-	this.notifqueue.setSynchronous('powerAdded', 2000);
+	this.notifqueue.setSynchronous('powerAdded', 1000);
 
 	dojo.subscribe('workerPlaced', this, 'notif_workerPlaced');
-	this.notifqueue.setSynchronous('workerPlaced', 2000);
+	this.notifqueue.setSynchronous('workerPlaced', 1000);
 
 	dojo.subscribe('workerMoved', this, 'notif_workerMoved');
-	this.notifqueue.setSynchronous('workerMoved', 2000);
+	this.notifqueue.setSynchronous('workerMoved', 1000);
 
 	dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
-	this.notifqueue.setSynchronous('blockBuilt', 2000);
+	this.notifqueue.setSynchronous('blockBuilt', 1000);
 
 	// Happens with Apollo
 	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
-	this.notifqueue.setSynchronous('workerSwitched', 2000);
+	this.notifqueue.setSynchronous('workerSwitched', 1000);
 
 	// Happens with Minotaur
 	dojo.subscribe('workerPushed', this, 'notif_workerPushed');
-	this.notifqueue.setSynchronous('workerPushed', 2000);
+	this.notifqueue.setSynchronous('workerPushed', 1000);
 },
 
 
