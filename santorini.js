@@ -335,7 +335,7 @@ onEnteringStatePowersPlayerChoose: function(args){
 
 /*
  * onClickChoosePower:
- *   during fair division, when a player claims a power
+ *   during fair division, when a player cladojo.place(ims a power
  */
 onClickChoosePower: function(powerId) {
 	if (!this.checkAction('choosePower'))
@@ -358,11 +358,14 @@ notif_powerAdded: function(n) {
 	var powerChooseCard = $("power-choose-" + powerId);
 	if(powerChooseCard == null)
 		this.addPowerToPlayer(playerId, powerId);
-	else
-		this.slide("power-choose-" + powerId, 'power_container_' + playerId).then(() => {
+	else {
+		powerChooseCard.classList.add("power-dummy");
+		var phantom = this.format_block('jstpl_powerDetail', this.getPower(powerId));
+		this.slideTemporary(phantom, "power-choose-" + powerId, 'power_container_' + playerId).then( () => {
 			dojo.destroy(powerChooseCard);
 			this.addPowerToPlayer(playerId, powerId);
-		})
+		});
+	}
 },
 
 
@@ -603,6 +606,19 @@ slide: function(sourceId, targetId){
 		animation.play();
 	});
 },
+
+/*
+ * // TODO:
+ */
+slideTemporary: function(phantom, sourceId, targetId, duration){
+	duration = duration || 800;
+
+	return new Promise((resolve, reject) => {
+		this.slideTemporaryObject(phantom, document.body, sourceId, targetId, duration);
+		setTimeout(resolve, duration);
+	});
+},
+
 
 getPower: function(powerId) {
 	// Gets a power object ready to use in UI templates

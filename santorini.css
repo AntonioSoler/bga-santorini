@@ -135,6 +135,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     width: 300px;
 }
 
+.power-detail.power-dummy div {
+  display:none;
+}
+
 .power-name {
     font: 24px 'Ink Blossoms', cursive;
     letter-spacing: -0.5px;
