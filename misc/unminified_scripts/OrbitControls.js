@@ -93,6 +93,10 @@ var OrbitControls = function ( object, domElement ) {
 	// Touch fingers
 	this.touches = { ONE: TOUCH.ROTATE, TWO: TOUCH.DOLLY_PAN };
 
+  // Tap/click settings
+  this.clickThreshold = 3;
+  this.clickTime = 500;
+
 	// for reset
 	this.target0 = this.target.clone();
 	this.position0 = this.object.position.clone();
@@ -307,6 +311,9 @@ var OrbitControls = function ( object, domElement ) {
 	var panOffset = new Vector3();
 	var zoomChanged = false;
 
+  var rotatePosStart = new Vector2();
+  var rotateTimeStart = null;
+
 	var rotateStart = new Vector2();
 	var rotateEnd = new Vector2();
 	var rotateDelta = new Vector2();
@@ -474,6 +481,9 @@ var OrbitControls = function ( object, domElement ) {
 
 		rotateStart.set( event.clientX, event.clientY );
 
+    rotateEnd.copy(rotateStart);
+    rotatePosStart.copy(rotateStart);
+    rotateTimeStart = Date.now();
 	}
 
 	function handleMouseDownDolly( event ) {
@@ -605,7 +615,7 @@ var OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchStartRotate( event ) {
-
+//alert(event.touches[0].clientY + " " + event.touches[0].pageY)
 		if ( event.touches.length == 1 ) {
 
 			rotateStart.set( event.touches[ 0 ].pageX, event.touches[ 0 ].pageY );
@@ -618,6 +628,10 @@ var OrbitControls = function ( object, domElement ) {
 			rotateStart.set( x, y );
 
 		}
+
+    rotateEnd.copy(rotateStart);
+    rotatePosStart.copy(rotateStart);
+    rotateTimeStart = Date.now();
 
 	}
 
@@ -749,7 +763,6 @@ var OrbitControls = function ( object, domElement ) {
 	}
 
 	function handleTouchEnd( /*event*/ ) {
-
 		// no-op
 
 	}
@@ -759,7 +772,6 @@ var OrbitControls = function ( object, domElement ) {
 	//
 
 	function onMouseDown( event ) {
-
 		if ( scope.enabled === false ) return;
 
 		// Prevent the browser from scrolling.
@@ -905,9 +917,7 @@ var OrbitControls = function ( object, domElement ) {
 	}
 
 	function onMouseUp( event ) {
-
 		if ( scope.enabled === false ) return;
-
 		handleMouseUp( event );
 
 		document.removeEventListener( 'mousemove', onMouseMove, false );
@@ -917,6 +927,10 @@ var OrbitControls = function ( object, domElement ) {
 
 		state = STATE.NONE;
 
+    if(  Date.now() - rotateTimeStart <= scope.clickTime
+      && Math.abs(rotateEnd.x - rotatePosStart.x) <= scope.clickThreshold
+      && Math.abs(rotateEnd.y - rotatePosStart.y) <= scope.clickThreshold)
+      scope.dispatchEvent( { type:"click", posX:rotateEnd.x, posY:rotateEnd.y} );
 	}
 
 	function onMouseWheel( event ) {
@@ -1086,7 +1100,6 @@ var OrbitControls = function ( object, domElement ) {
 	}
 
 	function onTouchEnd( event ) {
-
 		if ( scope.enabled === false ) return;
 
 		handleTouchEnd( event );
@@ -1095,6 +1108,11 @@ var OrbitControls = function ( object, domElement ) {
 
 		state = STATE.NONE;
 
+
+    if(  Date.now() - rotateTimeStart <= scope.clickTime
+      && Math.abs(rotateEnd.x - rotatePosStart.x) <= scope.clickThreshold
+      && Math.abs(rotateEnd.y - rotatePosStart.y) <= scope.clickThreshold)
+      scope.dispatchEvent( { type:"click", posX:rotateEnd.x, posY:rotateEnd.y} );
 	}
 
 	function onContextMenu( event ) {

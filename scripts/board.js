@@ -1,8 +1,6 @@
 import * as THREE 				from './three.js';
-import Stats 							from './stats.js';
 import { OrbitControls } 	from './OrbitControls.min.js';
 import { MeshManager } 	  from './meshManager.js';
-import Hammer 						from './hammer.min.js';
 import { Tween, Ease } 		from './tweenjs.min.js';
 
 
@@ -103,20 +101,14 @@ Board.prototype.initScene = function(){
 	}, false );
 
 	const getRealMouseCoords = (px,py) => {
+		var scale = document.getElementById("page-content").style.zoom || 1;
 		var rect = this._renderer.domElement.getBoundingClientRect()
+
 		return {
-			x : (px - rect.left) / canvasWidth() * 2 - 1,
-			y : -(py - rect.top) / canvasHeight() * 2 + 1
+			x : (px - rect.left * scale) / (scale * canvasWidth()) * 2 - 1,
+			y : -(py - rect.top * scale) / (scale * canvasHeight()) * 2 + 1
 		}
 	};
-
-
-	var hammer = new Hammer(this._renderer.domElement);
-	hammer.on('tap', (ev) => {
-		this._mouse = getRealMouseCoords(ev.center.x, ev.center.y);
-		this.raycasting(false);
-	});
-
 
 	// Controls
 	var controls = new OrbitControls( this._camera, this._renderer.domElement );
@@ -124,9 +116,15 @@ Board.prototype.initScene = function(){
 	controls.minDistance = ZOOM_MIN;
 	controls.maxDistance = ZOOM_MAX;
 	controls.mouseButtons = {
+		LEFT: THREE.MOUSE.ROTATE,
 		RIGHT: THREE.MOUSE.ROTATE
 	}
   controls.addEventListener('change', this.render.bind(this));
+	controls.addEventListener("click", (ev) => {
+		this._mouse = getRealMouseCoords(ev.posX, ev.posY);
+		this.raycasting(false);
+	})
+
 
 	// Raycasting
 	this._raycaster = new THREE.Raycaster();
@@ -143,19 +141,6 @@ Board.prototype.initScene = function(){
 
 	document.addEventListener( 'mousedown', (event) => this._mouseDown = true );
 	document.addEventListener( 'mouseup', (event) => this._mouseDown = false );
-
-
-//TODO remove in production
-	// Stats
-	this._stats = new Stats();
-	this._container.appendChild( this._stats.dom );
-/*
-	// Axes helper
-	this._scene.add( new THREE.AxesHelper(8));
-
-	// Grid
-	this._scene.add(new THREE.GridHelper(10, 10));
-*/
 };
 
 
@@ -196,7 +181,6 @@ Board.prototype.initBoard = function(){
  * Render the scene
  */
 Board.prototype.render = function() {
-	this._stats.update();
 	this._renderer.render( this._scene, this._camera );
 }
 
