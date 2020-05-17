@@ -65,19 +65,20 @@ setup: function(gamedatas) {
 	this.setupNotifications();
 },
 
-getPower: function(powerId) {
-	// Gets a power object ready to use in UI templates
-	var power = this.gamedatas.powers[powerId] || {
-		id : 0,
-		name: '',
-		title: '',
-		text: [],
-	};
-	power.type = power.hero ? 'hero' : '';
-	// TODO map for translation
-	power.textList = power.text.join('</li><li>');
-	return power;
+
+/*
+ * addPowerToPlayer:
+ * 	add a power card to given player
+ * params:
+ *  - object piece: main infos are type, x,y,z
+ */
+addPowerToPlayer: function(playerId, powerId) {
+	var power = this.getPower(powerId);
+	var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
+	card.id = "mini-card-" + playerId + "-" + powerId;
+	this.addTooltipHtml( card.id, this.format_block('jstpl_powerDetail', power) );
 },
+
 
 ///////////////////////////////////////
 ////////  Game & client states ////////
@@ -92,7 +93,7 @@ getPower: function(powerId) {
  *  - mixed args : additional information
  */
 onEnteringState: function(stateName, args) {
-	debug('Entering state: ' + stateName, args.args);
+	debug('Entering state: ' + stateName, args);
 
 	// Stop here if it's not the current player's turn for some states
 	if(["playerPlaceWorker", "playerMove", "playerBuild"].includes(stateName)){
@@ -101,67 +102,10 @@ onEnteringState: function(stateName, args) {
 			return;
 	}
 
-
-	switch(stateName){
-		/*
-		 * BuildOffer: in the fair division setup,the contestant can select #players powers from available powers (depending on game option)
-		 */
-		case "buildOffer":
-	 		this.focusContainer('powers-offer');
-
-	 		args.args.offer.forEach(powerId => {
-	 			var power = this.getPower(powerId);
-	 			var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('cards-offer') );
-	 			div.classList.add('selected');
-	 			dojo.connect(div, 'onclick', e => this.onClickPowerSmall(power.id) );
-	 		});
-	 		args.args.deck.forEach(powerId => {
-	 			var power = this.getPower(powerId);
-	 			console.info('card is in the DECK', powerId, power);
-	 			var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('cards-deck') );
-	 			dojo.connect(div, 'onclick', e => this.onClickPowerSmall(power.id) );
-	 		});
-	 		this.buildOfferActionButtons();
-			break;
-
-		/*
-		 * powersPlayerChoose: in the fair division setup, each player then proceed to pick one card
-		 */
-		case "powersPlayerChoose":
-			this.focusContainer('powers-choose');
-			args.args.powers.forEach(powerId => {
-				var power = this.getPower(powerId);
-				var div = dojo.place(this.format_block('jstpl_powerDetail', power), $('power-choose-container') );
-				div.id = "power-choose-" + power.id;
-
-				if (this.isCurrentPlayerActive()) {
-					dojo.style(div, "cursor", "pointer");
-					dojo.connect(div, 'onclick', e => this.onClickChoosePower(power.id) );
-				}
-			});
-			break;
-
-		/*
-		 * playerPlaceWorker: the active player can place one worker on the board
-		 */
-		case "playerPlaceWorker":
-			this.worker = args.args.worker;
-			this.board.makeClickable(args.args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
-			break;
-
-		/*
-		 * playerMove and playerBuild r: the active player can/must move/build
-		 */
-		case "playerMove":
-		case "playerBuild":
-			this._action = stateName;
-			this._selectableWorkers = args.args.workers.filter(worker => worker.works.length > 0); // TODO : this should be useless now since filtering is done on backend
-			if(this._selectableWorkers.length > 1)
-				this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
-			else if(this._selectableWorkers.length == 1)
-				this.onClickSelectWorker(this._selectableWorkers[0]);
-			break;
-	}
+	// Call appropriate method
+	var methodName = "onEnteringState" + stateName.charAt(0).toUpperCase() + stateName.slice(1);
+	if(this[methodName] !== undefined)
+		this[methodName](args.args);
 },
 
 
@@ -196,141 +140,59 @@ onUpdateActionButtons: function(stateName, args) {
 	}
 },
 
+
+
+///////////////////////////////////////
+///////////////////////////////////////
+//////////    Fair division   /////////
+///////////////////////////////////////
+///////////////////////////////////////
+// As stated in the rulebook, the fair division process goes as follows :
+//  - the contestant pick n powers
+//  - each player choose one power (contestant is last to choose)
+//  - contestant choose the first player to place its worker TODO
+//////////////////////////////////////
+
+
+/////////////////////
+//// Build Offer ////
+/////////////////////
+
+/*
+ * BuildOffer: in the fair division setup,the contestant can select #players powers from available powers (depending on game option)
+ */
+onEnteringStateBuildOffer: function(args){
+	this.focusContainer('powers-offer');
+
+	// Display selected powers
+	args.offer.forEach(powerId => {
+		var div = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(powerId)), $('cards-offer') );
+		div.classList.add('selected');
+		dojo.connect(div, 'onclick', e => this.onClickPowerSmall(powerId) );
+	});
+	this._nMissingPowers = this.gamedatas.fplayers.length - args.offer.length;
+
+	// Display remeaining powers
+	args.deck.forEach(powerId => {
+		var div = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(powerId)), $('cards-deck') );
+		dojo.connect(div, 'onclick', e => this.onClickPowerSmall(powerId) );
+	});
+
+	this.buildOfferActionButtons();
+},
+
+
+/*
+ * buildOfferActionButtons: show confirm button if the count is correct
+ */
 buildOfferActionButtons: function() {
-	// Show confirm button if the count is correct
 	if (this.isCurrentPlayerActive()) {
 		this.removeActionButtons();
-		if (dojo.query('.power-card.small.selected').length == this.gamedatas.fplayers.length) {
+		if (this._nMissingPowers == 0) {
 			this.addActionButton('buttonConfirmOffer', _('Confirm'), 'onClickConfirmOffer', null, false, 'blue');
 		}
 	}
 },
-
-
-///////////////////////////////////////
-////////    Utility methods    ////////
-///////////////////////////////////////
-
-/*
- * focusContainer:
- * 	show and hide containers depending on state
- */
-focusContainer: function(container){
-	dojo.style( 'power-offer-container', 'display', container == 'powers-offer'? 'flex' : 'none');
-	dojo.style( 'power-choose-container', 'display', container == 'powers-choose'? 'flex' : 'none');
-	dojo.style( 'play-area', 'display', container == 'board'?  'block' : 'none');
-},
-
-/*
- * addPowerToPlayer:
- * 	add a power card to given player
- * params:
- *  - object piece: main infos are type, x,y,z
- */
-addPowerToPlayer: function(playerId, powerId) {
-	var power = this.getPower(powerId);
-
-	var addPower = () => {
-		var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
-		card.id = "mini-card-" + playerId + "-" + powerId;
-		this.addTooltipHtml( card.id, this.format_block('jstpl_powerDetail', power) );
-	};
-
-
-	var powerChooseCard = $("power-choose-" + powerId);
-	if(powerChooseCard == null)
-		addPower();
-	else {
-		var animation = this.slideToObjectPos("power-choose-" + powerId, 'power_container_' + playerId, 0, 0);
-		dojo.connect(animation, 'onEnd', () =>  addPower() );
-		animation_id.play();
-	}
-},
-
-
-/*
- * createPiece:
- * 	add a piece to the board (with falldown animation)
- * params:
- *  - object piece: main infos are type, x,y,z
- */
-createPiece: function(piece) {
-	piece.name = piece.type;
-	if(piece.type == "worker")
-		piece.name = piece.type_arg + piece.type;
-
-	this.board.addPiece(piece);
-},
-
-
-/*
- * clearPossible:
- * 	clear every clickable space and any selected worker
- */
-clearPossible: function() {
-	this.removeActionButtons();
-	this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
-
-	this._selectedWorker = null;
-	dojo.empty('grid-powers');
-	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
-	dojo.empty('power-choose-container');
-
-	this.board.clearClickable();
-	this.board.clearHighlights();
-},
-
-displayPower: function(powerId) {
-	// Mark only this card as displayed
-	dojo.query('.power-card.small.displayed').removeClass('displayed');
-	var powerDiv = $('power-select-' + powerId);
-	powerDiv.classList.add('displayed');
-	// Display the detail
-	var power = this.getPower(powerId);
-	dojo.place(this.format_block('jstpl_powerDetail', power), 'grid-detail', 'only');
-},
-
-selectPower: function(powerId) {
-	// Create a dummy
-	var dummy = dojo.place(this.format_block('jstpl_powerSelect', this.getPower(0)), $('power-select-selected') );
-	dummy.id = 'selectPower-dummy';
-	// Slide the real card to the position of the dummy
-	var animation_id = this.slideToObject('power-select-' + powerId, 'selectPower-dummy');
-	dojo.connect(animation_id, 'onEnd', () => {
-		// Replace the dummy with the real card
-		var powerDiv = dojo.place('power-select-' + powerId, 'selectPower-dummy', 'replace');
-		powerDiv.style = '';
-		powerDiv.classList.add('selected');
-		// Show confirm button
-		if (this.isCurrentPlayerActive() && dojo.query('.power-card.small.selected').length == this.gamedatas.fplayers.length) {
-			this.addActionButton('buttonValidateSelection', _('Confirm'), 'onClickValidateSelection', null, false, 'blue');
-		}
-	});
-	animation_id.play();
-},
-
-unselectPower: function(powerId) {
-	// Create a dummy
-	var dummy = dojo.place(this.format_block('jstpl_powerSelect', this.getPower(0)), $('power-select-available'), 'first');
-	dummy.id = 'unselectPower-dummy';
-	// Slide the real card to the position of the dummy
-	var animation_id = this.slideToObject('power-select-' + powerId, 'unselectPower-dummy');
-	dojo.connect(animation_id, 'onEnd', () => {
-		// Replace the dummy with the real card
-		var powerDiv = dojo.place('power-select-' + powerId, 'unselectPower-dummy', 'replace');
-		powerDiv.style = '';
-		powerDiv.classList.remove('selected');
-		// Remove confirm button
-		if (this.isCurrentPlayerActive()) {
-			this.removeActionButtons();
-		}
-	}));
-	animation_id.play();
-},
-
-//////////////////////////////////////////////////
-//////////////   Player's action   ///////////////
-//////////////////////////////////////////////////
 
 
 /*
@@ -338,28 +200,98 @@ unselectPower: function(powerId) {
  * 	 during fair division setup, when clicking on a small card while building the offer
  */
 onClickPowerSmall: function(powerId) {
-	var powerDiv = $('power-small-' + powerId);
-	var isActive = this.isCurrentPlayerActive();
-	var isDisplayed = powerDiv.classList.contains('displayed');
-	var isSelected = powerDiv.classList.contains('selected');
-	var isWait = powerDiv.classList.contains('wait');
+	var powerDiv = $('power-small-' + powerId),
+			isActive = this.isCurrentPlayerActive(),
+			isDisplayed = powerDiv.classList.contains('displayed'),
+			isSelected = powerDiv.classList.contains('selected'),
+			isWait = powerDiv.classList.contains('wait');
+
+	// Everyone may view details on first click
 	if (!isDisplayed) {
-		// Everyone may view details on first click
 		// Mark only this card as displayed
 		dojo.query('.power-card.small.displayed').removeClass('displayed');
 		powerDiv.classList.add('displayed');
+
 		// Display the detail
 		var power = this.getPower(powerId);
 		dojo.place(this.format_block('jstpl_powerDetail', power), 'grid-detail', 'only');
-	} else if (!isWait && isActive && isSelected) {
-		// Active player may unselect
-		this.ajaxcall( "/santorini/santorini/removeOffer.html", { powerId: powerId }, this, res => {} );
-		powerDiv.classList.add('wait');
-	} else if (!isWait && isActive && dojo.query('.power-card.small.selected').length < this.gamedatas.fplayers.length) {
-		// Active player may select
-		this.ajaxcall( "/santorini/santorini/addOffer.html", { powerId: powerId }, this, res => {} );
-		powerDiv.classList.add('wait');
 	}
+
+	// Otherwise, active player may select/unselect the power
+	else if (!isWait && isActive){
+		// Already selected => unselect it
+		if(isSelected) {
+			this.ajaxcall( "/santorini/santorini/removeOffer.html", { powerId: powerId }, this, res => {} );
+			powerDiv.classList.add('wait');
+		}
+		// Not yet select + still need powers => select it
+		else if (this._nMissingPowers > 0){
+			this.ajaxcall( "/santorini/santorini/addOffer.html", { powerId: powerId }, this, res => {} );
+			powerDiv.classList.add('wait');
+		}
+	}
+},
+
+
+
+/*
+ * notif_addOffer:
+ *   called during fair division setup, when player 1 adds a power to the offer
+ */
+notif_addOffer: function(n) {
+	debug('Notif: addOffer', n.args);
+
+	// Create a dummy in the offer that will be replaced by the actual power
+	var dummy = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(0)), $('cards-offer') );
+	dummy.id = 'addOffer-dummy';
+
+	// Slide the real card to the position of the dummy
+	var powerDivId = 'power-small-' + n.args.powerId;
+	this.slide(powerDivId, dummy.id).then(() => {
+		// Replace the dummy with the real card
+		var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
+		powerDiv.style = '';
+		powerDiv.classList.add('selected');
+		powerDiv.classList.remove('wait');
+
+		this._nMissingPowers--;
+		this.buildOfferActionButtons();
+	});
+},
+
+/*
+ * notif_removeOffer:
+ *   called during fair division setup, when player 1 removes a power from the offer
+ */
+notif_removeOffer: function(n) {
+	debug('Notif: removeOffer', n.args);
+
+	// Create a dummy in the deck
+	var dummy = this.format_block('jstpl_powerSmall', this.getPower(0));
+	dummy.id = 'removeOffer-dummy';
+	// Find the right position
+	var nextPower = dojo.query('#cards-deck .power-card').reduce((acc, div) => {
+		if(acc != null) return acc;
+		if(div.getAttribute('data-power') > n.args.powerId) return div
+	}, null);
+	// Insert it
+	if(nextPower !== null)
+		dummy = dojo.place(dummy, nextPower, 'before');
+	else
+		dummy = dojo.place(dummy, $('cards-deck'), 'last');
+
+	// Slide the real card to the position of the dummy
+	var powerDivId = 'power-small-' + n.args.powerId;
+	this.slide(powerDivId, dummy.id).then(() => {
+		// Replace the dummy with the real card
+		var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
+		powerDiv.style = '';
+		powerDiv.classList.remove('selected');
+		powerDiv.classList.remove('wait');
+
+		this._nMissingPowers++;
+		this.buildOfferActionButtons();
+	});
 },
 
 
@@ -368,11 +300,36 @@ onClickPowerSmall: function(powerId) {
  *   during fair division setup, when player 1 confirms they are done building the offer
  */
 onClickConfirmOffer: function() {
-	// Check that this action is possible at this moment
-	if (!this.checkAction('confirmOffer')) {
+	if (!this.checkAction('confirmOffer'))
 		return false;
-	}
+
 	this.ajaxcall( "/santorini/santorini/confirmOffer.html", {}, this, res => {} );
+},
+
+
+
+
+//////////////////////
+//// Choose Power ////
+//////////////////////
+
+/*
+ * powersPlayerChoose: in the fair division setup, each player then proceed to pick one card
+ */
+onEnteringStatePowersPlayerChoose: function(args){
+	this.focusContainer('powers-choose');
+
+	// Display remeaining powers
+	args.offer.forEach(powerId => {
+		var power = this.getPower(powerId);
+		var div = dojo.place(this.format_block('jstpl_powerDetail', power), $('power-choose-container') );
+		div.id = "power-choose-" + power.id;
+
+		if (this.isCurrentPlayerActive()) {
+			dojo.style(div, "cursor", "pointer");
+			dojo.connect(div, 'onclick', e => this.onClickChoosePower(power.id) );
+		}
+	});
 },
 
 
@@ -381,12 +338,47 @@ onClickConfirmOffer: function() {
  *   during fair division, when a player claims a power
  */
 onClickChoosePower: function(powerId) {
-	if (!this.checkAction('choosePower')) {
+	if (!this.checkAction('choosePower'))
 		return false;
-	}
+
 	this.ajaxcall( "/santorini/santorini/choosePower.html", { powerId : powerId }, this, res => {} );
 },
 
+
+/*
+ * notif_powerAdded:
+ *   called whenever a player choose a power on a Fair Division process
+ */
+notif_powerAdded: function(n) {
+	debug('Notif: a power was chosen', n.args);
+
+	var playerId = n.args.player_id,
+			powerId = n.args.power_id;
+
+	var powerChooseCard = $("power-choose-" + powerId);
+	if(powerChooseCard == null)
+		this.addPowerToPlayer(playerId, powerId);
+	else
+		this.slide("power-choose-" + powerId, 'power_container_' + playerId).then(() => {
+			dojo.destroy(powerChooseCard);
+			this.addPowerToPlayer(playerId, powerId);
+		})
+},
+
+
+///////////////////////////////////////
+///////////////////////////////////////
+////////    Worker placement   ////////
+///////////////////////////////////////
+///////////////////////////////////////
+
+/*
+ * playerPlaceWorker: the active player can place one worker on the board
+ */
+onEnteringStatePlayerPlaceWorker: function(args){
+	this.worker = args.worker;
+	this.board.makeClickable(args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
+},
 
 
 /*
@@ -404,9 +396,51 @@ onClickPlaceWorker: function(space) {
 },
 
 
-//////////
-// Work //
-//////////
+
+/*
+ * notif_workerPlaced:
+ *   called whenever a new worker is placed on the board
+ */
+notif_workerPlaced: function(n) {
+	debug('Notif: new worker placed', n.args);
+	this.createPiece(n.args.piece);
+},
+
+
+
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+////////    Work : move / build  ////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+
+/*
+ * playerMove and playerBuild r: the active player can/must move/build
+ */
+onEnteringStatePlayerWork: function(args){
+	// TODO : this filtering should be useless now since filtering is done on backend
+	this._selectableWorkers = args.workers.filter(worker => worker.works.length > 0);
+
+	// If only one worker can work, automatically select it
+	if(this._selectableWorkers.length == 1)
+		this.onClickSelectWorker(this._selectableWorkers[0]);
+	// Otherwise, let the user make the choice
+	else if(this._selectableWorkers.length > 1)
+		this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
+},
+
+onEnteringStatePlayerMove: function(args){
+	this._action = "playerMove";
+	this.onEnteringStatePlayerWork(args);
+},
+
+onEnteringStatePlayerBuild: function(args){
+	this._action = "playerBuild";
+	this.onEnteringStatePlayerWork(args);
+},
+
+
 
 /*
  * onClickSelectWorker:
@@ -414,12 +448,17 @@ onClickPlaceWorker: function(space) {
  */
 onClickSelectWorker: function(worker) {
 	this.clearPossible();
+
+	// Select the worker, highlight it and let the use change selection (if any other choices)
 	this._selectedWorker = worker;
-	this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
 	this.board.highlightPiece(worker);
 	if(this._selectableWorkers.length > 1)
 		this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
+
+	// TODO : automatically choose if only one space ?
+	this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
 },
+
 
 /*
  * onClickCancelSelect:
@@ -429,6 +468,7 @@ onClickSelectWorker: function(worker) {
 onClickCancelSelect: function(evt) {
 	dojo.stopEvent(evt);
 	this.clearPossible();
+	this._selectedWorker = null;
 	this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
 },
 
@@ -436,6 +476,7 @@ onClickCancelSelect: function(evt) {
 /*
  * onClickSpace:
  * 	triggered after a click on a space to either move/build/...
+ *  a space may have some args denoting some choices (eg type of block for Atlas)
  */
 onClickSpace: function(space) {
 	if(space.arg == null)
@@ -448,6 +489,10 @@ onClickSpace: function(space) {
 },
 
 
+
+/*
+ * TODO
+ */
 dialogChooseArg: function(space){
 	var dial = new ebg.popindialog();
 	dial.create( 'chooseArg' );
@@ -465,6 +510,9 @@ dialogChooseArg: function(space){
 
 
 
+/*
+ * TODO
+ */
 onClickSpaceArg: function(space, arg) {
 	if( !this.checkAction( this._action ) )
 		return;
@@ -482,8 +530,7 @@ onClickSpaceArg: function(space, arg) {
 
 
 /*
- * onClickSkip:
- * 	TODO
+ * onClickSkip: is called when the active player decide to skip work
  */
 onClickSkip: function() {
 	if( !this.checkAction( 'skip' ) )
@@ -494,107 +541,10 @@ onClickSkip: function() {
 },
 
 
-///////////////////////////////////////////////////
-//////   Reaction to cometD notifications   ///////
-///////////////////////////////////////////////////
-/*
- * setupNotifications:
- *  In this method, you associate each of your game notifications with your local method to handle it.
- *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
- */
-setupNotifications: function() {
-	dojo.subscribe( 'addOffer', this, "notif_addOffer" );
-	this.notifqueue.setSynchronous('selectPower', 500);
 
-	dojo.subscribe( 'removeOffer', this, "notif_removeOffer" );
-	this.notifqueue.setSynchronous('unselectPower', 500);
-
-	dojo.subscribe( 'powerAdded', this, "notif_powerAdded" );
-	this.notifqueue.setSynchronous('powerAdded', 1000);
-
-	dojo.subscribe('workerPlaced', this, 'notif_workerPlaced');
-	this.notifqueue.setSynchronous('workerPlaced', 1000);
-
-	dojo.subscribe('workerMoved', this, 'notif_workerMoved');
-	this.notifqueue.setSynchronous('workerMoved', 2000);
-
-	dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
-	this.notifqueue.setSynchronous('blockBuilt', 1000);
-
-	// Happens with Apollo
-	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
-	this.notifqueue.setSynchronous('workerSwitched', 2000);
-
-	// Happens with Minotaur
-	dojo.subscribe('workerPushed', this, 'notif_workerPushed');
-	this.notifqueue.setSynchronous('workerPushed', 2000);
-},
-
-/*
- * notif_addOffer:
- *   called during fair division setup, when player 1 adds a power to the offer
- */
-notif_addOffer: function(n) {
-	debug('Notif: addOffer', n.args);
-	// Create a dummy in the offer
-	var dummy = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(0)), $('cards-offer') );
-	dummy.id = 'addOffer-dummy';
-	// Slide the real card to the position of the dummy
-	var powerDivId = 'power-small-' + n.args.powerId;
-	var animation_id = this.slideToObject(powerDivId, dummy.id);
-	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
-		// Replace the dummy with the real card
-		var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
-		powerDiv.style = '';
-		powerDiv.classList.add('selected');
-		powerDiv.classList.remove('wait');
-		this.buildOfferActionButtons();
-	}));
-	animation_id.play();
-},
-
-/*
- * notif_removeOffer:
- *   called during fair division setup, when player 1 removes a power from the offer
- */
-notif_removeOffer: function(n) {
-	debug('Notif: removeOffer', n.args);
-	// Create a dummy in the deck
-	var dummy = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(0)), $('cards-deck'), 'first');
-	dummy.id = 'removeOffer-dummy';
-	// Slide the real card to the position of the dummy
-	var powerDivId = 'power-small-' + n.args.powerId;
-	var animation_id = this.slideToObject(powerDivId, dummy.id);
-	dojo.connect(animation_id, 'onEnd', dojo.hitch(this, function() {
-		// Replace the dummy with the real card
-		var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
-		powerDiv.style = '';
-		powerDiv.classList.remove('selected');
-		powerDiv.classList.remove('wait');
-		this.buildOfferActionButtons();
-	}));
-	animation_id.play();
-},
-
-
-/*
- * notif_powerAdded:
- *   called whenever a player choose a power on a Fair Division process
- */
-notif_powerAdded: function(n) {
-	debug('Notif: a power was chosen', n.args);
-	this.addPowerToPlayer(n.args.player_id, n.args.power_id);
-},
-
-
-/*
- * notif_workerPlaced:
- *   called whenever a new worker is placed on the board
- */
-notif_workerPlaced: function(n) {
-	debug('Notif: new worker placed', n.args);
-	this.createPiece(n.args.piece);
-},
+/////////////////////
+//// Work Notifs ////
+/////////////////////
 
 
 /*
@@ -635,6 +585,117 @@ notif_workerPushed : function(n) {
 	console.info('Notif: worker pushed', n.args);
 	this.board.movePiece(n.args.piece2, n.args.space, 1500);
 	this.board.movePiece(n.args.piece1, n.args.piece2);
+},
+
+
+
+///////////////////////////////////////
+////////    Utility methods    ////////
+///////////////////////////////////////
+
+/*
+ * // TODO:
+ */
+slide: function(sourceId, targetId){
+	return new Promise((resolve, reject) => {
+		var animation = this.slideToObject(sourceId, targetId);
+		dojo.connect(animation, 'onEnd', resolve);
+		animation.play();
+	});
+},
+
+getPower: function(powerId) {
+	// Gets a power object ready to use in UI templates
+	var power = this.gamedatas.powers[powerId] || {
+		id : 0,
+		name: '',
+		title: '',
+		text: [],
+	};
+	power.type = power.hero ? 'hero' : '';
+	// TODO map for translation
+	power.textList = power.text.join('</li><li>');
+	return power;
+},
+
+/*
+ * focusContainer:
+ * 	show and hide containers depending on state
+ */
+focusContainer: function(container){
+	dojo.style( 'power-offer-container', 'display', container == 'powers-offer'? 'flex' : 'none');
+	dojo.style( 'power-choose-container', 'display', container == 'powers-choose'? 'flex' : 'none');
+	dojo.style( 'play-area', 'display', container == 'board'?  'block' : 'none');
+},
+
+
+/*
+ * createPiece:
+ * 	add a piece to the board (with falldown animation)
+ * params:
+ *  - object piece: main infos are type, x,y,z
+ */
+createPiece: function(piece) {
+	piece.name = piece.type;
+	if(piece.type == "worker")
+		piece.name = piece.type_arg + piece.type;
+
+	this.board.addPiece(piece);
+},
+
+
+/*
+ * clearPossible:
+ * 	clear every clickable space and any selected worker
+ */
+clearPossible: function() {
+	this.removeActionButtons();
+	this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
+
+	this._selectedWorker = null;
+	dojo.empty('grid-powers');
+	dojo.query('#power-detail').removeClass().addClass('power-card power-0');
+	dojo.empty('power-choose-container');
+
+	this.board.clearClickable();
+	this.board.clearHighlights();
+},
+
+
+///////////////////////////////////////////////////
+//////   Reaction to cometD notifications   ///////
+///////////////////////////////////////////////////
+/*
+ * setupNotifications:
+ *  In this method, you associate each of your game notifications with your local method to handle it.
+ *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
+ */
+setupNotifications: function() {
+	dojo.subscribe( 'addOffer', this, "notif_addOffer" );
+	this.notifqueue.setSynchronous('addOffer', 500);
+
+	dojo.subscribe( 'removeOffer', this, "notif_removeOffer" );
+	this.notifqueue.setSynchronous('removeOffer', 500);
+
+	dojo.subscribe( 'powerAdded', this, "notif_powerAdded" );
+	this.notifqueue.setSynchronous('powerAdded', 1000);
+
+	dojo.subscribe('workerPlaced', this, 'notif_workerPlaced');
+	this.notifqueue.setSynchronous('workerPlaced', 1000);
+
+	dojo.subscribe('workerMoved', this, 'notif_workerMoved');
+	this.notifqueue.setSynchronous('workerMoved', 2000);
+
+	dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
+	this.notifqueue.setSynchronous('blockBuilt', 1000);
+
+	// Happens with Apollo
+	dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
+	this.notifqueue.setSynchronous('workerSwitched', 2000);
+
+	// Happens with Minotaur
+	dojo.subscribe('workerPushed', this, 'notif_workerPushed');
+	this.notifqueue.setSynchronous('workerPushed', 2000);
 },
 
 });
