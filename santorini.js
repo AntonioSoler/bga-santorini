@@ -566,7 +566,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *   called whenever a new block is built
      */
     notif_blockBuilt: function(n) {
-      console.log('Notif: block built', n.args);
+      debug('Notif: block built', n.args);
       this.createPiece(n.args.piece);
     },
 
@@ -575,7 +575,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *   called whenever two workers are switched using Apollo
      */
     notif_workerSwitched: function(n) {
-      console.info('Notif: worker switched', n.args);
+      debug('Notif: worker switched', n.args);
       this.board.switchPiece(n.args.piece1, n.args.piece2);
     },
 
@@ -584,11 +584,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *   called whenever a worker is pushed using Minotaur
      */
     notif_workerPushed: function(n) {
-      console.info('Notif: worker pushed', n.args);
+      debug('Notif: worker pushed', n.args);
       this.board.movePiece(n.args.piece2, n.args.space, 1500);
       this.board.movePiece(n.args.piece1, n.args.piece2);
     },
 
+		/*
+     * notif_blockBuilt:
+     *   called whenever a new block is built under a worker using Zeus
+     */
+    notif_blockBuiltUnder: function(n) {
+      debug('Notif: block built under', n.args);
+      this.board.addPieceUnder(n.args.piece);
+    },
 
 
 ///////////////////////////////////////
@@ -717,6 +725,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 			// Happens with Minotaur
       dojo.subscribe('workerPushed', this, 'notif_workerPushed');
       this.notifqueue.setSynchronous('workerPushed', 2000);
+
+			// Happens with Zeus
+			dojo.subscribe('blockBuiltUnder', this, 'notif_blockBuiltUnder');
+      this.notifqueue.setSynchronous('blockBuiltUnder', 2000);
     }
   });
 });

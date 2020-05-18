@@ -199,25 +199,43 @@ Board.prototype.addMeshToBoard = function(mesh, space){
  * - mixed space : contains the location
  * - optionnal int id : useful to access the mesh later
  */
-Board.prototype.addPiece = function(piece){
+Board.prototype.addPiece = function(piece, animation){
+	animation = animation || "fall";
 	var center = new THREE.Vector3(xCenters[piece.x], lvlHeights[piece.z], zCenters[piece.y]);
 	var sky = center.clone();
 	sky.setY(center.y + fallAnimation.sky);
 
-	var mesh = this._meshManager.createMesh(piece.name);
+	var mesh = this._meshManager.createMesh(piece.name || piece.type, animation == "fadeIn");
 	mesh.name = piece.name;
-	mesh.position.copy(sky);
+	mesh.position.copy(animation == "fall"? sky : center);
+	mesh.material.opacity = animation == "fall"? 1 : 0;
 	mesh.rotation.set(0, (Math.floor(Math.random() * 4) - 1)*Math.PI/2, 0);
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);
 
 	return new Promise((resolve, reject) => {
-		Tween.get(mesh.position)
-			.to(center, fallAnimation.duration,  Ease.quadInOut)
-			.call(resolve)
-			.addEventListener('change', () => this.render())
+		var tweenAnimation;
+		if(animation == "fall")
+			tweenAnimation = Tween.get(mesh.position).to(center, fallAnimation.duration,  Ease.quadInOut);
+		if(animation == "fadeIn")
+			tweenAnimation = Tween.get(mesh.material).wait(400).to({opacity : 1}, 800,  Ease.quadInOut);
+
+			tweenAnimation.call(resolve).addEventListener('change', () => this.render())
 	});
+};
+
+
+/*
+ * Add a piece to a given position and move the mesh already here up
+ * - str name : name of the mesh
+ * - mixed space : contains the location
+ * - optionnal int id : useful to access the mesh later
+ */
+Board.prototype.addPieceUnder = function(piece){
+	var space = {x: piece.x, y:piece.y, z:parseInt(piece.z) + 1};
+	this.movePiece(piece, space);
+	this.addPiece(piece, "fadeIn");
 };
 
 

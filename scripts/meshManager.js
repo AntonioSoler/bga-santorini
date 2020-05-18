@@ -180,7 +180,7 @@ MeshManager.prototype.load = function(){
 /*
  * Create mesh
  */
-MeshManager.prototype.createMesh = function(name){
+MeshManager.prototype.createMesh = function(name, transparent){
 	for(var i = 0; i < Meshes.length; i++) {
 	if(name == Meshes[i].n){
 		var m = Meshes[i];
@@ -188,10 +188,9 @@ MeshManager.prototype.createMesh = function(name){
 		var g = this._geometries[typeof m.g == "string"? m.g : m.n];
 
 		var material = new THREE.MeshLambertMaterial({
-			alphaMap: m.a? new THREE.TextureLoader().load(this._url + 'img/'+m.a) : null,
 			map : m.c? null : t,
 			color: m.c || 0xDDDDDD,
-			transparent: (m.tExt == "png" || m.a) ? true : false,
+			transparent: transparent || false,
 			side: THREE.DoubleSide
 		});
 		var mesh = new THREE.Mesh(g, material);

@@ -43,25 +43,23 @@ import { Board } from '../scripts/board.js';
 
 var	container = document.getElementById("container");
 window.board = new Board(container, "http://192.168.1.29/" );
-board.render();
-//board.display();
 
-/*
+
 var piece1 = {
-	x:4,y:2,z:0, name:'f1worker',
+	x:1,y:4,z:0, name:'lvl0',
 };
 var piece2 = {
 	x:1,y:4,z:0, name:'f0worker',
 }
 
-board.addPiece(piece1);
+//board.addPiece(piece1);
 //board.highlightPiece(piece1);
 //setTimeout(() => board.clearHighlights(), 2000);
-board.addPiece(piece2).then(() => board.switchPiece(piece2, piece1));
-*/
+board.addPiece(piece2).then(() => board.addPieceUnder(piece1));
 
 
 
+/*
 var click = (pos) => {
 	board.clearClickable();
 
@@ -79,6 +77,7 @@ for(var j = 0; j < 5; j++)
   tPos.push({x:i, y:j, z:0});
 
 board.makeClickable(tPos, click, 'move');
+*/
 
 /*
 for(var i = 1; i <= 55; i++){
