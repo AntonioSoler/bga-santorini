@@ -2,6 +2,8 @@
 
 class Hades extends Power
 {
+  public function isImplemented(){ return true; }
+
   public static function getId() {
     return HADES;
   }
@@ -29,10 +31,15 @@ class Hades extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
-  /* * */
+
+  public function argOpponentMove(&$arg)
+  {
+    Utils::filterWorks($arg, function($space, $worker){
+        return $space['z'] >= $worker['z'];
+    });
+  }
 
 }
-  
