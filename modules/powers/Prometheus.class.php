@@ -2,6 +2,8 @@
 
 class Prometheus extends Power
 {
+  public function isImplemented(){ return true; }
+
   public static function getId() {
     return PROMETHEUS;
   }
@@ -47,7 +49,7 @@ class Prometheus extends Power
       return;
 
     $arg['skippable'] = true;
-    $arg['workers'] = $this->game->board->getPlacedWorkers($this->game->getActivePlayerId());
+    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
     foreach($arg['workers'] as &$worker){
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
     }

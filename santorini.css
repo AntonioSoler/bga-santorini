@@ -341,6 +341,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-image: url('img/card-small-displayed.png');
 }
 
+.power-card.small.not-implemented::before {
+  background-image:none;
+  background-color:rgba(0,0,0,0.5);
+  cursor:not-allowed;
+}
+
 .power-card.small .power-name {
     font-size: 15px;
     line-height: 18px;

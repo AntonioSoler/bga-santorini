@@ -3,7 +3,10 @@
 abstract class Utils extends APP_GameClass {
   /* TODO */
   public static function filterWorkers(&$arg, $filter){
-    $arg['workers'] = array_values(array_filter($arg['workers'], $filter));
+    if(array_key_exists('workers', $arg))
+      $arg['workers'] = array_values(array_filter($arg['workers'], $filter));
+    else
+      $arg = array_values(array_filter($arg, $filter));
   }
 
   public static function filterWorkersById(&$arg, $wId){
@@ -13,7 +16,7 @@ abstract class Utils extends APP_GameClass {
   }
 
   public static function cleanWorkers(&$arg){
-      self::filterWorkers($arg, function($worker){ return count($worker['works']) > 0; });
+      self::filterWorkers($arg, function($worker){ return array_key_exists('works', $worker) && count($worker['works']) > 0; });
   }
 
 

@@ -471,7 +471,7 @@ class santorini extends Table
   public function argPlayerMove()
   {
     // Return for each worker of this player the spaces he can move to
-    $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
+    $workers = $this->board->getPlacedActiveWorkers();
     foreach ($workers as &$worker)
       $worker["works"] = $this->board->getNeighbouringSpaces($worker, 'move');
 

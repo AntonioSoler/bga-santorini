@@ -2,6 +2,8 @@
 
 class Hermes extends Power
 {
+  public function isImplemented(){ return true; }
+
   public static function getId() {
     return HERMES;
   }
@@ -71,7 +73,7 @@ class Hermes extends Power
       return;
 
     // Otherwise, let the player build with any worker
-    $arg['workers'] = $this->game->board->getPlacedWorkers($this->game->getActivePlayerId());
+    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
     foreach($arg['workers'] as &$worker){
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
     }

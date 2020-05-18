@@ -2,6 +2,8 @@
 
 class Apollo extends Power
 {
+  public function isImplemented(){ return true; }
+
   public static function getId() {
     return APOLLO;
   }

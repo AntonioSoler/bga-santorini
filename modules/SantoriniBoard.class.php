@@ -65,6 +65,15 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
+   * getPlacedActiveWorkers: return all placed workers of active player
+   */
+  public function getPlacedActiveWorkers()
+  {
+    return $this->getPlacedWorkers($this->game->getActivePlayerId());
+  }
+
+
+  /*
    * getBoard:
    *   return a 3d matrix reprensenting the board with all the placed pieces
    */

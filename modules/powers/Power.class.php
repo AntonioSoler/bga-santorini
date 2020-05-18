@@ -12,6 +12,8 @@ abstract class Power extends APP_GameClass
     $this->playerId = $playerId;
   }
 
+  public function isImplemented(){ return false; }
+
   public function getUiData()
   {
     return [
@@ -20,6 +22,7 @@ abstract class Power extends APP_GameClass
       'title'     => $this->getTitle(),
       'text'      => $this->getText(),
       'hero'      => get_parent_class($this) == 'HeroPower',
+      'implemented' => $this->isImplemented()? 'implemented' : 'not-implemented',
     ];
   }
 

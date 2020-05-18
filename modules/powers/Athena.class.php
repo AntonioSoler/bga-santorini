@@ -2,6 +2,8 @@
 
 class Athena extends Power
 {
+  public function isImplemented(){ return true; }
+
   public static function getId() {
     return ATHENA;
   }
