@@ -2,6 +2,8 @@
 
 class Hestia extends Power
 {
+  public function isImplemented(){ return true; }
+
   public static function getId() {
     return HESTIA;
   }
@@ -29,10 +31,33 @@ class Hestia extends Power
   }
 
   public static function isGoldenFleece() {
-    return true; 
+    return true;
   }
 
-  /* * */
+
+  public function argPlayerBuild(&$arg)
+  {
+    $build = $this->game->log->getLastBuild();
+    // No build before => usual rule
+    if($build == null)
+      return;
+
+    // Otherwise, let the player do a second build (not mandatory) but not on the perimeter
+    $arg['skippable'] = true;
+    Utils::filterWorkersById($arg, $build['pieceId']);
+    Utils::filterWorks($arg, function($space, $worker){
+      return !$this->game->board->isPerimeter($space);
+    });
+  }
+
+
+  public function stateAfterBuild()
+  {
+    if(count($this->game->log->getLastBuilds()) != 1)
+      return null;
+
+    $arg = $this->game->argPlayerBuild();
+    return !empty($arg['workers'])? 'buildAgain' : null;
+  }
 
 }
-  
