@@ -118,6 +118,11 @@ onEnteringState: function(stateName, args) {
  */
 onLeavingState: function(stateName) {
 	debug('Leaving state: ' + stateName);
+
+	// Don't remove the power cards
+	if(stateName == 'powersPlayerChoose')
+		return;
+
 	this.clearPossible();
 },
 
@@ -356,9 +361,11 @@ notif_powerAdded: function(n) {
 			powerId = n.args.power_id;
 
 	var powerChooseCard = $("power-choose-" + powerId);
+
 	if(powerChooseCard == null)
 		this.addPowerToPlayer(playerId, powerId);
 	else {
+		powerChooseCard.style.height = powerChooseCard.offsetHeight + "px";
 		powerChooseCard.classList.add("power-dummy");
 		var phantom = this.format_block('jstpl_powerDetail', this.getPower(powerId));
 		this.slideTemporary(phantom, "power-choose-" + powerId, 'power_container_' + playerId).then( () => {
