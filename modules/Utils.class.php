@@ -9,9 +9,9 @@ abstract class Utils extends APP_GameClass {
       $arg = array_values(array_filter($arg, $filter));
   }
 
-  public static function filterWorkersById(&$arg, $wId){
+  public static function filterWorkersById(&$arg, $wId, $same = true){
     self::filterWorkers($arg, function($worker) use ($wId){
-      return $worker['id'] == $wId;
+      return ($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId);
     });
   }
 

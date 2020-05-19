@@ -8,7 +8,7 @@ class Limus extends SantoriniPower
     $this->name  = clienttranslate('Limus');
     $this->title = clienttranslate('Goddess of Famine');
     $this->text  = [
-      clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome to create a Complete Tower.")
+      clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome. *** TODO: updated rule")
     ];
     $this->players = [2, 3, 4];
     $this->banned  = [TERPSICHORE];
@@ -22,9 +22,13 @@ class Limus extends SantoriniPower
   {
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
     foreach($myWorkers as &$worker){
-      Utils::filterWorks($arg, function($space, $oppworker) use ($worker) {
+      Utils::filterWorks($arg, function(&$space, $oppworker) use ($worker) {
         // can build only a dome or at a non-neighbouring space
-        return $space['arg'] == 3 || !$this->game->board->isNeighbour($space, $worker, 'build');
+        if(!in_array(3, $space['arg']) || !$this->game->board->isNeighbour($space, $worker, 'build')
+          return false;
+
+        $space['arg'] = [3];
+        return true;
       });
     }
   }
