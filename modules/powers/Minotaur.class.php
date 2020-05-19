@@ -2,36 +2,19 @@
 
 class Minotaur extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return MINOTAUR;
-  }
-
-  public static function getName() {
-    return clienttranslate('Minotaur');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Bull-headed Monster');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = MINOTAUR;
+    $this->name  = clienttranslate('Minotaur');
+    $this->title = clienttranslate('Bull-headed Monster');
+    $this->text  = [
       clienttranslate("Your Move: Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -91,11 +74,10 @@ class Minotaur extends SantoriniPower
       'space'  => $space,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
-      'player_name2' => 'TODO!'
+      'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
     ];
     $this->game->notifyAllPlayers('workerPushed', clienttranslate('${power_name}: ${player_name} forces ${player_name2} one space backwards'), $args);
 
     return true;
   }
-
 }

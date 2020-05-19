@@ -2,40 +2,22 @@
 
 class Apollo extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return APOLLO;
-  }
-
-  public static function getName() {
-    return clienttranslate('Apollo');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God Of Music');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = APOLLO;
+    $this->name  = clienttranslate('Apollo');
+    $this->title = clienttranslate('God Of Music');
+    $this->text  = [
       clienttranslate("Your Move: Your Worker may move into an opponent Worker's space by forcing their Worker to the space yours just vacated.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
-
   public function argPlayerMove(&$arg)
   {
     $allWorkers = $this->game->board->getPlacedWorkers();
@@ -75,5 +57,4 @@ class Apollo extends SantoriniPower
 
     return true;
   }
-
 }

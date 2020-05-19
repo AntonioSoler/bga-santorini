@@ -2,36 +2,19 @@
 
 class Hermes extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return HERMES;
-  }
-
-  public static function getName() {
-    return clienttranslate('Hermes');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of Travel');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HERMES;
+    $this->name  = clienttranslate('Hermes');
+    $this->title = clienttranslate('God of Travel');
+    $this->text  = [
       clienttranslate("Your Turn: If your Workers do not move up or down, they may each move any number of times (even zero), and then either builds.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [HARPIES];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [HARPIES];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -78,6 +61,5 @@ class Hermes extends SantoriniPower
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
     }
   }
-
 
 }

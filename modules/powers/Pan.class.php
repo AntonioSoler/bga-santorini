@@ -2,36 +2,19 @@
 
 class Pan extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return PAN;
-  }
-
-  public static function getName() {
-    return clienttranslate('Pan');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of the Wild');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = PAN;
+    $this->name  = clienttranslate('Pan');
+    $this->title = clienttranslate('God of the Wild');
+    $this->text  = [
       clienttranslate("Win Condition: You also win if your Worker moves down two or more levels.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [HADES];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [HADES];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -46,5 +29,4 @@ class Pan extends SantoriniPower
     $arg['win'] = true;
     $arg['msg'] = clienttranslate('Pan won by moving down.');
   }
-
 }

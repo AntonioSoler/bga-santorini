@@ -2,38 +2,20 @@
 
 class Triton extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return TRITON;
-  }
-
-  public static function getName() {
-    return clienttranslate('Triton');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of the Waves');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = TRITON;
+    $this->name  = clienttranslate('Triton');
+    $this->title = clienttranslate('God of the Waves');
+    $this->text  = [
       clienttranslate("Your Move: Each time your Worker moves into a perimeter space, it may immediately move again.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [HARPIES];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
+    $this->implemented = true;
   }
-
-  public static function getBannedIds() {
-    return [HARPIES];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
-  }
-
 
   /* * */
   public function hasMovedOnPerimeter()
@@ -58,5 +40,4 @@ class Triton extends SantoriniPower
   {
     return $this->hasMovedOnPerimeter()?  'moveAgain' : null;
   }
-
 }

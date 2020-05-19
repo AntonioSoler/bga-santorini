@@ -2,26 +2,17 @@
 
 class Heracles extends SantoriniHeroPower
 {
-  public static function getId() {
-    return HERACLES;
-  }
-
-  public static function getName() {
-    return clienttranslate('Heracles');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Doer of Great Deeds');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HERACLES;
+    $this->name  = clienttranslate('Heracles');
+    $this->title = clienttranslate('Doer of Great Deeds');
+    $this->text  = [
       clienttranslate("End of Your Turn: Once, both your Workers build any number of domes (even zero) at any level.")
     ];
-  }
-
-  public static function getBannedIds() {
-    return [];
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
   }
 
   /* * */

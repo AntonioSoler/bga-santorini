@@ -1,11 +1,11 @@
 <?php
 
 abstract class SantoriniHeroPower extends SantoriniPower {
-  public static function getPlayers() {
+  public function getPlayers() {
     return [2];
   }
 
-  public static function isGoldenFleece() {
-    return false; 
+  public function isGoldenFleece() {
+    return false;
   }
 }

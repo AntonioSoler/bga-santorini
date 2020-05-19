@@ -764,6 +764,7 @@ foreach($heroes as $id => $god){
 }
 */
 
+
 /*
 foreach($gods as $id => $god){
     $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
@@ -771,39 +772,22 @@ foreach($gods as $id => $god){
 
 class ".$god['name']." extends SantoriniPower
 {
-  public static function getId() {
-    return ".$r[$id].";
-  }
-
-  public static function getName() {
-    return clienttranslate('".$god['name']."');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('".$god['title']."');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct(\$game, \$playerId){
+    parent::__construct(\$game, \$playerId);
+    \$this->id    = ".$r[$id].";
+    \$this->name  = clienttranslate('".$god['name']."');
+    \$this->title = clienttranslate('".$god['title']."');
+    \$this->text  = [
 ".
         implode(",\n", array_map(function($a){ return '      clienttranslate("'.$a.'")'; }, $god['power']))
 ."
     ];
+    \$this->players = [".implode(', ', $god['players'])."];
+    \$this->banned  = [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
+    \$this->golden  = ".($god['golden']? "true":"false").";
   }
 
-  public static function getPlayers() {
-    return [".implode(', ', $god['players'])."];
-  }
-
-  public static function getBannedIds() {
-    return [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
-  }
-
-  public static function isGoldenFleece() {
-    return ".($god['golden']? "true":"false")."; 
-  }
-
-  / * * * /
+  /* * */
 
 }
   ");
@@ -817,28 +801,19 @@ foreach($heroes as $id => $god){
 
 class ".$god['name']." extends SantoriniHeroPower
 {
-  public static function getId() {
-    return ".$r[$id].";
-  }
-
-  public static function getName() {
-    return clienttranslate('".$god['name']."');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('".$god['title']."');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct(\$game, \$playerId){
+    parent::__construct(\$game, \$playerId);
+    \$this->id    = ".$r[$id].";
+    \$this->name  = clienttranslate('".$god['name']."');
+    \$this->title = clienttranslate('".$god['title']."');
+    \$this->text  = [
 ".
         implode(",\n", array_map(function($a){ return '      clienttranslate("'.$a.'")'; }, $god['power']))
 ."
     ];
-  }
-
-  public static function getBannedIds() {
-    return [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
+    \$this->players = [".implode(', ', $god['players'])."];
+    \$this->banned  = [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
+    \$this->golden  = false;
   }
 
   /* * */

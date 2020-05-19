@@ -2,36 +2,19 @@
 
 class Prometheus extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return PROMETHEUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Prometheus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Titan Benefactor of Mankind');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = PROMETHEUS;
+    $this->name  = clienttranslate('Prometheus');
+    $this->title = clienttranslate('Titan Benefactor of Mankind');
+    $this->text  = [
       clienttranslate("Your Turn: If your Worker does not move up, it may build both before and after moving.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -81,5 +64,6 @@ class Prometheus extends SantoriniPower
     // TODO : check the state is "build" ?
     return is_null($this->game->log->getLastMove())? 'move' : null;
   }
+
 
 }

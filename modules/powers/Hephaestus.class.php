@@ -2,39 +2,21 @@
 
 class Hephaestus extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return HEPHAESTUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Hephaestus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of Blacksmiths');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HEPHAESTUS;
+    $this->name  = clienttranslate('Hephaestus');
+    $this->title = clienttranslate('God of Blacksmiths');
+    $this->text  = [
       clienttranslate("Your Build: Your Worker may build one additional block (not dome) on top of your first block.")
     ];
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
+
+    $this->implemented = true;
   }
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
-  }
-
-  /* * */
   /* * */
   public function argPlayerBuild(&$arg)
   {
@@ -57,5 +39,4 @@ class Hephaestus extends SantoriniPower
     $build = $this->game->log->getLastBuild();
     return (count($this->game->log->getLastBuilds()) == 1 && $build['to']['z'] <= 1)? 'buildAgain' : null;
   }
-
 }

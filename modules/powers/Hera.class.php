@@ -2,36 +2,19 @@
 
 class Hera extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return HERA;
-  }
-
-  public static function getName() {
-    return clienttranslate('Hera');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Goddess of Marriage');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HERA;
+    $this->name  = clienttranslate('Hera');
+    $this->title = clienttranslate('Goddess of Marriage');
+    $this->text  = [
       clienttranslate("Opponent's Turn: An opponent cannot win by moving into a perimeter space.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */

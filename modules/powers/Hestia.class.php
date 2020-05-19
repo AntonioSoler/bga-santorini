@@ -2,39 +2,22 @@
 
 class Hestia extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return HESTIA;
-  }
-
-  public static function getName() {
-    return clienttranslate('Hestia');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Goddess of Hearth and Home');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HESTIA;
+    $this->name  = clienttranslate('Hestia');
+    $this->title = clienttranslate('Goddess of Hearth and Home');
+    $this->text  = [
       clienttranslate("Your Build: Your Worker may build one additional time, but this cannot be on a perimeter space.")
     ];
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
+
+    $this->implemented = true;
   }
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
-  }
-
-
+  /* * */
   public function argPlayerBuild(&$arg)
   {
     $build = $this->game->log->getLastBuild();
@@ -59,5 +42,4 @@ class Hestia extends SantoriniPower
     $arg = $this->game->argPlayerBuild();
     return !empty($arg['workers'])? 'buildAgain' : null;
   }
-
 }

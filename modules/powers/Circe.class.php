@@ -2,34 +2,17 @@
 
 class Circe extends SantoriniPower
 {
-  public static function getId() {
-    return CIRCE;
-  }
-
-  public static function getName() {
-    return clienttranslate('Circe');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Divine Enchantress');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = CIRCE;
+    $this->name  = clienttranslate('Circe');
+    $this->title = clienttranslate('Divine Enchantress');
+    $this->text  = [
       clienttranslate("Start of Your Turn: If an opponent's Workers do not neighbor each other, you alone have use of their power until your next turn.")
     ];
-  }
-
-  public static function getPlayers() {
-    return [2];
-  }
-
-  public static function getBannedIds() {
-    return [CLIO, HECATE];
-  }
-
-  public static function isGoldenFleece() {
-    return false; 
+    $this->players = [2];
+    $this->banned  = [CLIO, HECATE];
+    $this->golden  = false;
   }
 
   /* * */

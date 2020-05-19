@@ -2,36 +2,19 @@
 
 class Zeus extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return ZEUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Zeus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of the Sky');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = ZEUS;
+    $this->name  = clienttranslate('Zeus');
+    $this->title = clienttranslate('God of the Sky');
+    $this->text  = [
       clienttranslate("Your Build: Your Worker may build a block under itself.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -81,4 +64,5 @@ class Zeus extends SantoriniPower
 
     return true;
   }
+
 }

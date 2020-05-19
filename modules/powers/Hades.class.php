@@ -2,39 +2,22 @@
 
 class Hades extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return HADES;
-  }
-
-  public static function getName() {
-    return clienttranslate('Hades');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of the Underworld');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HADES;
+    $this->name  = clienttranslate('Hades');
+    $this->title = clienttranslate('God of the Underworld');
+    $this->text  = [
       clienttranslate("Opponent's Turn: Opponent Workers cannot move down.")
     ];
+    $this->players = [2, 3, 4];
+    $this->banned  = [PAN];
+    $this->golden  = true;
+
+    $this->implemented = true;
   }
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [PAN];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
-  }
-
-
+  /* * */
   public function argOpponentMove(&$arg)
   {
     Utils::filterWorks($arg, function($space, $worker){

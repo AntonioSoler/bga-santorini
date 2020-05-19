@@ -2,36 +2,19 @@
 
 class Artemis extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return ARTEMIS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Artemis');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Goddess of the Hunt');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = ARTEMIS;
+    $this->name  = clienttranslate('Artemis');
+    $this->title = clienttranslate('Goddess of the Hunt');
+    $this->text  = [
       clienttranslate("Your Move: Your Worker may move one additional time, but not back to its initial space.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -55,4 +38,5 @@ class Artemis extends SantoriniPower
   {
     return count($this->game->log->getLastMoves()) == 1? 'moveAgain' : null;
   }
+
 }

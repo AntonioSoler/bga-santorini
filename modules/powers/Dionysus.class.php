@@ -2,34 +2,17 @@
 
 class Dionysus extends SantoriniPower
 {
-  public static function getId() {
-    return DIONYSUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Dionysus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of Wine');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = DIONYSUS;
+    $this->name  = clienttranslate('Dionysus');
+    $this->title = clienttranslate('God of Wine');
+    $this->text  = [
       clienttranslate("Your Build: Each time a Worker you control creates a Complete Tower, you may take an additional turn using an opponent Worker instead of your own. No player can win during these additional turns.")
     ];
-  }
-
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true; 
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
   }
 
   /* * */

@@ -2,34 +2,17 @@
 
 class Hypnus extends SantoriniPower
 {
-  public static function getId() {
-    return HYPNUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Hypnus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of Sleep');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = HYPNUS;
+    $this->name  = clienttranslate('Hypnus');
+    $this->title = clienttranslate('God of Sleep');
+    $this->text  = [
       clienttranslate("Start of Opponent's Turn: If one of your opponent's Workers is higher than all of their others, it cannot move.")
     ];
-  }
-
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [TERPSICHORE];
-  }
-
-  public static function isGoldenFleece() {
-    return true; 
+    $this->players = [2, 3, 4];
+    $this->banned  = [TERPSICHORE];
+    $this->golden  = true;
   }
 
   /* * */

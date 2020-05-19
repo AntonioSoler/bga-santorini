@@ -2,36 +2,19 @@
 
 class Limus extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return LIMUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Limus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Goddess of Famine');
-  }
-
-  public static function getText() {
-    return [
-      clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome. *** TODO: updated rule")
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = LIMUS;
+    $this->name  = clienttranslate('Limus');
+    $this->title = clienttranslate('Goddess of Famine');
+    $this->text  = [
+      clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome to create a Complete Tower.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [TERPSICHORE];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [TERPSICHORE];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -45,5 +28,4 @@ class Limus extends SantoriniPower
       });
     }
   }
-
 }

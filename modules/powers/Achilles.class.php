@@ -2,26 +2,17 @@
 
 class Achilles extends SantoriniHeroPower
 {
-  public static function getId() {
-    return ACHILLES;
-  }
-
-  public static function getName() {
-    return clienttranslate('Achilles');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Volatile Warrior');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = ACHILLES;
+    $this->name  = clienttranslate('Achilles');
+    $this->title = clienttranslate('Volatile Warrior');
+    $this->text  = [
       clienttranslate("Your Turn: Once, your Worker builds both before and after moving.")
     ];
-  }
-
-  public static function getBannedIds() {
-    return [];
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
   }
 
   /* * */

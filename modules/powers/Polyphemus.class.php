@@ -2,26 +2,17 @@
 
 class Polyphemus extends SantoriniHeroPower
 {
-  public static function getId() {
-    return POLYPHEMUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Polyphemus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Gigantic Cyclops');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = POLYPHEMUS;
+    $this->name  = clienttranslate('Polyphemus');
+    $this->title = clienttranslate('Gigantic Cyclops');
+    $this->text  = [
       clienttranslate("End of Your Turn: Once, your Worker builds up to 2 domes at any level on any unoccupied spaces on the board.")
     ];
-  }
-
-  public static function getBannedIds() {
-    return [];
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
   }
 
   /* * */

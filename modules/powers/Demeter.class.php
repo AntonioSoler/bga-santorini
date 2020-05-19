@@ -2,36 +2,19 @@
 
 class Demeter extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return DEMETER;
-  }
-
-  public static function getName() {
-    return clienttranslate('Demeter');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Goddess of the Harvest');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = DEMETER;
+    $this->name  = clienttranslate('Demeter');
+    $this->title = clienttranslate('Goddess of the Harvest');
+    $this->text  = [
       clienttranslate("Your Build: Your Worker may build one additional time, but not on the same space.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */

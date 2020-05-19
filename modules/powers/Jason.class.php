@@ -2,27 +2,18 @@
 
 class Jason extends SantoriniHeroPower
 {
-  public static function getId() {
-    return JASON;
-  }
-
-  public static function getName() {
-    return clienttranslate('Jason');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Leader of the Argonauts');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = JASON;
+    $this->name  = clienttranslate('Jason');
+    $this->title = clienttranslate('Leader of the Argonauts');
+    $this->text  = [
       clienttranslate("Setup: Take one extra Worker of your color. This is kept on your God Power card until needed."),
       clienttranslate("Your Turn: Once, instead of your normal turn, place your extra Worker on an unoccupied ground-level perimeter space. This Worker then builds.")
     ];
-  }
-
-  public static function getBannedIds() {
-    return [];
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
   }
 
   /* * */

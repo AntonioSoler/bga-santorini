@@ -2,36 +2,19 @@
 
 class Chronus extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return CHRONUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Chronus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of Time');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = CHRONUS;
+    $this->name  = clienttranslate('Chronus');
+    $this->title = clienttranslate('God of Time');
+    $this->text  = [
       clienttranslate("Win Condition: You also win when there are at least five Complete Towers on the board.")
     ];
-  }
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
 
-  public static function getPlayers() {
-    return [2];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return false;
+    $this->implemented = true;
   }
 
   /* * */
@@ -62,5 +45,6 @@ class Chronus extends SantoriniPower
   public function checkOpponentWinning(&$arg) {
     $this->checkWinning($arg);
    }
+
 
 }

@@ -2,26 +2,17 @@
 
 class Odysseus extends SantoriniHeroPower
 {
-  public static function getId() {
-    return ODYSSEUS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Odysseus');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Cunning Leader');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = ODYSSEUS;
+    $this->name  = clienttranslate('Odysseus');
+    $this->title = clienttranslate('Cunning Leader');
+    $this->text  = [
       clienttranslate("Start of Your Turn: Once, force to unoccupied corner spaces any number of opponent Workers that neighbor your Workers.")
     ];
-  }
-
-  public static function getBannedIds() {
-    return [];
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
   }
 
   /* * */

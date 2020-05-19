@@ -12,17 +12,33 @@ abstract class SantoriniPower extends APP_GameClass
     $this->playerId = $playerId;
   }
 
-  public function isImplemented(){ return false; }
+
+  protected $id = 0;
+  protected $name = '';
+  protected $title = '';
+  protected $text;
+  protected $players;
+  protected $banned;
+  protected $golden;
+  protected $implemented = false;
+
+  public function getId() { return $this->id; }
+  public function getName() { return $this->name; }
+  public function getTitle() { return $this->title; }
+  public function getText() { return $this->text; }
+  public function getPlayers() { return $this->players; }
+  public function getBannedIds() { return $this->banned; }
+  public function isGoldenFleece() { return $this->golden; }
 
   public function getUiData()
   {
     return [
-      'id'        => $this->getId(),
-      'name'      => $this->getName(),
-      'title'     => $this->getTitle(),
-      'text'      => $this->getText(),
+      'id'        => $this->id,
+      'name'      => $this->name,
+      'title'     => $this->title,
+      'text'      => $this->text,
       'hero'      => get_parent_class($this) == 'SantoriniHeroPower',
-      'implemented' => $this->isImplemented()? 'implemented' : 'not-implemented',
+      'implemented' => $this->implemented? 'implemented' : 'not-implemented',
     ];
   }
 

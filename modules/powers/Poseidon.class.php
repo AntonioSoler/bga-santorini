@@ -2,40 +2,22 @@
 
 class Poseidon extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return POSEIDON;
-  }
-
-  public static function getName() {
-    return clienttranslate('Poseidon');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('God of the Sea');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = POSEIDON;
+    $this->name  = clienttranslate('Poseidon');
+    $this->title = clienttranslate('God of the Sea');
+    $this->text  = [
       clienttranslate("End of Your Turn: If your unmoved Worker is on the ground level, it may build up to three times.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
-
   public function argPlayerBuild(&$arg)
   {
     $build = $this->game->log->getLastBuild();
@@ -73,5 +55,6 @@ class Poseidon extends SantoriniPower
     });
     return empty($workers)? null : 'buildAgain';
   }
+
 
 }

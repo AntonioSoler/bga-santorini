@@ -2,26 +2,17 @@
 
 class Bellerophon extends SantoriniHeroPower
 {
-  public static function getId() {
-    return BELLEROPHON;
-  }
-
-  public static function getName() {
-    return clienttranslate('Bellerophon');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Tamer of Pegasus');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = BELLEROPHON;
+    $this->name  = clienttranslate('Bellerophon');
+    $this->title = clienttranslate('Tamer of Pegasus');
+    $this->text  = [
       clienttranslate("Your Move: Once, your Worker moves up two levels.")
     ];
-  }
-
-  public static function getBannedIds() {
-    return [];
+    $this->players = [2];
+    $this->banned  = [];
+    $this->golden  = false;
   }
 
   /* * */

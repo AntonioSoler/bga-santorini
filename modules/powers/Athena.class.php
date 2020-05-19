@@ -2,36 +2,19 @@
 
 class Athena extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return ATHENA;
-  }
-
-  public static function getName() {
-    return clienttranslate('Athena');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Goddess of Wisdom');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = ATHENA;
+    $this->name  = clienttranslate('Athena');
+    $this->title = clienttranslate('Goddess of Wisdom');
+    $this->text  = [
       clienttranslate("Opponent's Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [];
+    $this->golden  = false;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [];
-  }
-
-  public static function isGoldenFleece() {
-    return false;
+    $this->implemented = true;
   }
 
   /* * */
@@ -53,4 +36,5 @@ class Athena extends SantoriniPower
         return $space['z'] <= $worker['z'];
     });
   }
+
 }

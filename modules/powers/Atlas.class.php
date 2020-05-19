@@ -2,36 +2,19 @@
 
 class Atlas extends SantoriniPower
 {
-  public function isImplemented(){ return true; }
-
-  public static function getId() {
-    return ATLAS;
-  }
-
-  public static function getName() {
-    return clienttranslate('Atlas');
-  }
-
-  public static function getTitle() {
-    return clienttranslate('Titan Shouldering the Heavens');
-  }
-
-  public static function getText() {
-    return [
+  public function __construct($game, $playerId){
+    parent::__construct($game, $playerId);
+    $this->id    = ATLAS;
+    $this->name  = clienttranslate('Atlas');
+    $this->title = clienttranslate('Titan Shouldering the Heavens');
+    $this->text  = [
       clienttranslate("Your Build: Your Worker may build a dome at any level.")
     ];
-  }
+    $this->players = [2, 3, 4];
+    $this->banned  = [GAEA];
+    $this->golden  = true;
 
-  public static function getPlayers() {
-    return [2, 3, 4];
-  }
-
-  public static function getBannedIds() {
-    return [GAEA];
-  }
-
-  public static function isGoldenFleece() {
-    return true;
+    $this->implemented = true;
   }
 
   /* * */
@@ -43,5 +26,4 @@ class Atlas extends SantoriniPower
         $work['arg'][] = 3;
     }
   }
-
 }
