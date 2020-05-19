@@ -1,6 +1,6 @@
 <?php
 
-class Achilles extends HeroPower
+class Achilles extends SantoriniHeroPower
 {
   public static function getId() {
     return ACHILLES;

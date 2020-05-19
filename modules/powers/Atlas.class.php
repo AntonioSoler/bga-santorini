@@ -1,6 +1,6 @@
 <?php
 
-class Atlas extends Power
+class Atlas extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

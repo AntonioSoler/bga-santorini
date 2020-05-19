@@ -1,6 +1,6 @@
 <?php
 
-class Apollo extends Power
+class Apollo extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

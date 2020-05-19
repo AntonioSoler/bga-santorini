@@ -1,6 +1,6 @@
 <?php
 
-class Hypnus extends Power
+class Hypnus extends SantoriniPower
 {
   public static function getId() {
     return HYPNUS;

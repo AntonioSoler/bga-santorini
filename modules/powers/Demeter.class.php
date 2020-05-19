@@ -1,6 +1,6 @@
 <?php
 
-class Demeter extends Power
+class Demeter extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

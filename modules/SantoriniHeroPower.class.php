@@ -1,6 +1,6 @@
 <?php
 
-abstract class HeroPower extends Power {
+abstract class SantoriniHeroPower extends SantoriniPower {
   public static function getPlayers() {
     return [2];
   }

@@ -33,7 +33,7 @@ class SantoriniPlayer extends APP_GameClass
             // Load powers
             $cards = $game->cards->getCardsInLocation('hand', $player->id);
             foreach ($cards as $powerId => $card) {
-                $player->powers[] = Power::getPower($game, $powerId);
+                $player->powers[] = SantoriniPower::getPower($game, $powerId);
             }
             $players[] = $player;
         }

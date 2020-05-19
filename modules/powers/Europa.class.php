@@ -1,6 +1,6 @@
 <?php
 
-class Europa extends Power
+class Europa extends SantoriniPower
 {
   public static function getId() {
     return EUROPA;

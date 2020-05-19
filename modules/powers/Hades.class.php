@@ -1,6 +1,6 @@
 <?php
 
-class Hades extends Power
+class Hades extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

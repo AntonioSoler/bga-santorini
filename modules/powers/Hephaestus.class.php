@@ -1,6 +1,6 @@
 <?php
 
-class Hephaestus extends Power
+class Hephaestus extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

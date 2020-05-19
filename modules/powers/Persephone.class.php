@@ -1,6 +1,6 @@
 <?php
 
-class Persephone extends Power
+class Persephone extends SantoriniPower
 {
   public static function getId() {
     return PERSEPHONE;

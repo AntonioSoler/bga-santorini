@@ -1,6 +1,6 @@
 <?php
 
-class Dionysus extends Power
+class Dionysus extends SantoriniPower
 {
   public static function getId() {
     return DIONYSUS;

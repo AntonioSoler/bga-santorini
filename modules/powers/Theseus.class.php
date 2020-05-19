@@ -1,6 +1,6 @@
 <?php
 
-class Theseus extends HeroPower
+class Theseus extends SantoriniHeroPower
 {
   public static function getId() {
     return THESEUS;

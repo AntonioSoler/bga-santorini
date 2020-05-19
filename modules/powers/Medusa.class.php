@@ -1,6 +1,6 @@
 <?php
 
-class Medusa extends Power
+class Medusa extends SantoriniPower
 {
   public static function getId() {
     return MEDUSA;

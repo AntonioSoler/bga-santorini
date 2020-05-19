@@ -1,6 +1,6 @@
 <?php
 
-class Circe extends Power
+class Circe extends SantoriniPower
 {
   public static function getId() {
     return CIRCE;

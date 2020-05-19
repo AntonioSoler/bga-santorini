@@ -1,6 +1,6 @@
 <?php
 
-class Pan extends Power
+class Pan extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

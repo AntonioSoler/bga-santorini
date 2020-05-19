@@ -1,6 +1,6 @@
 <?php
 
-class Aeolus extends Power
+class Aeolus extends SantoriniPower
 {
   public static function getId() {
     return AEOLUS;

@@ -1,6 +1,6 @@
 <?php
 
-class Hestia extends Power
+class Hestia extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

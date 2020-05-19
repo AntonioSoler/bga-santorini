@@ -1,6 +1,6 @@
 <?php
 
-class Limus extends Power
+class Limus extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

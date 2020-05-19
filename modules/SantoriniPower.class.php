@@ -1,6 +1,6 @@
 <?php
 
-abstract class Power extends APP_GameClass
+abstract class SantoriniPower extends APP_GameClass
 {
 
   protected $game;
@@ -21,14 +21,14 @@ abstract class Power extends APP_GameClass
       'name'      => $this->getName(),
       'title'     => $this->getTitle(),
       'text'      => $this->getText(),
-      'hero'      => get_parent_class($this) == 'HeroPower',
+      'hero'      => get_parent_class($this) == 'SantoriniHeroPower',
       'implemented' => $this->isImplemented()? 'implemented' : 'not-implemented',
     ];
   }
 
   public function isSupported($nPlayers, $optionPowers)
   {
-    $isHero = $this instanceof HeroPower;
+    $isHero = $this instanceof SantoriniHeroPower;
     return in_array($nPlayers, $this->getPlayers())
       && (($optionPowers == GODS_AND_HEROES)
         || ($optionPowers == SIMPLE && $this->getId() <= 10)

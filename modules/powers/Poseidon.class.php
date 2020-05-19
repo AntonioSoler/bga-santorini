@@ -1,6 +1,6 @@
 <?php
 
-class Poseidon extends Power
+class Poseidon extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

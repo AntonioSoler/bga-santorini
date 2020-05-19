@@ -1,6 +1,6 @@
 <?php
 
-class Zeus extends Power
+class Zeus extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

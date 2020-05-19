@@ -1,6 +1,6 @@
 <?php
 
-class Tartarus extends Power
+class Tartarus extends SantoriniPower
 {
   public static function getId() {
     return TARTARUS;

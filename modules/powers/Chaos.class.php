@@ -1,6 +1,6 @@
 <?php
 
-class Chaos extends Power
+class Chaos extends SantoriniPower
 {
   public static function getId() {
     return CHAOS;

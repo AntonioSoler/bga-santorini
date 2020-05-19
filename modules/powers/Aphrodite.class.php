@@ -1,6 +1,6 @@
 <?php
 
-class Aphrodite extends Power
+class Aphrodite extends SantoriniPower
 {
   public static function getId() {
     return APHRODITE;

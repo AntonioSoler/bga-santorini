@@ -1,6 +1,6 @@
 <?php
 
-class Urania extends Power
+class Urania extends SantoriniPower
 {
   public static function getId() {
     return URANIA;

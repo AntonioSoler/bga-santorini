@@ -1,6 +1,6 @@
 <?php
 
-class Atalanta extends HeroPower
+class Atalanta extends SantoriniHeroPower
 {
   public static function getId() {
     return ATALANTA;

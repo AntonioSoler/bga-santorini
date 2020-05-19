@@ -1,6 +1,6 @@
 <?php
 
-class Artemis extends Power
+class Artemis extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

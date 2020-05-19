@@ -1,6 +1,6 @@
 <?php
 
-class Ares extends Power
+class Ares extends SantoriniPower
 {
   public static function getId() {
     return ARES;

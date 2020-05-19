@@ -1,6 +1,6 @@
 <?php
 
-class Heracles extends HeroPower
+class Heracles extends SantoriniHeroPower
 {
   public static function getId() {
     return HERACLES;

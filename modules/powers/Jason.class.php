@@ -1,6 +1,6 @@
 <?php
 
-class Jason extends HeroPower
+class Jason extends SantoriniHeroPower
 {
   public static function getId() {
     return JASON;

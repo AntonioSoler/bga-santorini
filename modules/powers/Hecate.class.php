@@ -1,6 +1,6 @@
 <?php
 
-class Hecate extends Power
+class Hecate extends SantoriniPower
 {
   public static function getId() {
     return HECATE;

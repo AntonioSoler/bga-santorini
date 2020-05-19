@@ -1,6 +1,6 @@
 <?php
 
-class Morpheus extends Power
+class Morpheus extends SantoriniPower
 {
   public static function getId() {
     return MORPHEUS;

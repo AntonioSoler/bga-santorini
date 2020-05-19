@@ -1,6 +1,6 @@
 <?php
 
-class Bia extends Power
+class Bia extends SantoriniPower
 {
   public static function getId() {
     return BIA;

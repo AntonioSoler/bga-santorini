@@ -1,6 +1,6 @@
 <?php
 
-class Siren extends Power
+class Siren extends SantoriniPower
 {
   public static function getId() {
     return SIREN;

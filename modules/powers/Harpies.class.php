@@ -1,6 +1,6 @@
 <?php
 
-class Harpies extends Power
+class Harpies extends SantoriniPower
 {
   public static function getId() {
     return HARPIES;

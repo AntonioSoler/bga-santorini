@@ -1,6 +1,6 @@
 <?php
 
-class Chronus extends Power
+class Chronus extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

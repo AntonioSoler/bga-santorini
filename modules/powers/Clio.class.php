@@ -1,6 +1,6 @@
 <?php
 
-class Clio extends Power
+class Clio extends SantoriniPower
 {
   public static function getId() {
     return CLIO;

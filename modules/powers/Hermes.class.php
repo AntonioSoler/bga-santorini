@@ -1,6 +1,6 @@
 <?php
 
-class Hermes extends Power
+class Hermes extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

@@ -1,6 +1,6 @@
 <?php
 
-class Gaea extends Power
+class Gaea extends SantoriniPower
 {
   public static function getId() {
     return GAEA;

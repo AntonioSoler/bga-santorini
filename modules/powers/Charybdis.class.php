@@ -1,6 +1,6 @@
 <?php
 
-class Charybdis extends Power
+class Charybdis extends SantoriniPower
 {
   public static function getId() {
     return CHARYBDIS;

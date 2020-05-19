@@ -1,6 +1,6 @@
 <?php
 
-class Selene extends Power
+class Selene extends SantoriniPower
 {
   public static function getId() {
     return SELENE;

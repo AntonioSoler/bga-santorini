@@ -1,6 +1,6 @@
 <?php
 
-class Minotaur extends Power
+class Minotaur extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

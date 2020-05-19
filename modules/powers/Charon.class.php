@@ -1,6 +1,6 @@
 <?php
 
-class Charon extends Power
+class Charon extends SantoriniPower
 {
   public static function getId() {
     return CHARON;

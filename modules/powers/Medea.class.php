@@ -1,6 +1,6 @@
 <?php
 
-class Medea extends HeroPower
+class Medea extends SantoriniHeroPower
 {
   public static function getId() {
     return MEDEA;

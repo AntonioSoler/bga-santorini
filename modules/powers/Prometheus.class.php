@@ -1,6 +1,6 @@
 <?php
 
-class Prometheus extends Power
+class Prometheus extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

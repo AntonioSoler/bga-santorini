@@ -1,6 +1,6 @@
 <?php
 
-class Bellerophon extends HeroPower
+class Bellerophon extends SantoriniHeroPower
 {
   public static function getId() {
     return BELLEROPHON;

@@ -769,7 +769,7 @@ foreach($gods as $id => $god){
     $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
     fwrite($fp, "<?php
 
-class ".$god['name']." extends Power
+class ".$god['name']." extends SantoriniPower
 {
   public static function getId() {
     return ".$r[$id].";
@@ -815,7 +815,7 @@ foreach($heroes as $id => $god){
     $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
     fwrite($fp, "<?php
 
-class ".$god['name']." extends HeroPower
+class ".$god['name']." extends SantoriniHeroPower
 {
   public static function getId() {
     return ".$r[$id].";

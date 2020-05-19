@@ -1,6 +1,6 @@
 <?php
 
-class Adonis extends HeroPower
+class Adonis extends SantoriniHeroPower
 {
   public static function getId() {
     return ADONIS;

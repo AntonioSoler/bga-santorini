@@ -1,6 +1,6 @@
 <?php
 
-class Nemesis extends Power
+class Nemesis extends SantoriniPower
 {
   public static function getId() {
     return NEMESIS;

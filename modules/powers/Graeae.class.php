@@ -1,6 +1,6 @@
 <?php
 
-class Graeae extends Power
+class Graeae extends SantoriniPower
 {
   public static function getId() {
     return GRAEAE;

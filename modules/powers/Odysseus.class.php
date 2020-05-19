@@ -1,6 +1,6 @@
 <?php
 
-class Odysseus extends HeroPower
+class Odysseus extends SantoriniHeroPower
 {
   public static function getId() {
     return ODYSSEUS;

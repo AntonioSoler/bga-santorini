@@ -1,6 +1,6 @@
 <?php
 
-class Hera extends Power
+class Hera extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

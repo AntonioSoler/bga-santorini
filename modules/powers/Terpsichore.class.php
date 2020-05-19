@@ -1,6 +1,6 @@
 <?php
 
-class Terpsichore extends Power
+class Terpsichore extends SantoriniPower
 {
   public static function getId() {
     return TERPSICHORE;

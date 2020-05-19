@@ -1,6 +1,6 @@
 <?php
 
-class Athena extends Power
+class Athena extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

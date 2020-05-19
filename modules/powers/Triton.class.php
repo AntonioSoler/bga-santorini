@@ -1,6 +1,6 @@
 <?php
 
-class Triton extends Power
+class Triton extends SantoriniPower
 {
   public function isImplemented(){ return true; }
 

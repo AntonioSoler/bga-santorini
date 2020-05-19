@@ -1,6 +1,6 @@
 <?php
 
-class Polyphemus extends HeroPower
+class Polyphemus extends SantoriniHeroPower
 {
   public static function getId() {
     return POLYPHEMUS;
