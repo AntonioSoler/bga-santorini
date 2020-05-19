@@ -85,13 +85,15 @@ class Minotaur extends SantoriniPower
 
     // Notify
     $args = [
-      'i18n' => [],
+      'i18n' => ['power_name'],
       'piece1' => $worker,
       'piece2' => $worker2,
       'space'  => $space,
-      'playerName' => $this->game->getActivePlayerName(),
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'player_name2' => 'TODO!'
     ];
-    $this->game->notifyAllPlayers('workerPushed', clienttranslate('${playerName} pushed opponent\'s worker with its worker'), $args);
+    $this->game->notifyAllPlayers('workerPushed', clienttranslate('${power_name}: ${player_name} forces ${player_name2} one space backwards'), $args);
 
     $this->game->gamestate->nextState('moved');
 

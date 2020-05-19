@@ -64,12 +64,14 @@ class Apollo extends SantoriniPower
 
     // Notify
     $args = [
-      'i18n' => [],
+      'i18n' => ['power_name'],
       'piece1' => $worker,
       'piece2' => $worker2,
-      'playerName' => $this->game->getActivePlayerName(),
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'player_name2' => 'TODO!'
     ];
-    $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${playerName} switch his worker with opponent\'s worker'), $args);
+    $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${power_name}: ${player_name} forces a swap with ${player_name2}'), $args);
 
     $this->game->gamestate->nextState('moved');
 

@@ -361,9 +361,9 @@ class santorini extends Table
     $args = [
       'i18n' => [],
       'piece' => $piece,
-      'playerName' => self::getActivePlayerName(),
+      'player_name' => self::getActivePlayerName(),
     ];
-    self::notifyAllPlayers('workerPlaced', clienttranslate('${playerName} places a worker'), $args);
+    self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places a worker'), $args);
 
     $this->gamestate->nextState('workerPlaced');
   }
@@ -406,8 +406,9 @@ class santorini extends Table
   {
     $arg = [
       'win' => false,
-      'msg' => clienttranslate('A worker reached the top level of a building.'),
+      'msg' => clienttranslate('${player_name} wins by moving up to level 3!'),
       'pId' => self::getActivePlayerId(),
+      'player_name' => self::getActivePlayerName(),
     ];
 
     // Basic rule
@@ -420,13 +421,13 @@ class santorini extends Table
     $this->powerManager->checkWinning($arg);
 
     if($arg['win']){
-      self::notifyAllPlayers('message', $arg['msg'], []);
+      self::notifyAllPlayers('message', $arg['msg'], $arg);
       self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $arg['pId'] );
       $this->gamestate->nextState('endgame');
     }
 
 
-    // Loosing condition
+    // Losing condition
     $state = $this->gamestate->state();
 
     // No move or build => loose
@@ -438,9 +439,9 @@ class santorini extends Table
       $pId = self::getActivePlayerId();
       $args = [
         'i18n' => [],
-        'playerName' => self::getActivePlayerName(),
+        'player_name' => self::getActivePlayerName(),
       ];
-      self::notifyAllPlayers('message', clienttranslate('${playerName} looses the game because none of the workers can move/build.'), $args);
+      self::notifyAllPlayers('message', clienttranslate('${player_name} cannot move/build and is eliminated!'), $args);
 
       // 1v1 or 2v2 => end of the game
       if($this->playerManager->getPlayerCount() != 3){
@@ -605,9 +606,9 @@ class santorini extends Table
       'i18n' => [],
       'piece' => $worker,
       'space' => $space,
-      'playerName' => self::getActivePlayerName(),
+      'player_name' => self::getActivePlayerName(),
     ];
-    self::notifyAllPlayers('workerMoved', clienttranslate('${playerName} moves a worker'), $args);
+    self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
 
     // Apply power
     $state = $this->powerManager->stateAfterMove() ?: 'moved';
@@ -632,13 +633,13 @@ class santorini extends Table
     $pieceName = ($space['arg'] == 3) ? clienttranslate('dome') : clienttranslate('block');
     $args = [
       'i18n' => ['pieceName'],
-      'playerName' => self::getActivePlayerName(),
-      'pieceName' => $pieceName,
+      'player_name' => self::getActivePlayerName(),
+      'piece_name' => $pieceName,
       'piece' => $piece,
       'level' => $space['z'],
     ];
-    $msg = ($space['z'] == 0) ? clienttranslate('${playerName} builds a ${pieceName} at ground level')
-      : clienttranslate('${playerName} builds a ${pieceName} at level ${level}');
+    $msg = ($space['z'] == 0) ? clienttranslate('${player_name} builds a ${piece_name} at ground level')
+      : clienttranslate('${player_name} builds a ${piece_name} at level ${level}');
     self::notifyAllPlayers('blockBuilt', $msg, $args);
 
     // Apply power

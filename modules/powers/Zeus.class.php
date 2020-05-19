@@ -59,7 +59,7 @@ class Zeus extends SantoriniPower
     $space = $this->game->board->getCoords($worker);
     $space['z'] = $space['z'] + 1;
     if($space['z'] > 3)
-      throw new BgaUserException(_("This worker would go too high (Zeus)"));
+      throw new BgaUserException(_("Zeus: This worker would go too high"));
     self::DbQuery( "UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$worker['id']}" );
     $this->game->log->addForce($worker, $space);
 
@@ -72,11 +72,12 @@ class Zeus extends SantoriniPower
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
     $args = [
-      'i18n' => [],
+      'i18n' => ['power_name'],
       'piece' => $piece,
-      'playerName' => $this->game->getActivePlayerName(),
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
     ];
-    $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${playerName} built a block under its worker'), $args);
+    $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${power_name}: ${player_name} builds a block under themself'), $args);
 
     $this->game->gamestate->nextState('built');
 
