@@ -421,8 +421,9 @@ class santorini extends Table
     $this->powerManager->checkWinning($arg);
 
     if($arg['win']){
+      $player = $this->playerManager->getPlayer($arg['pId']);
       self::notifyAllPlayers('message', $arg['msg'], $arg);
-      self::DbQuery('UPDATE player SET player_score = 1 WHERE player_id = '. $arg['pId'] );
+      self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team = {$player->getTeam()}" );
       $this->gamestate->nextState('endgame');
     }
 
