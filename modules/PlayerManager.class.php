@@ -52,6 +52,16 @@ class PlayerManager extends APP_GameClass
   }
 
   /*
+   * getTeams: return the team IDs that have any active players
+   */
+  public function getTeams()
+  {
+    return self::getObjectListFromDb("SELECT DISTINCT player_team FROM player WHERE player_eliminated = 0 AND player_zombie = 0", true);
+  }
+
+
+
+  /*
    * getUiData : get all ui data of all players : id, no, name, team, color, powers list
    */
   public function getUiData()
@@ -118,7 +128,7 @@ class PlayerManager extends APP_GameClass
 
 
   /*
-  * eliminate : called after a player loose in a 3 players setup
+  * eliminate : called after a player meets any losing condition
   */
   public function eliminate($pId)
   {
