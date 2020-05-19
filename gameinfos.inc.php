@@ -71,7 +71,7 @@ $gameinfos = array(
     // Note: if you are NOT using any tie breaker, leave the empty string.
     //
     // Example: 'tie_breaker_description' => totranslate( "Number of remaining cards in hand" ),
-    'tie_breaker_description' => totranslate("Elimination order"),
+    'tie_breaker_description' => '',
 
     // Game is "beta". A game MUST set is_beta=1 when published on BGA for the first time, and must remains like this until all bugs are fixed.
     'is_beta' => 1,
@@ -81,7 +81,7 @@ $gameinfos = array(
 
     // If in the game, all losers are equal (no score to rank them or explicit in the rules that losers are not ranked between them), set this to true
     // The game end result will display "Winner" for the 1st player and "Loser" for all other players
-    'losers_not_ranked' => false,
+    'losers_not_ranked' => true,
 
     // Complexity of the game, from 0 (extremely simple) to 5 (extremely complex)
     'complexity' => 2,
