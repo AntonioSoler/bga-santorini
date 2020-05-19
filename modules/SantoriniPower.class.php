@@ -29,6 +29,7 @@ abstract class SantoriniPower extends APP_GameClass
   public function getPlayers() { return $this->players; }
   public function getBannedIds() { return $this->banned; }
   public function isGoldenFleece() { return $this->golden; }
+  public function isSimple() { return $this->id <= 10; }
 
   public function getUiData()
   {
@@ -47,9 +48,9 @@ abstract class SantoriniPower extends APP_GameClass
     $isHero = $this instanceof SantoriniHeroPower;
     return in_array($nPlayers, $this->getPlayers())
       && (($optionPowers == GODS_AND_HEROES)
-        || ($optionPowers == SIMPLE && $this->getId() <= 10)
-        ||  ($optionPowers == GODS && !$isHero)
-        ||  ($optionPowers == HEROES && $isHero)
+        || ($optionPowers == SIMPLE && $this->isSimple())
+        || ($optionPowers == GODS && !$isHero)
+        || ($optionPowers == HEROES && $isHero)
         || ($optionPowers == GOLDEN_FLEECE && $this->isGoldenFleece()));
   }
 
