@@ -24,7 +24,7 @@ class Limus extends SantoriniPower
     foreach($myWorkers as &$worker){
       Utils::filterWorks($arg, function(&$space, $oppworker) use ($worker) {
         // can build only a dome or at a non-neighbouring space
-        if(!in_array(3, $space['arg']) || !$this->game->board->isNeighbour($space, $worker, 'build')
+        if(!in_array(3, $space['arg']) || !$this->game->board->isNeighbour($space, $worker, 'build'))
           return false;
 
         $space['arg'] = [3];

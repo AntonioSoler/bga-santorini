@@ -160,7 +160,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 			// Display selected powers
       args.offer.forEach(function (powerId) {
-        var div = dojo.place(_this2.format_block('jstpl_powerSmall', _this.getPower(powerId)), $('cards-offer'));
+        var div = dojo.place(_this.format_block('jstpl_powerSmall', _this.getPower(powerId)), $('cards-offer'));
         div.classList.add('selected');
         dojo.connect(div, 'onclick', function (e) {
           return _this.onClickPowerSmall(powerId);
@@ -552,6 +552,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 //// Work Notifs ////
 /////////////////////
 
+		/*
+		 * notif_automatic:
+		 *   called whenever a worker has only one choice
+		 */
+		notif_automatic: function(n) {
+			debug('Notif: automatic work incoming', n.args);
+		},
+
     /*
      * notif_workerMoved:
      *   called whenever a worker is moved on the board
@@ -711,6 +719,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     setupNotifications: function setupNotifications() {
 			var notifs = [
+				['automatic', 1000],
 				['addOffer', 500],
 				['removeOffer', 500],
 				['powerAdded', 1200],

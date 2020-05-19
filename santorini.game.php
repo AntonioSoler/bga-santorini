@@ -517,33 +517,45 @@ class santorini extends Table
     $state = $this->gamestate->state();
     // TODO: apply power before work ?
 
-    if(count($state['args']['workers']) > 0)
-      return;
+    if(count($state['args']['workers']) == 0){
+      // No move or build => loose unless skippable
+      if($state['args']['skippable']){
+        $this->skipWork();
+        return;
+      }
 
-    // No move or build => loose unless skippable
-    if($state['args']['skippable']){
-      $this->skipWork();
-      return;
+      // Notify
+      $pId = self::getActivePlayerId();
+      $args = [
+        'i18n' => [],
+        'player_name' => self::getActivePlayerName(),
+      ];
+      self::notifyAllPlayers('message', clienttranslate('${player_name} cannot move/build and is eliminated!'), $args);
+
+      // 1v1 or 2v2 => end of the game
+      if($this->playerManager->getPlayerCount() != 3){
+        $player = $this->playerManager->getPlayer($pId);
+        self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team != {$player->getTeam()}");
+        $this->gamestate->nextState('endgame');
+      }
+      // 3 players => eliminate the player
+      else {
+        $this->playerManager->eliminate($pId);
+        $this->gamestate->nextState('next');
+      }
     }
+    // Only one work possible => do it but notify player first
+    else if(count($state['args']['workers']) == 1 && !$state['args']['skippable']){
+      $worker = $state['args']['workers'][0];
+      if(count($worker['works']) > 1)
+        return;
+      $work = $worker['works'][0];
+      if(is_array($work['arg']) && count($work['arg']) > 1)
+        return;
+      $arg = is_array($work['arg'])? $work['arg'][0] : $work['arg'];
 
-    // Notify
-    $pId = self::getActivePlayerId();
-    $args = [
-      'i18n' => [],
-      'player_name' => self::getActivePlayerName(),
-    ];
-    self::notifyAllPlayers('message', clienttranslate('${player_name} cannot move/build and is eliminated!'), $args);
-
-    // 1v1 or 2v2 => end of the game
-    if($this->playerManager->getPlayerCount() != 3){
-      $player = $this->playerManager->getPlayer($pId);
-      self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team != {$player->getTeam()}");
-      $this->gamestate->nextState('endgame');
-    }
-    // 3 players => eliminate the player
-    else {
-      $this->playerManager->eliminate($pId);
-      $this->gamestate->nextState('next');
+      self::notifyPlayer(self::getActivePlayerId(), 'automatic', clienttranslate('Next action will be done automatically since it\'s the only one available'), []);
+      $this->work($worker['id'], $work['x'], $work['y'], $work['z'], $arg, true);
     }
   }
 
@@ -572,12 +584,15 @@ class santorini extends Table
    *  - int $x,$y,$z : the new location on the board
    *  - int actionArg : can hold additional data for the work (e.g. the building type)
    */
-  public function work($wId, $x, $y, $z, $actionArg)
+  public function work($wId, $x, $y, $z, $actionArg, $possible = false)
   {
     // Get state name to check action
     $state = $this->gamestate->state();
     $stateName = $state['name'];
-    self::checkAction($stateName);
+    if($possible)
+      $this->gamestate->checkPossibleAction($stateName);
+    else
+      $this->checkAction($stateName);
 
     // Get information about the piece and check if work is possible
     $worker = $this->board->getPiece($wId);
