@@ -401,9 +401,9 @@ class santorini extends Table
    * stCheckEndOfGame:
    *   check if winning condition has been achieved by one of the player
    */
-  // TODO: add the losing condition : active player player cannot build
   public function stCheckEndOfGame()
   {
+    // Basic rule
     $arg = [
       'win' => false,
       'msg' => clienttranslate('${player_name} wins by moving up to level 3!'),
@@ -411,7 +411,6 @@ class santorini extends Table
       'player_name' => self::getActivePlayerName(),
     ];
 
-    // Basic rule
     $work = $this->log->getLastWork();
     if($work != null && $work['action'] == 'move'){
       $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
@@ -427,35 +426,7 @@ class santorini extends Table
       $this->gamestate->nextState('endgame');
     }
 
-
-    // Losing condition
-    $state = $this->gamestate->state();
-
-    // No move or build => loose
-    if ($state['name']=='playerMove' || $state['name']=='playerBuild') {
-      if(count($state['args']['workers']) > 0 || $state['args']['skippable'])
-        return;
-
-      // Notify
-      $pId = self::getActivePlayerId();
-      $args = [
-        'i18n' => [],
-        'player_name' => self::getActivePlayerName(),
-      ];
-      self::notifyAllPlayers('message', clienttranslate('${player_name} cannot move/build and is eliminated!'), $args);
-
-      // 1v1 or 2v2 => end of the game
-      if($this->playerManager->getPlayerCount() != 3){
-        $player = $this->playerManager->getPlayer($pId);
-        self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team != {$player->getTeam()}");
-        $this->gamestate->nextState('endgame');
-      }
-      // 3 players => eliminate the player
-      else {
-        $this->playerManager->eliminate($pId);
-        $this->gamestate->nextState('next');
-      }
-    }
+    return $arg['win'];
   }
 
 
@@ -536,6 +507,49 @@ class santorini extends Table
 
 
   /*
+   * stBeforeWork: Check if a work is possible/skippable, otherwise loose
+   */
+  public function stBeforeWork()
+  {
+    if($this->stCheckEndOfGame())
+      return;
+
+    $state = $this->gamestate->state();
+    // TODO: apply power before work ?
+
+    if(count($state['args']['workers']) > 0)
+      return;
+
+    // No move or build => loose unless skippable
+    if($state['args']['skippable']){
+      $this->skipWork();
+      return;
+    }
+
+    // Notify
+    $pId = self::getActivePlayerId();
+    $args = [
+      'i18n' => [],
+      'player_name' => self::getActivePlayerName(),
+    ];
+    self::notifyAllPlayers('message', clienttranslate('${player_name} cannot move/build and is eliminated!'), $args);
+
+    // 1v1 or 2v2 => end of the game
+    if($this->playerManager->getPlayerCount() != 3){
+      $player = $this->playerManager->getPlayer($pId);
+      self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team != {$player->getTeam()}");
+      $this->gamestate->nextState('endgame');
+    }
+    // 3 players => eliminate the player
+    else {
+      $this->playerManager->eliminate($pId);
+      $this->gamestate->nextState('next');
+    }
+  }
+
+
+
+  /*
    * skip: called when a player decide to skip a skippable work
    */
   public function skipWork()
@@ -584,11 +598,19 @@ class santorini extends Table
 
     // Check if power apply
     $work = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => $actionArg];
-    if ($this->powerManager->$stateName($worker, $work))
-      return;
+    if (!$this->powerManager->$stateName($worker, $work)){
+      // Otherwise, do the work
+      $this->$stateName($worker, $work);
+    }
 
-    // Otherwise, do the work
-    $this->$stateName($worker, $work);
+    // Apply post-work powers
+    $nameAfterWork = "after". ucfirst($stateName);
+    $this->powerManager->$nameAfterWork($worker, $work);
+
+    // Apply powers for next state
+    $nameNextState = "stateAfter". ucfirst($stateName);
+    $state = $this->powerManager->$nameNextState() ?: 'done';
+    $this->gamestate->nextState($state);
   }
 
   /*
@@ -610,10 +632,6 @@ class santorini extends Table
       'player_name' => self::getActivePlayerName(),
     ];
     self::notifyAllPlayers('workerMoved', clienttranslate('${player_name} moves a worker'), $args);
-
-    // Apply power
-    $state = $this->powerManager->stateAfterMove() ?: 'moved';
-    $this->gamestate->nextState($state);
   }
 
   /*
@@ -642,10 +660,6 @@ class santorini extends Table
     $msg = ($space['z'] == 0) ? clienttranslate('${player_name} builds a ${piece_name} at ground level')
       : clienttranslate('${player_name} builds a ${piece_name} at level ${level}');
     self::notifyAllPlayers('blockBuilt', $msg, $args);
-
-    // Apply power
-    $state = $this->powerManager->stateAfterBuild() ?: 'built';
-    $this->gamestate->nextState($state);
   }
 
   ////////////////////////////////////

@@ -41,61 +41,24 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
-  public function stateStartTurn()
-  {
-    return null;
-  }
-  public function stateAfterSkip()
-  {
-    return null;
-  }
+  public function stateStartTurn()  { return null; }
 
-  public function beforeMove()
-  {
-  }
-  public function argPlayerMove(&$arg)
-  {
-  }
-  public function argOpponentMove(&$arg)
-  {
-  }
-  public function playerMove($worker, $work)
-  {
-    return false;
-  }
-  public function stateAfterMove()
-  {
-    return null;
-  }
+  public function stateAfterSkip()  { return null;  }
 
-  public function beforeBuild()
-  {
-  }
-  public function argPlayerBuild(&$arg)
-  {
-  }
-  public function argOpponentBuild(&$arg)
-  {
-  }
-  public function playerBuild($worker, $work)
-  {
-    return false;
-  }
-  public function stateAfterBuild()
-  {
-    return null;
-  }
-  public function build()
-  {
-  }
+  public function argPlayerMove(&$arg)  {  }
+  public function argOpponentMove(&$arg)  {  }
+  public function playerMove($worker, $work) { return false; }
+  public function afterPlayerMove($worker, $work) { }
+  public function afterOpponentMove($worker, $work) { }
+  public function stateAfterMove() { return null; }
 
-  public function endTurn()
-  {
-  }
-  public function checkPlayerWinning(&$arg)
-  {
-  }
-  public function checkOpponentWinning(&$arg)
-  {
-  }
+  public function argPlayerBuild(&$arg) { }
+  public function argOpponentBuild(&$arg)  {  }
+  public function playerBuild($worker, $work) { return false; }
+  public function afterPlayerBuild($worker, $work) { }
+  public function afterOpponentBuild($worker, $work) { }
+  public function stateAfterBuild() { return null; }
+
+  public function checkPlayerWinning(&$arg) { }
+  public function checkOpponentWinning(&$arg) { }
 }

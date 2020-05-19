@@ -599,6 +599,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+		/*
+     * notif_pieceRemoved:
+     *   called whenever a piece is removed/killed (eg Bia, Medusa, Ares)
+     */
+    notif_pieceRemoved: function(n) {
+      debug('Notif: piece removed', n.args);
+      this.board.removePiece(n.args.piece);
+    },
+
+
 ///////////////////////////////////////
 ////////    Utility methods    ////////
 ///////////////////////////////////////
@@ -700,35 +710,24 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
      */
     setupNotifications: function setupNotifications() {
-      dojo.subscribe('addOffer', this, "notif_addOffer");
-      this.notifqueue.setSynchronous('addOffer', 500);
+			var notifs = [
+				['addOffer', 500],
+				['removeOffer', 500],
+				['powerAdded', 1200],
+				['workerPlaced', 1000],
+				['workerMoved', 2000],
+				['blockBuilt', 1000],
+				['workerSwitched', 2000], 	// Happens with Apollo
+				['workerPushed', 2000], // Happens with Minotaur
+				['blockBuiltUnder', 2000],// Happens with Zeus
+				['pieceRemoved', 2000] // Happens with Bia, Ares, Medusa
+			];
 
-      dojo.subscribe('removeOffer', this, "notif_removeOffer");
-      this.notifqueue.setSynchronous('removeOffer', 500);
-
-      dojo.subscribe('powerAdded', this, "notif_powerAdded");
-      this.notifqueue.setSynchronous('powerAdded', 1200);
-
-      dojo.subscribe('workerPlaced', this, 'notif_workerPlaced');
-      this.notifqueue.setSynchronous('workerPlaced', 1000);
-
-      dojo.subscribe('workerMoved', this, 'notif_workerMoved');
-      this.notifqueue.setSynchronous('workerMoved', 2000);
-
-      dojo.subscribe('blockBuilt', this, 'notif_blockBuilt');
-      this.notifqueue.setSynchronous('blockBuilt', 1000);
-
-			// Happens with Apollo
-      dojo.subscribe('workerSwitched', this, 'notif_workerSwitched');
-      this.notifqueue.setSynchronous('workerSwitched', 2000);
-
-			// Happens with Minotaur
-      dojo.subscribe('workerPushed', this, 'notif_workerPushed');
-      this.notifqueue.setSynchronous('workerPushed', 2000);
-
-			// Happens with Zeus
-			dojo.subscribe('blockBuiltUnder', this, 'notif_blockBuiltUnder');
-      this.notifqueue.setSynchronous('blockBuiltUnder', 2000);
+			var _this = this;
+			notifs.forEach(function(notif){
+				dojo.subscribe(notif[0], _this, "notif_" + notif[0]);
+	      _this.notifqueue.setSynchronous(notif[0], notif[1]);
+			});
     }
   });
 });

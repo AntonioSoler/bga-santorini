@@ -81,6 +81,15 @@ class SantoriniLog extends APP_GameClass
   }
 
 
+  /*
+   * addRemoval: add a piece removal entry to log (eg. Bia or Ares)
+   */
+  public function addRemoval($piece)
+  {
+    $this->insert(-1, $piece['id'], 'removal', '{}');
+  }
+
+
 
 /////////////////////////////////
 /////////////////////////////////

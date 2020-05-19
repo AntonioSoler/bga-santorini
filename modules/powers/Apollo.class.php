@@ -69,11 +69,9 @@ class Apollo extends SantoriniPower
       'piece2' => $worker2,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
-      'player_name2' => 'TODO!'
+      'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
     ];
     $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${power_name}: ${player_name} forces a swap with ${player_name2}'), $args);
-
-    $this->game->gamestate->nextState('moved');
 
     return true;
   }

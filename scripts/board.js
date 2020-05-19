@@ -195,9 +195,8 @@ Board.prototype.addMeshToBoard = function(mesh, space){
 
 /*
  * Add a piece to a given position
- * - str name : name of the mesh
- * - mixed space : contains the location
- * - optionnal int id : useful to access the mesh later
+ * - mixed piece : contains the infos
+ * - optionnal string animation : which kind of animation we want
  */
 Board.prototype.addPiece = function(piece, animation){
 	animation = animation || "fall";
@@ -205,7 +204,7 @@ Board.prototype.addPiece = function(piece, animation){
 	var sky = center.clone();
 	sky.setY(center.y + fallAnimation.sky);
 
-	var mesh = this._meshManager.createMesh(piece.name || piece.type, animation == "fadeIn");
+	var mesh = this._meshManager.createMesh(piece.name || piece.type);
 	mesh.name = piece.name;
 	mesh.position.copy(animation == "fall"? sky : center);
 	mesh.material.opacity = animation == "fall"? 1 : 0;
@@ -228,9 +227,7 @@ Board.prototype.addPiece = function(piece, animation){
 
 /*
  * Add a piece to a given position and move the mesh already here up
- * - str name : name of the mesh
- * - mixed space : contains the location
- * - optionnal int id : useful to access the mesh later
+ * - mixed piece : contains the info
  */
 Board.prototype.addPieceUnder = function(piece){
 	var space = {x: piece.x, y:piece.y, z:parseInt(piece.z) + 1};
@@ -298,6 +295,23 @@ Board.prototype.switchPiece = function(piece1, piece2){
 	this.moveMesh(mesh1, piece2);
 	this.moveMesh(mesh2, piece1);
 };
+
+
+/*
+ * Remove a piece
+ * - mixed piece : contains the infos
+ */
+Board.prototype.removePiece = function(piece){
+	var mesh = this._board[piece.x][piece.y][piece.z].piece;
+	this._board[piece.x][piece.y][piece.z].piece = null;
+
+	return new Promise((resolve, reject) => {
+		Tween.get(mesh.material).to({ opacity:0 }, fallAnimation.duration,  Ease.quadInOut)
+			.call(() => { this._scene.remove(mesh); resolve() })
+			.addEventListener('change', () => this.render())
+	});
+};
+
 
 
 

@@ -79,8 +79,6 @@ class Zeus extends SantoriniPower
     ];
     $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${power_name}: ${player_name} builds a block under themself'), $args);
 
-    $this->game->gamestate->nextState('built');
-
     return true;
   }
 }

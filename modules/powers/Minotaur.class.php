@@ -95,8 +95,6 @@ class Minotaur extends SantoriniPower
     ];
     $this->game->notifyAllPlayers('workerPushed', clienttranslate('${power_name}: ${player_name} forces ${player_name2} one space backwards'), $args);
 
-    $this->game->gamestate->nextState('moved');
-
     return true;
   }
 

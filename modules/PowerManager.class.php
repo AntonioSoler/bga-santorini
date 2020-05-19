@@ -280,6 +280,51 @@ class PowerManager extends APP_GameClass
   }
 
 
+  /////////////////////////////////////
+  /////////////////////////////////////
+  ////////   Afterwork hook   /////////
+  /////////////////////////////////////
+  /////////////////////////////////////
+
+  /*
+   * afterWork: is called after each work of each player.
+   *  Useful for Harpies, Bia, ...
+   */
+  public function afterWork($worker, $work, $action)
+  {
+    // First apply current user power(s)
+    $name = "afterPlayer" . $action;
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power)
+      $power->$name($worker, $work);
+
+    // Then apply oponnents power(s)
+    $name = "afterOpponent" . $action;
+    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
+      foreach ($opponent->getPowers() as $power)
+        $power->$name($worker, $work);
+  }
+
+
+  /*
+   * afterMove: is called whenever a player just made a move
+   */
+  public function afterPlayerMove($worker, $work)
+  {
+    return $this->afterWork($worker, $work, 'Move');
+  }
+
+
+  /*
+   * afterBuild: is called whenever a player just built
+   */
+  public function afterPlayerBuild($worker, $work)
+  {
+    return $this->afterWork($worker, $work, 'Build');
+  }
+
+
 
   /////////////////////////////////////
   /////////////////////////////////////
@@ -323,7 +368,7 @@ class PowerManager extends APP_GameClass
   /*
    * stateAfterMove: is called after a regular move
    */
-  public function stateAfterMove()
+  public function stateAfterPlayerMove()
   {
     return $this->stateAfterWork('Move');
   }
@@ -331,7 +376,7 @@ class PowerManager extends APP_GameClass
   /*
    * stateAfterBuild: is called after a regular build
    */
-  public function stateAfterBuild()
+  public function stateAfterPlayerBuild()
   {
     return $this->stateAfterWork('Build');
   }

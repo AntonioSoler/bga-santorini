@@ -6,25 +6,30 @@ const Meshes = [
 	{
 		n:'sea',
 		s:0.8,
+		a:false,
 	},
 	{
 		n:'island',
 		s:6.5,
+		a:false,
 	},
 	{
 		n:'board',
 		t:'island',
-		s:0.84
+		s:0.84,
+		a:false,
 	},
 	{
 		n:'outerWall',
 		t:'island',
-		s:0.84
+		s:0.84,
+		a:false,
 	},
 	{
 		n:'innerWall',
 		t:'island',
-		s:0.84
+		s:0.84,
+		a:false,
 	},
 
 /* Lvl */
@@ -180,7 +185,7 @@ MeshManager.prototype.load = function(){
 /*
  * Create mesh
  */
-MeshManager.prototype.createMesh = function(name, transparent){
+MeshManager.prototype.createMesh = function(name){
 	for(var i = 0; i < Meshes.length; i++) {
 	if(name == Meshes[i].n){
 		var m = Meshes[i];
@@ -190,7 +195,7 @@ MeshManager.prototype.createMesh = function(name, transparent){
 		var material = new THREE.MeshLambertMaterial({
 			map : m.c? null : t,
 			color: m.c || 0xDDDDDD,
-			transparent: transparent || false,
+			transparent: (m.a == undefined)? true : m.a,
 			side: THREE.DoubleSide
 		});
 		var mesh = new THREE.Mesh(g, material);
