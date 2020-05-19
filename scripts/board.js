@@ -22,6 +22,7 @@ const fallAnimation = {
 };
 
 const basicColor 		= 0xff0034;
+const multiColor    = 0x994d00;
 const hoveringColor = 0x000000;
 const highlightColor= 0x0012AA;
 
@@ -417,6 +418,7 @@ Board.prototype.makeClickable = function(objects, callback, action){
 		// Create a marker depending on the action and whether there is a piece at this location
 		var piece = this._board[o.x][o.y][o.z].piece;
 		var mark = null;
+		var color = (o.arg != null && o.arg.length > 1)? multiColor : basicColor;
 		if(piece !== null){
 			piece.space = mesh.space;
 			this._clickable.push(piece);
@@ -424,21 +426,21 @@ Board.prototype.makeClickable = function(objects, callback, action){
 			// Disk animation
 			mark = new THREE.Mesh(
 				new THREE.CircleGeometry( 0.728, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.7,	transparent: true, })
+				new THREE.MeshPhongMaterial({ color: color, opacity:0.7,	transparent: true, })
 			);
 		}
 		// Show square
 		else if(action == "playerBuild"){
 			mark = new THREE.Mesh(
 				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: basicColor, opacity:0.5,	transparent: true, })
+				new THREE.MeshPhongMaterial({ color: color, opacity:0.5,	transparent: true, })
 			);
 		}
 		// Ring animation
 		else {
 			mark = new THREE.Mesh(
 				new THREE.RingGeometry( 0.4, 0.53, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({	color: basicColor, opacity:0.8,	transparent: true,	})
+				new THREE.MeshPhongMaterial({	color: color, opacity:0.8,	transparent: true,	})
 			);
 		}
 

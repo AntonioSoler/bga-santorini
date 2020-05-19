@@ -10,7 +10,7 @@ abstract class Utils extends APP_GameClass {
   }
 
   public static function filterWorkersById(&$arg, $wId, $same = true){
-    self::filterWorkers($arg, function($worker) use ($wId, $same){
+    self::filterWorkers($arg, function(&$worker) use ($wId, $same){
       return ($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId);
     });
   }
@@ -23,11 +23,20 @@ abstract class Utils extends APP_GameClass {
 
 
   /* TODO */
+  /*
+    // Don't work when you change the array in $filter !!
+        $worker['works'] = array_values(array_filter($worker['works'], function(&$space) use ($worker, $filter) {
+          return $filter($space, $worker);
+        }));
+  */
   public static function filterWorks(&$arg, $filter){
     foreach($arg["workers"] as &$worker){
-      $worker['works'] = array_values(array_filter($worker['works'], function($space) use ($worker, $filter) {
-        return $filter($space, $worker);
-      }));
+      $works = [];
+      foreach($worker['works'] as &$space){
+        if($filter($space, $worker))
+          $works[] = $space;
+      }
+      $worker['works'] = $works;
     }
 
     self::cleanWorkers($arg);
