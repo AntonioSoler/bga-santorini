@@ -88,7 +88,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       debug('Entering state: ' + stateName, args);
 
 			// Stop here if it's not the current player's turn for some states
-      if (["playerPlaceWorker", "playerMove", "playerBuild"].includes(stateName)) {
+      if (["playerPlaceWorker", "playerMove", "playerBuild", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
         if (!this.isCurrentPlayerActive()) return;
       }
