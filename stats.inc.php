@@ -50,44 +50,9 @@
 $stats_type = array(
     // Statistics global to table
     'table' => array(
-      'tiles' => array(
-          'id' => 10,
-          'name' => totranslate('Tiles placed'),
-          'type' => 'int'
-      ),
-      'z' => array(
-          'id' => 11,
-          'name' => totranslate('Highest level'),
-          'type' => 'int'
-      ),
     ),
 
     // Statistics existing for each player
     'player' => array(
-        'tiles' => array(
-            'id' => 10,
-            'name' => totranslate('Tiles placed'),
-            'type' => 'int'
-        ),
-        'buildings_2' => array(
-            'id' => 22,
-            'name' => totranslate('Temples placed'),
-            'type' => 'int'
-        ),
-        'buildings_3' => array(
-            'id' => 23,
-            'name' => totranslate('Towers placed'),
-            'type' => 'int'
-        ),
-        'buildings_1' => array(
-            'id' => 21,
-            'name' => totranslate('Huts placed'),
-            'type' => 'int'
-        ),
-        'destroy' => array(
-            'id' => 30,
-            'name' => totranslate('Huts destroyed'),
-            'type' => 'int'
-        ),
     )
 );
