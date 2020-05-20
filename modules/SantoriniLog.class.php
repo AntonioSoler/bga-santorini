@@ -108,12 +108,7 @@ class SantoriniLog extends APP_GameClass
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
     $limitClause = ($limit == -1)? '' : "LIMIT $limit";
-    if(!$this->game->playerManager->isPlayingBefore($pId))
-      $round -= 1;
-
-    if(!is_array($actions))
-      $actions = [$actions];
-    $actionsNames = "'". implode("','", $actions) ."'";
+    $actionsNames = "'". (is_array($actions)? implode("','", $actions) : $actions )."'";
 
     $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC ".$limitClause);
 

@@ -122,18 +122,6 @@ class PlayerManager extends APP_GameClass
 
 
   /*
-   * isPlayingBefore : check if a player $pId1 is playing before player $pId2
-   *    useful to have consistant round number when fetching lastMoves of a player (in Log class)
-   */
-  public function isPlayingBefore($pId1, $pId2 = null)
-  {
-    $pId2 = $pId2 ?: $this->game->getActivePlayerId();
-    $players = self::getObjectListFromDb("SELECT player_id id, player_no no FROM player WHERE player_id IN ($pId1, $pId2) ORDER BY no");
-    return $players[0]['id'] == $pId1;
-  }
-
-
-  /*
   * eliminate : called after a player meets any losing condition
   */
   public function eliminate($pId)
