@@ -159,8 +159,8 @@ class santorini extends Table
       $power = $player->addPower();
       $power->setup($player);
 
-      // Remove banned powers
-      $this->cards->moveCards($power->getBannedIds(), 'box');
+      // Remove banned powers TODO
+      // Old code : $this->cards->moveCards($power->getBannedIds(), 'box');
     }
 
     $this->gamestate->nextState('done');
@@ -186,6 +186,7 @@ class santorini extends Table
       'count' => $this->playerManager->getPlayerCount(),
       'deck' => $this->powerManager->getPowerIdsInLocation('deck'),
       'offer' => $this->powerManager->getPowerIdsInLocation('offer'),
+      'banned' => $this->powerManager->computeBannedIds(),
     ];
   }
 

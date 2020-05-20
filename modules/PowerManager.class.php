@@ -67,6 +67,38 @@ class PowerManager extends APP_GameClass
     THESEUS => 'Theseus',
   ];
 
+  /*
+   * TODO
+   */
+  public static $bannedMatchups = [
+    [ATLAS, GAEA],
+    [APHRODITE, NEMESIS],
+    [APHRODITE, URANIA],
+    [BIA, NEMESIS],
+    [BIA, TARTARUS],
+    [CHARON, HECATE],
+    [CIRCE, CLIO],
+    [CIRCE, HECATE],
+    [CLIO, NEMESIS],
+    [GAEA, NEMESIS],
+    [GAEA, SELENE],
+    [GRAEAE, NEMESIS],
+    [HADES, PAN],
+    [HARPIES, HERMES],
+    [HARPIES, TRITON],
+    [HECATE, MOERAE],
+    [HECATE, TARTARUS],
+    [HYPNUS, TERPSICHORE],
+    [LIMUS, TERPSICHORE],
+    [MEDUSA, NEMESIS],
+    [MOERAE, NEMESIS],
+    [MOERAE, TARTARUS],
+    [NEMESIS, TERPSICHORE],
+    [NEMESIS, THESEUS],
+    [SELENE, GAEA],
+    [TARTARUS, TERPSICHORE],
+  ];
+
 
   public $game;
   public function __construct($game)
@@ -163,6 +195,24 @@ class PowerManager extends APP_GameClass
   }
 
   /*
+   * computeBannedIds: is called during fair division setup, whenever a player add/remove an offer
+   *    it should return the list of banned powers against current offer
+   */
+  public function computeBannedIds()
+  {
+    $powers = $this->game->cards->getCardsInLocation('offer');
+    $ids = [];
+    foreach($powers as $power)
+    foreach(self::$bannedMatchups as $matchup){
+      if($matchup[0] == $power['id']) $ids[] = $matchup[1];
+      if($matchup[1] == $power['id']) $ids[] = $matchup[0];
+    }
+
+    return $ids;
+  }
+
+
+  /*
    * addOffer:
    *   during fair division setup, player 1 adds a power to the offer
    */
@@ -171,7 +221,8 @@ class PowerManager extends APP_GameClass
     // Move the power card to the selection
     $this->game->cards->moveCard($powerId, 'offer');
     $this->game->notifyAllPlayers('addOffer', '', [
-      'powerId' => $powerId
+      'powerId' => $powerId,
+      'banned' => $this->computeBannedIds()
     ]);
   }
 
@@ -184,7 +235,8 @@ class PowerManager extends APP_GameClass
     // Move the power card to the deck
     $this->game->cards->moveCard($powerId, 'deck');
     $this->game->notifyAllPlayers('removeOffer', '', [
-      'powerId' => $powerId
+      'powerId' => $powerId,
+      'banned' => $this->computeBannedIds()
     ]);
   }
 

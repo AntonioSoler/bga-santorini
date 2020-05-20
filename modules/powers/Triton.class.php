@@ -11,7 +11,7 @@ class Triton extends SantoriniPower
       clienttranslate("Your Move: Each time your Worker moves into a perimeter space, it may immediately move again.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [HARPIES];
+    
     $this->golden  = true;
 
     $this->implemented = true;

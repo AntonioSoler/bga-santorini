@@ -11,7 +11,7 @@ class Artemis extends SantoriniPower
       clienttranslate("Your Move: Your Worker may move one additional time, but not back to its initial space.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
 
     $this->implemented = true;

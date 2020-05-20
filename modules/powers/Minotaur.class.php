@@ -11,7 +11,7 @@ class Minotaur extends SantoriniPower
       clienttranslate("Your Move: Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
 
     $this->implemented = true;

@@ -11,7 +11,7 @@ class Polyphemus extends SantoriniHeroPower
       clienttranslate("End of Your Turn: Once, your Worker builds up to 2 domes at any level on any unoccupied spaces on the board.")
     ];
     $this->players = [2];
-    $this->banned  = [];
+    
     $this->golden  = false;
   }
 

@@ -11,7 +11,7 @@ class Pan extends SantoriniPower
       clienttranslate("Win Condition: You also win if your Worker moves down two or more levels.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [HADES];
+    
     $this->golden  = true;
 
     $this->implemented = true;

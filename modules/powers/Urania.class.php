@@ -11,7 +11,7 @@ class Urania extends SantoriniPower
       clienttranslate("Your Turn: When your Worker moves or builds, treat opposite edges and corners as if they are adjacent so that every space has 8 neighbors.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [APHRODITE];
+    
     $this->golden  = true;
   }
 

@@ -12,7 +12,7 @@ class Siren extends SantoriniPower
       clienttranslate("Your Turn: You may choose not to take your normal turn. Instead, force one or more opponent Workers one space in the direction of the Siren's Song to unoccupied spaces at any level.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
   }
 

@@ -11,7 +11,7 @@ class Hermes extends SantoriniPower
       clienttranslate("Your Turn: If your Workers do not move up or down, they may each move any number of times (even zero), and then either builds.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [HARPIES];
+    
     $this->golden  = true;
 
     $this->implemented = true;

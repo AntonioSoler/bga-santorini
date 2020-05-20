@@ -11,7 +11,7 @@ class Hephaestus extends SantoriniPower
       clienttranslate("Your Build: Your Worker may build one additional block (not dome) on top of your first block.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
 
     $this->implemented = true;

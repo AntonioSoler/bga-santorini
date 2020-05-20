@@ -11,7 +11,7 @@ class Poseidon extends SantoriniPower
       clienttranslate("End of Your Turn: If your unmoved Worker is on the ground level, it may build up to three times.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
 
     $this->implemented = true;

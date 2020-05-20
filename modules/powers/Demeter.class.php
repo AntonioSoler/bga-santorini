@@ -11,7 +11,7 @@ class Demeter extends SantoriniPower
       clienttranslate("Your Build: Your Worker may build one additional time, but not on the same space.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
 
     $this->implemented = true;

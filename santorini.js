@@ -177,6 +177,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         });
       });
 
+			this.updateBannedPowers(args.banned);
       this.buildOfferActionButtons();
     },
 
@@ -194,6 +195,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       }
     },
 
+		/*
+		 * updateBannedPowers: display only "selectable" powers
+		 */
+		updateBannedPowers: function(bannedIds){
+			dojo.query(".power-card.small").removeClass("banned");
+			bannedIds.forEach(function(powerId) {
+				dojo.addClass("power-small-" + powerId, "banned");
+			});
+		},
 
     /*
      * onClickPowerSmall:
@@ -202,6 +212,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onClickPowerSmall: function(powerId) {
       var powerDiv = $('power-small-' + powerId),
           isActive = this.isCurrentPlayerActive(),
+					isBanned = powerDiv.classList.contains('banned'),
           isDisplayed = powerDiv.classList.contains('displayed'),
           isSelected = powerDiv.classList.contains('selected'),
           isWait = powerDiv.classList.contains('wait'); // Everyone may view details on first click
@@ -224,7 +235,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
             powerDiv.classList.add('wait');
           }
 					// Not yet select + still need powers => select it
-          else if (this._nMissingPowers > 0) {
+          else if (this._nMissingPowers > 0 && !isBanned) {
             this.ajaxcall("/santorini/santorini/addOffer.html", {
               powerId: powerId
             }, this, function (res) {});
@@ -256,6 +267,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         powerDiv.classList.remove('wait');
         _this._nMissingPowers--;
 
+				_this.updateBannedPowers(n.args.banned);
         _this.buildOfferActionButtons();
       });
     },
@@ -293,6 +305,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         powerDiv.classList.remove('wait');
         _this._nMissingPowers++;
 
+				_this.updateBannedPowers(n.args.banned);
         _this.buildOfferActionButtons();
       });
     },

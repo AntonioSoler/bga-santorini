@@ -11,7 +11,7 @@ class Limus extends SantoriniPower
       clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome. *** TODO: updated rule")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [TERPSICHORE];
+
     $this->golden  = true;
 
     $this->implemented = true;

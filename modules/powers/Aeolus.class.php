@@ -13,7 +13,7 @@ class Aeolus extends SantoriniPower
       clienttranslate("Any Move: Workers cannot move directly into the Wind.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
   }
 

@@ -11,7 +11,7 @@ class Hera extends SantoriniPower
       clienttranslate("Opponent's Turn: An opponent cannot win by moving into a perimeter space.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [];
+    
     $this->golden  = true;
 
     $this->implemented = true;

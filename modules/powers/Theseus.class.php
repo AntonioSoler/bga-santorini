@@ -11,7 +11,7 @@ class Theseus extends SantoriniHeroPower
       clienttranslate("End of Your Turn: Once, if any of your Workers is exactly 2 levels below any neighboring opponent Workers, remove one of those opponent Workers from play.")
     ];
     $this->players = [2];
-    $this->banned  = [NEMESIS];
+    
     $this->golden  = false;
   }
 

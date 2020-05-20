@@ -18,7 +18,6 @@ abstract class SantoriniPower extends APP_GameClass
   protected $title = '';
   protected $text;
   protected $players;
-  protected $banned;
   protected $golden;
   protected $implemented = false;
 
@@ -27,7 +26,6 @@ abstract class SantoriniPower extends APP_GameClass
   public function getTitle() { return $this->title; }
   public function getText() { return $this->text; }
   public function getPlayers() { return $this->players; }
-  public function getBannedIds() { return $this->banned; }
   public function isGoldenFleece() { return $this->golden; }
   public function isSimple() { return $this->id <= 10; }
 

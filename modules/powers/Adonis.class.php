@@ -11,7 +11,7 @@ class Adonis extends SantoriniHeroPower
       clienttranslate("End of Your Turn: Once, choose an opponent Worker. If possible, that Worker must be neighboring one of your Workers at the end of their next turn.")
     ];
     $this->players = [2];
-    $this->banned  = [];
+    
     $this->golden  = false;
   }
 

@@ -341,9 +341,16 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-image: url('img/card-small-displayed.png');
 }
 
+.power-card.small.banned::before {
+  background-image:none;
+  background-color:rgba(200,0,0,0.5);
+  cursor:not-allowed;
+}
+
+
 .power-card.small.not-implemented::before {
   background-image:none;
-  background-color:rgba(0,0,0,0.5);
+  background-color:rgba(0,0,0,0.6);
   cursor:not-allowed;
 }
 
