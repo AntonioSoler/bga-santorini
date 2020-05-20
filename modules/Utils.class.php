@@ -35,6 +35,8 @@ abstract class Utils extends APP_GameClass {
   public static function filterWorks(&$arg, $filter){
     foreach($arg["workers"] as &$worker){
       $works = [];
+
+      if(isset($worker['works'])) // TODO should be useless...
       foreach($worker['works'] as &$space){
         if($filter($space, $worker))
           $works[] = $space;

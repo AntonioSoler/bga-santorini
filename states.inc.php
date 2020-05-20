@@ -162,13 +162,24 @@ ST_NEXT_PLAYER => [
   'action' => 'stNextPlayer',
   'transitions' => [
     'next' => ST_NEXT_PLAYER,
-    'move' => ST_MOVE,
-    'build' => ST_BUILD,
+    'play' => ST_START_OF_TURN,
     'endgame' => ST_GAME_END,
   ],
   'updateGameProgression' => true,
 ],
 
+
+ST_START_OF_TURN => [
+  'name' => 'startOfTurn',
+  'description' => '',
+  'type' => 'game',
+  'action' => 'stStartOfTurn',
+  'transitions' => [
+    'move' => ST_MOVE,
+    'build' => ST_BUILD,
+    'endgame' => ST_GAME_END,
+  ],
+],
 
 /*
  * Worker move TODO description
@@ -201,12 +212,12 @@ ST_MOVE => [
   'action' => 'stBeforeWork',
   'possibleactions' => [ 'playerMove', 'skip', 'endgame' ],
   'transitions' => [
-    'zombiePass' => ST_NEXT_PLAYER,
-    'endgame' => ST_GAME_END,
+    'zombiePass' => ST_END_OF_TURN,
+    'endturn'    => ST_END_OF_TURN,
+    'endgame'    => ST_GAME_END,
     'done' => ST_BUILD,
     'skip' => ST_BUILD,
     'moveAgain' => ST_MOVE,
-    'next' => ST_NEXT_PLAYER,
   ],
 ],
 
@@ -222,15 +233,29 @@ ST_BUILD => [
   'action' => 'stBeforeWork',
   'possibleactions' => [ 'playerBuild' , 'skip', 'endgame' ],
   'transitions' => [
-    'zombiePass' => ST_NEXT_PLAYER,
-    'endgame' => ST_GAME_END,
-    'done' => ST_NEXT_PLAYER,
-    'skip' => ST_NEXT_PLAYER,
-    'buildAgain' => ST_BUILD,
+    'zombiePass' => ST_END_OF_TURN,
+    'endturn'    => ST_END_OF_TURN,
+    'endgame'    => ST_GAME_END,
+    'done' => ST_END_OF_TURN,
+    'skip' => ST_END_OF_TURN,
     'move' => ST_MOVE,
-    'next' => ST_NEXT_PLAYER,
+    'buildAgain' => ST_BUILD,
   ],
 ],
+
+/*
+ * TODO
+ */
+ ST_END_OF_TURN => [
+   'name' => 'endOfTurn',
+   'description' => '',
+   'type' => 'game',
+   'action' => 'stEndOfTurn',
+   'transitions' => [
+     'next' => ST_NEXT_PLAYER,
+     'endgame' => ST_GAME_END,
+   ],
+ ],
 
 
 /*

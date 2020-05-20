@@ -80,8 +80,10 @@ define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);
 
 define('ST_NEXT_PLAYER', 5);
+define('ST_START_OF_TURN', 16);
 define('ST_MOVE', 6);
 define('ST_BUILD', 7);
+define('ST_END_OF_TURN', 17);
 define('ST_USE_POWER', 15);
 
 define('ST_GAME_END', 99);

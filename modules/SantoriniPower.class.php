@@ -58,23 +58,29 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
-  public function stateStartTurn()  { return null; }
-
-  public function stateAfterSkip()  { return null;  }
+  public function stateStartOfTurn()  { return null; }
+  public function startPlayerTurn() {}
+  public function startOpponentTurn() {}
 
   public function argPlayerMove(&$arg)  {  }
   public function argOpponentMove(&$arg)  {  }
   public function playerMove($worker, $work) { return false; }
   public function afterPlayerMove($worker, $work) { }
   public function afterOpponentMove($worker, $work) { }
-  public function stateAfterMove() { return null; }
 
   public function argPlayerBuild(&$arg) { }
   public function argOpponentBuild(&$arg)  {  }
   public function playerBuild($worker, $work) { return false; }
   public function afterPlayerBuild($worker, $work) { }
   public function afterOpponentBuild($worker, $work) { }
+
+  public function stateAfterMove() { return null; }
   public function stateAfterBuild() { return null; }
+  public function stateAfterSkip()  { return null;  }
+
+//  public function stateEndOfTurn()  { return null; }
+  public function endPlayerTurn() {}
+  public function endOpponentTurn() {}
 
   public function checkPlayerWinning(&$arg) { }
   public function checkOpponentWinning(&$arg) { }

@@ -189,6 +189,31 @@ class PowerManager extends APP_GameClass
   }
 
 
+
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  /////////    Apply power   ////////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  public function applyPower($methods, $arg)
+  {
+    if(!is_array($methods)) $methods = [$methods];
+    if(!is_array($arg)) $arg = [$arg];
+
+    // First apply current user power(s)
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power)
+      call_user_func_array([$power, $methods[0]], $arg);
+
+    // Then apply oponnents power(s) if needed
+    if(count($methods) > 1)
+    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
+      foreach ($opponent->getPowers() as $power)
+        call_user_func_array([$power, $methods[1]], $arg);
+  }
+
+
   ///////////////////////////////////////
   ///////////////////////////////////////
   /////////    Work argument   //////////
@@ -202,20 +227,8 @@ class PowerManager extends APP_GameClass
    */
   public function argPlayerWork(&$arg, $action)
   {
-    // First apply current user power(s)
-    $name = "argPlayer" . $action;
-    $playerId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($playerId);
-    foreach ($player->getPowers() as $power)
-      $power->$name($arg);
-
-    // Then apply oponnents power(s)
-    $name = "argOpponent" . $action;
-    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
-      foreach ($opponent->getPowers() as $power)
-        $power->$name($arg);
+    $this->applyPower(["argPlayer".$action, "argOpponent".$action], [&$arg]);
   }
-
 
   /*
    * argPlayerMove: is called whenever a player is going to do some move
@@ -292,20 +305,8 @@ class PowerManager extends APP_GameClass
    */
   public function afterWork($worker, $work, $action)
   {
-    // First apply current user power(s)
-    $name = "afterPlayer" . $action;
-    $playerId = $this->game->getActivePlayerId();
-    $player = $this->game->playerManager->getPlayer($playerId);
-    foreach ($player->getPowers() as $power)
-      $power->$name($worker, $work);
-
-    // Then apply oponnents power(s)
-    $name = "afterOpponent" . $action;
-    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
-      foreach ($opponent->getPowers() as $power)
-        $power->$name($worker, $work);
+    $this->applyPower(["afterPlayer".$action, "afterOpponent".$action], [$worker,$work]);
   }
-
 
   /*
    * afterMove: is called whenever a player just made a move
@@ -314,7 +315,6 @@ class PowerManager extends APP_GameClass
   {
     return $this->afterWork($worker, $work, 'Move');
   }
-
 
   /*
    * afterBuild: is called whenever a player just built
@@ -383,16 +383,30 @@ class PowerManager extends APP_GameClass
 
   /////////////////////////////////////
   /////////////////////////////////////
-  ///////  Start/end turn state  //////
+  //////////  Start/end turn  /////////
   /////////////////////////////////////
   /////////////////////////////////////
 
   /*
-   * stateStartTurn: is called at the beginning of the player state.
+   * TODO
    */
-  public function stateStartTurn()
+  public function startOfTurn()
   {
-    return $this->getNewState('stateStartTurn', _("Can't figure next state at the beginning of the turn"));
+    $this->applyPower(["startPlayerTurn", "startOpponentTurn"], []);
+  }
+
+  public function endOfTurn()
+  {
+    $this->applyPower(["endPlayerTurn", "endOpponentTurn"], []);
+  }
+
+
+  /*
+   * stateStartOfTurn: is called at the beginning of the player state.
+   */
+  public function stateStartOfTurn()
+  {
+    return $this->getNewState('stateStartOfTurn', _("Can't figure next state at the beginning of the turn"));
   }
 
   /*

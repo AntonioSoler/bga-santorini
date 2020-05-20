@@ -31,21 +31,8 @@ class Bia extends SantoriniPower
     // If there is no opponent in the next space -> return null
     $worker2 = self::getObjectFromDB( "SELECT * FROM piece WHERE x = {$x} AND y = {$y} AND type = 'worker'");
     if ($worker2 == null || $worker2['player_id'] == $worker['player_id'])
-      return null;
+      return;
 
-    // Kill worker
-    self::DbQuery( "UPDATE piece SET location = 'box' WHERE id = {$worker2['id']}" );
-    $this->game->log->addRemoval($worker2);
-
-    // Notify
-    $args = [
-      'i18n' => [],
-      'piece' => $worker2,
-      'power_name' => $this->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-      'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
-    ];
-    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} kills a worker of ${player_name2}'), $args);
-    return null;
+    $this->game->playerKill($worker2, $this->getName());
   }
 }

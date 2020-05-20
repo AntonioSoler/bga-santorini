@@ -13,10 +13,20 @@ class SantoriniBoard extends APP_GameClass
 
   /*
    * getCoords: return an array with only 'x', 'y', 'z' keys parsed as int
+   *   - optional $arg :
+   *       * 0 : don't add any field arg
+   *       * 1 : arg is filled with singleton [z] (useful eg in argPlayerBuild)
+   *       * 2 : arg is set to z (useful when building)
    */
-  public static function getCoords($mixed)
+  public static function getCoords($mixed, $arg = 0)
   {
-    return ['x' => (int) $mixed['x'], 'y' => (int) $mixed['y'], 'z' => (int) $mixed['z']];
+    $data = ['x' => (int) $mixed['x'], 'y' => (int) $mixed['y'], 'z' => (int) $mixed['z']];
+    if($arg == 1)
+      $data['arg'] = [$mixed['z']];
+    if($arg == 2)
+      $data['arg'] = $mixed['z'];
+
+    return $data;
   }
 
   /*
@@ -56,7 +66,7 @@ class SantoriniBoard extends APP_GameClass
   {
     $filter = "";
     if ($pId != -1) {
-      $ids = implode(',', $this->game->playerManager->getTeammatesIds($pId));
+      $ids = is_array($pId)? implode(',', $pId) : $pId;
       $filter = " AND player_id IN ($ids)";
     }
 
@@ -69,7 +79,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedActiveWorkers($type = null)
   {
-    $workers = $this->getPlacedWorkers($this->game->getActivePlayerId());
+    $workers = $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds());
     if($type == null)
       return $workers;
 
@@ -77,6 +87,15 @@ class SantoriniBoard extends APP_GameClass
       return $worker['type_arg'][0] == $type;
     }));
   }
+
+  /*
+   * getPlacedOpponentWorkers: return all placed workers of opponents of active player
+   */
+  public function getPlacedOpponentWorkers()
+  {
+    return $this->game->board->getPlacedWorkers($this->game->playerManager->getOpponentsIds());
+  }
+
 
 
   /*

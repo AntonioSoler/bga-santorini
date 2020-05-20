@@ -30,7 +30,7 @@ class PlayerManager extends APP_GameClass
   public function getPlayers($playerIds = null)
   {
     $sql = "SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player";
-    if (!empty($playerIds)) {
+    if (is_array($playerIds)) {
       $sql .= " WHERE player_id IN ('" . implode("','", $playerIds) . "')";
     }
     $rows = self::getObjectListFromDb($sql);
@@ -78,8 +78,11 @@ class PlayerManager extends APP_GameClass
   /*
    * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
    */
-  public function getTeammatesIds($pId)
+  public function getTeammatesIds($pId = -1)
   {
+    if($pId == -1)
+      $pId = $this->game->getActivePlayerId();
+
     $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
     return array_map(function ($player) {
       return $player['id'];
@@ -98,8 +101,11 @@ class PlayerManager extends APP_GameClass
   /*
    * getOpponentIds: return all opponnnts ids (useful to use within WHERE clause)
    */
-  public function getOpponentsIds($pId)
+  public function getOpponentsIds($pId = -1)
   {
+    if($pId == -1)
+      $pId = $this->game->getActivePlayerId();
+
     $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` <> ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
     return array_map(function ($player) {
       return $player['id'];
@@ -109,7 +115,7 @@ class PlayerManager extends APP_GameClass
   /*
    * getOpponents: return all players not in the same team as $pId player
    */
-  public function getOpponents($pId)
+  public function getOpponents($pId = -1)
   {
     return $this->getPlayers($this->getOpponentsIds($pId));
   }

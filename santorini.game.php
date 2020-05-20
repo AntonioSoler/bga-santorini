@@ -379,23 +379,44 @@ class santorini extends Table
    */
   public function stNextPlayer()
   {
-    // First check if current player has won
-    $this->stCheckEndOfGame();
-
-    // If not, go to next player
     $pId = $this->activeNextPlayer();
     self::giveExtraTime($pId);
     if(self::getGamestateValue("firstPlayer") == $pId){
       $n = (int) self::getGamestateValue('currentRound') + 1;
       self::setGamestateValue("currentRound", $n);
     }
+
+    $this->gamestate->nextState('play');
+  }
+
+  /*
+   * stStartOfTurn: called at the beggining of each player turn
+   */
+  public function stStartOfTurn()
+  {
     $this->log->startTurn();
 
     // Apply power
-    $state = $this->powerManager->stateStartTurn() ?: 'move';
+    $this->powerManager->startOfTurn();
+    $state = $this->powerManager->stateStartOfTurn() ?: 'move';
     $this->gamestate->nextState($state);
   }
 
+
+  /*
+   * stEndOfTurn: called at the end of each player turn
+   */
+  public function stEndOfTurn()
+  {
+    // First check if current player has won
+    $this->stCheckEndOfGame();
+
+    // Apply power
+    $this->powerManager->endOfTurn();
+//    $state = $this->powerManager->stateStartOfTurn() ?: 'move';
+//    $this->gamestate->nextState($state);
+    $this->gamestate->nextState('next');
+  }
 
   /*
    * stCheckEndOfGame:
@@ -543,7 +564,7 @@ class santorini extends Table
       // 3 players => eliminate the player
       else {
         $this->playerManager->eliminate($pId);
-        $this->gamestate->nextState('next');
+        $this->gamestate->nextState('endturn');
       }
     }
     // Only one work possible => do it but notify player first
@@ -678,6 +699,29 @@ class santorini extends Table
       : clienttranslate('${player_name} builds a ${piece_name} at level ${level}');
     self::notifyAllPlayers('blockBuilt', $msg, $args);
   }
+
+
+  /*
+   * playerKill: kill a piece (only called with specific power eg Medusa, Bia)
+   *  - obj $worker : the piece id we want to use to kill
+   */
+  public function playerKill($worker, $powerName)
+  {
+    // Kill worker
+    self::DbQuery( "UPDATE piece SET location = 'box' WHERE id = {$worker['id']}" );
+    $this->log->addRemoval($worker);
+
+    // Notify
+    $args = [
+      'i18n' => [],
+      'piece' => $worker,
+      'power_name' => $powerName,
+      'player_name' => $this->getActivePlayerName(),
+      'player_name2' => $this->playerManager->getPlayer($worker['player_id'])->getName(),
+    ];
+    $this->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} kills a worker of ${player_name2}'), $args);
+  }
+
 
   ////////////////////////////////////
   ////////////   Zombie   ////////////

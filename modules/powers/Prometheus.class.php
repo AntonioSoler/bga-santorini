@@ -18,7 +18,7 @@ class Prometheus extends SantoriniPower
   }
 
   /* * */
-  public function stateStartTurn(){
+  public function stateStartOfTurn(){
     return 'build';
   }
 
