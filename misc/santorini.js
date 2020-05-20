@@ -465,7 +465,6 @@ onClickSelectWorker: function(worker) {
 	if(this._selectableWorkers.length > 1)
 		this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
 
-	// TODO : automatically choose if only one space ?
 	this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
 },
 
@@ -501,7 +500,8 @@ onClickSpace: function(space) {
 
 
 /*
- * TODO
+ * dialogChooseArg: with some power, some action need user choice on some space
+ *    (eg Atlas can build a block or a dome). This launch a dialogbox that offers them the choices
  */
 dialogChooseArg: function(space){
 	var dial = new ebg.popindialog();
@@ -521,7 +521,8 @@ dialogChooseArg: function(space){
 
 
 /*
- * TODO
+ * onClickSpaceArg: is called whenever a space arg has been selected either by the user (eg Atlas),
+ *		or in most cases automatically when only one choice of arg
  */
 onClickSpaceArg: function(space, arg) {
 	if( !this.checkAction( this._action ) )

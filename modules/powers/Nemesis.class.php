@@ -11,11 +11,9 @@ class Nemesis extends SantoriniPower
       clienttranslate("End of Your Turn: If none of an opponent's Workers neighbor yours, you may force as many of your opponent's Workers as possible to take the spaces you occupy, and vice versa.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [CLIO, GAEA, GRAEAE, MOERAE, APHRODITE, BIA, MEDUSA, TERPSICHORE, THESEUS];
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

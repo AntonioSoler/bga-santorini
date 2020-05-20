@@ -11,11 +11,9 @@ class Atalanta extends SantoriniHeroPower
       clienttranslate("Your Move: Once, your Worker moves any number of additional times.")
     ];
     $this->players = [2];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

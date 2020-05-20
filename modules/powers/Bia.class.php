@@ -12,7 +12,6 @@ class Bia extends SantoriniPower
       clienttranslate("Your Move: If your Worker moves into a space and the next space in the same direction is occupied by an opponent Worker, the opponent's Worker is removed from the game.")
     ];
     $this->players = [2, 3, 4];
-    $this->banned  = [NEMESIS, TARTARUS];
     $this->golden  = true;
 
     $this->implemented = true;

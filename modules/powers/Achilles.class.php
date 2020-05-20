@@ -11,11 +11,9 @@ class Achilles extends SantoriniHeroPower
       clienttranslate("Your Turn: Once, your Worker builds both before and after moving.")
     ];
     $this->players = [2];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

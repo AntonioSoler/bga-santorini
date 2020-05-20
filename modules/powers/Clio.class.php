@@ -12,11 +12,9 @@ class Clio extends SantoriniPower
       clienttranslate("Opponent's Turn: Opponents treat spaces containing your Coin Tokens as if they contain only a dome.")
     ];
     $this->players = [2, 3];
-    $this->banned  = [CIRCE, NEMESIS];
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

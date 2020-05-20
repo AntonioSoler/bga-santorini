@@ -11,7 +11,6 @@ class Chronus extends SantoriniPower
       clienttranslate("Win Condition: You also win when there are at least five Complete Towers on the board.")
     ];
     $this->players = [2];
-    
     $this->golden  = false;
 
     $this->implemented = true;

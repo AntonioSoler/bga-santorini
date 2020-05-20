@@ -765,6 +765,11 @@ foreach($heroes as $id => $god){
 */
 
 
+
+foreach($gods as $id => $god){
+  foreach($god['banned'] as $ban)
+    echo '  ['. $r[$id] .', '. $r[$ban] .'],<br />';
+}
 /*
 foreach($gods as $id => $god){
     $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
@@ -787,13 +792,12 @@ class ".$god['name']." extends SantoriniPower
     \$this->golden  = ".($god['golden']? "true":"false").";
   }
 
-  /* * */
+  /* * * /
 
 }
   ");
   fclose($fp);
 }
-*/
 
 foreach($heroes as $id => $god){
     $fp = fopen("Classes/".$god['name'].'.class.php', 'w');
@@ -816,9 +820,10 @@ class ".$god['name']." extends SantoriniHeroPower
     \$this->golden  = false;
   }
 
-  /* * */
+  /* * * /
 
 }
   ");
   fclose($fp);
 }
+*/

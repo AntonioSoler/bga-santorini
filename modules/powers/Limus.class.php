@@ -8,11 +8,11 @@ class Limus extends SantoriniPower
     $this->name  = clienttranslate('Limus');
     $this->title = clienttranslate('Goddess of Famine');
     $this->text  = [
-      clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome. *** TODO: updated rule")
+      clienttranslate("Opponent's Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome.")
     ];
     $this->players = [2, 3, 4];
-
     $this->golden  = true;
+    $this->newRule = true;
 
     $this->implemented = true;
   }

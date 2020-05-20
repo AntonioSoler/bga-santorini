@@ -11,7 +11,6 @@ class Medusa extends SantoriniPower
       clienttranslate("End of Your Turn: If possible, your Workers build in lower neighboring spaces that are occupied by opponent Workers, removing the opponent Workers from the game.")
     ];
     $this->players = [2, 3, 4];
-
     $this->golden  = true;
 
     $this->implemented = true;

@@ -12,11 +12,9 @@ class Gaea extends SantoriniPower
       clienttranslate("Any Build: When a Worker builds a dome, Gaea may immediately place a Worker from her God Power card onto a ground-level space neighboring the dome.")
     ];
     $this->players = [2, 3];
-    $this->banned  = [ATLAS, NEMESIS, SELENE];
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

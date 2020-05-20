@@ -11,7 +11,6 @@ class Zeus extends SantoriniPower
       clienttranslate("Your Build: Your Worker may build a block under itself.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = true;
 
     $this->implemented = true;

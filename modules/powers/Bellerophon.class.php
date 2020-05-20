@@ -11,11 +11,9 @@ class Bellerophon extends SantoriniHeroPower
       clienttranslate("Your Move: Once, your Worker moves up two levels.")
     ];
     $this->players = [2];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

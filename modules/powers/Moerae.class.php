@@ -12,11 +12,9 @@ class Moerae extends SantoriniPower
       clienttranslate("Win Condition: If an opponent Worker attempts to win by moving into one of your Fate spaces, you win instead.")
     ];
     $this->players = [2, 3];
-    $this->banned  = [HECATE, NEMESIS, TARTARUS];
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

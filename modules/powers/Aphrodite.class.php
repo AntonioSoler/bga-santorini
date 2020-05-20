@@ -11,11 +11,9 @@ class Aphrodite extends SantoriniPower
       clienttranslate("Any Move: If an opponent Worker starts its turn neighboring one of your Workers, its last move must be to a space neighboring one of your Workers.")
     ];
     $this->players = [2, 4];
-    $this->banned  = [NEMESIS, URANIA];
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

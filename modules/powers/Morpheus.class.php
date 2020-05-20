@@ -12,11 +12,9 @@ class Morpheus extends SantoriniPower
       clienttranslate("Your Build: Your Worker cannot build as normal. Instead, your Worker may build any number of times (even zero) using blocks / domes collected on your God Power card. At any time, any player may exchange a block / dome on the God Power card for dome or a block of a different shape.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

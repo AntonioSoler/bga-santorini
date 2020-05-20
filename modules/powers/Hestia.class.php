@@ -11,7 +11,6 @@ class Hestia extends SantoriniPower
       clienttranslate("Your Build: Your Worker may build one additional time, but this cannot be on a perimeter space.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = true;
 
     $this->implemented = true;

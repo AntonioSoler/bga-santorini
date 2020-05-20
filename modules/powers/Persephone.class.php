@@ -11,11 +11,9 @@ class Persephone extends SantoriniPower
       clienttranslate("Opponent's Turn: If possible, at least one Worker must move up this turn.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = true;
   }
 
   /* * */
 
 }
-  

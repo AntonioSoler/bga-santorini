@@ -11,11 +11,9 @@ class Ares extends SantoriniPower
       clienttranslate("End of Your Turn: You may remove an unoccupied block (not dome) neighboring your unmoved Worker. You also remove any Tokens on the block.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

@@ -196,6 +196,9 @@ class santorini extends Table
    */
   public function addOffer($powerId) {
     self::checkAction('addOffer');
+    if(in_array($powerId, $this->powerManager->computeBannedIds()))
+      throw new BgaUserException("This power is not compatible with some already selected powers");
+
     $this->powerManager->addOffer($powerId);
   }
 

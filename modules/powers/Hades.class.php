@@ -11,7 +11,6 @@ class Hades extends SantoriniPower
       clienttranslate("Opponent's Turn: Opponent Workers cannot move down.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = true;
 
     $this->implemented = true;

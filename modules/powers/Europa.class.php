@@ -13,7 +13,6 @@ class Europa extends SantoriniPower
       clienttranslate("Any Time: All players treat the space containing the Talus Token as if it contains only a dome.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = false;
   }
 

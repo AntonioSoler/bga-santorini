@@ -11,7 +11,6 @@ class Prometheus extends SantoriniPower
       clienttranslate("Your Turn: If your Worker does not move up, it may build both before and after moving.")
     ];
     $this->players = [2, 3, 4];
-    
     $this->golden  = true;
 
     $this->implemented = true;

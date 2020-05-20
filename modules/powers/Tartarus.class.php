@@ -12,11 +12,9 @@ class Tartarus extends SantoriniPower
       clienttranslate("Lose Condition: If any player's Worker enters the Abyss, they immediately lose. Workers cannot win by entering the Abyss.")
     ];
     $this->players = [2];
-    $this->banned  = [BIA, HECATE, MOERAE, TERPSICHORE];
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

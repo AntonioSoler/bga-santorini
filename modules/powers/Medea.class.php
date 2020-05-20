@@ -11,11 +11,9 @@ class Medea extends SantoriniHeroPower
       clienttranslate("End of Your Turn: Once, remove one block from under any number of Workers neighboring your unmoved Worker. You also remove any Tokens on the blocks.")
     ];
     $this->players = [2];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  

@@ -12,11 +12,9 @@ class Jason extends SantoriniHeroPower
       clienttranslate("Your Turn: Once, instead of your normal turn, place your extra Worker on an unoccupied ground-level perimeter space. This Worker then builds.")
     ];
     $this->players = [2];
-    
     $this->golden  = false;
   }
 
   /* * */
 
 }
-  
