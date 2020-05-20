@@ -447,6 +447,7 @@ class santorini extends Table
     $workers = $this->board->getPlacedActiveWorkers();
     foreach ($workers as &$worker)
       $worker["works"] = $this->board->getNeighbouringSpaces($worker, 'move');
+    Utils::cleanWorkers($arg);
 
     $arg = [
       'skippable' => false,
@@ -487,6 +488,7 @@ class santorini extends Table
       $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
       $arg['workers'][] = $worker;
     }
+    Utils::cleanWorkers($arg);
 
     // Apply power
     $this->powerManager->argPlayerBuild($arg);

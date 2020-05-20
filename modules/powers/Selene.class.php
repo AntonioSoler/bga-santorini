@@ -16,6 +16,28 @@ class Selene extends SantoriniPower
   }
 
   /* * */
+  protected function updateBuildArg(&$worker, $add) {
+    foreach($worker['works'] as &$work){
+      if($add){
+        if (!in_array(3, $work['arg']))
+          $work['arg'][] = 3;
+      } else {
+        $work['arg'] = [3];
+      }
+    }
+  }
 
+  public function argPlayerBuild(&$arg)
+  {
+    $fworkers = $this->game->board->getPlacedActiveWorkers('f');
+    if(count($fworkers) == 0)
+      return;
+
+    $move = $this->game->log->getLastMove();
+    foreach($fworkers as &$fworker){
+      $worker = &Utils::getWorkerOrCreate($arg, $fworker);
+      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
+      $this->updateBuildArg($worker, $worker['id'] == $move['pieceId']);
+    }
+  }
 }
-  
