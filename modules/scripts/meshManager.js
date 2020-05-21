@@ -107,7 +107,7 @@ MeshManager.prototype.loadGeometry = function(names, scales){
 
 	return new Promise(function(resolve, reject){
 		// Create a promise with all loading requests
-		Promise.all(names.map( (n) => loader.load(scope._url + 'geometries/' + n + '.glb') ))
+		Promise.all(names.map( (n) => loader.load(scope._url + 'img/geometries/' + n + '.glb') ))
 		.then( (values) => {
 			// Store them (assuming only one mesh inside the obj file
 			for(var i = 0; i < names.length; i++){
