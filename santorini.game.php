@@ -707,7 +707,7 @@ class santorini extends Table
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
-    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds a ${piece_name} at ${level_name}'), [
+    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds a ${piece_name} on ${level_name}'), [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
       'piece' => $piece,
