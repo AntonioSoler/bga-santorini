@@ -12,8 +12,8 @@ const canvasHeight = () => 600; //Math.min(600, document.getElementById("page-co
 const canvasWidth = () => document.getElementById("page-content").offsetWidth;
 
 // Zoom limits
-const ZOOM_MIN = 20;
-const ZOOM_MAX = 40;
+const ZOOM_MIN = 10;
+const ZOOM_MAX = 30;
 
 // Fall animation
 const fallAnimation = {
@@ -81,8 +81,8 @@ Board.prototype.initScene = function(){
 	this._scene.background.convertLinearToGamma( 2 );
 
 	// Camera
-	this._camera = new THREE.PerspectiveCamera( 35, canvasWidth() / canvasHeight(), 1, 150 );
-	this._camera.position.set( 20, 14, 20 );
+	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, 150 );
+	this._camera.position.set( 0, 14, 15 );
 	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 	// Lights
@@ -113,7 +113,8 @@ Board.prototype.initScene = function(){
 
 	// Controls
 	var controls = new OrbitControls( this._camera, this._renderer.domElement );
-	controls.maxPolarAngle = Math.PI * 0.36;
+	controls.enablePan = false;
+	controls.maxPolarAngle = Math.PI * 0.45;
 	controls.minDistance = ZOOM_MIN;
 	controls.maxDistance = ZOOM_MAX;
 	controls.mouseButtons = {
