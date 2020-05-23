@@ -384,7 +384,7 @@ $gods = array(
         'name'   => clienttranslate('Limus'),
         'title'  => clienttranslate('Goddess of Famine'),
         'power'  => array(
-            clienttranslate('Opponent\'s Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome to create a Complete Tower.'),
+            clienttranslate('Opponent\'s Turn: Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome.'),
         ),
         'banned'  => array(TERPSICHORE),
         'players' => array(2, 3, 4),
@@ -787,7 +787,7 @@ class ".$god['name']." extends SantoriniPower
         implode(",\n", array_map(function($a){ return '      clienttranslate("'.$a.'")'; }, $god['power']))
 ."
     ];
-    \$this->players = [".implode(', ', $god['players'])."];
+    \$this->playerCount = [".implode(', ', $god['players'])."];
     \$this->banned  = [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
     \$this->golden  = ".($god['golden']? "true":"false").";
   }
@@ -815,7 +815,7 @@ class ".$god['name']." extends SantoriniHeroPower
         implode(",\n", array_map(function($a){ return '      clienttranslate("'.$a.'")'; }, $god['power']))
 ."
     ];
-    \$this->players = [".implode(', ', $god['players'])."];
+    \$this->playerCount = [".implode(', ', $god['players'])."];
     \$this->banned  = [".implode(', ', array_map(function($a) use($r){ return $r[$a]; }, $god['banned']) ) ."];
     \$this->golden  = false;
   }

@@ -12,7 +12,7 @@ class Eros extends SantoriniPower
       clienttranslate("Setup: Place your Workers anywhere along opposite edges of the board."),
       clienttranslate("Win Condition: You also win if one of your Workers moves to a space neighboring your other Worker and both are on the first level (or the same level in a 3-player game).")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = false;
   }
 

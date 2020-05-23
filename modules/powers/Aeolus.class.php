@@ -13,7 +13,7 @@ class Aeolus extends SantoriniPower
       clienttranslate("End of Your Turn: Orient the Wind Token to any of the the eight directions."),
       clienttranslate("Any Move: Workers cannot move directly into the Wind.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
   }
 

@@ -12,7 +12,7 @@ class Siren extends SantoriniPower
       clienttranslate("Setup: Place the Arrow Token beside the board and orient it in any of the 8 directions to indicate the direction of the Siren's Song."),
       clienttranslate("Your Turn: You may choose not to take your normal turn. Instead, force one or more opponent Workers one space in the direction of the Siren's Song to unoccupied spaces at any level.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
   }
 

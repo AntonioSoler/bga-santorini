@@ -2,7 +2,7 @@
 
 abstract class SantoriniHeroPower extends SantoriniPower
 {
-  public function getPlayers()
+  public function getPlayerCount()
   {
     return [2];
   }

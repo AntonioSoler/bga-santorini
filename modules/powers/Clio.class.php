@@ -12,7 +12,7 @@ class Clio extends SantoriniPower
       clienttranslate("Your Build: Place a Coin Token on each of the first 3 blocks your Workers build."),
       clienttranslate("Opponent's Turn: Opponents treat spaces containing your Coin Tokens as if they contain only a dome.")
     ];
-    $this->players = [2, 3];
+    $this->playerCount = [2, 3];
     $this->golden  = false;
   }
 

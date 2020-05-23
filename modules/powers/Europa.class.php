@@ -13,7 +13,7 @@ class Europa extends SantoriniPower
       clienttranslate("End of Your Turn: You may relocate your Talus Token to an unoccupied space neighboring the Worker that moved."),
       clienttranslate("Any Time: All players treat the space containing the Talus Token as if it contains only a dome.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = false;
   }
 

@@ -11,7 +11,7 @@ class Heracles extends SantoriniHeroPower
     $this->text  = [
       clienttranslate("End of Your Turn: Once, both your Workers build any number of domes (even zero) at any level.")
     ];
-    $this->players = [2];
+    $this->playerCount = [2];
     $this->golden  = false;
   }
 

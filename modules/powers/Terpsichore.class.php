@@ -11,7 +11,7 @@ class Terpsichore extends SantoriniPower
     $this->text  = [
       clienttranslate("Your Turn: All of your Workers must move, and then all must build.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
 
     $this->implemented = true;

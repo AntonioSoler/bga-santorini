@@ -11,7 +11,7 @@ class Aphrodite extends SantoriniPower
     $this->text  = [
       clienttranslate("Any Move: If an opponent Worker starts its turn neighboring one of your Workers, its last move must be to a space neighboring one of your Workers.")
     ];
-    $this->players = [2, 4];
+    $this->playerCount = [2, 4];
     $this->golden  = false;
   }
 

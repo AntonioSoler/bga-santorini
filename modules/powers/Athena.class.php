@@ -11,7 +11,7 @@ class Athena extends SantoriniPower
     $this->text  = [
       clienttranslate("Opponent's Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = false;
 
     $this->implemented = true;

@@ -11,7 +11,7 @@ class Harpies extends SantoriniPower
     $this->text  = [
       clienttranslate("Opponent's Turn: Each time an opponent's Worker moves, it is forced space by space in the same direction until the next space is at a higher level or it is obstructed.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
   }
 

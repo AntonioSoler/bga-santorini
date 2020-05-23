@@ -11,7 +11,7 @@ class Nemesis extends SantoriniPower
     $this->text  = [
       clienttranslate("End of Your Turn: If none of an opponent's Workers neighbor yours, you may force as many of your opponent's Workers as possible to take the spaces you occupy, and vice versa.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = false;
   }
 

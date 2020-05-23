@@ -12,7 +12,7 @@ class Graeae extends SantoriniPower
       clienttranslate("Setup: When placing your Workers, place 3 of your color."),
       clienttranslate("Your Build: You choose which Worker of yours builds.")
     ];
-    $this->players = [2, 3];
+    $this->playerCount = [2, 3];
     $this->golden  = false;
   }
 
