@@ -2,7 +2,8 @@
 
 class Jason extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = JASON;
     $this->name  = clienttranslate('Jason');
@@ -16,5 +17,4 @@ class Jason extends SantoriniHeroPower
   }
 
   /* * */
-
 }

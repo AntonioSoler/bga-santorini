@@ -2,7 +2,8 @@
 
 class Atlas extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = ATLAS;
     $this->name  = clienttranslate('Atlas');
@@ -17,12 +18,15 @@ class Atlas extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerBuild(&$arg)
   {
-    foreach($arg["workers"] as &$worker)
-    foreach($worker["works"] as &$work){
-      if(!in_array(3, $work['arg']))
-        $work['arg'][] = 3;
+    foreach ($arg["workers"] as &$worker) {
+      foreach ($worker["works"] as &$work) {
+        if (!in_array(3, $work['arg'])) {
+          $work['arg'][] = 3;
+        }
+      }
     }
   }
 }

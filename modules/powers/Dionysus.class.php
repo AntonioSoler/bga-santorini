@@ -2,7 +2,8 @@
 
 class Dionysus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = DIONYSUS;
     $this->name  = clienttranslate('Dionysus');
@@ -15,5 +16,4 @@ class Dionysus extends SantoriniPower
   }
 
   /* * */
-
 }

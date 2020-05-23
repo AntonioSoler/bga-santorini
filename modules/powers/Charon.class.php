@@ -2,7 +2,8 @@
 
 class Charon extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = CHARON;
     $this->name  = clienttranslate('Charon');
@@ -15,5 +16,4 @@ class Charon extends SantoriniPower
   }
 
   /* * */
-
 }

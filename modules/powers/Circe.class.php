@@ -2,7 +2,8 @@
 
 class Circe extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = CIRCE;
     $this->name  = clienttranslate('Circe');
@@ -15,5 +16,4 @@ class Circe extends SantoriniPower
   }
 
   /* * */
-
 }

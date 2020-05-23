@@ -2,7 +2,8 @@
 
 class Bellerophon extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = BELLEROPHON;
     $this->name  = clienttranslate('Bellerophon');
@@ -15,5 +16,4 @@ class Bellerophon extends SantoriniHeroPower
   }
 
   /* * */
-
 }

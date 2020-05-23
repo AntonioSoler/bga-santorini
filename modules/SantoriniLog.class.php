@@ -13,11 +13,11 @@ class SantoriniLog extends APP_GameClass
   }
 
 
-////////////////////////////////
-////////////////////////////////
-//////////   Adders   //////////
-////////////////////////////////
-////////////////////////////////
+  ////////////////////////////////
+  ////////////////////////////////
+  //////////   Adders   //////////
+  ////////////////////////////////
+  ////////////////////////////////
 
   /*
    * insert: add a new log entry
@@ -29,9 +29,9 @@ class SantoriniLog extends APP_GameClass
    */
   public function insert($playerId, $pieceId, $action, $args)
   {
-    $playerId = $playerId == -1? $this->game->getActivePlayerId() : $playerId;
+    $playerId = $playerId == -1 ? $this->game->getActivePlayerId() : $playerId;
     $round = $this->game->getGameStateValue("currentRound");
-    $actionArgs = is_array($args)? json_encode($args) : $args;
+    $actionArgs = is_array($args) ? json_encode($args) : $args;
     self::DbQuery("INSERT INTO log (`round`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$playerId', '$pieceId', '$action', '$actionArgs')");
   }
 
@@ -91,13 +91,13 @@ class SantoriniLog extends APP_GameClass
 
 
 
-/////////////////////////////////
-/////////////////////////////////
-//////////   Getters   //////////
-/////////////////////////////////
-/////////////////////////////////
+  /////////////////////////////////
+  /////////////////////////////////
+  //////////   Getters   //////////
+  /////////////////////////////////
+  /////////////////////////////////
 
-/*
+  /*
  * getLastWorks: fetch last works of player of current round
  * params:
  *    - string $action : type of work we want to fetch (move/build)
@@ -107,12 +107,12 @@ class SantoriniLog extends APP_GameClass
   public function getLastWorks($actions, $pId = null, $limit = -1)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
-    $limitClause = ($limit == -1)? '' : "LIMIT $limit";
-    $actionsNames = "'". (is_array($actions)? implode("','", $actions) : $actions )."'";
+    $limitClause = ($limit == -1) ? '' : "LIMIT $limit";
+    $actionsNames = "'" . (is_array($actions) ? implode("','", $actions) : $actions) . "'";
 
-    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC ".$limitClause);
+    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC " . $limitClause);
 
-    return array_map(function($work){
+    return array_map(function ($work) {
       $args = json_decode($work['action_arg'], true);
       return [
         'action' => $work['action'],
@@ -129,7 +129,7 @@ class SantoriniLog extends APP_GameClass
   public function getLastWork($pId = null)
   {
     $works = $this->getLastWorks(['move', 'build'], $pId, 1);
-    return (count($works) == 1)? $works[0] : null;
+    return (count($works) == 1) ? $works[0] : null;
   }
 
 
@@ -147,7 +147,7 @@ class SantoriniLog extends APP_GameClass
   public function getLastMove($pId = null)
   {
     $moves = $this->getLastMoves($pId, 1);
-    return (count($moves) == 1)? $moves[0] : null;
+    return (count($moves) == 1) ? $moves[0] : null;
   }
 
 
@@ -165,7 +165,6 @@ class SantoriniLog extends APP_GameClass
   public function getLastBuild($pId = null)
   {
     $builds = $this->getLastBuilds($pId, 1);
-    return (count($builds) == 1)? $builds[0] : null;
+    return (count($builds) == 1) ? $builds[0] : null;
   }
-
 }

@@ -2,7 +2,8 @@
 
 class Prometheus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = PROMETHEUS;
     $this->name  = clienttranslate('Prometheus');
@@ -17,7 +18,9 @@ class Prometheus extends SantoriniPower
   }
 
   /* * */
-  public function stateStartOfTurn(){
+
+  public function stateStartOfTurn()
+  {
     return 'build';
   }
 
@@ -27,12 +30,13 @@ class Prometheus extends SantoriniPower
     $build = $this->game->log->getLastBuild();
     $move  = $this->game->log->getLastMove();
     // Already built or move before => usual rule
-    if($build != null || $move != null)
+    if ($build != null || $move != null) {
       return;
+    }
 
     $arg['skippable'] = true;
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    foreach($arg['workers'] as &$worker){
+    foreach ($arg['workers'] as &$worker) {
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
     }
   }
@@ -42,12 +46,13 @@ class Prometheus extends SantoriniPower
   {
     $build = $this->game->log->getLastBuild();
     // No build before => usual rule
-    if($build == null)
+    if ($build == null) {
       return;
+    }
 
     // Otherwise, the player has to move with the worker that built
     Utils::filterWorkersById($arg, $build['pieceId']);
-    Utils::filterWorks($arg, function($space, $worker){
+    Utils::filterWorks($arg, function ($space, $worker) {
       return $space['z'] <= $worker['z'];
     });
   }
@@ -55,14 +60,12 @@ class Prometheus extends SantoriniPower
 
   public function stateAfterBuild()
   {
-    return is_null($this->game->log->getLastMove())? 'move' : null;
+    return is_null($this->game->log->getLastMove()) ? 'move' : null;
   }
 
   public function stateAfterSkip()
   {
     // TODO : check the state is "build" ?
-    return is_null($this->game->log->getLastMove())? 'move' : null;
+    return is_null($this->game->log->getLastMove()) ? 'move' : null;
   }
-
-
 }

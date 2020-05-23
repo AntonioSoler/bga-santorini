@@ -2,7 +2,8 @@
 
 class Morpheus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = MORPHEUS;
     $this->name  = clienttranslate('Morpheus');
@@ -16,5 +17,4 @@ class Morpheus extends SantoriniPower
   }
 
   /* * */
-
 }

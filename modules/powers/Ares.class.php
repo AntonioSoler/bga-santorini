@@ -2,7 +2,8 @@
 
 class Ares extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = ARES;
     $this->name  = clienttranslate('Ares');
@@ -15,5 +16,4 @@ class Ares extends SantoriniPower
   }
 
   /* * */
-
 }

@@ -2,7 +2,8 @@
 
 class Bia extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = BIA;
     $this->name  = clienttranslate('Bia');
@@ -24,13 +25,14 @@ class Bia extends SantoriniPower
 
   public function afterPlayerMove($worker, $work)
   {
-    $x = 2*$work['x'] - $worker['x'];
-    $y = 2*$work['y'] - $worker['y'];
+    $x = 2 * $work['x'] - $worker['x'];
+    $y = 2 * $work['y'] - $worker['y'];
 
     // If there is no opponent in the next space -> return null
-    $worker2 = self::getObjectFromDB( "SELECT * FROM piece WHERE x = {$x} AND y = {$y} AND type = 'worker'");
-    if ($worker2 == null || $worker2['player_id'] == $worker['player_id'])
+    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$x} AND y = {$y} AND type = 'worker'");
+    if ($worker2 == null || $worker2['player_id'] == $worker['player_id']) {
       return;
+    }
 
     $this->game->playerKill($worker2, $this->getName());
   }

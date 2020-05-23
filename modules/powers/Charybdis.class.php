@@ -2,7 +2,8 @@
 
 class Charybdis extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = CHARYBDIS;
     $this->name  = clienttranslate('Charybdis');
@@ -17,5 +18,4 @@ class Charybdis extends SantoriniPower
   }
 
   /* * */
-
 }

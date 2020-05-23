@@ -2,7 +2,8 @@
 
 class Artemis extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = ARTEMIS;
     $this->name  = clienttranslate('Artemis');
@@ -17,17 +18,19 @@ class Artemis extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerMove(&$arg)
   {
     $move = $this->game->log->getLastMove();
     // No move before => usual rule
-    if($move == null)
+    if ($move == null) {
       return;
+    }
 
     // Otherwise, let the player do a second move (not mandatory) with same worker
     $arg['skippable'] = true;
     Utils::filterWorkersById($arg, $move['pieceId']);
-    Utils::filterWorks($arg, function($space, $worker) use ($move){
+    Utils::filterWorks($arg, function ($space, $worker) use ($move) {
       // Not back to its initial space
       return !$this->game->board->isSameSpace($space, $move['from']);
     });
@@ -35,7 +38,6 @@ class Artemis extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return count($this->game->log->getLastMoves()) == 1? 'moveAgain' : null;
+    return count($this->game->log->getLastMoves()) == 1 ? 'moveAgain' : null;
   }
-
 }

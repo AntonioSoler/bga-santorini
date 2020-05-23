@@ -21,10 +21,12 @@ class SantoriniBoard extends APP_GameClass
   public static function getCoords($mixed, $arg = 0)
   {
     $data = ['x' => (int) $mixed['x'], 'y' => (int) $mixed['y'], 'z' => (int) $mixed['z']];
-    if($arg == 1)
+    if ($arg == 1) {
       $data['arg'] = [$mixed['z']];
-    if($arg == 2)
+    }
+    if ($arg == 2) {
       $data['arg'] = $mixed['z'];
+    }
 
     return $data;
   }
@@ -66,7 +68,7 @@ class SantoriniBoard extends APP_GameClass
   {
     $filter = "";
     if ($pId != -1) {
-      $ids = is_array($pId)? implode(',', $pId) : $pId;
+      $ids = is_array($pId) ? implode(',', $pId) : $pId;
       $filter = " AND player_id IN ($ids)";
     }
 
@@ -80,10 +82,11 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedActiveWorkers($type = null)
   {
     $workers = $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds());
-    if($type == null)
+    if ($type == null) {
       return $workers;
+    }
 
-    return array_values(array_filter($workers, function($worker) use ($type){
+    return array_values(array_filter($workers, function ($worker) use ($type) {
       return $worker['type_arg'][0] == $type;
     }));
   }
@@ -108,8 +111,9 @@ class SantoriniBoard extends APP_GameClass
     $board = [];
     for ($x = 0; $x < 5; $x++) {
       $board[$x] = [];
-      for ($y = 0; $y < 5; $y++)
+      for ($y = 0; $y < 5; $y++) {
         $board[$x][$y] = [];
+      }
     }
 
     // Add all placed pieces
@@ -132,30 +136,33 @@ class SantoriniBoard extends APP_GameClass
     $board = $this->getBoard();
 
     $accessible = [];
-    for ($x = 0; $x < 5; $x++)
-    for ($y = 0; $y < 5; $y++) {
-      $z = 0;
-      $blocked = false; // If we see a worker or a dome, the space is not accessible
-      // Find next free space above ground
-      for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
-        $p = $board[$x][$y][$z];
-        $blocked = ($p['type'] == 'worker' || $p['type'] == 'lvl3');
+    for ($x = 0; $x < 5; $x++) {
+      for ($y = 0; $y < 5; $y++) {
+        $z = 0;
+        $blocked = false; // If we see a worker or a dome, the space is not accessible
+        // Find next free space above ground
+        for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
+          $p = $board[$x][$y][$z];
+          $blocked = ($p['type'] == 'worker' || $p['type'] == 'lvl3');
+        }
+
+        if ($blocked || $z > 3) {
+          continue;
+        }
+
+        // Add the space to accessible
+        $space = [
+          'x' => $x,
+          'y' => $y,
+          'z' => $z,
+          'arg' => null,
+        ];
+        if ($action == "build") {
+          $space['arg'] = [$z];
+        }
+
+        $accessible[] = $space;
       }
-
-      if ($blocked || $z > 3)
-        continue;
-
-      // Add the space to accessible
-      $space = [
-        'x' => $x,
-        'y' => $y,
-        'z' => $z,
-        'arg' => null,
-      ];
-      if($action == "build")
-        $space['arg'] = [$z];
-
-      $accessible[] = $space;
     }
 
     return $accessible;
@@ -167,15 +174,15 @@ class SantoriniBoard extends APP_GameClass
    */
   public static function isSameSpace($a, $b)
   {
-    return ($a['x'] == $b['x'] && $a['y'] == $b['y']);
+    return $a['x'] == $b['x'] && $a['y'] == $b['y'];
   }
 
   /*
    * isPerimeter: TODO
    */
-  public function isPerimeter($space){
-    return $space['x'] == 0 || $space['x'] == 4
-       ||  $space['y'] == 0 || $space['y'] == 4;
+  public function isPerimeter($space)
+  {
+    return $space['x'] == 0 || $space['x'] == 4 || $space['y'] == 0 || $space['y'] == 4;
   }
 
 
@@ -191,8 +198,9 @@ class SantoriniBoard extends APP_GameClass
     $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
 
     // For moving, the new height can't be more than +1
-    if ($action == 'move')
+    if ($action == 'move') {
       $ok = $ok && $b['z'] <= $a['z'] + 1;
+    }
 
     return $ok;
   }
@@ -212,4 +220,11 @@ class SantoriniBoard extends APP_GameClass
     }));
   }
 
+  /*
+   * getCompleteTowerCount: Return the number of Complete Towers (domes on level 3)
+   */
+  public function getCompleteTowerCount()
+  {
+    return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM piece WHERE location = 'board' AND z = '3' AND type = 'lvl3'"));
+  }
 }

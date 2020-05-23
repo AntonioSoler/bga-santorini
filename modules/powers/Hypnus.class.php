@@ -2,7 +2,8 @@
 
 class Hypnus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = HYPNUS;
     $this->name  = clienttranslate('Hypnus');
@@ -15,5 +16,4 @@ class Hypnus extends SantoriniPower
   }
 
   /* * */
-
 }

@@ -2,7 +2,8 @@
 
 class Graeae extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = GRAEAE;
     $this->name  = clienttranslate('Graeae');
@@ -16,5 +17,4 @@ class Graeae extends SantoriniPower
   }
 
   /* * */
-
 }

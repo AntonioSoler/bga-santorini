@@ -2,7 +2,8 @@
 
 class Heracles extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = HERACLES;
     $this->name  = clienttranslate('Heracles');
@@ -15,5 +16,4 @@ class Heracles extends SantoriniHeroPower
   }
 
   /* * */
-
 }

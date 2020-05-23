@@ -2,7 +2,8 @@
 
 class Eros extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = EROS;
     $this->name  = clienttranslate('Eros');
@@ -16,5 +17,4 @@ class Eros extends SantoriniPower
   }
 
   /* * */
-
 }

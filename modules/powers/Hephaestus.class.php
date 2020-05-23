@@ -2,7 +2,8 @@
 
 class Hephaestus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = HEPHAESTUS;
     $this->name  = clienttranslate('Hephaestus');
@@ -17,17 +18,19 @@ class Hephaestus extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerBuild(&$arg)
   {
     $build = $this->game->log->getLastBuild();
     // No build before => usual rule
-    if($build == null)
+    if ($build == null) {
       return;
+    }
 
     // Otherwise, let the player do a second build (not mandatory)
     $arg['skippable'] = true;
     Utils::filterWorkersById($arg, $build['pieceId']);
-    Utils::filterWorks($arg, function($space, $worker) use ($build){
+    Utils::filterWorks($arg, function ($space, $worker) use ($build) {
       return $this->game->board->isSameSpace($space, $build['to']) && $space['z'] != 3;
     });
   }
@@ -36,6 +39,6 @@ class Hephaestus extends SantoriniPower
   public function stateAfterBuild()
   {
     $build = $this->game->log->getLastBuild();
-    return (count($this->game->log->getLastBuilds()) == 1 && $build['to']['z'] <= 1)? 'buildAgain' : null;
+    return (count($this->game->log->getLastBuilds()) == 1 && $build['to']['z'] <= 1) ? 'buildAgain' : null;
   }
 }

@@ -2,7 +2,8 @@
 
 class Siren extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = SIREN;
     $this->name  = clienttranslate('Siren');
@@ -16,5 +17,4 @@ class Siren extends SantoriniPower
   }
 
   /* * */
-
 }

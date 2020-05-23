@@ -2,7 +2,8 @@
 
 class Gaea extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = GAEA;
     $this->name  = clienttranslate('Gaea');
@@ -16,5 +17,4 @@ class Gaea extends SantoriniPower
   }
 
   /* * */
-
 }

@@ -2,7 +2,8 @@
 
 class Persephone extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = PERSEPHONE;
     $this->name  = clienttranslate('Persephone');
@@ -15,5 +16,4 @@ class Persephone extends SantoriniPower
   }
 
   /* * */
-
 }

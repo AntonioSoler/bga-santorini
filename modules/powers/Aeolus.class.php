@@ -2,7 +2,8 @@
 
 class Aeolus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = AEOLUS;
     $this->name  = clienttranslate('Aeolus');
@@ -17,5 +18,4 @@ class Aeolus extends SantoriniPower
   }
 
   /* * */
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -36,14 +37,16 @@ class action_santorini extends APP_GameAction
     }
   }
 
-  public function addOffer() {
+  public function addOffer()
+  {
     self::setAjaxMode();
     $powerId = (int) self::getArg('powerId', AT_int, true);
     $this->game->addOffer($powerId);
     self::ajaxResponse();
   }
 
-  public function removeOffer() {
+  public function removeOffer()
+  {
     self::setAjaxMode();
     $powerId = (int) self::getArg('powerId', AT_int, true);
     $this->game->removeOffer($powerId);

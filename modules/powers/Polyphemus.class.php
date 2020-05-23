@@ -2,7 +2,8 @@
 
 class Polyphemus extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = POLYPHEMUS;
     $this->name  = clienttranslate('Polyphemus');
@@ -15,5 +16,4 @@ class Polyphemus extends SantoriniHeroPower
   }
 
   /* * */
-
 }

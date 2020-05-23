@@ -2,7 +2,8 @@
 
 class Pan extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = PAN;
     $this->name  = clienttranslate('Pan');
@@ -17,15 +18,24 @@ class Pan extends SantoriniPower
   }
 
   /* * */
-  public function checkPlayerWinning(&$arg) {
-    if($arg['win'])
+
+  public function checkPlayerWinning(&$arg)
+  {
+    if ($arg['win']) {
       return;
+    }
 
     $move = $this->game->log->getLastWork();
-    if($move == null || $move['action'] != 'move' || $move['to']['z'] > $move['from']['z'] - 2)
+    if ($move == null || $move['action'] != 'move' || $move['to']['z'] > $move['from']['z'] - 2) {
       return;
+    }
 
+    // Pan wins
     $arg['win'] = true;
-    $arg['msg'] = clienttranslate('Pan won by moving down.');
+    $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} moved down two or more levels'), [
+      'i18n' => ['power_name'],
+      'power_name' => $this->getName(),
+      'player_name' => $this->getPlayer()->getName(),
+    ]);
   }
 }

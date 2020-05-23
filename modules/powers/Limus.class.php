@@ -2,7 +2,8 @@
 
 class Limus extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = LIMUS;
     $this->name  = clienttranslate('Limus');
@@ -21,13 +22,15 @@ class Limus extends SantoriniPower
   public function argOpponentBuild(&$arg)
   {
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
-    foreach($myWorkers as &$worker){
-      Utils::filterWorks($arg, function(&$space, $oppworker) use ($worker) {
+    foreach ($myWorkers as &$worker) {
+      Utils::filterWorks($arg, function (&$space, $oppworker) use ($worker) {
         // can build only a dome or at a non-neighbouring space
-        if(!$this->game->board->isNeighbour($space, $worker, 'build'))
+        if (!$this->game->board->isNeighbour($space, $worker, 'build')) {
           return true;
-        if(!in_array(3, $space['arg']))
+        }
+        if (!in_array(3, $space['arg'])) {
           return false;
+        }
         $space['arg'] = [3];
         return true;
       });

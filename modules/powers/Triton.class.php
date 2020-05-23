@@ -2,7 +2,8 @@
 
 class Triton extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = TRITON;
     $this->name  = clienttranslate('Triton');
@@ -17,6 +18,7 @@ class Triton extends SantoriniPower
   }
 
   /* * */
+
   public function hasMovedOnPerimeter()
   {
     $move = $this->game->log->getLastMove($this->playerId);
@@ -28,8 +30,9 @@ class Triton extends SantoriniPower
   {
     // No move before => usual rule
     $move = $this->game->log->getLastMove();
-    if($move == null)
+    if ($move == null) {
       return;
+    }
 
     Utils::filterWorkersById($arg, $move['pieceId']);
     $arg['skippable'] = true;
@@ -37,6 +40,6 @@ class Triton extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return $this->hasMovedOnPerimeter()?  'moveAgain' : null;
+    return $this->hasMovedOnPerimeter() ?  'moveAgain' : null;
   }
 }
