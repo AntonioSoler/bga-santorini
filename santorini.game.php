@@ -372,10 +372,14 @@ class santorini extends Table
     $pId = self::getActivePlayerId();
     $workers = $this->board->getAvailableWorkers($pId);
 
-    return [
+    $arg = [
       'worker' => $workers[0],
       'accessibleSpaces' => $this->board->getAccessibleSpaces()
     ];
+
+    // Apply powers (Bia workers must be placed on perimeter spaces)
+    $this->powerManager->argPlaceWorker($arg);
+    return $arg;
   }
 
   /*

@@ -2,6 +2,12 @@
 
 abstract class Utils extends APP_GameClass
 {
+  public static function filter(&$data, $filter)
+  {
+    $data = array_values(array_filter($data, $filter));
+  }
+
+
   /* TODO */
   public static function filterWorkers(&$arg, $filter)
   {
@@ -10,9 +16,9 @@ abstract class Utils extends APP_GameClass
     }
 
     if (is_array($arg) && array_key_exists('workers', $arg)) {
-      $arg['workers'] = array_values(array_filter($arg['workers'], $filter));
+      Utils::filter($arg['workers'], $filter);
     } else {
-      $arg = array_values(array_filter($arg, $filter));
+      Utils::filter($arg, $filter);
     }
   }
 
@@ -44,7 +50,7 @@ abstract class Utils extends APP_GameClass
   {
     foreach ($arg["workers"] as &$worker) {
       $works = [];
-      
+
       if (isset($worker['works'])) { // TODO should be useless...
         foreach ($worker['works'] as &$space) {
           if ($filter($space, $worker)) {

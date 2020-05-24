@@ -92,6 +92,13 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  public function argPlayerPlaceWorker(&$arg)
+  {
+  }
+  public function argOpponentPlaceWorker(&$arg)
+  {
+  }
+
 
   public function stateStartOfTurn()
   {

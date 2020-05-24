@@ -289,6 +289,15 @@ class PowerManager extends APP_GameClass
   }
 
 
+  /*
+   * argPlaceWorker: is called when a player has to place one of its worker
+   */
+  public function argPlaceWorker(&$arg)
+  {
+    $this->applyPower(["argPlayerPlaceWorker","argOpponentPlaceWorker"], [&$arg]);
+  }
+
+
   ///////////////////////////////////////
   ///////////////////////////////////////
   /////////    Work argument   //////////

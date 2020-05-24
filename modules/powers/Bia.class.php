@@ -9,11 +9,12 @@ class Bia extends SantoriniPower
     $this->name  = clienttranslate('Bia');
     $this->title = clienttranslate('Goddess of Violence');
     $this->text  = [
-      clienttranslate("Setup: Place your Workers first."),
+      clienttranslate("Setup: Place your Workers first. Your workers must be placed in perimeter spaces."),
       clienttranslate("Your Move: If your Worker moves into a space and the next space in the same direction is occupied by an opponent Worker, the opponent's Worker is removed from the game.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
+    $this->newRule = true;
 
     $this->implemented = true;
   }
@@ -23,15 +24,22 @@ class Bia extends SantoriniPower
   public function argChooseFirstPlayer(&$arg)
   {
     $pId = $this->playerId;
-    $arg['players'] = array_values(array_filter($arg['players'], function($player) use ($pId){
+    Utils::filter($arg['players'], function($player) use ($pId){
       return $player['id'] == $pId;
-    }));
+    });
 
     $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} must place its workers first'), [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),
       'player_name' => $this->getPlayer()->getName(),
     ]);
+  }
+
+  public function argPlayerPlaceWorker(&$arg)
+  {
+    Utils::filter($arg['accessibleSpaces'], function($space){
+      return $this->game->board->isPerimeter($space);
+    });
   }
 
 
