@@ -159,11 +159,13 @@ class santorini extends Table
       $power = $player->addPower();
       $power->setup($player);
 
-      // Remove banned powers TODO
-      // Old code : $this->cards->moveCards($power->getBannedIds(), 'box');
+      $this->cards->moveCards($this->powerManager->computeBannedIds('hand'), 'box');
     }
 
-    $this->gamestate->nextState('done');
+    // Choose first player
+    $players = $this->argChooseFirstPlayer()['players'];
+    $firstPlayer = $players[array_rand($players, 1)];
+    $this->chooseFirstPlayer($firstPlayer['id']);
   }
 
 

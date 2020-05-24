@@ -187,6 +187,7 @@ class PowerManager extends APP_GameClass
     $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
       return $power->isSupported($nPlayers, $optionPowers);
     });
+
     $powerIds = array_values(array_map(function ($power) {
       return $power->getId();
     }, $powers));
@@ -198,9 +199,9 @@ class PowerManager extends APP_GameClass
    * computeBannedIds: is called during fair division setup, whenever a player add/remove an offer
    *    it should return the list of banned powers against current offer
    */
-  public function computeBannedIds()
+  public function computeBannedIds($location = 'offer')
   {
-    $powers = $this->game->cards->getCardsInLocation('offer');
+    $powers = $this->game->cards->getCardsInLocation($location);
     $ids = [];
     foreach ($powers as $power) {
       foreach (self::$bannedMatchups as $matchup) {
