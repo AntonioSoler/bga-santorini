@@ -2,7 +2,8 @@
 
 class Ares extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = ARES;
     $this->name  = clienttranslate('Ares');
@@ -10,10 +11,9 @@ class Ares extends SantoriniPower
     $this->text  = [
       clienttranslate("End of Your Turn: You may remove an unoccupied block (not dome) neighboring your unmoved Worker. You also remove any Tokens on the block.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = false;
   }
 
   /* * */
-
 }

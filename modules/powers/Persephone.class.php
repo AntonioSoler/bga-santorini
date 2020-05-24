@@ -2,7 +2,8 @@
 
 class Persephone extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = PERSEPHONE;
     $this->name  = clienttranslate('Persephone');
@@ -10,10 +11,9 @@ class Persephone extends SantoriniPower
     $this->text  = [
       clienttranslate("Opponent's Turn: If possible, at least one Worker must move up this turn.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
   }
 
   /* * */
-
 }

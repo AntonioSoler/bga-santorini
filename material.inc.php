@@ -28,7 +28,13 @@ require_once("modules/PlayerManager.class.php");
 require_once("modules/PowerManager.class.php");
 require_once("modules/SantoriniPower.class.php");
 require_once("modules/SantoriniHeroPower.class.php");
-
 foreach (PowerManager::$classes as $className) {
   require_once("modules/powers/$className.class.php");
 }
+
+$this->levelNames = [
+  0 => clienttranslate('ground level'),
+  1 => clienttranslate('level 1'),
+  2 => clienttranslate('level 2'),
+  3 => clienttranslate('level 3'),
+];

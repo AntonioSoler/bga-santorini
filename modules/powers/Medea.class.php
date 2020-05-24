@@ -2,7 +2,8 @@
 
 class Medea extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = MEDEA;
     $this->name  = clienttranslate('Medea');
@@ -10,10 +11,9 @@ class Medea extends SantoriniHeroPower
     $this->text  = [
       clienttranslate("End of Your Turn: Once, remove one block from under any number of Workers neighboring your unmoved Worker. You also remove any Tokens on the blocks.")
     ];
-    $this->players = [2];
+    $this->playerCount = [2];
     $this->golden  = false;
   }
 
   /* * */
-
 }

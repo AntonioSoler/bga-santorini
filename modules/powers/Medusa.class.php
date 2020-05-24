@@ -2,7 +2,8 @@
 
 class Medusa extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = MEDUSA;
     $this->name  = clienttranslate('Medusa');
@@ -10,7 +11,7 @@ class Medusa extends SantoriniPower
     $this->text  = [
       clienttranslate("End of Your Turn: If possible, your Workers build in lower neighboring spaces that are occupied by opponent Workers, removing the opponent Workers from the game.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
 
     $this->implemented = true;
@@ -22,17 +23,19 @@ class Medusa extends SantoriniPower
   {
     // If no build before => usual rule
     $build = $this->game->log->getLastBuild();
-    if($build == null)
+    if ($build == null) {
       return;
+    }
 
     // Otherwise, we check if a kill is possible
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    foreach($arg['workers'] as &$worker){
+    foreach ($arg['workers'] as &$worker) {
       $worker['works'] = [];
-      foreach($oppWorkers as $worker2){
-        if($this->game->board->isNeighbour($worker, $worker2, 'build') && $worker2['z'] < $worker['z'])
+      foreach ($oppWorkers as $worker2) {
+        if ($this->game->board->isNeighbour($worker, $worker2, 'build') && $worker2['z'] < $worker['z']) {
           $worker['works'][] = SantoriniBoard::getCoords($worker2, 1);
+        }
       }
     }
   }
@@ -41,17 +44,21 @@ class Medusa extends SantoriniPower
   {
     // Check if any kill is possible (using argPlayerBuild)
     $arg = $this->game->argPlayerBuild();
-    if(count($arg['workers']) == 0)
+    if (count($arg['workers']) == 0) {
       return;
+    }
 
-    foreach($arg['workers'] as $worker)
-    foreach($worker['works'] as $work){
-      $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
-      if($worker2 == null) // Might happens if the only worker already killed the piece just before
-        continue;
+    foreach ($arg['workers'] as $worker) {
+      foreach ($worker['works'] as $work) {
+        $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
+        if ($worker2 == null) {
+          // Might happens if the only worker already killed the piece just before
+          continue;
+        }
 
-      $this->game->playerKill($worker2, $this->getName());
-      $this->game->playerBuild($worker, SantoriniBoard::getCoords($worker2, 2));
+        $this->game->playerKill($worker2, $this->getName());
+        $this->game->playerBuild($worker, SantoriniBoard::getCoords($worker2, 2));
+      }
     }
   }
 }

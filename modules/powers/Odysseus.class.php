@@ -2,7 +2,8 @@
 
 class Odysseus extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = ODYSSEUS;
     $this->name  = clienttranslate('Odysseus');
@@ -10,10 +11,9 @@ class Odysseus extends SantoriniHeroPower
     $this->text  = [
       clienttranslate("Start of Your Turn: Once, force to unoccupied corner spaces any number of opponent Workers that neighbor your Workers.")
     ];
-    $this->players = [2];
+    $this->playerCount = [2];
     $this->golden  = false;
   }
 
   /* * */
-
 }

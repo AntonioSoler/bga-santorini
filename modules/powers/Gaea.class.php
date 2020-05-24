@@ -2,7 +2,8 @@
 
 class Gaea extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = GAEA;
     $this->name  = clienttranslate('Gaea');
@@ -11,10 +12,9 @@ class Gaea extends SantoriniPower
       clienttranslate("Setup: Take 2 extra Workers of your color. These are kept on your God Power card until needed."),
       clienttranslate("Any Build: When a Worker builds a dome, Gaea may immediately place a Worker from her God Power card onto a ground-level space neighboring the dome.")
     ];
-    $this->players = [2, 3];
+    $this->playerCount = [2, 3];
     $this->golden  = false;
   }
 
   /* * */
-
 }

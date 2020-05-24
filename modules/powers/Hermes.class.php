@@ -2,7 +2,8 @@
 
 class Hermes extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = HERMES;
     $this->name  = clienttranslate('Hermes');
@@ -10,17 +11,18 @@ class Hermes extends SantoriniPower
     $this->text  = [
       clienttranslate("Your Turn: If your Workers do not move up or down, they may each move any number of times (even zero), and then either builds.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
 
     $this->implemented = true;
   }
 
   /* * */
+
   public function hasMovedUpOrDown()
   {
     $moves = $this->game->log->getLastMoves($this->playerId);
-    return array_reduce($moves, function($movedUp, $move){
+    return array_reduce($moves, function ($movedUp, $move) {
       return $movedUp || $move['to']['z'] != $move['from']['z'];
     }, false);
   }
@@ -33,32 +35,33 @@ class Hermes extends SantoriniPower
 
     // No move before => usual rule
     $move = $this->game->log->getLastMove();
-    if($move == null)
+    if ($move == null) {
       return;
+    }
 
     // Otherwise, let the player do a second move but on same height
-    Utils::filterWorks($arg, function($space, $worker){
+    Utils::filterWorks($arg, function ($space, $worker) {
       return $space['z'] == $worker['z'];
     });
   }
 
   public function stateAfterMove()
   {
-    return $this->hasMovedUpOrDown()? null : 'moveAgain';
+    return $this->hasMovedUpOrDown() ? null : 'moveAgain';
   }
 
 
   public function argPlayerBuild(&$arg)
   {
     // Moved up/down => usual rule
-    if($this->hasMovedUpOrDown())
+    if ($this->hasMovedUpOrDown()) {
       return;
+    }
 
     // Otherwise, let the player build with any worker
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    foreach($arg['workers'] as &$worker){
+    foreach ($arg['workers'] as &$worker) {
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
     }
   }
-
 }

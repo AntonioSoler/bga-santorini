@@ -143,16 +143,15 @@ class SantoriniPlayer extends APP_GameClass
         $power = $this->game->powerManager->getPower($powerId, $this->id);
         $this->powers[] = $power;
 
-        // Send notification
-        $args = array(
-            'i18n' => array('power_name', 'power_title'),
+        // Notify
+        $this->game->notifyAllPlayers('powerAdded', clienttranslate('${player_name} receives ${power_name}, ${power_title}'), [
+            'i18n' => ['power_name', 'power_title'],
             'player_id' => $this->getId(),
             'player_name' => $this->getName(),
             'power_id' => $power->getId(),
             'power_name' => $power->getName(),
             'power_title' => $power->getTitle(),
-        );
-        $this->game->notifyAllPlayers('powerAdded', clienttranslate('${player_name} receives ${power_name}, ${power_title}'), $args);
+        ]);
 
         return $power;
     }

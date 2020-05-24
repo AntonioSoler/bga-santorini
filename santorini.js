@@ -19,13 +19,13 @@
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
 var isDebug = false;
-var debug = isDebug ? console.info.bind(window.console) : function () {};
+var debug = isDebug ? console.info.bind(window.console) : function () { };
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
   return declare("bgagame.santorini", ebg.core.gamegui, {
     /*
      * Constructor
      */
-    constructor: function() {},
+    constructor: function () { },
 
     /*
      * Setup:
@@ -35,11 +35,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * Params :
      *  - mixed gamedatas : contains all datas retrieved by the getAllDatas PHP method.
      */
-    setup: function(gamedatas) {
+    setup: function (gamedatas) {
       var _this = this;
       debug('SETUP', gamedatas);
 
-			// Setup the board (3d scene using threejs)
+      // Setup the board (3d scene using threejs)
       var container = document.getElementById('scene-container');
       this.board = new Board(container, URL); // Setup player boards
 
@@ -50,10 +50,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         });
       });
 
-			// Setup workers and buildings
+      // Setup workers and buildings
       gamedatas.placedPieces.forEach(this.createPiece.bind(this));
 
-			// Setup game notifications
+      // Setup game notifications
       this.setupNotifications();
     },
 
@@ -64,7 +64,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * params:
      *  - object piece: main infos are type, x,y,z
      */
-    addPowerToPlayer: function(playerId, powerId) {
+    addPowerToPlayer: function (playerId, powerId) {
       var power = this.getPower(powerId);
       var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
       card.id = "mini-card-" + playerId + "-" + powerId;
@@ -72,9 +72,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
-///////////////////////////////////////
-////////  Game & client states ////////
-///////////////////////////////////////
+    ///////////////////////////////////////
+    ////////  Game & client states ////////
+    ///////////////////////////////////////
 
     /*
      * onEnteringState:
@@ -84,19 +84,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *  - str stateName : name of the state we are entering
      *  - mixed args : additional information
      */
-    onEnteringState: function(stateName, args) {
+    onEnteringState: function (stateName, args) {
       debug('Entering state: ' + stateName, args);
 
-			// Stop here if it's not the current player's turn for some states
+      // Stop here if it's not the current player's turn for some states
       if (["playerPlaceWorker", "playerMove", "playerBuild", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
         if (!this.isCurrentPlayerActive()) return;
       }
 
-			// Call appropriate method
+      // Call appropriate method
       var methodName = "onEnteringState" + stateName.charAt(0).toUpperCase() + stateName.slice(1);
       if (this[methodName] !== undefined)
-				this[methodName](args.args);
+        this[methodName](args.args);
     },
 
 
@@ -108,12 +108,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * params:
      *  - str stateName : name of the state we are leaving
      */
-    onLeavingState: function(stateName) {
+    onLeavingState: function (stateName) {
       debug('Leaving state: ' + stateName);
 
-			// Don't remove the power cards
+      // Don't remove the power cards
       if (stateName == 'powersPlayerChoose')
-				return;
+        return;
 
       this.clearPossible();
     },
@@ -123,11 +123,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * 	called by BGA framework before onEnteringState
      *  in this method you can manage "action buttons" that are displayed in the action status bar (ie: the HTML links in the status bar).
      */
-    onUpdateActionButtons: function(stateName, args) {
+    onUpdateActionButtons: function (stateName, args) {
       debug('Update action buttons: ' + stateName, args); // Make sure it the player's turn
 
       if (!this.isCurrentPlayerActive())
-				return;
+        return;
 
       if ((stateName == "playerMove" || stateName == "playerBuild") && args.skippable) {
         this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
@@ -135,30 +135,30 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
-///////////////////////////////////////
-///////////////////////////////////////
-//////////    Fair division   /////////
-///////////////////////////////////////
-///////////////////////////////////////
-// As stated in the rulebook, the fair division process goes as follows :
-//  - the contestant pick n powers
-//  - each player choose one power (contestant is last to choose)
-//  - contestant choose the first player to place its worker TODO
-//////////////////////////////////////
+    ///////////////////////////////////////
+    ///////////////////////////////////////
+    //////////    Fair division   /////////
+    ///////////////////////////////////////
+    ///////////////////////////////////////
+    // As stated in the rulebook, the fair division process goes as follows :
+    //  - the contestant pick n powers
+    //  - each player choose one power (contestant is last to choose)
+    //  - contestant choose the first player to place its worker TODO
+    //////////////////////////////////////
 
 
-/////////////////////
-//// Build Offer ////
-/////////////////////
+    /////////////////////
+    //// Build Offer ////
+    /////////////////////
 
     /*
      * BuildOffer: in the fair division setup,the contestant can select #players powers from available powers (depending on game option)
      */
-    onEnteringStateBuildOffer: function(args) {
+    onEnteringStateBuildOffer: function (args) {
       var _this = this;
       this.focusContainer('powers-offer');
 
-			// Display selected powers
+      // Display selected powers
       args.offer.forEach(function (powerId) {
         var div = dojo.place(_this.format_block('jstpl_powerSmall', _this.getPower(powerId)), $('cards-offer'));
         div.classList.add('selected');
@@ -169,7 +169,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       this._nMissingPowers = this.gamedatas.fplayers.length - args.offer.length;
 
-			// Display remeaining powers
+      // Display remeaining powers
       args.deck.forEach(function (powerId) {
         var div = dojo.place(_this.format_block('jstpl_powerSmall', _this.getPower(powerId)), $('cards-deck'));
         dojo.connect(div, 'onclick', function (e) {
@@ -177,7 +177,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         });
       });
 
-			this.updateBannedPowers(args.banned);
+      this.updateBannedPowers(args.banned);
       this.buildOfferActionButtons();
     },
 
@@ -185,7 +185,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /*
      * buildOfferActionButtons: show confirm button if the count is correct
      */
-    buildOfferActionButtons: function() {
+    buildOfferActionButtons: function () {
       if (this.isCurrentPlayerActive()) {
         this.removeActionButtons();
 
@@ -210,13 +210,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickPowerSmall:
      * 	 during fair division setup, when clicking on a small card while building the offer
      */
-    onClickPowerSmall: function(powerId) {
+    onClickPowerSmall: function (powerId) {
       var powerDiv = $('power-small-' + powerId),
-          isActive = this.isCurrentPlayerActive(),
-					isBanned = powerDiv.classList.contains('banned'),
-          isDisplayed = powerDiv.classList.contains('displayed'),
-          isSelected = powerDiv.classList.contains('selected'),
-          isWait = powerDiv.classList.contains('wait'); // Everyone may view details on first click
+        isActive = this.isCurrentPlayerActive(),
+        isBanned = powerDiv.classList.contains('banned'),
+        isDisplayed = powerDiv.classList.contains('displayed'),
+        isSelected = powerDiv.classList.contains('selected'),
+        isWait = powerDiv.classList.contains('wait'); // Everyone may view details on first click
 
       if (!isDisplayed) {
         // Mark only this card as displayed
@@ -226,22 +226,22 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         var power = this.getPower(powerId);
         dojo.place(this.format_block('jstpl_powerDetail', power), 'grid-detail', 'only');
       }
-			// Otherwise, active player may select/unselect the power
+      // Otherwise, active player may select/unselect the power
       else if (!isWait && isActive) {
-          // Already selected => unselect it
-          if (isSelected) {
-            this.ajaxcall("/santorini/santorini/removeOffer.html", {
-              powerId: powerId
-            }, this, function (res) {});
-            powerDiv.classList.add('wait');
-          }
-					// Not yet select + still need powers => select it
-          else if (this._nMissingPowers > 0 && !isBanned) {
-            this.ajaxcall("/santorini/santorini/addOffer.html", {
-              powerId: powerId
-            }, this, function (res) {});
-            powerDiv.classList.add('wait');
-          }
+        // Already selected => unselect it
+        if (isSelected) {
+          this.ajaxcall("/santorini/santorini/removeOffer.html", {
+            powerId: powerId
+          }, this, function (res) { });
+          powerDiv.classList.add('wait');
+        }
+        // Not yet select + still need powers => select it
+        else if (this._nMissingPowers > 0 && !isBanned) {
+          this.ajaxcall("/santorini/santorini/addOffer.html", {
+            powerId: powerId
+          }, this, function (res) { });
+          powerDiv.classList.add('wait');
+        }
       }
     },
 
@@ -250,15 +250,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_addOffer:
      *   called during fair division setup, when player 1 adds a power to the offer
      */
-    notif_addOffer: function(n) {
-			var _this = this;
+    notif_addOffer: function (n) {
+      var _this = this;
       debug('Notif: addOffer', n.args);
 
-			// Create a dummy in the offer that will be replaced by the actual power
+      // Create a dummy in the offer that will be replaced by the actual power
       var dummy = dojo.place(this.format_block('jstpl_powerSmall', this.getPower(0)), $('cards-offer'));
       dummy.id = 'addOffer-dummy';
 
-			// Slide the real card to the position of the dummy
+      // Slide the real card to the position of the dummy
       var powerDivId = 'power-small-' + n.args.powerId;
       this.slide(powerDivId, dummy.id).then(function () {
         // Replace the dummy with the real card
@@ -268,7 +268,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         powerDiv.classList.remove('wait');
         _this._nMissingPowers--;
 
-				_this.updateBannedPowers(n.args.banned);
+        _this.updateBannedPowers(n.args.banned);
         _this.buildOfferActionButtons();
       });
     },
@@ -277,27 +277,27 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_removeOffer:
      *   called during fair division setup, when player 1 removes a power from the offer
      */
-    notif_removeOffer: function(n) {
+    notif_removeOffer: function (n) {
       var _this = this;
       debug('Notif: removeOffer', n.args);
 
-			// Create a dummy in the deck
+      // Create a dummy in the deck
       var dummy = this.format_block('jstpl_powerSmall', this.getPower(0));
-			// Find the right position
+      // Find the right position
       var nextPower = dojo.query('#cards-deck .power-card').reduce(function (acc, div) {
         if (acc != null) return acc;
         if (div.getAttribute('data-power') > n.args.powerId) return div;
       }, null);
 
-			// Insert it
+      // Insert it
       if (nextPower !== null)
-				dummy = dojo.place(dummy, nextPower, 'before');
-			else
-				dummy = dojo.place(dummy, $('cards-deck'), 'last');
+        dummy = dojo.place(dummy, nextPower, 'before');
+      else
+        dummy = dojo.place(dummy, $('cards-deck'), 'last');
 
-			// Slide the real card to the position of the dummy
-			var powerDivId = 'power-small-' + n.args.powerId;
-			dummy.id = 'removeOffer-dummy';
+      // Slide the real card to the position of the dummy
+      var powerDivId = 'power-small-' + n.args.powerId;
+      dummy.id = 'removeOffer-dummy';
       this.slide(powerDivId, dummy.id).then(function () {
         // Replace the dummy with the real card
         var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
@@ -306,7 +306,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         powerDiv.classList.remove('wait');
         _this._nMissingPowers++;
 
-				_this.updateBannedPowers(n.args.banned);
+        _this.updateBannedPowers(n.args.banned);
         _this.buildOfferActionButtons();
       });
     },
@@ -316,24 +316,24 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickConfirmOffer:
      *   during fair division setup, when player 1 confirms they are done building the offer
      */
-    onClickConfirmOffer: function() {
+    onClickConfirmOffer: function () {
       if (!this.checkAction('confirmOffer')) return false;
-      this.ajaxcall("/santorini/santorini/confirmOffer.html", {}, this, function (res) {});
+      this.ajaxcall("/santorini/santorini/confirmOffer.html", {}, this, function (res) { });
     },
 
 
-//////////////////////
-//// Choose Power ////
-//////////////////////
+    //////////////////////
+    //// Choose Power ////
+    //////////////////////
 
     /*
      * powersPlayerChoose: in the fair division setup, each player then proceed to pick one card
      */
-    onEnteringStatePowersPlayerChoose: function(args) {
+    onEnteringStatePowersPlayerChoose: function (args) {
       var _this = this;
       this.focusContainer('powers-choose');
 
-			// Display remeaining powers
+      // Display remeaining powers
       args.offer.forEach(function (powerId) {
         var power = _this.getPower(powerId);
         var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
@@ -353,13 +353,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickChoosePower:
      *   during fair division, when a player cladojo.place(ims a power
      */
-    onClickChoosePower: function(powerId) {
+    onClickChoosePower: function (powerId) {
       if (!this.checkAction('choosePower'))
-				return false;
+        return false;
 
       this.ajaxcall("/santorini/santorini/choosePower.html", {
         powerId: powerId
-      }, this, function (res) {});
+      }, this, function (res) { });
     },
 
 
@@ -367,16 +367,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_powerAdded:
      *   called whenever a player choose a power on a Fair Division process
      */
-    notif_powerAdded: function(n) {
+    notif_powerAdded: function (n) {
       var _this = this;
       debug('Notif: a power was chosen', n.args);
 
       var playerId = n.args.player_id,
-          powerId = n.args.power_id;
+        powerId = n.args.power_id;
       var powerChooseCard = $("power-choose-" + powerId);
       if (powerChooseCard == null)
-				this.addPowerToPlayer(playerId, powerId);
-			else {
+        this.addPowerToPlayer(playerId, powerId);
+      else {
         powerChooseCard.style.height = powerChooseCard.offsetHeight + "px";
         powerChooseCard.classList.add("power-dummy");
         var phantom = this.format_block('jstpl_powerDetail', this.getPower(powerId));
@@ -388,16 +388,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
-///////////////////////////////////////
-///////////////////////////////////////
-////////    Worker placement   ////////
-///////////////////////////////////////
-///////////////////////////////////////
+    ///////////////////////////////////////
+    ///////////////////////////////////////
+    ////////    Worker placement   ////////
+    ///////////////////////////////////////
+    ///////////////////////////////////////
 
     /*
      * playerPlaceWorker: the active player can place one worker on the board
      */
-    onEnteringStatePlayerPlaceWorker: function(args) {
+    onEnteringStatePlayerPlaceWorker: function (args) {
       this.worker = args.worker;
       this.board.makeClickable(args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
     },
@@ -407,14 +407,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickPlaceWorker:
      * 	triggered after a click on a space to place new worker
      */
-    onClickPlaceWorker: function(space) {
+    onClickPlaceWorker: function (space) {
       // Check that this action is possible at this moment
       if (!this.checkAction('placeWorker'))
-				return false;
+        return false;
 
       this.clearPossible();
       space.workerId = this.worker.id;
-      this.ajaxcall("/santorini/santorini/placeWorker.html", space, this, function (res) {});
+      this.ajaxcall("/santorini/santorini/placeWorker.html", space, this, function (res) { });
     },
 
 
@@ -422,41 +422,41 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_workerPlaced:
      *   called whenever a new worker is placed on the board
      */
-    notif_workerPlaced: function(n) {
+    notif_workerPlaced: function (n) {
       debug('Notif: new worker placed', n.args);
       this.createPiece(n.args.piece);
     },
 
 
-/////////////////////////////////////////
-/////////////////////////////////////////
-////////    Work : move / build  ////////
-/////////////////////////////////////////
-/////////////////////////////////////////
+    /////////////////////////////////////////
+    /////////////////////////////////////////
+    ////////    Work : move / build  ////////
+    /////////////////////////////////////////
+    /////////////////////////////////////////
 
     /*
      * playerMove and playerBuild: the active player can/must move/build
      */
-    onEnteringStatePlayerWork: function(args) {
+    onEnteringStatePlayerWork: function (args) {
       // TODO : this filtering should be useless now since filtering is done on backend
       this._selectableWorkers = args.workers.filter(function (worker) {
         return worker.works.length > 0;
       });
 
-			// If only one worker can work, automatically select it
+      // If only one worker can work, automatically select it
       if (this._selectableWorkers.length == 1)
-				this.onClickSelectWorker(this._selectableWorkers[0]);
-			// Otherwise, let the user make the choice
+        this.onClickSelectWorker(this._selectableWorkers[0]);
+      // Otherwise, let the user make the choice
       else if (this._selectableWorkers.length > 1)
-				this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
+        this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
     },
 
-    onEnteringStatePlayerMove: function(args) {
+    onEnteringStatePlayerMove: function (args) {
       this._action = "playerMove";
       this.onEnteringStatePlayerWork(args);
     },
 
-    onEnteringStatePlayerBuild: function(args) {
+    onEnteringStatePlayerBuild: function (args) {
       this._action = "playerBuild";
       this.onEnteringStatePlayerWork(args);
     },
@@ -466,15 +466,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickSelectWorker:
      * 	triggered after a click on a worker
      */
-    onClickSelectWorker: function(worker) {
+    onClickSelectWorker: function (worker) {
       this.clearPossible();
 
-			// Select the worker, highlight it and let the use change selection (if any other choices)
+      // Select the worker, highlight it and let the use change selection (if any other choices)
       this._selectedWorker = worker;
       this.board.highlightPiece(worker);
       if (this._selectableWorkers.length > 1)
-				this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
-			// TODO : automatically choose if only one space ?
+        this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
+      // TODO : automatically choose if only one space ?
 
       this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
     },
@@ -485,7 +485,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * 	triggered after a click on the action button "buttonReset".
      *  unselect the previously selected worker and make every worker selectable
      */
-    onClickCancelSelect: function(evt) {
+    onClickCancelSelect: function (evt) {
       dojo.stopEvent(evt);
       this.clearPossible();
       this._selectedWorker = null;
@@ -498,11 +498,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * 	triggered after a click on a space to either move/build/...
      *  a space may have some args denoting some choices (eg type of block for Atlas)
      */
-    onClickSpace: function(space) {
+    onClickSpace: function (space) {
       if (space.arg == null)
-				return this.onClickSpaceArg(space, null);
+        return this.onClickSpaceArg(space, null);
       if (space.arg.length == 1)
-				return this.onClickSpaceArg(space, space.arg[0]);
+        return this.onClickSpaceArg(space, space.arg[0]);
 
       return this.dialogChooseArg(space);
     },
@@ -510,13 +510,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /*
      * TODO
      */
-    dialogChooseArg: function(space) {
+    dialogChooseArg: function (space) {
       var _this = this;
       var dial = new ebg.popindialog();
       dial.create('chooseArg');
       dial.setTitle(_("Choose the building block"));
 
-			// TODO : might be other choices ?
+      // TODO : might be other choices ?
       space.arg.forEach(function (arg) {
         var div = dojo.place(_this.format_block('jstpl_argPrompt', {
           arg: arg
@@ -534,9 +534,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /*
      * TODO
      */
-    onClickSpaceArg: function(space, arg) {
+    onClickSpaceArg: function (space, arg) {
       if (!this.checkAction(this._action))
-				return;
+        return;
 
       this.ajaxcall("/santorini/santorini/work.html", {
         workerId: this._selectedWorker.id,
@@ -544,7 +544,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         y: space.y,
         z: space.z,
         arg: arg
-      }, this, function (res) {});
+      }, this, function (res) { });
 
       this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null
     },
@@ -553,32 +553,32 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /*
      * onClickSkip: is called when the active player decide to skip work
      */
-    onClickSkip: function() {
+    onClickSkip: function () {
       if (!this.checkAction('skip'))
-				return;
+        return;
 
-      this.ajaxcall("/santorini/santorini/skipWork.html", {}, this, function (res) {});
+      this.ajaxcall("/santorini/santorini/skipWork.html", {}, this, function (res) { });
       this.clearPossible();
     },
 
 
-/////////////////////
-//// Work Notifs ////
-/////////////////////
+    /////////////////////
+    //// Work Notifs ////
+    /////////////////////
 
 		/*
 		 * notif_automatic:
 		 *   called whenever a worker has only one choice
 		 */
-		notif_automatic: function(n) {
-			debug('Notif: automatic work incoming', n.args);
-		},
+    notif_automatic: function (n) {
+      debug('Notif: automatic work incoming', n.args);
+    },
 
     /*
      * notif_workerMoved:
      *   called whenever a worker is moved on the board
      */
-    notif_workerMoved: function(n) {
+    notif_workerMoved: function (n) {
       debug('Notif: worker moved', n.args);
       this.board.movePiece(n.args.piece, n.args.space);
     },
@@ -587,7 +587,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_blockBuilt:
      *   called whenever a new block is built
      */
-    notif_blockBuilt: function(n) {
+    notif_blockBuilt: function (n) {
       debug('Notif: block built', n.args);
       this.createPiece(n.args.piece);
     },
@@ -596,26 +596,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_workerSwitched:
      *   called whenever two workers are switched using Apollo
      */
-    notif_workerSwitched: function(n) {
+    notif_workerSwitched: function (n) {
       debug('Notif: worker switched', n.args);
       this.board.switchPiece(n.args.piece1, n.args.piece2);
-    },
-
-    /*
-     * notif_workerPushed:
-     *   called whenever a worker is pushed using Minotaur
-     */
-    notif_workerPushed: function(n) {
-      debug('Notif: worker pushed', n.args);
-      this.board.movePiece(n.args.piece2, n.args.space, 1500);
-      this.board.movePiece(n.args.piece1, n.args.piece2);
     },
 
 		/*
      * notif_blockBuilt:
      *   called whenever a new block is built under a worker using Zeus
      */
-    notif_blockBuiltUnder: function(n) {
+    notif_blockBuiltUnder: function (n) {
       debug('Notif: block built under', n.args);
       this.board.addPieceUnder(n.args.piece);
     },
@@ -625,15 +615,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * notif_pieceRemoved:
      *   called whenever a piece is removed/killed (eg Bia, Medusa, Ares)
      */
-    notif_pieceRemoved: function(n) {
+    notif_pieceRemoved: function (n) {
       debug('Notif: piece removed', n.args);
       this.board.removePiece(n.args.piece);
     },
 
 
-///////////////////////////////////////
-////////    Utility methods    ////////
-///////////////////////////////////////
+    ///////////////////////////////////////
+    ////////    Utility methods    ////////
+    ///////////////////////////////////////
 
     /*
      * // TODO:
@@ -669,11 +659,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         name: '',
         title: '',
         text: [],
-				implemented: "implemented"
+        implemented: "implemented"
       };
       power.type = power.hero ? 'hero' : '';
 
-			// TODO map for translation
+      // TODO map for translation
       power.textList = power.text.join('</li><li>');
       return power;
     },
@@ -698,7 +688,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     createPiece: function createPiece(piece) {
       piece.name = piece.type;
       if (piece.type == "worker")
-				piece.name = piece.type_arg + piece.type;
+        piece.name = piece.type_arg + piece.type;
 
       this.board.addPiece(piece);
     },
@@ -712,7 +702,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.removeActionButtons();
       this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
 
-			dojo.empty('grid-powers');
+      dojo.empty('grid-powers');
       dojo.query('#power-detail').removeClass().addClass('power-card power-0');
       dojo.empty('power-choose-container');
 
@@ -722,9 +712,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
-///////////////////////////////////////////////////
-//////   Reaction to cometD notifications   ///////
-///////////////////////////////////////////////////
+    ///////////////////////////////////////////////////
+    //////   Reaction to cometD notifications   ///////
+    ///////////////////////////////////////////////////
 
     /*
      * setupNotifications:
@@ -732,25 +722,24 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
      */
     setupNotifications: function setupNotifications() {
-			var notifs = [
-				['automatic', 1000],
-				['addOffer', 500],
-				['removeOffer', 500],
-				['powerAdded', 1200],
-				['workerPlaced', 1000],
-				['workerMoved', 2000],
-				['blockBuilt', 1000],
-				['workerSwitched', 2000], 	// Happens with Apollo
-				['workerPushed', 2000], // Happens with Minotaur
-				['blockBuiltUnder', 2000],// Happens with Zeus
-				['pieceRemoved', 2000] // Happens with Bia, Ares, Medusa
-			];
+      var notifs = [
+        ['automatic', 1000],
+        ['addOffer', 500],
+        ['removeOffer', 500],
+        ['powerAdded', 1200],
+        ['workerPlaced', 1000],
+        ['workerMoved', 2000],
+        ['blockBuilt', 1000],
+        ['workerSwitched', 2000], 	// Happens with Apollo
+        ['blockBuiltUnder', 2000],// Happens with Zeus
+        ['pieceRemoved', 2000] // Happens with Bia, Ares, Medusa
+      ];
 
-			var _this = this;
-			notifs.forEach(function(notif){
-				dojo.subscribe(notif[0], _this, "notif_" + notif[0]);
-	      _this.notifqueue.setSynchronous(notif[0], notif[1]);
-			});
+      var _this = this;
+      notifs.forEach(function (notif) {
+        dojo.subscribe(notif[0], _this, "notif_" + notif[0]);
+        _this.notifqueue.setSynchronous(notif[0], notif[1]);
+      });
     }
   });
 });

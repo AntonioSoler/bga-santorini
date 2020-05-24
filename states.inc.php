@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -51,137 +52,128 @@
 
 
 $machinestates = array(
-/*
- * The initial state.
- * Please do not modify.
- */
-ST_GAME_SETUP => [
-  'name' => 'gameSetup',
-  'description' => '',
-  'type' => 'manager',
-  'action' => 'stGameSetup',
-  'transitions' => [
-    '' => ST_POWERS_SETUP,
+  /*
+   * BGA framework initial state. Do not modify.
+   */
+  ST_GAME_SETUP => [
+    'name' => 'gameSetup',
+    'description' => '',
+    'type' => 'manager',
+    'action' => 'stGameSetup',
+    'transitions' => [
+      '' => ST_POWERS_SETUP,
+    ],
   ],
-],
 
-/*
- * The God/Hero Powers setup state.
- */
-ST_POWERS_SETUP => [
-  'name' => 'powersSetup',
-  'description' => '',
-  'type' => 'game',
-  'action' => 'stPowersSetup',
-  'transitions' => [
-    'done' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'offer' => ST_BUILD_OFFER
+  /*
+   * The God/Hero Powers setup state.
+   */
+  ST_POWERS_SETUP => [
+    'name' => 'powersSetup',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stPowersSetup',
+    'transitions' => [
+      'done' => ST_NEXT_PLAYER_PLACE_WORKER,
+      'offer' => ST_BUILD_OFFER
+    ],
   ],
-],
 
-/*
- * Fair division setup
- */
-ST_BUILD_OFFER => [
-  'name' => 'buildOffer',
-  'description' => clienttranslate('${actplayer} must offer ${count} powers for selection'),
-  'descriptionmyturn' => clienttranslate('${you} must offer ${count} powers for selection'),
-  'type' => 'activeplayer',
-  'args' => 'argBuildOffer',
-  'possibleactions' => ['addOffer', 'removeOffer', 'confirmOffer'],
-  'transitions' => [
-    'zombiePass' => ST_GAME_END,
-    'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+  ST_BUILD_OFFER => [
+    'name' => 'buildOffer',
+    'description' => clienttranslate('${actplayer} must offer ${count} powers for selection'),
+    'descriptionmyturn' => clienttranslate('${you} must offer ${count} powers for selection'),
+    'type' => 'activeplayer',
+    'args' => 'argBuildOffer',
+    'possibleactions' => ['addOffer', 'removeOffer', 'confirmOffer'],
+    'transitions' => [
+      'zombiePass' => ST_GAME_END,
+      'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    ],
   ],
-],
 
-ST_POWERS_NEXT_PLAYER_CHOOSE => [
-  'name' => 'powersNextPlayerChoose',
-  'description' => '',
-  'type' => 'game',
-  'action' => 'stPowersNextPlayerChoose',
-  'transitions' => [
-    'next' => ST_POWERS_CHOOSE,
-    'done' => ST_NEXT_PLAYER_PLACE_WORKER, // TODO should add a state with choose of first player
+  ST_POWERS_NEXT_PLAYER_CHOOSE => [
+    'name' => 'powersNextPlayerChoose',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stPowersNextPlayerChoose',
+    'transitions' => [
+      'next' => ST_POWERS_CHOOSE,
+      'done' => ST_NEXT_PLAYER_PLACE_WORKER, // TODO should add a state with choose of first player
+    ],
   ],
-],
 
-ST_POWERS_CHOOSE => [
-  'name' => 'powersPlayerChoose',
-  'description' => clienttranslate('${actplayer} must choose a power'),
-  'descriptionmyturn' => clienttranslate('${you} must choose a power'),
-  'type' => 'activeplayer',
-  'args' => 'argChoosePower',
-  'possibleactions' => ['choosePower'],
-  'transitions' => [
-    'zombiePass' => ST_GAME_END,
-    'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+  ST_POWERS_CHOOSE => [
+    'name' => 'powersPlayerChoose',
+    'description' => clienttranslate('${actplayer} must choose a power'),
+    'descriptionmyturn' => clienttranslate('${you} must choose a power'),
+    'type' => 'activeplayer',
+    'args' => 'argChoosePower',
+    'possibleactions' => ['choosePower'],
+    'transitions' => [
+      'zombiePass' => ST_GAME_END,
+      'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    ],
   ],
-],
 
 
-/*
- * Worker placement
- *  - nextPlayerPlaceWorker : automatically determined the next player who has to place his workers, and if all workers are placed, start the game
- *  - playerPlaceWorker : allow a player to place a worker
- */
-ST_NEXT_PLAYER_PLACE_WORKER => [
-  'name' => 'nextPlayerPlaceWorker',
-  'description' => '',
-  'type' => 'game',
-  'action' => 'stNextPlayerPlaceWorker',
-  'transitions' => [
-    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'next' => ST_PLACE_WORKER,
-    'done' => ST_NEXT_PLAYER,
+  /*
+   * Worker placement
+   *  - nextPlayerPlaceWorker : automatically determined the next player who has to place his workers, and if all workers are placed, start the game
+   *  - playerPlaceWorker : allow a player to place a worker
+   */
+  ST_NEXT_PLAYER_PLACE_WORKER => [
+    'name' => 'nextPlayerPlaceWorker',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stNextPlayerPlaceWorker',
+    'transitions' => [
+      'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+      'next' => ST_PLACE_WORKER,
+      'done' => ST_NEXT_PLAYER,
+    ],
+    'updateGameProgression' => true,
   ],
-  'updateGameProgression' => true,
-],
 
-ST_PLACE_WORKER => [
-  'name' => 'playerPlaceWorker',
-  'description' => clienttranslate('${actplayer} must place a worker'),
-  'descriptionmyturn' => clienttranslate('${you} must place a worker'),
-  'type' => 'activeplayer',
-  'args' => 'argPlaceWorker',
-  'possibleactions' => ['placeWorker'],
-  'transitions' => [
-    'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
-    'workerPlaced' => ST_NEXT_PLAYER_PLACE_WORKER,
+  ST_PLACE_WORKER => [
+    'name' => 'playerPlaceWorker',
+    'description' => clienttranslate('${actplayer} must place a worker'),
+    'descriptionmyturn' => clienttranslate('${you} must place a worker'),
+    'type' => 'activeplayer',
+    'args' => 'argPlaceWorker',
+    'possibleactions' => ['placeWorker'],
+    'transitions' => [
+      'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
+      'workerPlaced' => ST_NEXT_PLAYER_PLACE_WORKER,
+    ],
   ],
-],
 
-
-/*
- * TODO description
- */
-ST_NEXT_PLAYER => [
-  'name' => 'nextPlayer',
-  'description' => '',
-  'type' => 'game',
-  'action' => 'stNextPlayer',
-  'transitions' => [
-    'next' => ST_NEXT_PLAYER,
-    'play' => ST_START_OF_TURN,
-    'endgame' => ST_GAME_END,
+  ST_NEXT_PLAYER => [
+    'name' => 'nextPlayer',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stNextPlayer',
+    'transitions' => [
+      'next' => ST_NEXT_PLAYER,
+      'play' => ST_START_OF_TURN,
+      'endgame' => ST_GAME_END,
+    ],
+    'updateGameProgression' => true,
   ],
-  'updateGameProgression' => true,
-],
 
-
-ST_START_OF_TURN => [
-  'name' => 'startOfTurn',
-  'description' => '',
-  'type' => 'game',
-  'action' => 'stStartOfTurn',
-  'transitions' => [
-    'move' => ST_MOVE,
-    'build' => ST_BUILD,
-    'endgame' => ST_GAME_END,
+  ST_START_OF_TURN => [
+    'name' => 'startOfTurn',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stStartOfTurn',
+    'transitions' => [
+      'move' => ST_MOVE,
+      'build' => ST_BUILD,
+      'endgame' => ST_GAME_END,
+    ],
   ],
-],
 
-/*
+  /*
  * Worker move TODO description
  *
 ST_USE_POWER => [
@@ -200,74 +192,63 @@ ST_USE_POWER => [
 ],
 */
 
-/*
- * Worker move TODO description
- */
-ST_MOVE => [
-  'name' => 'playerMove',
-  'description' => clienttranslate('${description}'),
-  'descriptionmyturn' => clienttranslate('${descriptionmyturn}'),
-  'type' => 'activeplayer',
-  'args' => 'argPlayerMove',
-  'action' => 'stBeforeWork',
-  'possibleactions' => [ 'playerMove', 'skip', 'endgame' ],
-  'transitions' => [
-    'zombiePass' => ST_END_OF_TURN,
-    'endturn'    => ST_END_OF_TURN,
-    'endgame'    => ST_GAME_END,
-    'done' => ST_BUILD,
-    'skip' => ST_BUILD,
-    'moveAgain' => ST_MOVE,
+  ST_MOVE => [
+    'name' => 'playerMove',
+    'description' => clienttranslate('${actplayer} must move'),
+    'descriptionmyturn' => clienttranslate('${you} must move'),
+    'type' => 'activeplayer',
+    'args' => 'argPlayerMove',
+    'action' => 'stBeforeWork',
+    'possibleactions' => ['playerMove', 'skip', 'endgame'],
+    'transitions' => [
+      'zombiePass' => ST_END_OF_TURN,
+      'endturn'    => ST_END_OF_TURN,
+      'endgame'    => ST_GAME_END,
+      'done'       => ST_BUILD,
+      'skip'       => ST_BUILD,
+      'moveAgain'  => ST_MOVE,
+    ],
   ],
-],
 
-/*
- * Build TODO description
- */
-ST_BUILD => [
-  'name' => 'playerBuild',
-  'description' => clienttranslate('${description}'),
-  'descriptionmyturn' => clienttranslate('${descriptionmyturn}'),
-  'type' => 'activeplayer',
-  'args' => 'argPlayerBuild',
-  'action' => 'stBeforeWork',
-  'possibleactions' => [ 'playerBuild' , 'skip', 'endgame' ],
-  'transitions' => [
-    'zombiePass' => ST_END_OF_TURN,
-    'endturn'    => ST_END_OF_TURN,
-    'endgame'    => ST_GAME_END,
-    'done' => ST_END_OF_TURN,
-    'skip' => ST_END_OF_TURN,
-    'move' => ST_MOVE,
-    'buildAgain' => ST_BUILD,
+  ST_BUILD => [
+    'name' => 'playerBuild',
+    'description' => clienttranslate('${actplayer} must build'),
+    'descriptionmyturn' => clienttranslate('${you} must build'),
+    'type' => 'activeplayer',
+    'args' => 'argPlayerBuild',
+    'action' => 'stBeforeWork',
+    'possibleactions' => ['playerBuild', 'skip', 'endgame'],
+    'transitions' => [
+      'zombiePass' => ST_END_OF_TURN,
+      'endturn'    => ST_END_OF_TURN,
+      'endgame'    => ST_GAME_END,
+      'done'       => ST_END_OF_TURN,
+      'skip'       => ST_END_OF_TURN,
+      'move'       => ST_MOVE,
+      'buildAgain' => ST_BUILD,
+    ],
   ],
-],
 
-/*
- * TODO
- */
- ST_END_OF_TURN => [
-   'name' => 'endOfTurn',
-   'description' => '',
-   'type' => 'game',
-   'action' => 'stEndOfTurn',
-   'transitions' => [
-     'next' => ST_NEXT_PLAYER,
-     'endgame' => ST_GAME_END,
-   ],
- ],
+  ST_END_OF_TURN => [
+    'name' => 'endOfTurn',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stEndOfTurn',
+    'transitions' => [
+      'next' => ST_NEXT_PLAYER,
+      'endgame' => ST_GAME_END,
+    ],
+  ],
 
-
-/*
- * Final state.
- * Please do not modify.
- */
-ST_GAME_END => [
-  'name' => 'gameEnd',
-  'description' => clienttranslate('End of game'),
-  'type' => 'manager',
-  'action' => 'stGameEnd',
-  'args' => 'argGameEnd'
-]
+  /*
+   * BGA framework final state. Do not modify.
+   */
+  ST_GAME_END => [
+    'name' => 'gameEnd',
+    'description' => clienttranslate('End of game'),
+    'type' => 'manager',
+    'action' => 'stGameEnd',
+    'args' => 'argGameEnd'
+  ]
 
 );

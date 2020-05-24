@@ -2,7 +2,8 @@
 
 class Bellerophon extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = BELLEROPHON;
     $this->name  = clienttranslate('Bellerophon');
@@ -10,10 +11,9 @@ class Bellerophon extends SantoriniHeroPower
     $this->text  = [
       clienttranslate("Your Move: Once, your Worker moves up two levels.")
     ];
-    $this->players = [2];
+    $this->playerCount = [2];
     $this->golden  = false;
   }
 
   /* * */
-
 }

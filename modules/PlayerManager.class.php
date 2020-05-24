@@ -80,8 +80,9 @@ class PlayerManager extends APP_GameClass
    */
   public function getTeammatesIds($pId = -1)
   {
-    if($pId == -1)
+    if ($pId == -1) {
       $pId = $this->game->getActivePlayerId();
+    }
 
     $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
     return array_map(function ($player) {
@@ -103,8 +104,9 @@ class PlayerManager extends APP_GameClass
    */
   public function getOpponentsIds($pId = -1)
   {
-    if($pId == -1)
+    if ($pId == -1) {
       $pId = $this->game->getActivePlayerId();
+    }
 
     $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` <> ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
     return array_map(function ($player) {

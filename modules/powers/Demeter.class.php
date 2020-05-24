@@ -2,7 +2,8 @@
 
 class Demeter extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = DEMETER;
     $this->name  = clienttranslate('Demeter');
@@ -10,24 +11,26 @@ class Demeter extends SantoriniPower
     $this->text  = [
       clienttranslate("Your Build: Your Worker may build one additional time, but not on the same space.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = true;
 
     $this->implemented = true;
   }
 
   /* * */
+
   public function argPlayerBuild(&$arg)
   {
     $build = $this->game->log->getLastBuild();
     // No build before => usual rule
-    if($build == null)
+    if ($build == null) {
       return;
+    }
 
     // Otherwise, let the player do a second build (not mandatory)
     $arg['skippable'] = true;
     Utils::filterWorkersById($arg, $build['pieceId']);
-    Utils::filterWorks($arg, function($space, $worker) use ($build){
+    Utils::filterWorks($arg, function ($space, $worker) use ($build) {
       return !$this->game->board->isSameSpace($space, $build['to']);
     });
   }
@@ -35,6 +38,6 @@ class Demeter extends SantoriniPower
 
   public function stateAfterBuild()
   {
-    return count($this->game->log->getLastBuilds()) == 1? 'buildAgain' : null;
+    return count($this->game->log->getLastBuilds()) == 1 ? 'buildAgain' : null;
   }
 }

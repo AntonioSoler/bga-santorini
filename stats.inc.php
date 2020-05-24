@@ -47,12 +47,10 @@
 
 */
 
-$stats_type = array(
+$stats_type = [
     // Statistics global to table
-    'table' => array(
-    ),
+    'table' => [],
 
     // Statistics existing for each player
-    'player' => array(
-    )
-);
+    'player' => []
+];

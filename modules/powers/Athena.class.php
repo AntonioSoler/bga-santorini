@@ -2,7 +2,8 @@
 
 class Athena extends SantoriniPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = ATHENA;
     $this->name  = clienttranslate('Athena');
@@ -10,7 +11,7 @@ class Athena extends SantoriniPower
     $this->text  = [
       clienttranslate("Opponent's Turn: If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn.")
     ];
-    $this->players = [2, 3, 4];
+    $this->playerCount = [2, 3, 4];
     $this->golden  = false;
 
     $this->implemented = true;
@@ -21,19 +22,19 @@ class Athena extends SantoriniPower
   public function hasMovedUp()
   {
     $moves = $this->game->log->getLastMoves($this->playerId);
-    return array_reduce($moves, function($movedUp, $move){
+    return array_reduce($moves, function ($movedUp, $move) {
       return $movedUp || $move['to']['z'] > $move['from']['z'];
     }, false);
   }
 
   public function argOpponentMove(&$arg)
   {
-    if(!$this->hasMovedUp())
+    if (!$this->hasMovedUp()) {
       return;
+    }
 
-    Utils::filterWorks($arg, function($space, $worker){
-        return $space['z'] <= $worker['z'];
+    Utils::filterWorks($arg, function ($space, $worker) {
+      return $space['z'] <= $worker['z'];
     });
   }
-
 }

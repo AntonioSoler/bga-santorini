@@ -2,7 +2,8 @@
 
 class Polyphemus extends SantoriniHeroPower
 {
-  public function __construct($game, $playerId){
+  public function __construct($game, $playerId)
+  {
     parent::__construct($game, $playerId);
     $this->id    = POLYPHEMUS;
     $this->name  = clienttranslate('Polyphemus');
@@ -10,10 +11,9 @@ class Polyphemus extends SantoriniHeroPower
     $this->text  = [
       clienttranslate("End of Your Turn: Once, your Worker builds up to 2 domes at any level on any unoccupied spaces on the board.")
     ];
-    $this->players = [2];
+    $this->playerCount = [2];
     $this->golden  = false;
   }
 
   /* * */
-
 }

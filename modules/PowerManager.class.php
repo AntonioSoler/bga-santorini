@@ -133,7 +133,7 @@ class PowerManager extends APP_GameClass
   public function getUiData()
   {
     $ui = [];
-    foreach($this->getPowers() as $power) {
+    foreach ($this->getPowers() as $power) {
       $ui[$power->getId()] = $power->getUiData();
     }
     return $ui;
@@ -202,12 +202,16 @@ class PowerManager extends APP_GameClass
   {
     $powers = $this->game->cards->getCardsInLocation('offer');
     $ids = [];
-    foreach($powers as $power)
-    foreach(self::$bannedMatchups as $matchup){
-      if($matchup[0] == $power['id']) $ids[] = $matchup[1];
-      if($matchup[1] == $power['id']) $ids[] = $matchup[0];
+    foreach ($powers as $power) {
+      foreach (self::$bannedMatchups as $matchup) {
+        if ($matchup[0] == $power['id']) {
+          $ids[] = $matchup[1];
+        }
+        if ($matchup[1] == $power['id']) {
+          $ids[] = $matchup[0];
+        }
+      }
     }
-
     return $ids;
   }
 
@@ -249,20 +253,28 @@ class PowerManager extends APP_GameClass
   ///////////////////////////////////////
   public function applyPower($methods, $arg)
   {
-    if(!is_array($methods)) $methods = [$methods];
-    if(!is_array($arg)) $arg = [$arg];
+    if (!is_array($methods)) {
+      $methods = [$methods];
+    }
+    if (!is_array($arg)) {
+      $arg = [$arg];
+    }
 
     // First apply current user power(s)
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
-    foreach ($player->getPowers() as $power)
+    foreach ($player->getPowers() as $power) {
       call_user_func_array([$power, $methods[0]], $arg);
+    }
 
     // Then apply oponnents power(s) if needed
-    if(count($methods) > 1)
-    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
-      foreach ($opponent->getPowers() as $power)
-        call_user_func_array([$power, $methods[1]], $arg);
+    if (count($methods) > 1) {
+      foreach ($this->game->playerManager->getOpponents($playerId) as $opponent) {
+        foreach ($opponent->getPowers() as $power) {
+          call_user_func_array([$power, $methods[1]], $arg);
+        }
+      }
+    }
   }
 
 
@@ -279,7 +291,7 @@ class PowerManager extends APP_GameClass
    */
   public function argPlayerWork(&$arg, $action)
   {
-    $this->applyPower(["argPlayer".$action, "argOpponent".$action], [&$arg]);
+    $this->applyPower(["argPlayer" . $action, "argOpponent" . $action], [&$arg]);
   }
 
   /*
@@ -357,7 +369,7 @@ class PowerManager extends APP_GameClass
    */
   public function afterWork($worker, $work, $action)
   {
-    $this->applyPower(["afterPlayer".$action, "afterOpponent".$action], [$worker,$work]);
+    $this->applyPower(["afterPlayer" . $action, "afterOpponent" . $action], [$worker, $work]);
   }
 
   /*
@@ -396,13 +408,15 @@ class PowerManager extends APP_GameClass
     $r = array_filter(array_map(function ($power) use ($method) {
       return $power->$method();
     }, $player->getPowers()));
-    if (count($r) > 1)
+    if (count($r) > 1) {
       throw new BgaUserException($msg);
+    }
 
-    if (count($r) == 1)
+    if (count($r) == 1) {
       return $r[0];
-    else
+    } else {
       return null;
+    }
   }
 
 
@@ -493,12 +507,15 @@ class PowerManager extends APP_GameClass
     // First apply current user power(s)
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
-    foreach ($player->getPowers() as $power)
+    foreach ($player->getPowers() as $power) {
       $power->checkPlayerWinning($arg);
+    }
 
     // Then apply oponnents power(s)
-    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent)
-      foreach ($opponent->getPowers() as $power)
+    foreach ($this->game->playerManager->getOpponents($playerId) as $opponent) {
+      foreach ($opponent->getPowers() as $power) {
         $power->checkOpponentWinning($arg);
+      }
+    }
   }
 }
