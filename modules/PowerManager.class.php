@@ -278,6 +278,17 @@ class PowerManager extends APP_GameClass
   }
 
 
+
+  /*
+   * argChooseFirstPlayer: is called either when the contestant has to choose first player
+   *  or when the powers are assigned randomly
+   */
+  public function argChooseFirstPlayer(&$arg)
+  {
+    $this->applyPower(["argChooseFirstPlayer","argChooseFirstPlayer"], [&$arg]);
+  }
+
+
   ///////////////////////////////////////
   ///////////////////////////////////////
   /////////    Work argument   //////////

@@ -62,13 +62,21 @@ class action_santorini extends APP_GameAction
 
   public function choosePower()
   {
+    $this->game->checkAction('choosePower');
     self::setAjaxMode();
     $powerId = (int) self::getArg('powerId', AT_int, true);
-    $this->game->checkAction('choosePower');
     $this->game->choosePower($powerId);
     self::ajaxResponse();
   }
 
+  public function chooseFirstPlayer()
+  {
+    $this->game->checkAction('chooseFirstPlayer');
+    self::setAjaxMode();
+    $playerId = (int) self::getArg('playerId', AT_int, true);
+    $this->game->chooseFirstPlayer($playerId);
+    self::ajaxResponse();
+  }
 
   /*
    * TODO

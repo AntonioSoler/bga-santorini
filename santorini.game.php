@@ -291,6 +291,41 @@ class santorini extends Table
   }
 
 
+  /*
+   * argChooseFirstPlayer: is called in the fair division setup, when a the contestant choose who will start
+   */
+  public function argChooseFirstPlayer()
+  {
+    $arg = [
+      'players' => array_map(function($p){ return $p->getUiData(); }, $this->playerManager->getPlayers())
+    ];
+
+    // Apply powers (Bia must start)
+    $this->powerManager->argChooseFirstPlayer($arg);
+    return $arg;
+  }
+
+  /*
+   * stChooseFirstPlayer: is called before choosing a first player TODO
+   */
+  public function stChooseFirstPlayer()
+  {
+    $players = $this->gamestate->state()['args']['players'];
+    if(count($players) == 1){
+      $this->chooseFirstPlayer($players[0]['id']);
+    }
+  }
+
+
+  /*
+   * choosePlayer: is called in the fair division setup, when the contestant pick the first player
+   */
+  public function chooseFirstPlayer($playerId)
+  {
+    $this->setGameStateValue('firstPlayer', $playerId);
+    $this->gamestate->nextState('done');
+  }
+
 
   ///////////////////////////////////////
   ///////////////////////////////////////
@@ -305,6 +340,11 @@ class santorini extends Table
    */
   public function stNextPlayerPlaceWorker()
   {
+    // First switch to first player if no worker placed
+    $placedWorkers = $this->board->getPlacedWorkers();
+    if(count($placedWorkers) == 0)
+      $this->gamestate->changeActivePlayer($this->getGameStateValue('firstPlayer'));
+
     // Get all the remeaning workers of all players
     $workers = $this->board->getAvailableWorkers();
     if (count($workers) == 0) {
@@ -424,6 +464,7 @@ class santorini extends Table
 
     // Apply power
     $this->powerManager->endOfTurn();
+    // TODO : some power can do stuff at the end of the turn
     //    $state = $this->powerManager->stateStartOfTurn() ?: 'move';
     //    $this->gamestate->nextState($state);
     $this->gamestate->nextState('next');
@@ -455,6 +496,10 @@ class santorini extends Table
     return $arg['win'];
   }
 
+
+  /*
+   * announceWin: TODO
+   */
   public function announceWin($playerId)
   {
     $players = $this->playerManager->getTeammates($playerId);
@@ -553,8 +598,8 @@ class santorini extends Table
     $state = $this->gamestate->state();
     // TODO: apply power before work ?
 
+    // No move or build => loose unless skippable
     if (count($state['args']['workers']) == 0) {
-      // No move or build => loose unless skippable
       if ($state['args']['skippable']) {
         $this->skipWork();
         return;
@@ -574,8 +619,9 @@ class santorini extends Table
         $this->playerManager->eliminate($pId);
         $this->gamestate->nextState('endturn');
       }
-    } else if (count($state['args']['workers']) == 1 && !$state['args']['skippable']) {
-      // Only one work possible => do it but notify player first
+    }
+    // Only one work possible => do it but notify player first
+    else if (count($state['args']['workers']) == 1 && !$state['args']['skippable']) {
       $worker = $state['args']['workers'][0];
       if (count($worker['works']) > 1) {
         return;

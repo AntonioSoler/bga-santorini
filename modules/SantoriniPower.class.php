@@ -88,6 +88,11 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  public function argChooseFirstPlayer(&$arg)
+  {
+  }
+
+
   public function stateStartOfTurn()
   {
     return null;

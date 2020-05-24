@@ -20,7 +20,19 @@ class Bia extends SantoriniPower
 
   /* * */
 
-  // TODO setup: 1st player
+  public function argChooseFirstPlayer(&$arg)
+  {
+    $pId = $this->playerId;
+    $arg['players'] = array_values(array_filter($arg['players'], function($player) use ($pId){
+      return $player['id'] == $pId;
+    }));
+
+    $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} must place its workers first'), [
+      'i18n' => ['power_name'],
+      'power_name' => $this->getName(),
+      'player_name' => $this->getPlayer()->getName(),
+    ]);
+  }
 
 
   public function afterPlayerMove($worker, $work)

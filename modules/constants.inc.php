@@ -75,6 +75,7 @@ define('ST_POWERS_SETUP', 10);
 define('ST_BUILD_OFFER', 12);
 define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
 define('ST_POWERS_CHOOSE', 14);
+define('ST_CHOOSE_FIRST_PLAYER', 18);
 
 define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);

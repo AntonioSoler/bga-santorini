@@ -99,7 +99,7 @@ $machinestates = array(
     'action' => 'stPowersNextPlayerChoose',
     'transitions' => [
       'next' => ST_POWERS_CHOOSE,
-      'done' => ST_NEXT_PLAYER_PLACE_WORKER, // TODO should add a state with choose of first player
+      'done' => ST_CHOOSE_FIRST_PLAYER,
     ],
   ],
 
@@ -113,6 +113,21 @@ $machinestates = array(
     'transitions' => [
       'zombiePass' => ST_GAME_END,
       'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    ],
+  ],
+
+
+  ST_CHOOSE_FIRST_PLAYER => [
+    'name' => 'chooseFirstPlayer',
+    'description' => clienttranslate('${actplayer} must choose who will start'),
+    'descriptionmyturn' => clienttranslate('${you} must choose who will start'),
+    'type' => 'activeplayer',
+    'args' => 'argChooseFirstPlayer',
+    'action' => 'stChooseFirstPlayer',
+    'possibleactions' => ['chooseFirstPlayer'],
+    'transitions' => [
+      'zombiePass' => ST_GAME_END,
+      'done' => ST_NEXT_PLAYER_PLACE_WORKER,
     ],
   ],
 

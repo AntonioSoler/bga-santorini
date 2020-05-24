@@ -18,7 +18,7 @@
 	*/
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
-var isDebug = false;
+var isDebug = true;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
   return declare("bgagame.santorini", ebg.core.gamegui, {
@@ -385,6 +385,36 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           _this.addPowerToPlayer(playerId, powerId);
         });
       }
+    },
+
+
+    /////////////////////////////
+    //// Choose First Player ////
+    /////////////////////////////
+
+    onEnteringStateChooseFirstPlayer: function(args){
+      this.focusContainer(null);
+      this.chooseFirstPlayerActionsButtons(args.players);
+    },
+
+    /*
+     * chooseFirstPlayerActionsButtons: let the contestant choose who will start
+     */
+    chooseFirstPlayerActionsButtons: function(players){
+      var _this = this;
+      players.forEach(function(player){
+        _this.addActionButton('buttonFirstPlayer' + player.id, player.name, function(){ _this.onClickChooseFirstPlayer(player) }, null, false, 'gray');
+      });
+    },
+
+    /*
+     * onClickChooseFirstPlayer: is called when the contestant clicked on the player who will start
+     */
+    onClickChooseFirstPlayer: function(player){
+      if (!this.checkAction('chooseFirstPlayer'))
+        return false;
+
+      this.ajaxcall("/santorini/santorini/chooseFirstPlayer.html", {playerId: player.id}, this, function (res) { });
     },
 
 
