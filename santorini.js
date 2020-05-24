@@ -201,7 +201,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 		updateBannedPowers: function(bannedIds){
 			dojo.query(".power-card.small").removeClass("banned");
 			bannedIds.forEach(function(powerId) {
-				dojo.addClass("power-small-" + powerId, "banned");
+        if($("power-small-" + powerId))
+				  dojo.addClass("power-small-" + powerId, "banned");
 			});
 		},
 
