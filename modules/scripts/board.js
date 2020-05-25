@@ -30,13 +30,75 @@ const lvlHeights = [0, 1.24, 2.44, 3.25];
 const xCenters = [-4.2, -2.12, -0.04, 2.12, 4.2];
 const zCenters = [-4.2, -2.12, 0, 2.13, 4.15];
 
+// Compute real getBoundingClientRect taking into account zoom
+var computeRealBoundingClientRect = (o) => {
+	var rect = {
+		left:0,
+		top:0,
+		width:o.offsetWidth,
+		height:o.offsetHeight
+	};
+
+	var zoom = false;
+
+	while (o) {
+		var scale = o.style.zoom
+		if(scale != "" && scale != undefined){
+			zoom = true;
+			rect.left	*= scale;
+			rect.top	*= scale;
+			rect.width*= scale;
+			rect.height*= scale;
+		}
+
+		rect.left += o.offsetLeft;
+		rect.top  += o.offsetTop;
+		o = o.offsetParent;
+//		console.log(rect, o)
+	}
+
+	rect.top -= document.body.parentNode.scrollTop;
+
+	// Try to correct scroll...
+	if(zoom){
+		if($('page-title').classList.contains('fixed-page-title')){
+			rect.top -= 45;
+		} else {
+			rect.top -= 20;
+		}
+	}
+
+	return rect;
+};
+
+/*
+var removeZoom = () => {
+	['page-content', 'page-title', 'right-side-first-part'].forEach(id => {
+		var o = document.getElementById(id);
+		var scale = o.style.zoom;
+		if(scale == undefined || scale == "")
+			return;
+		if(id == "right-side-first-part")
+			scale = Math.min(scale, 0.5);
+		o.style.zoom = 1;
+		o.style.transform = "scale(" + scale + ")";
+		o.style.transformOrigin = "top left";
+		o.style.width = 100/scale + "%";
+	});
+	setTimeout(() => $('left-side').style.marginTop = $('player_boards').getBoundingClientRect()['height'] + "px", 200);
+};
+
+*/
 
 var Board = function(container, url){
 	console.info("Creating board");
 	this._url = url;
 	this._container = container;
 	this._meshManager = new MeshManager(url);
-	this._meshManager.load().then( () => { this.render(); console.info("Meshes loaded, rendered scene should look good") });
+	this._meshManager.load().then( () => {
+		this.render();
+		console.info("Meshes loaded, rendered scene should look good")
+	});
 
 	this._board = new Array();
 	for(var i = 0; i < 5; i++){
@@ -94,20 +156,26 @@ Board.prototype.initScene = function(){
 	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;
 	this._container.appendChild(this._renderer.domElement);
-	window.addEventListener( 'resize', () => {
+
+	var updateSize = () => {
 		this._camera.aspect = canvasWidth() / canvasHeight();
 		this._camera.updateProjectionMatrix();
 		this._renderer.setSize( canvasWidth(), canvasHeight() );
 		this.render();
+	};
+	window.addEventListener( 'resize', () => {
+		updateSize();
+		setTimeout(updateSize, 200);
 	}, false );
 
 	const getRealMouseCoords = (px,py) => {
-		var scale = document.getElementById("page-content").style.zoom || 1;
-		var rect = this._renderer.domElement.getBoundingClientRect()
+//		var rect = this._renderer.domElement.getBoundingClientRect();
+		var rect = computeRealBoundingClientRect(this._renderer.domElement);
+		console.log(rect, px, py);
 
 		return {
-			x : (px - rect.left * scale) / (scale * canvasWidth()) * 2 - 1,
-			y : -(py - rect.top * scale) / (scale * canvasHeight()) * 2 + 1
+			x : (px - rect.left) / rect.width * 2 - 1,
+			y : -(py - rect.top) / rect.height * 2 + 1
 		}
 	};
 
@@ -124,6 +192,7 @@ Board.prototype.initScene = function(){
   controls.addEventListener('change', this.render.bind(this));
 	controls.addEventListener("click", (ev) => {
 		this._mouse = getRealMouseCoords(ev.posX, ev.posY);
+		console.log(this._mouse)
 		this.raycasting(false);
 	})
 
