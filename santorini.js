@@ -87,6 +87,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onEnteringState: function (stateName, args) {
       debug('Entering state: ' + stateName, args);
 
+			// Update gamestate description when skippable
+			if (["playerMove", "playerBuild"].includes(stateName) && args.args.skippable) {
+				this.updatePageTitleSkippableWork(stateName);
+			}
+
       // Stop here if it's not the current player's turn for some states
       if (["playerPlaceWorker", "playerMove", "playerBuild", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
@@ -99,6 +104,21 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         this[methodName](args.args);
     },
 
+		/*
+		 * TODO : description
+		 */
+		updatePageTitleSkippableWork : function(stateName) {
+			this.gamedatas.gamestate.descriptionmyturn = this.pageTitleSpan(true) + " " + ( (stateName == "playerMove")? _("may move a worker") : _("may build") );
+			this.gamedatas.gamestate.description = this.pageTitleSpan(false) + " " + ( (stateName == "playerMove")? _("may move a worker") : _("may build") );
+			this.updatePageTitle();
+		},
+
+		pageTitleSpan: function(myturn){
+			var pId = this.gamedatas.gamestate.active_player;
+			var color = this.gamedatas.players[pId].color;
+			var text = myturn ? __("lang_mainsite", "You") : this.gamedatas.players[pId].name;
+			return "<span style=\"font-weight:bold;color:#" + color + ";\">" + text + "</span>";
+		},
 
 
     /*

@@ -543,11 +543,6 @@ class santorini extends Table
 
     $this->powerManager->argPlayerMove($arg);
     Utils::cleanWorkers($arg);
-
-    if ($arg['skippable']) {
-      $arg['description'] = clienttranslate('${actplayer} may move a worker');
-      $arg['descriptionmyturn'] = clienttranslate('${you} may move a worker');
-    }
     return $arg;
   }
 
@@ -574,12 +569,6 @@ class santorini extends Table
     // Apply power
     $this->powerManager->argPlayerBuild($arg);
     Utils::cleanWorkers($arg);
-
-    if ($arg['skippable']) {
-      $arg['description'] = clienttranslate('${actplayer} may build');
-      $arg['descriptionmyturn'] = clienttranslate('${you} may build');
-    }
-
     return $arg;
   }
 
