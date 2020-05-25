@@ -506,9 +506,9 @@ class santorini extends Table
   /*
    * announceWin: TODO
    */
-  public function announceWin($playerId)
+  public function announceWin($playerId, $win = true)
   {
-    $players = $this->playerManager->getTeammates($playerId);
+    $players = $win ? $this->playerManager->getTeammates($playerId) : $this->playerManager->getOpponents($playerId);
     if (count($players) == 2) {
       self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} win!'), [
         'player_name' => $players[0]->getName(),
@@ -619,7 +619,7 @@ class santorini extends Table
 
       if ($this->playerManager->getPlayerCount() != 3) {
         // 1v1 or 2v2 => end of the game
-        self::announceWin($pId);
+        self::announceWin($pId, false);
       } else {
         // 3 players => eliminate the player
         $this->playerManager->eliminate($pId);
