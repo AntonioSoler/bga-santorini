@@ -62,8 +62,6 @@ class santorini extends Table
    */
   protected function setupNewGame($players, $options = array())
   {
-    self::setGameStateInitialValue('currentRound', 0);
-
     // Create players and assign teams
     self::DbQuery('DELETE FROM player');
     $gameInfos = self::getGameinfos();
@@ -85,6 +83,7 @@ class santorini extends Table
     // Active first player to play
     $pId = $this->activeNextPlayer();
     self::setGameStateInitialValue('firstPlayer', $pId);
+    self::setGameStateInitialValue('currentRound', 0);
   }
 
   /*
@@ -185,9 +184,9 @@ class santorini extends Table
   public function argBuildOffer()
   {
     return [
-      'count' => $this->playerManager->getPlayerCount(),
-      'deck' => $this->powerManager->getPowerIdsInLocation('deck'),
-      'offer' => $this->powerManager->getPowerIdsInLocation('offer'),
+      'count'  => $this->playerManager->getPlayerCount(),
+      'deck'   => $this->powerManager->getPowerIdsInLocation('deck'),
+      'offer'  => $this->powerManager->getPowerIdsInLocation('offer'),
       'banned' => $this->powerManager->computeBannedIds(),
     ];
   }
@@ -321,6 +320,7 @@ class santorini extends Table
 
   /*
    * choosePlayer: is called in the fair division setup, when the contestant pick the first player
+   * TODO check if choice is authorized
    */
   public function chooseFirstPlayer($playerId)
   {
@@ -392,23 +392,15 @@ class santorini extends Table
   public function placeWorker($workerId, $x, $y, $z)
   {
     self::checkAction('placeWorker');
-    $pId = self::getActivePlayerId();
 
-    // Get the piece and check owner
-    $worker = self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$workerId'");
-    if ($worker['player_id'] != $pId) {
-      throw new BgaVisibleSystemException('This worker is not yours');
+    $stateArgs = $this->gamestate->state()['args'];
+    if ($stateArgs['worker']['id'] != $workerId) {
+      throw new BgaVisibleSystemException('You cannot place this worker');
     }
 
-    // Make sure the space is free
-    $spaceContent = self::getObjectListFromDb("SELECT * FROM piece WHERE x = '$x' AND y = '$y' AND z = '$z' AND location ='board'");
-    if (count($spaceContent) > 0) {
-      throw new BgaUserException(_("This space is not free"));
-    }
-
-    // The worker should be on the ground
-    if ($z > 0) {
-      throw new BgaVisibleSystemException('Worker placed higher than ground floor');
+    $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
+    if(!in_array($space, $stateArgs['accessibleSpaces'])){
+      throw new BgaUserException(_("You cannot place this worker here"));
     }
 
     // Place the worker in this space

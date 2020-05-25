@@ -31,15 +31,6 @@ class SantoriniBoard extends APP_GameClass
     return $data;
   }
 
-  /*
-   * getAvailableWorkers: return all available workers
-   * opt params : int $pId -> if specified, return only available workers of corresponding player
-   */
-  public function getAvailableWorkers($pId = -1)
-  {
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . ($pId == -1 ? "" : "AND player_id = '$pId'"));
-  }
-
 
   /*
    * getPiece: return all info about a piece
@@ -60,19 +51,45 @@ class SantoriniBoard extends APP_GameClass
   }
 
 
+
+
+  /*
+   * TODO
+   */
+  public function playerFilter($pIds = -1){
+    $filter = "";
+    if ($pIds != -1) {
+      if(!is_array($pIds)){
+        $pIds = [$pIds];
+      }
+      $ids = [];
+      foreach($pIds as $pId){
+        $ids = array_merge($ids, $this->game->playerManager->getTeammatesIds($pId));
+      }
+
+      $filter = " AND player_id IN (". implode(',', $ids) .")";
+    }
+
+    return $filter;
+  }
+
+  /*
+   * getAvailableWorkers: return all available workers
+   * opt params : int $pId -> if specified, return only available workers of corresponding player
+   */
+  public function getAvailableWorkers($pId = -1)
+  {
+    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId));
+  }
+
+
   /*
    * getPlacedWorkers: return all placed wor!kers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
   public function getPlacedWorkers($pId = -1)
   {
-    $filter = "";
-    if ($pId != -1) {
-      $ids = is_array($pId) ? implode(',', $pId) : $pId;
-      $filter = " AND player_id IN ($ids)";
-    }
-
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter");
+    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' " . $this->playerFilter($pId));
   }
 
 
