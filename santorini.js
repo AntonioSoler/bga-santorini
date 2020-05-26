@@ -59,6 +59,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.setupNotifications();
     },
 
+		// TODO
+		onScreenWidthChange: function() {
+			dojo.style('page-content', 'zoom', 'normal' );
+		},
+
+
 		/*
 		 * notif_cancel:
 		 *   called whenever a player restart its turn
@@ -171,7 +177,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 				}
 
 				if(args.cancelable) {
-        	this.addActionButton('buttonCancel', _('Cancel'), 'onClickCancel', null, false, 'gray');
+        	this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
 				}
       }
     },

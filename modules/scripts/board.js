@@ -3,17 +3,15 @@ import { OrbitControls } 	from './OrbitControls.min.js';
 import { MeshManager } 	  from './meshManager.js';
 import { Tween, Ease } 		from './tweenjs.min.js';
 
+var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
 
-//const canvasHeight = () => window.innerHeight*0.8;
-const ratio = 1.2;
-//const canvasWidth = () => ratio*canvasHeight();
-
-const canvasHeight = () => 600; //Math.min(600, document.getElementById("page-content").offsetHeight);
+const canvasHeight = () => isMobile()? 400 : 600; //Math.min(600, document.getElementById("page-content").offsetHeight);
 const canvasWidth = () => document.getElementById("page-content").offsetWidth;
 
 // Zoom limits
-const ZOOM_MIN = 10;
-const ZOOM_MAX = 30;
+var ZOOM_MIN = 10;
+var ZOOM_MAX = 30;
+var ZOOM_MAX_MOBILE = 50;
 
 // Fall animation
 const fallAnimation = {
@@ -30,65 +28,6 @@ const lvlHeights = [0, 1.24, 2.44, 3.25];
 const xCenters = [-4.2, -2.12, -0.04, 2.12, 4.2];
 const zCenters = [-4.2, -2.12, 0, 2.13, 4.15];
 
-// Compute real getBoundingClientRect taking into account zoom
-var computeRealBoundingClientRect = (o) => {
-	var rect = {
-		left:0,
-		top:0,
-		width:o.offsetWidth,
-		height:o.offsetHeight
-	};
-
-	var zoom = false;
-
-	while (o) {
-		var scale = o.style.zoom
-		if(scale != "" && scale != undefined){
-			zoom = true;
-			rect.left	*= scale;
-			rect.top	*= scale;
-			rect.width*= scale;
-			rect.height*= scale;
-		}
-
-		rect.left += o.offsetLeft;
-		rect.top  += o.offsetTop;
-		o = o.offsetParent;
-//		console.log(rect, o)
-	}
-
-	rect.top -= document.body.parentNode.scrollTop;
-
-	// Try to correct scroll...
-	if(zoom){
-		if($('page-title').classList.contains('fixed-page-title')){
-			rect.top -= 45;
-		} else {
-			rect.top -= 20;
-		}
-	}
-
-	return rect;
-};
-
-/*
-var removeZoom = () => {
-	['page-content', 'page-title', 'right-side-first-part'].forEach(id => {
-		var o = document.getElementById(id);
-		var scale = o.style.zoom;
-		if(scale == undefined || scale == "")
-			return;
-		if(id == "right-side-first-part")
-			scale = Math.min(scale, 0.5);
-		o.style.zoom = 1;
-		o.style.transform = "scale(" + scale + ")";
-		o.style.transformOrigin = "top left";
-		o.style.width = 100/scale + "%";
-	});
-	setTimeout(() => $('left-side').style.marginTop = $('player_boards').getBoundingClientRect()['height'] + "px", 200);
-};
-
-*/
 
 var Board = function(container, url){
 	console.info("Creating board");
@@ -145,6 +84,8 @@ Board.prototype.initScene = function(){
 	// Camera
 	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, 150 );
 	this._camera.position.set( 0, 14, 15 );
+	if(isMobile())
+		this._camera.position.set( 0, 20, 25 );
 	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 	// Lights
@@ -169,8 +110,7 @@ Board.prototype.initScene = function(){
 	}, false );
 
 	const getRealMouseCoords = (px,py) => {
-//		var rect = this._renderer.domElement.getBoundingClientRect();
-		var rect = computeRealBoundingClientRect(this._renderer.domElement);
+		var rect = this._renderer.domElement.getBoundingClientRect();
 
 		return {
 			x : (px - rect.left) / rect.width * 2 - 1,
@@ -183,7 +123,7 @@ Board.prototype.initScene = function(){
 	controls.enablePan = false;
 	controls.maxPolarAngle = Math.PI * 0.45;
 	controls.minDistance = ZOOM_MIN;
-	controls.maxDistance = ZOOM_MAX;
+	controls.maxDistance = isMobile()? ZOOM_MAX_MOBILE : ZOOM_MAX;
 	controls.mouseButtons = {
 		LEFT: THREE.MOUSE.ROTATE,
 		RIGHT: THREE.MOUSE.ROTATE
@@ -191,7 +131,6 @@ Board.prototype.initScene = function(){
   controls.addEventListener('change', this.render.bind(this));
 	controls.addEventListener("click", (ev) => {
 		this._mouse = getRealMouseCoords(ev.posX, ev.posY);
-		console.log(this._mouse)
 		this.raycasting(false);
 	})
 
