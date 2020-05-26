@@ -171,7 +171,6 @@ Board.prototype.initScene = function(){
 	const getRealMouseCoords = (px,py) => {
 //		var rect = this._renderer.domElement.getBoundingClientRect();
 		var rect = computeRealBoundingClientRect(this._renderer.domElement);
-		console.log(rect, px, py);
 
 		return {
 			x : (px - rect.left) / rect.width * 2 - 1,
@@ -253,7 +252,24 @@ Board.prototype.initBoard = function(){
  */
 Board.prototype.render = function() {
 	this._renderer.render( this._scene, this._camera );
-}
+};
+
+
+/*
+ * Reset the board
+ */
+Board.prototype.reset = function(){
+	this.clearClickable();
+	this.clearHighlights();
+
+	for(var i = 0; i < 5; i++)
+	for(var j = 0; j < 5; j++)
+	for(var k = 0; k < 4; k++)
+	if(this._board[i][j][k].piece != null){
+		this._scene.remove(this._board[i][j][k].piece)
+		this._board[i][j][k].piece = null;
+	}
+};
 
 
 /*
@@ -278,12 +294,13 @@ Board.prototype.addPiece = function(piece, animation){
 	var mesh = this._meshManager.createMesh(piece.name || piece.type);
 	mesh.name = piece.name;
 	mesh.position.copy(animation == "fall"? sky : center);
-	mesh.material.opacity = animation == "fall"? 1 : 0;
+	mesh.material.opacity = (animation == "fall" || animation == "none") ? 1 : 0;
 	mesh.rotation.set(0, (Math.floor(Math.random() * 4) - 1)*Math.PI/2, 0);
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);
 
+	if(animation != "none")
 	return new Promise((resolve, reject) => {
 		var tweenAnimation;
 		if(animation == "fall")

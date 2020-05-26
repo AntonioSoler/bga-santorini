@@ -537,6 +537,7 @@ class santorini extends Table
     Utils::cleanWorkers($arg);
 
     $arg = [
+      'cancelable' => $this->log->getLastWork() != null,
       'skippable' => false,
       'workers' => $workers,
     ];
@@ -553,6 +554,7 @@ class santorini extends Table
   public function argPlayerBuild()
   {
     $arg = [
+      'cancelable' => $this->log->getLastWork() != null,
       'skippable' => false,
       'workers' => [],
     ];
@@ -641,6 +643,30 @@ class santorini extends Table
     // Apply power
     $state = $this->powerManager->stateAfterSkip() ?: 'skip';
     $this->gamestate->nextState($state);
+  }
+
+
+  /*
+   * cancelPreviousWorks: called when a player decide to go back at the beggining of the turn
+   */
+  public function cancelPreviousWorks()
+  {
+    self::checkAction('cancel');
+
+    $args = $this->gamestate->state()['args'];
+    if (!$args['cancelable']) {
+      throw new BgaUserException(_("You have nothing to cancel"));
+    }
+
+    // Undo the turn
+    $this->log->cancelTurn();
+    self::notifyAllPlayers('cancel', clienttranslate('${player_name} start its turn again'), [
+      'placedPieces' => $this->board->getPlacedPieces(),
+      'player_name' => self::getActivePlayerName(),
+    ]);
+
+    // Apply power
+    $this->gamestate->nextState('cancel');
   }
 
 

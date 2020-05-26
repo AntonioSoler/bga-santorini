@@ -116,4 +116,15 @@ class action_santorini extends APP_GameAction
     $this->game->skipWork();
     self::ajaxResponse();
   }
+
+  /*
+   * TODO
+   */
+  public function cancelPreviousWorks()
+  {
+    self::setAjaxMode();
+    $this->game->cancelPreviousWorks();
+    self::ajaxResponse();
+  }
+
 }

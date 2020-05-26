@@ -167,4 +167,39 @@ class SantoriniLog extends APP_GameClass
     $builds = $this->getLastBuilds($pId, 1);
     return (count($builds) == 1) ? $builds[0] : null;
   }
+
+
+  ////////////////////////////////
+  ////////////////////////////////
+  //////////   Cancel   //////////
+  ////////////////////////////////
+  ////////////////////////////////
+  public function cancelTurn()
+  {
+    $pId = $this->game->getActivePlayerId();
+    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC");
+
+    $ids = [];
+    foreach($logs as $log){
+      $args = json_decode($log['action_arg'], true);
+
+      // Move/force : go back to initial position
+      if($log['action'] == 'move' || $log['action'] == 'forced'){
+        self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
+      }
+      // Build : remove the piece
+      else if($log['action'] == 'build'){
+        self::DbQuery("DELETE FROM piece WHERE x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
+      }
+      // Removal : put the piece back on the board
+      else if($log['action'] == 'removal'){
+        self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$log['piece_id']}");
+      }
+
+      $ids[] = $log['log_id'];
+    }
+
+    // Remove the logs
+    self::DbQuery("DELETE FROM log WHERE `player_id` = '$pId' AND `log_id` IN (". implode($ids, ',') .")");
+  }
 }

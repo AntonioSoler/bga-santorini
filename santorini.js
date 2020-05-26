@@ -51,10 +51,26 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       });
 
       // Setup workers and buildings
-      gamedatas.placedPieces.forEach(this.createPiece.bind(this));
+      gamedatas.placedPieces.forEach(function(piece){
+				_this.createPiece(piece)
+			});
 
       // Setup game notifications
       this.setupNotifications();
+    },
+
+		/*
+		 * notif_cancel:
+		 *   called whenever a player restart its turn
+		 */
+    notif_cancel: function (n) {
+      debug('Notif: cancel turn', n.args);
+			this.board.reset();
+
+			var _this = this;
+			n.args.placedPieces.forEach(function(piece){
+				_this.createPiece(piece, "none")
+			});
     },
 
 
@@ -149,8 +165,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.isCurrentPlayerActive())
         return;
 
-      if ((stateName == "playerMove" || stateName == "playerBuild") && args.skippable) {
-        this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
+      if ((stateName == "playerMove" || stateName == "playerBuild")){
+				if(args.skippable) {
+        	this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
+				}
+
+				if(args.cancelable) {
+        	this.addActionButton('buttonCancel', _('Cancel'), 'onClickCancel', null, false, 'gray');
+				}
       }
     },
 
@@ -414,7 +436,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
     onEnteringStateChooseFirstPlayer: function(args){
       this.focusContainer(null);
-      this.chooseFirstPlayerActionsButtons(args.players);
+			if (this.isCurrentPlayerActive())
+      	this.chooseFirstPlayerActionsButtons(args.players);
     },
 
     /*
@@ -612,6 +635,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+		/*
+     * onClickCancel: is called when the active player decide to cancel previous works
+     */
+    onClickCancel: function () {
+      if (!this.checkAction('cancel'))
+        return;
+
+      this.ajaxcall("/santorini/santorini/cancelPreviousWorks.html", {}, this, function (res) { });
+      this.clearPossible();
+    },
+
+
     /////////////////////
     //// Work Notifs ////
     /////////////////////
@@ -735,12 +770,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * params:
      *  - object piece: main infos are type, x,y,z
      */
-    createPiece: function createPiece(piece) {
+    createPiece: function createPiece(piece, animation) {
       piece.name = piece.type;
       if (piece.type == "worker")
         piece.name = piece.type_arg + piece.type;
 
-      this.board.addPiece(piece);
+      this.board.addPiece(piece, animation);
     },
 
 
@@ -773,6 +808,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     setupNotifications: function setupNotifications() {
       var notifs = [
+				['cancel', 1000],
         ['automatic', 1000],
         ['addOffer', 500],
         ['removeOffer', 500],
