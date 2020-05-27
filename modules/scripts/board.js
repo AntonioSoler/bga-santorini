@@ -208,8 +208,41 @@ Board.prototype.reset = function(){
 		this._scene.remove(this._board[i][j][k].piece)
 		this._board[i][j][k].piece = null;
 	}
+
+	this._ids = [];
 };
 
+
+/*
+ * Diff current setup with new setup
+ */
+Board.prototype.diff = function(pieces){
+	this.clearClickable();
+	this.clearHighlights();
+
+	this._ids.forEach((mesh, id, object) => {
+		var piece = mesh.space;
+
+		var space = pieces.reduce( (carry, piece) => piece.id == id? piece : carry, null);
+		// Still exist => move it if needed
+		if(space != null){
+			if(piece.x != space.x || piece.y != space.y || piece.z != space.z)
+				this.movePiece(piece, space, 0, "none");
+		}
+		// Remove it
+		else {
+			this._scene.remove(mesh);
+			this._board[piece.x][piece.y][piece.z].piece = null;
+			object.splice(id, 1);
+		}
+	});
+
+	pieces.forEach(piece => {
+		if(this._ids[piece.id] != undefined)
+			return;
+		this.addPiece(piece, "none");
+	})
+};
 
 /*
  * Add a mesh to a given (abstract) position (useful for raycasting)
@@ -268,11 +301,17 @@ Board.prototype.addPieceUnder = function(piece){
  * - mixed mesh :
  * - mixed space : contains the location
  */
-Board.prototype.moveMesh = function(mesh, space, delay){
+Board.prototype.moveMesh = function(mesh, space, delay, animation){
 	delay = delay || 0;
+	animation = animation || "slide";
 
 	// Animate
 	var target = new THREE.Vector3(xCenters[space.x], lvlHeights[space.z], zCenters[space.y]);
+
+	if(animation == "none"){
+		mesh.position.copy(target);
+		return;
+	}
 
 	var maxZ = Math.max(mesh.position.y, lvlHeights[space.z]) + 1;
 	var tmp1 = mesh.position.clone();
@@ -298,13 +337,13 @@ Board.prototype.moveMesh = function(mesh, space, delay){
  * - mixed pece : info about the piece
  * - mixed space : contains the location
  */
-Board.prototype.movePiece = function(piece, space, delay){
+Board.prototype.movePiece = function(piece, space, delay, animation){
 	// Update location on (abstract) board
 	var mesh = this._board[piece.x][piece.y][piece.z].piece;
 	this._board[piece.x][piece.y][piece.z].piece = null;
 	this.addMeshToBoard(mesh, space);
 
-	this.moveMesh(mesh, space, delay);
+	this.moveMesh(mesh, space, delay, animation);
 };
 
 /*

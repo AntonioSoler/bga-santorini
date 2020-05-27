@@ -52,7 +52,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       // Setup workers and buildings
       gamedatas.placedPieces.forEach(function(piece){
-				_this.createPiece(piece)
+				_this.board.addPiece(piece);
 			});
 
       // Setup game notifications
@@ -71,12 +71,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 		 */
     notif_cancel: function (n) {
       debug('Notif: cancel turn', n.args);
-			this.board.reset();
-
-			var _this = this;
-			n.args.placedPieces.forEach(function(piece){
-				_this.createPiece(piece, "none")
-			});
+			this.board.diff(n.args.placedPieces);
     },
 
 
@@ -503,7 +498,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     notif_workerPlaced: function (n) {
       debug('Notif: new worker placed', n.args);
-      this.createPiece(n.args.piece);
+			this.board.addPiece(n.args.piece);
     },
 
 
@@ -680,7 +675,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     notif_blockBuilt: function (n) {
       debug('Notif: block built', n.args);
-      this.createPiece(n.args.piece);
+			this.board.addPiece(n.args.piece);
     },
 
     /*
@@ -767,21 +762,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       dojo.style('power-offer-container', 'display', container == 'powers-offer' ? 'flex' : 'none');
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
       dojo.style('play-area', 'display', container == 'board' ? 'block' : 'none');
-    },
-
-
-    /*
-     * createPiece:
-     * 	add a piece to the board (with falldown animation)
-     * params:
-     *  - object piece: main infos are type, x,y,z
-     */
-    createPiece: function createPiece(piece, animation) {
-      piece.name = piece.type;
-      if (piece.type == "worker")
-        piece.name = piece.type_arg + piece.type;
-
-      this.board.addPiece(piece, animation);
     },
 
 

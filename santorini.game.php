@@ -407,7 +407,7 @@ class santorini extends Table
     self::DbQuery("UPDATE piece SET location = 'board', x = '$x', y = '$y', z = '$z' WHERE id = '$workerId'");
 
     // Notify
-    $piece = self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$workerId'");
+    $piece = $this->board->getPiece($workerId);
     self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places a worker'), [
       'i18n' => [],
       'piece' => $piece,

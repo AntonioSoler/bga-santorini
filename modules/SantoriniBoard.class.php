@@ -38,7 +38,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPiece($id)
   {
-    return self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$id'");
+    return self::getNonEmptyObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE id = '$id'");
   }
 
 
@@ -47,7 +47,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedPieces()
   {
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board'");
+    return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'board'");
   }
 
 
@@ -79,7 +79,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getAvailableWorkers($pId = -1)
   {
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId));
+    return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId));
   }
 
 
@@ -89,7 +89,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedWorkers($pId = -1)
   {
-    return self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' " . $this->playerFilter($pId));
+    return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'board' AND type = 'worker' " . $this->playerFilter($pId));
   }
 
 
