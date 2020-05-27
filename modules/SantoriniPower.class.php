@@ -112,6 +112,21 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+
+  public function argUsePower(&$arg)
+  {
+  }
+  public function stateAfterUsePower()
+  {
+    return null;
+  }
+  public function stateAfterSkipPower()
+  {
+    return null;
+  }
+
+
+
   public function argPlayerMove(&$arg)
   {
   }

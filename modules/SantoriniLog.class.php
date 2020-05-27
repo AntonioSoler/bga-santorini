@@ -90,6 +90,14 @@ class SantoriniLog extends APP_GameClass
   }
 
 
+  /*
+   * addAction: add a new action to log
+   */
+  public function addAction($action, $args)
+  {
+    $this->insert(-1, 0, $action, $args);
+  }
+
 
   /////////////////////////////////
   /////////////////////////////////
@@ -169,6 +177,23 @@ class SantoriniLog extends APP_GameClass
   }
 
 
+  /*
+   * getLastActions : get works and actions of player (used to cancel previous action)
+   */
+  public function getLastActions($actions = ['move', 'build', 'usedPower', 'skippedPower'], $pId = null)
+  {
+    $pId = $pId ?: $this->game->getActivePlayerId();
+    $actionsNames = "'" . implode("','", $actions) . "'";
+
+    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC");
+  }
+
+  public function getLastAction($action, $pId = null)
+  {
+    $actions = $this->getLastActions([$action]);
+    return count($actions) > 0 ? json_decode($actions[0]['action_arg']) : null;
+  }
+
   ////////////////////////////////
   ////////////////////////////////
   //////////   Cancel   //////////
@@ -184,7 +209,7 @@ class SantoriniLog extends APP_GameClass
       $args = json_decode($log['action_arg'], true);
 
       // Move/force : go back to initial position
-      if($log['action'] == 'move' || $log['action'] == 'forced'){
+      if($log['action'] == 'move' or $log['action'] == 'force'){
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
       }
       // Build : remove the piece

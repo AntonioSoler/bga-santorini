@@ -81,6 +81,31 @@ class action_santorini extends APP_GameAction
   /*
    * TODO
    */
+  public function skipPower()
+  {
+    self::setAjaxMode();
+    $this->game->skipPower();
+    self::ajaxResponse();
+  }
+
+  public function usePowerWork()
+  {
+    self::setAjaxMode();
+    $powerId = (int) self::getArg('powerId', AT_posint, true);
+    $workerId = (int) self::getArg('workerId', AT_posint, true);
+    $x = (int) self::getArg('x', AT_int, true);
+    $y = (int) self::getArg('y', AT_int, true);
+    $z = (int) self::getArg('z', AT_posint, true);
+    $arg = self::getArg('arg', AT_int, false, null);
+    $this->game->usePowerWork($powerId, $workerId, $x, $y, $z, $arg);
+    self::ajaxResponse();
+  }
+
+
+
+  /*
+   * TODO
+   */
   public function placeWorker()
   {
     self::setAjaxMode();
@@ -91,6 +116,8 @@ class action_santorini extends APP_GameAction
     $this->game->placeWorker($workerId, $x, $y, $z);
     self::ajaxResponse();
   }
+
+
 
   /*
    * TODO

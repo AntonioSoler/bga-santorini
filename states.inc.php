@@ -185,27 +185,28 @@ $machinestates = array(
       'move' => ST_MOVE,
       'build' => ST_BUILD,
       'endgame' => ST_GAME_END,
+      'power' => ST_USE_POWER,
     ],
   ],
 
   /*
- * Worker move TODO description
- *
-ST_USE_POWER => [
-  'name' => 'playerUsePower',
-  'description' => clienttranslate('${actplayer} can use its power'),
-  'descriptionmyturn' => clienttranslate('${you} can use your power'),
-  'type' => 'activeplayer',
-  'args' => 'argUsePower',
-  'possibleactions' => [ 'use', 'skip' ],
-  'transitions' => [
-    'next' => ST_NEXT_PLAYER,
-    'move' => ST_MOVE,
-    'build' => ST_BUILD,
-    'endgame' => ST_GAME_END,
+   * TODO description
+   */
+  ST_USE_POWER => [
+    'name' => 'playerUsePower',
+    'description' => clienttranslate('${actplayer} may use its power'),
+    'descriptionmyturn' => clienttranslate('${you} may use your power'),
+    'type' => 'activeplayer',
+    'args' => 'argUsePower',
+    'possibleactions' => [ 'use', 'skip' ],
+    'transitions' => [
+      'next' => ST_NEXT_PLAYER,
+      'move' => ST_MOVE,
+      'build' => ST_BUILD,
+      'endgame' => ST_GAME_END,
+    ],
   ],
-],
-*/
+
 
   ST_MOVE => [
     'name' => 'playerMove',

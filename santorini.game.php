@@ -516,6 +516,84 @@ class santorini extends Table
   }
 
 
+  /////////////////////////////////////////
+  /////////////////////////////////////////
+  ///////////    UsePower    //////////////
+  /////////////////////////////////////////
+  /////////////////////////////////////////
+
+  /*
+   * argUsePower: give the list of possible action
+   */
+  public function argUsePower()
+  {
+    $arg = [];
+    $this->powerManager->argUsePower($arg);
+    return $arg;
+  }
+
+  /*
+   * usePower: called when a player decide to use its (non-basic) power
+   *
+  public function usePower($powerId, $action)
+  {
+    self::checkAction('use');
+
+    $args = $this->gamestate->state()['args'];
+    if ($args['power'] != $powerId || not(in_array($action, $args['actions']))) {
+      throw new BgaUserException(_("You can't use this power"));
+    }
+
+    // Use power
+    $this->powerManager->usePower($powerId, $action);
+
+    $state = $this->powerManager->stateAfterUsePower() ?: 'move';
+    $this->gamestate->nextState($state);
+  }*/
+
+
+  /*
+   * usePowerWork: called when a player decide to use its (non-basic) power which behave like a work
+   */
+  public function usePowerWork($powerId, $wId, $x, $y, $z, $actionArg)
+  {
+    self::checkAction('use');
+
+    // Check the power and the work
+    $args = $this->gamestate->state()['args'];
+    if ($args['power'] != $powerId) {
+      throw new BgaUserException(_("You can't use this power"));
+    }
+    $work = Utils::checkWork($args, $wId, $x, $y, $z, $actionArg);
+
+    // Use power
+    $this->powerManager->usePower($powerId, [$wId, $work]);
+    $this->log->addAction("usedPower", [$wId, $work]);
+
+    $state = $this->powerManager->stateAfterUsePower() ?: 'move';
+    $this->gamestate->nextState($state);
+  }
+
+
+
+  /*
+   * skip: called when a player decide to skip a skippable work
+   */
+  public function skipPower()
+  {
+    self::checkAction('skip');
+
+    $args = $this->gamestate->state()['args'];
+    if (!$args['skippable']) {
+      throw new BgaUserException(_("You can't skip this action"));
+    }
+    $this->log->addAction("skippedPower");
+
+    // Apply power
+    $state = $this->powerManager->stateAfterSkipPower() ?: 'move';
+    $this->gamestate->nextState($state);
+  }
+
 
 
   /////////////////////////////////////////
@@ -537,7 +615,7 @@ class santorini extends Table
     Utils::cleanWorkers($arg);
 
     $arg = [
-      'cancelable' => $this->log->getLastWork() != null,
+      'cancelable' => $this->log->getLastActions() != null,
       'skippable' => false,
       'workers' => $workers,
     ];
@@ -554,7 +632,7 @@ class santorini extends Table
   public function argPlayerBuild()
   {
     $arg = [
-      'cancelable' => $this->log->getLastWork() != null,
+      'cancelable' => $this->log->getLastActions() != null,
       'skippable' => false,
       'workers' => [],
     ];
@@ -687,27 +765,12 @@ class santorini extends Table
       $this->checkAction($stateName);
     }
 
-    // Get information about the piece and check if work is possible
-    $worker = $this->board->getPiece($wId);
-    $stateArgs = $state['args']; //();
-
-    $workers = array_values(array_filter($stateArgs['workers'], function ($w) use ($worker) {
-      return $w['id'] == $worker['id'];
-    }));
-    if (count($workers) != 1) {
-      throw new BgaUserException(_("This worker can't be used"));
-    }
-
-    $works = array_values(array_filter($workers[0]['works'], function ($w) use ($x, $y, $z, $actionArg) {
-      return $w['x'] == $x && $w['y'] == $y && $w['z'] == $z
-        && (is_null($actionArg) || in_array($actionArg, $w['arg']));
-    }));
-    if (count($works) != 1) {
-      throw new BgaUserException(_("You cannot reach this space with this worker"));
-    }
+    // Check if work is possible
+    $stateArgs = $state['args'];
+    $work = Utils::checkWork($stateArgs, $wId, $x, $y, $z, $actionArg);
 
     // Check if power apply
-    $work = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => $actionArg];
+    $worker = $this->board->getPiece($wId);
     if (!$this->powerManager->$stateName($worker, $work)) {
       // Otherwise, do the work
       $this->$stateName($worker, $work);

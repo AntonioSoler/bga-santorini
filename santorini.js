@@ -110,7 +110,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 			}
 
       // Stop here if it's not the current player's turn for some states
-      if (["playerPlaceWorker", "playerMove", "playerBuild", "gameEnd"].includes(stateName)) {
+      if (["playerUsePower", "playerPlaceWorker", "playerMove", "playerBuild", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
         if (!this.isCurrentPlayerActive()) return;
       }
@@ -166,7 +166,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.isCurrentPlayerActive())
         return;
 
-      if ((stateName == "playerMove" || stateName == "playerBuild")){
+      if ((stateName == "playerMove" || stateName == "playerBuild" || stateName == "playerUsePower")){
 				if(args.skippable) {
         	this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
 				}
@@ -502,6 +502,87 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+		/////////////////////////////////////////
+    /////////////////////////////////////////
+    ///////////    Use Power    /////////////
+    /////////////////////////////////////////
+    /////////////////////////////////////////
+		powersIds:{
+			APOLLO : 1,
+			ARTEMIS : 2,
+			ATHENA : 3,
+			ATLAS : 4,
+			DEMETER : 5,
+			HEPHAESTUS : 6,
+			HERMES : 7,
+			MINOTAUR : 8,
+			PAN : 9,
+			PROMETHEUS : 10,
+			APHRODITE : 11,
+			ARES : 12,
+			BIA : 13,
+			CHAOS : 14,
+			CHARON : 15,
+			CHRONUS : 16,
+			CIRCE : 17,
+			DIONYSUS : 18,
+			EROS : 19,
+			HERA : 20,
+			HESTIA : 21,
+			HYPNUS : 22,
+			LIMUS : 23,
+			MEDUSA : 24,
+			MORPHEUS : 25,
+			PERSEPHONE : 26,
+			POSEIDON : 27,
+			SELENE : 28,
+			TRITON : 29,
+			ZEUS : 30,
+			AEOLUS : 31,
+			CHARYBDIS : 32,
+			CLIO : 33,
+			EUROPA : 34,
+			GAEA : 35,
+			GRAEAE : 36,
+			HADES : 37,
+			HARPIES : 38,
+			HECATE : 39,
+			MOERAE : 40,
+			NEMESIS : 41,
+			SIREN : 42,
+			TARTARUS : 43,
+			TERPSICHORE : 44,
+			URANIA : 45,
+			ACHILLES : 46,
+			ADONIS : 47,
+			ATALANTA : 48,
+			BELLEROPHON : 49,
+			HERACLES : 50,
+			JASON : 51,
+			MEDEA : 52,
+			ODYSSEUS : 53,
+			POLYPHEMUS : 54,
+			THESEUS : 55,
+		},
+
+		/*
+     * onEnteringStatePlayerUsePower: the active player can use its (non-basic) power
+     */
+		onEnteringStatePlayerUsePower: function(args){
+			this._powerId = args.power;
+			this._action = 'use';
+
+			for(var power in this.powersIds){
+				if(this.powersIds[power] == args.power)
+					this['usePower' + power.charAt(0) + power.slice(1).toLowerCase()](args);
+			}
+		},
+
+
+		usePowerCharon: function(args){
+			this.makeWorkersSelectable(args.workers);
+		},
+
     /////////////////////////////////////////
     /////////////////////////////////////////
     ////////    Work : move / build  ////////
@@ -512,17 +593,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * playerMove and playerBuild: the active player can/must move/build
      */
     onEnteringStatePlayerWork: function (args) {
-      // TODO : this filtering should be useless now since filtering is done on backend
-      this._selectableWorkers = args.workers.filter(function (worker) {
-        return worker.works.length > 0;
-      });
-
-      // If only one worker can work, automatically select it
-      if (this._selectableWorkers.length == 1)
-        this.onClickSelectWorker(this._selectableWorkers[0]);
-      // Otherwise, let the user make the choice
-      else if (this._selectableWorkers.length > 1)
-        this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
+			this._powerId = null;
+			this.makeWorkersSelectable(args.workers);
     },
 
     onEnteringStatePlayerMove: function (args) {
@@ -535,6 +607,21 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.onEnteringStatePlayerWork(args);
     },
 
+		/*
+     * makeWorkersSelectable:
+     */
+		makeWorkersSelectable: function(workers){
+			this._selectableWorkers = workers.filter(function (worker) {
+        return worker.works && worker.works.length > 0;
+      });
+
+			// If only one worker can work, automatically select it
+			if (this._selectableWorkers.length == 1)
+				this.onClickSelectWorker(this._selectableWorkers[0]);
+			// Otherwise, let the user make the choice
+			else if (this._selectableWorkers.length > 1)
+				this.board.makeClickable(this._selectableWorkers, this.onClickSelectWorker.bind(this), 'select');
+		},
 
     /*
      * onClickSelectWorker:
@@ -612,13 +699,22 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction(this._action))
         return;
 
-      this.ajaxcall("/santorini/santorini/work.html", {
+			var data = {
         workerId: this._selectedWorker.id,
         x: space.x,
         y: space.y,
         z: space.z,
         arg: arg
-      }, this, function (res) { });
+      };
+			// Not using power => normal work
+			if(this._action != 'use'){
+      	this.ajaxcall("/santorini/santorini/work.html", data, this, function (res) { });
+			}
+			// Power work
+			else {
+				data.powerId = this._powerId;
+				this.ajaxcall("/santorini/santorini/usePowerWork.html", data, this, function (res) { });
+			}
 
       this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null
     },
@@ -631,7 +727,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction('skip'))
         return;
 
-      this.ajaxcall("/santorini/santorini/skipWork.html", {}, this, function (res) { });
+			var url = (this.gamedatas.gamestate.name == "playerUsePower")? "skipPower" : "skipWork";
+      this.ajaxcall("/santorini/santorini/" + url + ".html", {}, this, function (res) { });
       this.clearPossible();
     },
 

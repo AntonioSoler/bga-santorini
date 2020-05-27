@@ -299,6 +299,52 @@ class PowerManager extends APP_GameClass
   }
 
 
+  ///////////////////////////////////
+  ///////////////////////////////////
+  /////////    Use Power   //////////
+  ///////////////////////////////////
+  ///////////////////////////////////
+
+  /*
+   * argUsePower: is called when a player may use its power
+   */
+  public function argUsePower(&$arg)
+  {
+    $this->applyPower(["argUsePower"], [&$arg]);
+  }
+
+  /*
+   * usePower: is called when a player want to use its power
+   */
+  public function usePower($powerId, $action)
+  {
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power) {
+      if($power->getId() == $powerId){
+        $power->usePower($action);
+      }
+    }
+  }
+
+
+  /*
+   * stateAfterSkipPower: is called whenever a player used its (non-standard) power
+   */
+  public function stateAfterSkipPower()
+  {
+    return $this->getNewState("stateAfterSkipPower", _("Can't figure next state after skip power"));
+  }
+
+  /*
+   * stateAfterUsePower: is called whenever a player used its (non-standard) power
+   */
+  public function stateAfterUsePower()
+  {
+    return $this->getNewState("stateAfterUsePower", _("Can't figure next state after use power"));
+  }
+
+
   ///////////////////////////////////////
   ///////////////////////////////////////
   /////////    Work argument   //////////

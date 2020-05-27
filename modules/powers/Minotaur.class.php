@@ -18,18 +18,6 @@ class Minotaur extends SantoriniPower
   }
 
   /* * */
-
-  public function getSpaceBehind(&$worker, &$worker2, &$accessibleSpaces)
-  {
-    $x = 2 * $worker2['x'] - $worker['x'];
-    $y = 2 * $worker2['y'] - $worker['y'];
-    $spaces = array_values(array_filter($accessibleSpaces, function ($space) use ($x, $y) {
-      return $space['x'] == $x && $space['y'] == $y;
-    }));
-
-    return (count($spaces) == 1) ? $spaces[0] : null;
-  }
-
   public function argPlayerMove(&$arg)
   {
     $allWorkers = $this->game->board->getPlacedWorkers();
@@ -47,7 +35,7 @@ class Minotaur extends SantoriniPower
         }
 
         // Must be a free space behind
-        $space = $this->getSpaceBehind($worker, $worker2, $accessibleSpaces);
+        $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
         if (!is_null($space)) {
           $worker['works'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
         }
@@ -61,7 +49,7 @@ class Minotaur extends SantoriniPower
     $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
     if ($worker2 != null) {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
-      $space = $this->getSpaceBehind($worker, $worker2, $accessibleSpaces);
+      $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
       if (is_null($space)) {
         throw new BgaVisibleSystemException("Minotaur: No available space behind opponent worker");
       }

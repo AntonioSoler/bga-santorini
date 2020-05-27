@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `round` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
-  `piece_id` int(11) NOT NULL,
+  `piece_id` int(11),
   `action` varchar(16) NOT NULL,
   `action_arg` json,
   PRIMARY KEY (`log_id`)

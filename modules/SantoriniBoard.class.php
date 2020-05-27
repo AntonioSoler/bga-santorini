@@ -41,6 +41,15 @@ class SantoriniBoard extends APP_GameClass
     return self::getNonEmptyObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE id = '$id'");
   }
 
+  /*
+   * getPieceAt: return all info about a piece at a location
+   * params : array $space
+   */
+  public function getPieceAt($space)
+  {
+    return self::getNonEmptyObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}");
+  }
+
 
   /*
    * getPlacedPieces: return all pieces on the board
@@ -243,5 +252,20 @@ class SantoriniBoard extends APP_GameClass
   public function getCompleteTowerCount()
   {
     return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM piece WHERE location = 'board' AND z = '3' AND type = 'lvl3'"));
+  }
+
+
+  /*
+   * getSpaceBehind: Return the space behind a piece ($worker2) from another piece ($worker1)
+   */
+  public function getSpaceBehind(&$worker, &$worker2, &$accessibleSpaces)
+  {
+    $x = 2 * $worker2['x'] - $worker['x'];
+    $y = 2 * $worker2['y'] - $worker['y'];
+    $spaces = array_values(array_filter($accessibleSpaces, function ($space) use ($x, $y) {
+      return $space['x'] == $x && $space['y'] == $y;
+    }));
+
+    return (count($spaces) == 1) ? $spaces[0] : null;
   }
 }
