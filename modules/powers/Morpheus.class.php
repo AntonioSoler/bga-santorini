@@ -14,7 +14,50 @@ class Morpheus extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;
+
+    $this->implemented = true;
   }
 
   /* * */
+  public function computeStock()
+  {
+    $round = $this->game->getGameStateValue("currentRound");
+    $pId = $this->playerId;
+    $builds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'build' AND `player_id` = '$pId'");
+    return $round - $builds['n'];
+  }
+
+  public function updateUI()
+  {
+    $this->game->notifyAllPlayers('updatePowerUI', '', [
+      'playerId' => $this->playerId,
+      'powerId' => $this->getId(),
+      'stock' => $this->computeStock()
+    ]);
+  }
+
+  public function startOfTurn()
+  {
+    $this->updateUI();
+  }
+
+  public function argPlayerMove(&$arg)
+  {
+    $this->updateUI();
+  }
+
+  public function argPlayerBuild(&$arg)
+  {
+    $arg['skippable'] = true;
+  }
+
+  public function afterPlayerBuild($worker, $work)
+  {
+    $this->updateUI();
+  }
+
+  public function stateAfterBuild()
+  {
+    return $this->computeStock() > 0 ? 'buildAgain' : null;
+  }
 }

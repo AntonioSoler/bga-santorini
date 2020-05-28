@@ -89,6 +89,26 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+		/*
+		 * notif_updatePowerUI:
+		 *   called whenever a power UI is updated (eg Morpheus)
+		 */
+		notif_updatePowerUI: function (n) {
+			debug('Notif: updating power UI', n.args);
+
+			if(n.args.powerId == this.powersIds.MORPHEUS){
+				var div = $('morpheus-power-stock-' + n.args.playerId);
+				if(div == null){
+					div = document.createElement("div");
+					div.id = 'morpheus-power-stock-' + n.args.playerId;
+					div.className = "morpheus-power-stock";
+					$('mini-card-' + n.args.playerId + "-" + n.args.powerId).appendChild(div);
+				}
+				div.innerHTML = n.args.stock;
+			}
+		},
+
+
     ///////////////////////////////////////
     ////////  Game & client states ////////
     ///////////////////////////////////////
@@ -908,7 +928,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['blockBuilt', 1000],
         ['workerSwitched', 2000], 	// Happens with Apollo
         ['blockBuiltUnder', 2000],// Happens with Zeus
-        ['pieceRemoved', 2000] // Happens with Bia, Ares, Medusa
+        ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
+				['updatePowerUI', 10], // Happens with Morpheus
       ];
 
       var _this = this;

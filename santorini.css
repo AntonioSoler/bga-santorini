@@ -351,6 +351,21 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 
+.mini-card .morpheus-power-stock {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  color: white;
+  background-color: #25a1e7;
+  border-radius: 15px;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 27px;
+  font-size: 18px;
+  font-weight: bold;
+}
 
 /*********************
 ******* Tokens *******
