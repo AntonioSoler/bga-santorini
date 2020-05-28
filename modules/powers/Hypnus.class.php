@@ -13,7 +13,37 @@ class Hypnus extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
+
+    $this->implemented = true;
   }
 
   /* * */
+  protected static function cmpZ($worker1, $worker2){
+    if ($worker1['z'] == $worker2['z'])
+      return 0;
+    return ($worker1['z'] > $worker2['z']) ? -1 : 1;
+  }
+
+  public function startOpponentTurn()
+  {
+    // If at least two workers remeaining
+    $workers = $this->game->board->getPlacedActiveWorkers();
+    if (count($workers) < 2){
+      return;
+    }
+
+    // Sort them by height and see if first one is strictly higher
+    usort($workers, 'self::cmpZ');
+    if(self::cmpZ($workers[0], $workers[1]) != 0){
+      $this->game->log->addAction('blockedWorker', ['wId' => $workers[0]['id'] ]);
+    }
+  }
+
+  public function argOpponentMove(&$arg)
+  {
+    $action = $this->game->log->getLastAction('blockedWorker');
+    if($action != null){
+      Utils::filterWorkersById($arg, $action['wId'], false);
+    }
+  }
 }

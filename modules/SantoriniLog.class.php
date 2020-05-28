@@ -191,7 +191,7 @@ class SantoriniLog extends APP_GameClass
   public function getLastAction($action, $pId = null)
   {
     $actions = $this->getLastActions([$action]);
-    return count($actions) > 0 ? json_decode($actions[0]['action_arg']) : null;
+    return count($actions) > 0 ? json_decode($actions[0]['action_arg'], true) : null;
   }
 
   ////////////////////////////////
