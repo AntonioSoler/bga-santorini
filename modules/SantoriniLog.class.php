@@ -93,7 +93,7 @@ class SantoriniLog extends APP_GameClass
   /*
    * addAction: add a new action to log
    */
-  public function addAction($action, $args)
+  public function addAction($action, $args = '{}')
   {
     $this->insert(-1, 0, $action, $args);
   }
