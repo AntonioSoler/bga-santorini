@@ -27,6 +27,7 @@ class Charon extends SantoriniPower
   public function argUsePower(&$arg)
   {
     $arg['power'] = $this->id;
+    $arg['power_name'] = $this->name;
     $arg['skippable'] = true;
 
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
@@ -65,14 +66,15 @@ class Charon extends SantoriniPower
     self::DbQuery("UPDATE piece SET x = {$newSpace['x']}, y = {$newSpace['y']}, z = {$newSpace['z']} WHERE id = {$worker2['id']}");
     $this->game->log->addForce($worker2, $newSpace);
 
-    // Notify
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} ferries a worker of ${player_name2}'), [
-      'i18n' => ['power_name'],
+    // Notify (same text as Minotaur to help translators)
+    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name}'), [
+      'i18n' => ['power_name', 'level_name'],
       'piece' => $worker2,
       'space' => $newSpace,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
       'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
+      'level_name' => $this->game->levelNames[intval($newSpace['z'])],
     ]);
   }
 

@@ -56,14 +56,15 @@ class Minotaur extends SantoriniPower
       self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$worker2['id']}");
       $this->game->log->addForce($worker2, $space);
 
-      // Notify
-      $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} one space backwards'), [
-        'i18n' => ['power_name'],
+      // Notify (same text as Charon to help translators)
+      $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name}'), [
+        'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $space,
         'power_name' => $this->getName(),
         'player_name' => $this->game->getActivePlayerName(),
         'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
+        'level_name' => $this->game->levelNames[intval($newSpace['z'])],
       ]);
     }
 

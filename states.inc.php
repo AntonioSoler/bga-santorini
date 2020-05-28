@@ -194,8 +194,9 @@ $machinestates = array(
    */
   ST_USE_POWER => [
     'name' => 'playerUsePower',
-    'description' => clienttranslate('${actplayer} may use its power'),
-    'descriptionmyturn' => clienttranslate('${you} may use your power'),
+    'description' => clienttranslate('${actplayer} may use ${power_name}\'s power'),
+    'descriptionmyturn' => clienttranslate('${you} may use ${power_name}\'s power'),
+    'i18n' => array('power_name'),
     'type' => 'activeplayer',
     'args' => 'argUsePower',
     'possibleactions' => [ 'use', 'skip' ],
