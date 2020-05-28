@@ -570,7 +570,10 @@ class santorini extends Table
     $this->powerManager->usePower($powerId, [$wId, $work]);
     $this->log->addAction("usedPower", [$wId, $work]);
 
-    $state = $this->powerManager->stateAfterUsePower() ?: 'move';
+    $state = $this->powerManager->stateAfterUsePower();
+    if($state == null){
+      throw new BgaUserException(_("Don't know what to do after the use of power"));
+    }
     $this->gamestate->nextState($state);
   }
 
@@ -590,7 +593,10 @@ class santorini extends Table
     $this->log->addAction("skippedPower");
 
     // Apply power
-    $state = $this->powerManager->stateAfterSkipPower() ?: 'move';
+    $state = $this->powerManager->stateAfterSkipPower();
+    if($state == null){
+      throw new BgaUserException(_("Don't know what to do after the skip of power"));
+    }
     $this->gamestate->nextState($state);
   }
 
@@ -717,7 +723,9 @@ class santorini extends Table
     if (!$args['skippable']) {
       throw new BgaUserException(_("You can't skip this action"));
     }
-    $this->log->addAction('skippedWork');
+		if($log){
+	    $this->log->addAction('skippedWork');
+		}
 
     // Apply power
     $state = $this->powerManager->stateAfterSkip() ?: 'skip';
@@ -842,7 +850,7 @@ class santorini extends Table
 
   /*
    * playerKill: kill a piece (only called with specific power eg Medusa, Bia)
-   *  - obj $worker : the piece id we want to use to kill
+   *  - obj $worker : the worker we want to kill
    */
   public function playerKill($worker, $powerName)
   {

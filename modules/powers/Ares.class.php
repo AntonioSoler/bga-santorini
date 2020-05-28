@@ -13,66 +13,68 @@ class Ares extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;
+
+    $this->implemented = true;
   }
 
   /* * */
-  /*
+  public function stateAfterBuild()
+  {
+    $arg = [];
+    $this->argUsePower($arg);
+    return (count($arg['workers']) > 0)? 'power' : null;
+  }
+
+
   public function argUsePower(&$arg)
-   {
+  {
+    $arg['power'] = $this->id;
+    $arg['power_name'] = $this->name;
+    $arg['skippable'] = true;
 
-     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
+    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
+    $move = $this->game->log->getLastMove();
+    Utils::filterWorkersById($arg, $move['pieceId'], false);
 
-     // Otherwise, let the player do a second move (not mandatory) with same worker
-     $arg['skippable'] = true;
-     $arg['selectable'] = []; // TODO c'est ca que tu veux?    liste des spaces sur qui le pouvoir peut s'activer
+    foreach ($arg['workers'] as &$worker) {
+      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, '');
+      Utils::filter($worker['works'], function ($space){
+        return $space['z'] > 0;
+      });
+    }
 
-     $myWorkers = Utils::getPlacedActiveWorkers();
+    Utils::cleanWorkers($arg);
+  }
 
-     foreach ($myWorkers as $worker) {
 
-       $spaces = $this->game->board->getNeighbouringSpaces($worker, '');
+  public function usePower($action)
+  {
+    // Extract info from action
+    $wId = $action[0];
+    $space = $action[1];
+    $space['z']--;
 
-       // TODO j'ai pas trouvé plus dégeulasse pour merger les deux array
-       Utils::filter($spaces, function ($space) use (&$arg) {
-         $test =  array_values(array_filter($arg['selectable'], function ($prevSpace) use ($space){
-           return $this->game->board->isSameSpace($prevSpace, $space);
-         }));
-         if (count($test) > 0)
-           return false;
-         return $space['z'] > 0;
-       } );
+    // Remove piece
+    $piece = $this->game->board->getPieceAt($space);
+    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
+    $this->game->log->addRemoval($piece);
 
-       $arg['selectable'] = array_merge($arg['selectable'], $spaces);
-
-     }
-
-       return count(arg['selectable']) > 0;
+    // Notify
+    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block'), [
+      'i18n' => ['power_name'],
+      'piece' => $piece,
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+    ]);
    }
 
-
-   public function UsePower($space)
+   public function stateAfterUsePower()
    {
-
-     // Remove piece
-     $piece = // TODO: comment tu recupere l'id ?
-     $this->game->log->addRemoval($piece, $space);
-     self::DbQuery("DELETE FROM piece WHERE x = {$space['x']}, y = {$space['y']}, z = {$space['z']}}");
-
-     // Notify
-     $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block'), [ // TODO: UI notif
-       'i18n' => ['power_name'],
-       'piece1' => $piece,
-       'power_name' => $this->getName(),
-       'player_name' => $this->game->getActivePlayerName(),
-     ]);
-
-     return true;
+     return 'endturn';
    }
 
-
-   public function stateAfterBuild()
+   public function stateAfterSkipPower()
    {
-     return 'usePower';
+     return 'endturn';
    }
-   */
- }
+}

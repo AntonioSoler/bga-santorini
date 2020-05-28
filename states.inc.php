@@ -201,9 +201,9 @@ $machinestates = array(
     'args' => 'argUsePower',
     'possibleactions' => [ 'use', 'skip' ],
     'transitions' => [
-      'next' => ST_NEXT_PLAYER,
       'move' => ST_MOVE,
       'build' => ST_BUILD,
+      'endturn' => ST_END_OF_TURN,
       'endgame' => ST_GAME_END,
     ],
   ],
@@ -245,6 +245,7 @@ $machinestates = array(
       'cancel'     => ST_START_OF_TURN,
       'move'       => ST_MOVE,
       'buildAgain' => ST_BUILD,
+      'power'      => ST_USE_POWER,
     ],
   ],
 

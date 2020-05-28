@@ -570,7 +570,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
 		onEnteringStatePlayerUsePower: function(args){
 			this._powerId = args.power;
-			this._action = 'use';
 
 			for(var power in this.powersIds){
 				if(this.powersIds[power] == args.power)
@@ -580,8 +579,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 
 		usePowerCharon: function(args){
+			this._action = 'playerMove';
 			this.makeWorkersSelectable(args.workers);
 		},
+
+		usePowerAres: function(args){
+			this._action = 'playerBuild';
+			this.makeWorkersSelectable(args.workers);
+		},
+
 
     /////////////////////////////////////////
     /////////////////////////////////////////
@@ -696,7 +702,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * TODO
      */
     onClickSpaceArg: function (space, arg) {
-      if (!this.checkAction(this._action))
+      if ((this._powerId == null && !this.checkAction(this._action))
+			|| (!this._powerId == null && !this.checkAction("use")))
         return;
 
 			var data = {
@@ -707,7 +714,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         arg: arg
       };
 			// Not using power => normal work
-			if(this._action != 'use'){
+			if(this._powerId == null){
       	this.ajaxcall("/santorini/santorini/work.html", data, this, function (res) { });
 			}
 			// Power work

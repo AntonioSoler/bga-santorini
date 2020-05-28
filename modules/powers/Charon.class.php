@@ -22,7 +22,7 @@ class Charon extends SantoriniPower
   {
     $arg = [];
     $this->argUsePower($arg);
-    return (count($arg['workers']) > 0)? 'power' : 'move';
+    return (count($arg['workers']) > 0)? 'power' : null;
   }
 
 
@@ -80,6 +80,16 @@ class Charon extends SantoriniPower
       'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
       'level_name' => $this->game->levelNames[intval($newSpace['z'])],
     ]);
+  }
+
+  public function stateAfterUsePower()
+  {
+    return 'move';
+  }
+
+  public function stateAfterSkipPower()
+  {
+    return 'move';
   }
 
 
