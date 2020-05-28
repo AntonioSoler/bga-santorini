@@ -30,10 +30,6 @@ $game_options = [
   OPTION_POWERS => [
     'name' => totranslate('Powers'),
     'values' => [
-      NONE => [
-        'name' => totranslate('No Powers'),
-        'tmdisplay' => totranslate('No Powers'),
-      ],
       SIMPLE => [
         'name' => totranslate('Simple Gods'),
         'tmdisplay' => totranslate('Simple Gods'),
@@ -62,26 +58,13 @@ $game_options = [
         'description' => totranslate('One powerful ability is available to any player touching the Ram figure'),
         'nobeginner' => true,
       ],
+      NONE => [
+        'name' => totranslate('No Powers'),
+        'tmdisplay' => totranslate('No Powers'),
+      ],
     ],
     'startcondition' => [
-      GOLDEN_FLEECE => [
-        [
-          'type' => 'minplayers',
-          'value' => 2,
-          'message' => totranslate('Golden Fleece Variant requires exactly 2 players'),
-        ],
-        [
-          'type' => 'maxplayers',
-          'value' => 2,
-          'message' => totranslate('Golden Fleece Variant requires exactly 2 players'),
-        ],
-      ],
       HEROES => [
-        [
-          'type' => 'minplayers',
-          'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players'),
-        ],
         [
           'type' => 'maxplayers',
           'value' => 2,
@@ -90,14 +73,23 @@ $game_options = [
       ],
       GODS_AND_HEROES => [
         [
-          'type' => 'minplayers',
-          'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players'),
-        ],
-        [
           'type' => 'maxplayers',
           'value' => 2,
           'message' => totranslate('Hero Powers requires exactly 2 players'),
+        ],
+      ],
+      GOLDEN_FLEECE => [
+        [
+          'type' => 'maxplayers',
+          'value' => 2,
+          'message' => totranslate('Golden Fleece Variant requires exactly 2 players'),
+        ],
+      ],
+      NONE => [
+        [
+          'type' => 'maxplayers',
+          'value' => 2,
+          'message' => totranslate('No Powers requires exactly 2 players'),
         ],
       ],
     ],
@@ -112,7 +104,7 @@ $game_options = [
       FAIR_DIVISION => [
         'name' => totranslate('Fair Division'),
         'tmdisplay' => totranslate('Fair Division'),
-        'description' => totranslate('First player chooses all possible Powers, last player chooses first among these'),
+        'description' => totranslate('First player selects the possible Powers, choosing last among these'),
       ],
     ],
     'displaycondition' => [
