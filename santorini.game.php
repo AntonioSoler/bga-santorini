@@ -668,7 +668,7 @@ class santorini extends Table
     // No move or build => loose unless skippable
     if (count($state['args']['workers']) == 0) {
       if ($state['args']['skippable']) {
-        $this->skipWork();
+        $this->skipWork(false);
         return;
       }
 
@@ -709,7 +709,7 @@ class santorini extends Table
   /*
    * skip: called when a player decide to skip a skippable work
    */
-  public function skipWork()
+  public function skipWork($log = true)
   {
     self::checkAction('skip');
 
@@ -717,6 +717,7 @@ class santorini extends Table
     if (!$args['skippable']) {
       throw new BgaUserException(_("You can't skip this action"));
     }
+    $this->log->addAction('skippedWork');
 
     // Apply power
     $state = $this->powerManager->stateAfterSkip() ?: 'skip';

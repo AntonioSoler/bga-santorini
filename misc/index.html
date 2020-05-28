@@ -37,8 +37,8 @@ float:right;
     <div id="log"></div>
 </div>
 <script type="module">
-import * as THREE  from '../scripts/three.js';
-import { Board } from '../scripts/board.js';
+import * as THREE  from '../modules/scripts/three.js';
+import { Board } from '../modules/scripts/board.js';
 
 
 var	container = document.getElementById("container");
@@ -49,14 +49,14 @@ var piece1 = {
 	x:1,y:4,z:0, name:'lvl0',
 };
 var piece2 = {
-	x:1,y:4,z:0, name:'f0worker',
+	x:1,y:3,z:0, name:'m0worker',
 }
 
 //board.addPiece(piece1);
 //board.highlightPiece(piece1);
 //setTimeout(() => board.clearHighlights(), 2000);
-board.addPiece(piece2).then(() => board.removePiece(piece2));
-
+board.addPiece(piece2);
+board.addPiece(piece1);
 
 
 /*

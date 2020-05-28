@@ -180,7 +180,7 @@ class SantoriniLog extends APP_GameClass
   /*
    * getLastActions : get works and actions of player (used to cancel previous action)
    */
-  public function getLastActions($actions = ['move', 'build', 'usedPower', 'skippedPower'], $pId = null)
+  public function getLastActions($actions = ['move', 'build', 'skippedWork', 'usedPower', 'skippedPower'], $pId = null)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
     $actionsNames = "'" . implode("','", $actions) . "'";

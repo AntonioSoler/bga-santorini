@@ -36,14 +36,17 @@ const Meshes = [
 	{
 		n:'lvl0',
 		s:0.32,
+		l:0x89968a,
 	},
 	{
 		n:'lvl1',
 		s:0.32,
+		l:0x89968a,
 	},
 	{
 		n:'lvl2',
 		s:0.32,
+		l:0x89968a,
 	},
 	{
 		n:'lvl3',
@@ -55,7 +58,7 @@ const Meshes = [
 	{
 		n:'f0worker',
 		g:'fWorker',
-		s:0.9
+		s:0.9,
 	},
 	{
 		n:'m0worker',
@@ -89,6 +92,8 @@ var MeshManager = function(url){
 	this._url = url || "./";
 	this._geometries = [];
 	this._textures = [];
+	this._loaded = false;
+	this._meshAddLines = [];
 }
 
 
@@ -96,28 +101,40 @@ var MeshManager = function(url){
  * Allow to load several geometries using promises
  */
 MeshManager.prototype.loadGeometry = function(names, scales){
-	var scope = this;
 	var loader = new GLTFLoader();
 
 	if(!(names instanceof Array))
 		names = [names];
 
 	for(var i = 0; i < names.length; i++)
-		scope._geometries[names[i]] = new THREE.BufferGeometry();
+		this._geometries[names[i]] = new THREE.BufferGeometry();
 
-	return new Promise(function(resolve, reject){
+	var rnames = names.filter(n => n.indexOf("Line") == -1);
+	return new Promise((resolve, reject) => {
 		// Create a promise with all loading requests
-		Promise.all(names.map( (n) => loader.load(scope._url + 'img/geometries/' + n + '.glb') ))
+		Promise.all(rnames.map( (n) => loader.load(this._url + 'img/geometries/' + n + '.glb') ))
 		.then( (values) => {
 			// Store them (assuming only one mesh inside the obj file
-			for(var i = 0; i < names.length; i++){
+			for(var i = 0; i < rnames.length; i++){
 				values[i].scene.traverse( child => {
 					if(child.isMesh)
-						scope._geometries[names[i]].copy(child.geometry);
+						this._geometries[rnames[i]].copy(child.geometry);
 				});
-				scope._geometries[names[i]].scale(scales[i], scales[i], scales[i]);
+				this._geometries[rnames[i]].scale(scales[i], scales[i], scales[i]);
+
+				if(this._geometries[rnames[i] + "Line"] != undefined){
+					this._geometries[rnames[i] + "Line"] = new THREE.EdgesGeometry(this._geometries[rnames[i]] , 20);
+				}
 			}
 
+			// Add the lines to already existing meshs
+			this._meshAddLines.forEach(m => {
+				var line = new THREE.LineSegments( this._geometries[m.g + "Line"], new THREE.LineBasicMaterial( { color: m.l } ) );
+				m.m.add( line );
+			})
+			this._meshAddLines = [];
+
+			this._loaded = true;
 			resolve();
 		})
 		.catch( (err) => {
@@ -169,6 +186,8 @@ MeshManager.prototype.load = function(){
 				aGeometries.push(g);
 				aScales.push(m.s || 1);
 			}
+			if(m.l)
+				aGeometries.push(g + "Line");
 		}
 		else
 			scope._geometries[m.n] = g;
@@ -200,6 +219,15 @@ MeshManager.prototype.createMesh = function(name){
 		});
 		var mesh = new THREE.Mesh(g, material);
 
+		if(m.l){
+			if(this._loaded){
+				var line = new THREE.LineSegments( this._geometries[(m.g || m.n) + "Line"], new THREE.LineBasicMaterial( { color: m.l } ) );
+				mesh.add( line );
+			}
+			else {
+				this._meshAddLines.push({g:m.g || m.n, l:m.l, m:mesh});
+			}
+		}
 
 		return mesh;
 		}

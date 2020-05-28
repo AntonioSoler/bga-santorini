@@ -20,7 +20,9 @@ class Charon extends SantoriniPower
   /* * */
   public function stateStartOfTurn()
   {
-    return 'power';
+    $arg = [];
+    $this->argUsePower($arg);
+    return (count($arg['workers']) > 0)? 'power' : 'move';
   }
 
 
@@ -47,6 +49,8 @@ class Charon extends SantoriniPower
         }
       }
     }
+
+    Utils::cleanWorkers($arg);
   }
 
 
