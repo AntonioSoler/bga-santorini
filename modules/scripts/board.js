@@ -82,7 +82,7 @@ Board.prototype.initScene = function(){
 	this._scene.background.convertLinearToGamma( 2 );
 
 	// Camera
-	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, 150 );
+	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, isMobile()? 250 : 150 );
 	this._camera.position.set( 0, 14, 15 );
 	if(isMobile())
 		this._camera.position.set( 0, 20, 25 );
@@ -183,6 +183,67 @@ Board.prototype.initBoard = function(){
 	wall.position.set(0,-0.1,0);
 	this._scene.add(wall);
 
+	this.initCoordsHelpers();
+};
+
+
+/*
+ * Init the coords helpers
+ */
+Board.prototype.computeText = function(text, size){
+	size = size || 0.7;
+	var canvas = document.createElement('canvas'),
+			ctx = canvas.getContext('2d');
+
+	canvas.width = 100;
+	canvas.height = 100;
+	ctx.font = "Bold 80px Arial";
+	ctx.fillStyle = "rgba(24,52,24,0.50)";
+	ctx.fillText(text, 20, 75);
+
+	var text = new THREE.Texture(canvas);
+	text.needsUpdate = true;
+	var textMesh = new THREE.Mesh(
+			new THREE.PlaneGeometry(size, size),
+			new THREE.MeshBasicMaterial( {map: text, side:THREE.DoubleSide, transparent: true } )
+		);
+	textMesh.rotation.set(-Math.PI/2,0,0);
+	textMesh.layers.set(1);
+
+	return textMesh;
+};
+
+Board.prototype.initCoordsHelpers = function(){
+	// Cols
+	var cols = ['A','B','C','D','E'];
+	for(var i = 0; i < 5; i++){
+		var textMesh = this.computeText(cols[i])
+		textMesh.position.set(xCenters[i], 0.01, zCenters[4] + 1.6);
+		this._scene.add( textMesh );
+	}
+
+	// Rows
+	var rows = ['5','4','3','2','1'];
+	for(var i = 0; i < 5; i++){
+		var textMesh = this.computeText(rows[i])
+		textMesh.position.set(xCenters[0] - 1.6, 0.01, zCenters[i]);
+		this._scene.add( textMesh );
+	}
+};
+
+Board.prototype.showCoordsHelpers = function(){
+	this._camera.layers.enable(1);
+};
+
+Board.prototype.hideCoordsHelpers = function(){
+	this._camera.layers.disable(1);
+};
+
+Board.prototype.toggleCoordsHelpers = function(b){
+	if(b)
+		this.showCoordsHelpers();
+	else
+		this.hideCoordsHelpers();
 };
 
 
@@ -271,6 +332,15 @@ Board.prototype.addPiece = function(piece, animation){
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);
+
+	// If building => add text on layer 1
+	console.log(piece);
+	if(['lvl0', 'lvl1', 'lvl2'].includes(piece.type)){
+		var textMesh = this.computeText(parseInt(piece.type[3]) + 1, 0.5);
+		textMesh.position.set(0, lvlHeights[parseInt(piece.z) + 1] - lvlHeights[piece.z],0);
+		textMesh.rotation.set(-Math.PI/2, 0, -mesh.rotation.y);
+		mesh.add(textMesh);
+	}
 
 	if(animation != "none")
 	return new Promise((resolve, reject) => {
@@ -491,26 +561,26 @@ Board.prototype.makeClickable = function(objects, callback, action){
 			// Disk animation
 			mark = new THREE.Mesh(
 				new THREE.CircleGeometry( 0.728, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: color, opacity:0.7,	transparent: true, })
+				new THREE.MeshPhongMaterial({ color: color, opacity:0.7,	transparent: true, side:THREE.DoubleSide, })
 			);
 		}
 		// Show square
 		else if(action == "playerBuild"){
 			mark = new THREE.Mesh(
 				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: color, opacity:0.5,	transparent: true, })
+				new THREE.MeshPhongMaterial({ color: color, opacity:0.5,	transparent: true, side:THREE.DoubleSide,})
 			);
 		}
 		// Ring animation
 		else {
 			mark = new THREE.Mesh(
 				new THREE.RingGeometry( 0.4, 0.53, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({	color: color, opacity:0.8,	transparent: true,	})
+				new THREE.MeshPhongMaterial({	color: color, opacity:0.8,	transparent: true,	side:THREE.DoubleSide,})
 			);
 		}
 
 		// Add the marker as a planeHover child
-		mark.position.set(0, 0.05, 0);
+		mark.position.set(0, isMobile()? 0.15 : 0.05, 0);
 		mark.space = mesh.space;
 		this._clickable.push(mark);
 		mesh.add(mark);

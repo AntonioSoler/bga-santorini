@@ -118,6 +118,11 @@ define('OPTION_SETUP', 102);
 define('RANDOM', 0);
 define('FAIR_DIVISION', 1);
 
+
+define('HELPERS', 100);
+define('HIDE', 1);
+define('SHOW', 2);
+
 /*
  * Variable constants
  */

@@ -64,7 +64,7 @@ class Minotaur extends SantoriniPower
         'power_name' => $this->getName(),
         'player_name' => $this->game->getActivePlayerName(),
         'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
-        'level_name' => $this->game->levelNames[intval($newSpace['z'])],
+        'level_name' => $this->game->levelNames[intval($space['z'])],
       ]);
     }
 

@@ -38,10 +38,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     setup: function (gamedatas) {
       var _this = this;
       debug('SETUP', gamedatas);
+			console.log(this.prefs);
 
       // Setup the board (3d scene using threejs)
       var container = document.getElementById('scene-container');
       this.board = new Board(container, URL); // Setup player boards
+			this.board.toggleCoordsHelpers(this.prefs[100].value == 2);
 
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
