@@ -108,6 +108,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 			}
 		},
 
+		/*
+		 * TODO description
+		 */
+		takeAction: function(action, data, callback){
+			data = data || {};
+			data.lock = true;
+			callback = callback || function (res) { };
+			this.ajaxcall("/santorini/santorini/" + action + ".html", data, this, callback);
+		},
+
 
     ///////////////////////////////////////
     ////////  Game & client states ////////
@@ -279,17 +289,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       else if (!isWait && isActive) {
         // Already selected => unselect it
         if (isSelected) {
-          this.ajaxcall("/santorini/santorini/removeOffer.html", {
-            powerId: powerId
-          }, this, function (res) { });
-          powerDiv.classList.add('wait');
+					powerDiv.classList.add('wait');
+          this.takeAction("removeOffer", { powerId: powerId });
         }
         // Not yet select + still need powers => select it
         else if (this._nMissingPowers > 0 && !isBanned) {
-          this.ajaxcall("/santorini/santorini/addOffer.html", {
-            powerId: powerId
-          }, this, function (res) { });
-          powerDiv.classList.add('wait');
+					powerDiv.classList.add('wait');
+          this.takeAction("addOffer", { powerId: powerId });
         }
       }
     },
@@ -367,7 +373,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     onClickConfirmOffer: function () {
       if (!this.checkAction('confirmOffer')) return false;
-      this.ajaxcall("/santorini/santorini/confirmOffer.html", {}, this, function (res) { });
+      this.takeAction("confirmOffer");
     },
 
 
@@ -406,9 +412,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction('choosePower'))
         return false;
 
-      this.ajaxcall("/santorini/santorini/choosePower.html", {
-        powerId: powerId
-      }, this, function (res) { });
+      this.takeAction("choosePower", { powerId: powerId });
     },
 
 
@@ -464,7 +468,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction('chooseFirstPlayer'))
         return false;
 
-      this.ajaxcall("/santorini/santorini/chooseFirstPlayer.html", {playerId: player.id}, this, function (res) { });
+      this.takeAction("chooseFirstPlayer", { playerId: player.id });
     },
 
 
@@ -494,7 +498,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       this.clearPossible();
       space.workerId = this.worker.id;
-      this.ajaxcall("/santorini/santorini/placeWorker.html", space, this, function (res) { });
+      this.takeAction("placeWorker", space);
     },
 
 
@@ -721,12 +725,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       };
 			// Not using power => normal work
 			if(this._powerId == null){
-      	this.ajaxcall("/santorini/santorini/work.html", data, this, function (res) { });
+      	this.takeAction("work", data);
 			}
 			// Power work
 			else {
 				data.powerId = this._powerId;
-				this.ajaxcall("/santorini/santorini/usePowerWork.html", data, this, function (res) { });
+				this.takeAction("usePowerWork", data);
 			}
 
       this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null
@@ -740,8 +744,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction('skip'))
         return;
 
-			var url = (this.gamedatas.gamestate.name == "playerUsePower")? "skipPower" : "skipWork";
-      this.ajaxcall("/santorini/santorini/" + url + ".html", {}, this, function (res) { });
+			var action = (this.gamedatas.gamestate.name == "playerUsePower")? "skipPower" : "skipWork";
+      this.takeAction(action);
       this.clearPossible();
     },
 
@@ -753,7 +757,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction('cancel'))
         return;
 
-      this.ajaxcall("/santorini/santorini/cancelPreviousWorks.html", {}, this, function (res) { });
+      this.takeAction("cancelPreviousWorks");
       this.clearPossible();
     },
 
