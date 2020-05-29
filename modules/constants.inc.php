@@ -66,6 +66,20 @@ define('ODYSSEUS', 53);
 define('POLYPHEMUS', 54);
 define('THESEUS', 55);
 
+// Promo cards gods
+define('TYCHE', 56);
+define('SCYLLA', 57);
+define('CASTOR', 58);
+define('PROTEUS', 59);
+define('ERIS', 60);
+define('MAENADS', 61);
+define('ASTERIA', 62);
+define('HIPPOLYTA', 63);
+define('HYDRA', 64);
+define('IRIS', 65);
+define('NYX', 66);
+define('PEGASUS', 67);
+
 
 /*
  * State constants

@@ -71,7 +71,7 @@ abstract class SantoriniPower extends APP_GameClass
   public function isSupported($nPlayers, $optionPowers)
   {
     $isHero = $this instanceof SantoriniHeroPower;
-    return $this->implemented
+    return ($this->implemented)
       && in_array($nPlayers, $this->getPlayerCount())
       && (($optionPowers == GODS_AND_HEROES)
         || ($optionPowers == SIMPLE && $this->isSimple())
