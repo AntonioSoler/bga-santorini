@@ -14,6 +14,7 @@ class Adonis extends SantoriniHeroPower
     ];
     $this->playerCount = [2];
     $this->golden  = false;
+    $this->orderAid = 25;
   }
 
   /* * */

@@ -13,6 +13,7 @@ class Minotaur extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
+    $this->orderAid = 59;
 
     $this->implemented = true;
   }

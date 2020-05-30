@@ -13,6 +13,7 @@ class Ares extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;
+    $this->orderAid = 62;
 
     $this->implemented = true;
   }

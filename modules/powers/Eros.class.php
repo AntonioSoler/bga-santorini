@@ -14,6 +14,7 @@ class Eros extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;
+    $this->orderAid = 21;
 
     $this->implemented = true;
   }

@@ -13,6 +13,7 @@ class Chronus extends SantoriniPower
     ];
     $this->playerCount = [2];
     $this->golden  = false;
+    $this->orderAid = 2;
 
     $this->implemented = true;
   }

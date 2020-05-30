@@ -254,6 +254,47 @@ class santorini extends Table
 
 
   /*
+   * argChooseFirstPlayer: is called in the fair division setup, when a the contestant choose who will start
+   */
+  public function argChooseFirstPlayer()
+  {
+    $arg = [
+      'powers' => $this->powerManager->getPowerIdsInLocation('offer'),
+      'power_name' => $this->powerManager->getFirstPlayerSuggestion(),
+    ];
+
+    // Apply powers (Bia must start)
+    $this->powerManager->argChooseFirstPlayer($arg);
+    return $arg;
+  }
+
+  /*
+   * stChooseFirstPlayer: is called before choosing a first player TODO
+   */
+  public function stChooseFirstPlayer()
+  {
+    $powers = $this->gamestate->state()['args']['powers'];
+    if(count($powers) == 1){
+      $this->chooseFirstPlayer($powers[0]);
+    }
+  }
+
+
+  /*
+   * choosePlayer: is called in the fair division setup, when the contestant pick the first player
+   * TODO check if choice is authorized
+   */
+  public function chooseFirstPlayer($powerId)
+  {
+    $this->powerManager->setFirstPlayerOffer($powerId);
+    self::notifyAllPlayers('message', clienttranslate('${power_name} will start this game'), [
+      'power_name' => $this->powerManager->getPower($powerId)->getName(),
+    ]);
+    $this->gamestate->nextState('done');
+  }
+
+
+  /*
    * stPowersNextPlayerChoose: is called in the fair division process
    *  - if all player except one already have a power, automatically assign the last one and go on
    *  - otherwise, go to next player and ask him to choose a power
@@ -262,11 +303,11 @@ class santorini extends Table
   {
     $pId = $this->activeNextPlayer();
 
-    $remainingPowers = $this->powerManager->getPowerIdsInLocation('offer');
+    $remainingPowers = $this->powerManager->getOffer();
     if (count($remainingPowers) > 1) {
       $this->gamestate->nextState('next');
     } else {
-      self::choosePower(reset($remainingPowers));
+      self::choosePower($remainingPowers[0]['id']);
     }
   }
 
@@ -276,7 +317,7 @@ class santorini extends Table
   public function argChoosePower()
   {
     return [
-      'offer' => $this->powerManager->getPowerIdsInLocation('offer')
+      'offer' => $this->powerManager->getOffer()
     ];
   }
 
@@ -291,42 +332,6 @@ class santorini extends Table
     $this->gamestate->nextState('done');
   }
 
-
-  /*
-   * argChooseFirstPlayer: is called in the fair division setup, when a the contestant choose who will start
-   */
-  public function argChooseFirstPlayer()
-  {
-    $arg = [
-      'players' => array_map(function($p){ return $p->getUiData(); }, $this->playerManager->getPlayers())
-    ];
-
-    // Apply powers (Bia must start)
-    $this->powerManager->argChooseFirstPlayer($arg);
-    return $arg;
-  }
-
-  /*
-   * stChooseFirstPlayer: is called before choosing a first player TODO
-   */
-  public function stChooseFirstPlayer()
-  {
-    $players = $this->gamestate->state()['args']['players'];
-    if(count($players) == 1){
-      $this->chooseFirstPlayer($players[0]['id']);
-    }
-  }
-
-
-  /*
-   * choosePlayer: is called in the fair division setup, when the contestant pick the first player
-   * TODO check if choice is authorized
-   */
-  public function chooseFirstPlayer($playerId)
-  {
-    $this->setGameStateValue('firstPlayer', $playerId);
-    $this->gamestate->nextState('done');
-  }
 
 
   ///////////////////////////////////////

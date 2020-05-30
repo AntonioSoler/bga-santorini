@@ -379,6 +379,43 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+		/////////////////////////////
+    //// Choose First Player ////
+    /////////////////////////////
+    onEnteringStateChooseFirstPlayer: function(args){
+			var _this = this;
+			this.focusContainer('powers-choose');
+      args.powers.forEach(function (powerId) {
+        var power = _this.getPower(powerId);
+        var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
+        div.id = "power-choose-" + power.id;
+			});
+
+			if (this.isCurrentPlayerActive())
+      	this.chooseFirstPlayerActionsButtons(args.powers);
+    },
+
+    /*
+     * chooseFirstPlayerActionsButtons: let the contestant choose who will start
+     */
+    chooseFirstPlayerActionsButtons: function(powers){
+      var _this = this;
+      powers.forEach(function(powerId){
+        _this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function(){ _this.onClickChooseFirstPlayer(powerId) }, null, false, 'gray');
+      });
+    },
+
+    /*
+     * onClickChooseFirstPlayer: is called when the contestant clicked on the player who will start
+     */
+    onClickChooseFirstPlayer: function(powerId){
+      if (!this.checkAction('chooseFirstPlayer'))
+        return false;
+
+      this.takeAction("chooseFirstPlayer", { powerId: powerId });
+    },
+
+
     //////////////////////
     //// Choose Power ////
     //////////////////////
@@ -391,9 +428,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.focusContainer('powers-choose');
 
       // Display remeaining powers
-      args.offer.forEach(function (powerId) {
-        var power = _this.getPower(powerId);
+      args.offer.forEach(function (powerCard) {
+        var power = _this.getPower(powerCard.id);
         var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
+				if(powerCard.location_arg == 1){
+					var mark = document.createElement("div");
+					mark.className = "first";
+					mark.innerHTML = '1';
+					div.append(mark);
+				}
         div.id = "power-choose-" + power.id;
 
         if (_this.isCurrentPlayerActive()) {
@@ -440,37 +483,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           _this.addPowerToPlayer(playerId, powerId);
         });
       }
-    },
-
-
-    /////////////////////////////
-    //// Choose First Player ////
-    /////////////////////////////
-
-    onEnteringStateChooseFirstPlayer: function(args){
-      this.focusContainer(null);
-			if (this.isCurrentPlayerActive())
-      	this.chooseFirstPlayerActionsButtons(args.players);
-    },
-
-    /*
-     * chooseFirstPlayerActionsButtons: let the contestant choose who will start
-     */
-    chooseFirstPlayerActionsButtons: function(players){
-      var _this = this;
-      players.forEach(function(player){
-        _this.addActionButton('buttonFirstPlayer' + player.id, player.name, function(){ _this.onClickChooseFirstPlayer(player) }, null, false, 'gray');
-      });
-    },
-
-    /*
-     * onClickChooseFirstPlayer: is called when the contestant clicked on the player who will start
-     */
-    onClickChooseFirstPlayer: function(player){
-      if (!this.checkAction('chooseFirstPlayer'))
-        return false;
-
-      this.takeAction("chooseFirstPlayer", { playerId: player.id });
     },
 
 

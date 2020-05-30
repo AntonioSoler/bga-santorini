@@ -19,6 +19,7 @@ abstract class SantoriniPower extends APP_GameClass
   protected $text;
   protected $playerCount;
   protected $golden;
+  protected $orderAid;
   protected $implemented = false;
 
   public function getId()
@@ -40,6 +41,10 @@ abstract class SantoriniPower extends APP_GameClass
   public function getPlayerCount()
   {
     return $this->playerCount;
+  }
+  public function getOrderAid()
+  {
+    return $this->orderAid;
   }
   public function isGoldenFleece()
   {

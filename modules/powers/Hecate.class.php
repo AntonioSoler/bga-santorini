@@ -15,6 +15,7 @@ class Hecate extends SantoriniPower
     ];
     $this->playerCount = [2, 3];
     $this->golden  = false;
+    $this->orderAid = 64;
   }
 
   /* * */

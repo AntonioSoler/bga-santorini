@@ -13,6 +13,7 @@ class Eris extends SantoriniPower
     ];
     $this->playerCount = [2, 4];
     $this->golden  = true;
+    $this->orderAid = 50;
   }
 
   /* * */

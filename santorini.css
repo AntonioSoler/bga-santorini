@@ -161,6 +161,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 #power-offer-container .power-detail, #power-choose-container .power-detail {
     margin: 0 15px;
+    position:relative;
 }
 
 #power-offer-container {
@@ -345,6 +346,23 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     line-height: 18px;
 }
 
+
+#power-choose-container .power-detail .first {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  color: white;
+  background-color: #25a1e7;
+  border-radius: 15px;
+  border: 1px solid black;
+  text-align: center;
+  line-height: 27px;
+  font-size: 18px;
+  font-weight: bold;
+  z-index:5;
+}
 
 .mini-card .morpheus-power-stock {
   position: absolute;

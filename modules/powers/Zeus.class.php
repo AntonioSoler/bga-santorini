@@ -13,6 +13,7 @@ class Zeus extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
+    $this->orderAid = 31;
 
     $this->implemented = true;
   }

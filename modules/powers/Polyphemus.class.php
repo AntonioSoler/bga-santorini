@@ -13,6 +13,7 @@ class Polyphemus extends SantoriniHeroPower
     ];
     $this->playerCount = [2];
     $this->golden  = false;
+    $this->orderAid = 61;
   }
 
   /* * */

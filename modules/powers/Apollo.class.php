@@ -13,6 +13,7 @@ class Apollo extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
+    $this->orderAid = 18;
 
     $this->implemented = true;
   }

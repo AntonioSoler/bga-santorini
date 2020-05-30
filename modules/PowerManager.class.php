@@ -266,6 +266,44 @@ class PowerManager extends APP_GameClass
   }
 
 
+  /*
+   * getFirstPlayerSuggestion: TODO
+   */
+  public function getFirstPlayerSuggestion()
+  {
+    $minOrderAid = 100;
+    $powerName = "";
+    $offer = $this->getOffer();
+    foreach($offer as $powerCard){
+      $power = $this->getPower($powerCard['id']);
+      $o = $power->getOrderAid();
+      if($o < $minOrderAid && $o){
+        $minOrderAid = $o;
+        $powerName = $power->getName();
+      }
+    }
+
+    return $powerName;
+  }
+
+
+  /*
+   * setFirstPlayerOffer: set which power will start
+   */
+  public function setFirstPlayerOffer($powerId)
+  {
+    $this->game->cards->moveCard($powerId, 'offer', '1');
+  }
+
+
+  /*
+   * getOffer: return all the offer
+   */
+  public function getOffer()
+  {
+    return array_values($this->game->cards->getCardsInLocation('offer'));
+  }
+
 
   ///////////////////////////////////////
   ///////////////////////////////////////
@@ -306,7 +344,10 @@ class PowerManager extends APP_GameClass
    */
   public function argChooseFirstPlayer(&$arg)
   {
-    $this->applyPower(["argChooseFirstPlayer","argChooseFirstPlayer"], [&$arg]);
+    $powers = $arg['powers'];
+    foreach($powers as $powerId){
+      $this->getPower($powerId)->argChooseFirstPlayer($arg);
+    }
   }
 
 

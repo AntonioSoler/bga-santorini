@@ -13,6 +13,7 @@ class Nyx extends SantoriniPower
     ];
     $this->playerCount = [2];
     $this->golden  = false;
+    $this->orderAid = 51;
   }
 
   /* * */

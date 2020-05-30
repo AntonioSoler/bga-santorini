@@ -14,6 +14,7 @@ class Moerae extends SantoriniPower
     ];
     $this->playerCount = [2, 3];
     $this->golden  = false;
+    $this->orderAid = -1;
   }
 
   /* * */

@@ -15,6 +15,7 @@ class Bia extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
+    $this->orderAid = 0;
 
     $this->implemented = true;
   }
@@ -23,9 +24,9 @@ class Bia extends SantoriniPower
 
   public function argChooseFirstPlayer(&$arg)
   {
-    $pId = $this->playerId;
-    Utils::filter($arg['players'], function($player) use ($pId){
-      return $player['id'] == $pId;
+    $pId = $this->getId();
+    Utils::filter($arg['powers'], function($power) use ($pId){
+      return $power == $pId;
     });
 
     $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} must place its workers first'), [

@@ -3,43 +3,6 @@
 // Cannot use Player, already taken by BGA
 class SantoriniPlayer extends APP_GameClass
 {
-    /* Returns the SantoriniPlayer object for the given player ID */
-    public static function getPlayer($game, $id)
-    {
-        $players = SantoriniPlayer::getPlayers($game, [$id]);
-        return $players[0];
-    }
-
-    /*
-     * getPlayers : Returns array of SantoriniPlayer objects for all/specified player IDs
-     */
-    public static function getPlayers($game, $ids = null)
-    {
-        $players = [];
-        $sql = "SELECT player_id id, player_color color, player_name name, player_score score, player_zombie zombie, player_eliminated eliminated, player_team team, player_no no FROM player";
-        if (!empty($ids)) {
-            $sql .= " WHERE player_id IN (" . implode(',', $ids) . ")";
-        }
-        $rows = self::getObjectListFromDb($sql);
-        foreach ($rows as $row) {
-            $player = new SantoriniPlayer($game, $row['id']);
-            $player->no = (int) $row['no'];
-            $player->name = $row['name'];
-            $player->team = (int) $row['team'];
-            $player->color = $row['color'];
-            $player->eliminated = $row['eliminated'] == 1;
-            $player->zombie = $row['zombie'] == 1;
-
-            // Load powers
-            $cards = $game->cards->getCardsInLocation('hand', $player->id);
-            foreach ($cards as $powerId => $card) {
-                $player->powers[] = SantoriniPower::getPower($game, $powerId);
-            }
-            $players[] = $player;
-        }
-        return $players;
-    }
-
     public function __construct($game, $row)
     {
         $this->game = $game;
@@ -138,6 +101,10 @@ class SantoriniPlayer extends APP_GameClass
             $powerId = ($this->game->cards->pickCard('deck', $this->id))['id'];
         } else {
             // Draw a specific card
+            $card = $this->game->cards->getCard($powerId);
+            if($card['location_arg'] == 1){
+              $this->game->setGameStateValue('firstPlayer', $this->id);
+            }
             $this->game->cards->moveCard($powerId, 'hand', $this->id);
         }
         $power = $this->game->powerManager->getPower($powerId, $this->id);
