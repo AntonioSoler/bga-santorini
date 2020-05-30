@@ -19,7 +19,6 @@ abstract class SantoriniPower extends APP_GameClass
   protected $text;
   protected $playerCount;
   protected $golden;
-  protected $newRule = false;
   protected $implemented = false;
 
   public function getId()
@@ -46,10 +45,6 @@ abstract class SantoriniPower extends APP_GameClass
   {
     return $this->golden;
   }
-  public function hasNewRule()
-  {
-    return $this->newRule;
-  }
   public function isSimple()
   {
     return $this->id <= 10;
@@ -63,7 +58,6 @@ abstract class SantoriniPower extends APP_GameClass
       'title'     => $this->title,
       'text'      => $this->text,
       'hero'      => get_parent_class($this) == 'SantoriniHeroPower',
-      'newRule'   => $this->newRule ? 'new-rule' : '',
       'implemented' => $this->implemented ? 'implemented' : 'not-implemented',
     ];
   }

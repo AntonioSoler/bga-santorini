@@ -45,7 +45,7 @@ var jstpl_powerDetail = `<div class="power-detail">
 	<div class="power-info \${type}">
 		<div class="power-name">\${name}</div>
 		<div class="power-title">\${title}</div>
-		<ul class="power-text \${newRule}"><li>\${textList}</li></ul>
+		<ul class="power-text"><li>\${textList}</li></ul>
 	</div>
 </div>`;
 

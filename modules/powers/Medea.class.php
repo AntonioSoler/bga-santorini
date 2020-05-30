@@ -9,7 +9,8 @@ class Medea extends SantoriniHeroPower
     $this->name  = clienttranslate('Medea');
     $this->title = clienttranslate('Powerful Sorceress');
     $this->text  = [
-      clienttranslate("End of Your Turn: Once, remove one block from under any number of Workers neighboring your unmoved Worker. You also remove any Tokens on the blocks.")
+      clienttranslate("End of Your Turn: Once, remove all blocks from under a Worker neighboring either of your Workers. You also remove any Tokens on the blocks."),
+      clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2];
     $this->golden  = false;
