@@ -252,7 +252,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     height: 465px;
     position: relative;
     background-repeat: no-repeat;
-    background-size: cover;
+    background-size: 90%;
     background-position: center;
     border-radius: 15px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
@@ -309,7 +309,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     cursor: pointer;
     width: 103px;
     height: 150px;
-    background-size: 135%;
+    background-size: 125%;
     background-position: 50% 20%;
     border-radius: 8px;
     margin: 8px;
