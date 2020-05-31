@@ -48,9 +48,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
         player.powers.forEach(function (powerId) {
-          return _this.addPowerToPlayer(player.id, powerId);
+          _this.addPowerToPlayer(player.id, powerId, true);
         });
       });
+
 
       // Setup workers and buildings
       gamedatas.placedPieces.forEach(function(piece){
@@ -83,11 +84,23 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * params:
      *  - object piece: main infos are type, x,y,z
      */
-    addPowerToPlayer: function (playerId, powerId) {
+    addPowerToPlayer: function (playerId, powerId, showDialog) {
       var power = this.getPower(powerId);
       var card = dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
       card.id = "mini-card-" + playerId + "-" + powerId;
       this.addTooltipHtml(card.id, this.format_block('jstpl_powerDetail', power));
+
+			var powerDialog = new ebg.popindialog();
+			powerDialog.create( 'powerDialog-' + playerId + "-" + powerId);
+			powerDialog.setTitle(playerId == this.player_id? _("Your power") : _("Opponent's power") );
+			powerDialog.setContent(this.format_block( 'jstpl_powerDetail', this.getPower(powerId)));
+ 			powerDialog.replaceCloseCallback( function() { powerDialog.hide(); } );
+ 			dojo.connect(card, "onclick", function(ev){
+				powerDialog.show();
+			});
+
+			if(showDialog && playerId == this.player_id)
+				powerDialog.show();
     },
 
 

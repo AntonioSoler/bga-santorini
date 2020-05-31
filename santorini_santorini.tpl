@@ -49,6 +49,8 @@ var jstpl_powerDetail = `<div class="power-detail">
 	</div>
 </div>`;
 
+
+
 var jstpl_token = '<div id="token-\${token}" class="token token-\${token}"></div>';
 var jstpl_tokenPrompt = `<table class="token-prompt">
 	<tr>
