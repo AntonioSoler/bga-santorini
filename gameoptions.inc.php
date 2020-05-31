@@ -126,11 +126,11 @@ $game_options = [
 
 $game_preferences = [
   HELPERS => [
-			'name' => totranslate('Help markers on board'),
-			'needReload' => true,
-			'values' => [
-					HIDE => [ 'name' => totranslate( 'Hide' ) ],
-					SHOW => [ 'name' => totranslate( 'Show' ) ]
-			]
-	]
+    'name' => totranslate('Display height markers on board'),
+    'needReload' => true,
+    'values' => [
+      SHOW => ['name' => totranslate('Show')],
+      HIDE => ['name' => totranslate('Hide')],
+    ]
+  ]
 ];
