@@ -195,11 +195,14 @@ Board.prototype.computeText = function(text, size){
 	var canvas = document.createElement('canvas'),
 			ctx = canvas.getContext('2d');
 
-	canvas.width = 100;
-	canvas.height = 100;
-	ctx.font = "Bold 80px Arial";
-	ctx.fillStyle = "rgba(24,52,24,0.50)";
-	ctx.fillText(text, 20, 75);
+	canvas.width = 125;
+	canvas.height = 125;
+	ctx.font = "Bold 150px Arial";
+	ctx.fillStyle = "rgba(24,52,24,0.15)";
+	ctx.fillText(text, 15, 115);
+	ctx.lineWidth = 5;
+	ctx.strokeStyle = "rgba(24,52,24,0.25)";
+	ctx.strokeText(text, 15, 115);
 
 	var text = new THREE.Texture(canvas);
 	text.needsUpdate = true;
