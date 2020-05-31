@@ -96,20 +96,17 @@ $game_options = [
   ],
 
   OPTION_SETUP => [
-    'name' => totranslate('Assignment of Powers'),
+    'name' => totranslate('Setup'),
     'values' => [
-      RANDOM => [
-        'name' => totranslate('Random'),
+      QUICK => [
+        'name' => totranslate('Quick Setup'),
+        'tmdisplay' => totranslate('Quick Setup'),
+        'description' => totranslate('BGA randomly builds the offer of possible Powers'),
       ],
-      FAIR_DIVISION => [
-        'name' => totranslate('Fair Division'),
-        'tmdisplay' => totranslate('Fair Division'),
-        'description' => totranslate('First player selects the possible Powers, choosing last among these'),
-      ],
-      RANDOM_FAIR_DIVISION => [
-        'name' => totranslate('Randomized Fair Division'),
-        'tmdisplay' => totranslate('Randomized Fair Division'),
-        'description' => totranslate('First player selects the possible Powers among a random subset, choosing last among these'),
+      CUSTOM => [
+        'name' => totranslate('Custom Setup'),
+        'tmdisplay' => totranslate('Custom Setup'),
+        'description' => totranslate('First player builds the offer of possible Powers'),
       ],
     ],
     'displaycondition' => [

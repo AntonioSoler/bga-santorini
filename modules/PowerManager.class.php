@@ -201,33 +201,37 @@ class PowerManager extends APP_GameClass
    */
   public function preparePowers()
   {
-    // Filter supported powers depending on the number of players and game option
-    $nPlayers = $this->game->playerManager->getPlayerCount();
+    $nextState = 'done';
     $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
-    $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
-      return $power->isSupported($nPlayers, $optionPowers);
-    });
+    if ($optionPowers != NONE) {
+      // Filter supported powers depending on the number of players and game option
+      $nPlayers = $this->game->playerManager->getPlayerCount();
+      $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
+        return $power->isSupported($nPlayers, $optionPowers);
+      });
 
-    $powerIds = array_values(array_map(function ($power) {
-      return $power->getId();
-    }, $powers));
+      $powerIds = array_values(array_map(function ($power) {
+        return $power->getId();
+      }, $powers));
+      $this->game->cards->moveCards($powerIds, 'deck');
+      $this->game->cards->shuffle('deck');
 
-    $optionSetup = $this->game->getGameStateValue('optionSetup');
-    if($optionSetup == RANDOM_FAIR_DIVISION || $optionSetup == RANDOM){
-      $nPowers = $optionSetup == RANDOM? $nPlayers : (min(3*$nPlayers,10));
-
-      $offer = [];
-      for($i = 0; $i < $nPowers; $i++){
-        $offer[] = $powerIds[array_rand($powerIds, 1)];
-        Utils::filter($powerIds, function($power) use ($offer){
-          return !in_array($power, $this->computeBannedIds($offer));
-        });
+      $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
+      if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
+        $nextState = 'chooseFirstPlayer';
+        $offer = [];
+        for ($i = 0; $i < $nPlayers; $i++) {
+          $offer[] = $powerIds[array_rand($powerIds, 1)];
+          Utils::filter($powerIds, function ($power) use ($offer) {
+            return !in_array($power, $this->computeBannedIds($offer));
+          });
+        }
+        $this->game->cards->moveCards($offer, 'offer');
+      } else {
+        $nextState = 'offer';
       }
-      $powerIds = $offer;
     }
-
-    $this->game->cards->moveCards($powerIds, 'deck');
-    $this->game->cards->shuffle('deck');
+    return $nextState;
   }
 
   /*
@@ -236,7 +240,7 @@ class PowerManager extends APP_GameClass
    */
   public function computeBannedIds($mixed = 'offer')
   {
-    $powers = is_array($mixed)? $mixed : $this->getPowerIdsInLocation($mixed);
+    $powers = is_array($mixed) ? $mixed : $this->getPowerIdsInLocation($mixed);
     $ids = [];
     foreach ($powers as $power) {
       foreach (self::$bannedMatchups as $matchup) {
@@ -288,10 +292,10 @@ class PowerManager extends APP_GameClass
   {
     $minOrderAid = 100;
     $powerId = 0;
-    foreach($offer as $powerId){
+    foreach ($offer as $powerId) {
       $power = $this->getPower($powerId);
       $o = $power->getOrderAid();
-      if($o < $minOrderAid && $o){
+      if ($o < $minOrderAid && $o) {
         $minOrderAid = $o;
         $powerId = $power->getId();
       }
@@ -359,7 +363,7 @@ class PowerManager extends APP_GameClass
   public function argChooseFirstPlayer(&$arg)
   {
     $powers = $arg['powers'];
-    foreach($powers as $powerId){
+    foreach ($powers as $powerId) {
       $this->getPower($powerId)->argChooseFirstPlayer($arg);
     }
   }
@@ -370,7 +374,7 @@ class PowerManager extends APP_GameClass
    */
   public function argPlaceWorker(&$arg)
   {
-    $this->applyPower(["argPlayerPlaceWorker","argOpponentPlaceWorker"], [&$arg]);
+    $this->applyPower(["argPlayerPlaceWorker", "argOpponentPlaceWorker"], [&$arg]);
   }
 
 
@@ -396,7 +400,7 @@ class PowerManager extends APP_GameClass
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
     foreach ($player->getPowers() as $power) {
-      if($power->getId() == $powerId){
+      if ($power->getId() == $powerId) {
         $power->usePower($action);
       }
     }

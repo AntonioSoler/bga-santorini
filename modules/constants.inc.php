@@ -115,9 +115,8 @@ define('GOLDEN_FLEECE', 5);
 define('NONE', 6);
 
 define('OPTION_SETUP', 102);
-define('RANDOM', 0);
-define('FAIR_DIVISION', 1);
-define('RANDOM_FAIR_DIVISION', 2);
+define('QUICK', 0);
+define('CUSTOM', 1);
 
 define('HELPERS', 100);
 define('HIDE', 1);

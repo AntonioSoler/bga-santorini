@@ -120,8 +120,7 @@ class santorini extends Table
 
   /*
    * stPowersSetup:
-   *   called right after the board setup, should give a god/hero to each player
-   *   unless faire division process (see next block)
+   *   called right after the board setup, should prepare power deck
    */
   public function stPowersSetup()
   {
@@ -135,38 +134,9 @@ class santorini extends Table
       }
     }
 
-    // Stop here if not playing with powers
-    $optionPowers = intval(self::getGameStateValue('optionPowers'));
-    if ($optionPowers == NONE) {
-      $this->gamestate->nextState('done');
-      return;
-    }
-
-    // Prepare a deck with all possible powers for this game
-    $this->powerManager->preparePowers();
-
-    // In fair division setup player 1 must build the offer
-    $optionSetup = intval(self::getGameStateValue('optionSetup'));
-    if ($optionSetup == FAIR_DIVISION || $optionSetup == RANDOM_FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
-      $this->gamestate->nextState('offer');
-      return;
-    }
-
-    // Assign powers randomly
-    foreach ($players as $player) {
-      // Give the player a random power and invoke power-specific setup
-      $power = $player->addPower();
-      $power->setup($player);
-    }
-
-    // Choose first player
-    $firstPlayer = $this->argChooseFirstPlayer('hand')['suggestion'];
-    foreach ($players as $player) {
-      if($player->getPower()->getId() == $firstPlayer){
-        $this->setGamestateValue('firstPlayer', $player->getId());
-      }
-    }
-    $this->gamestate->nextState('done');
+    // Prepare a deck with all possible powers for this game (if needed)
+    $nextState = $this->powerManager->preparePowers();
+    $this->gamestate->nextState($nextState);
   }
 
 
@@ -279,7 +249,7 @@ class santorini extends Table
   public function stChooseFirstPlayer()
   {
     $powers = $this->gamestate->state()['args']['powers'];
-    if(count($powers) == 1){
+    if (count($powers) == 1) {
       $this->chooseFirstPlayer($powers[0]);
     }
   }
@@ -354,7 +324,7 @@ class santorini extends Table
   {
     // First switch to first player if no worker placed
     $placedWorkers = $this->board->getPlacedWorkers();
-    if(count($placedWorkers) == 0)
+    if (count($placedWorkers) == 0)
       $this->gamestate->changeActivePlayer($this->getGameStateValue('firstPlayer'));
 
     // Get all the remeaning workers of all players
@@ -409,7 +379,7 @@ class santorini extends Table
     }
 
     $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
-    if(!in_array($space, $stateArgs['accessibleSpaces'])){
+    if (!in_array($space, $stateArgs['accessibleSpaces'])) {
       throw new BgaUserException(_("You cannot place this worker here"));
     }
 
@@ -581,7 +551,7 @@ class santorini extends Table
     $this->log->addAction("usedPower", [$wId, $work]);
 
     $state = $this->powerManager->stateAfterUsePower();
-    if($state == null){
+    if ($state == null) {
       throw new BgaUserException(_("Don't know what to do after the use of power"));
     }
     $this->gamestate->nextState($state);
@@ -604,7 +574,7 @@ class santorini extends Table
 
     // Apply power
     $state = $this->powerManager->stateAfterSkipPower();
-    if($state == null){
+    if ($state == null) {
       throw new BgaUserException(_("Don't know what to do after the skip of power"));
     }
     $this->gamestate->nextState($state);
@@ -733,9 +703,9 @@ class santorini extends Table
     if (!$args['skippable']) {
       throw new BgaUserException(_("You can't skip this action"));
     }
-		if($log){
-	    $this->log->addAction('skippedWork');
-		}
+    if ($log) {
+      $this->log->addAction('skippedWork');
+    }
 
     // Apply power
     $state = $this->powerManager->stateAfterSkip() ?: 'skip';

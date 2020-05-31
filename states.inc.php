@@ -75,7 +75,8 @@ $machinestates = array(
     'action' => 'stPowersSetup',
     'transitions' => [
       'done' => ST_NEXT_PLAYER_PLACE_WORKER,
-      'offer' => ST_BUILD_OFFER
+      'offer' => ST_BUILD_OFFER,
+      'chooseFirstPlayer' => ST_CHOOSE_FIRST_PLAYER
     ],
   ],
 
@@ -94,8 +95,9 @@ $machinestates = array(
 
   ST_CHOOSE_FIRST_PLAYER => [
     'name' => 'chooseFirstPlayer',
-    'description' => clienttranslate('${actplayer} must choose which power will start (balanced suggestion : ${power_name})'),
-    'descriptionmyturn' => clienttranslate('${you} must choose which power will start (balanced suggestion : ${power_name})'),
+    'description' => clienttranslate('${actplayer} must choose which power will start (balanced suggestion: ${power_name})'),
+    'descriptionmyturn' => clienttranslate('${you} must choose which power will start (balanced suggestion: ${power_name})'),
+    'i18n' => array('power_name'),
     'type' => 'activeplayer',
     'args' => 'argChooseFirstPlayer',
     'action' => 'stChooseFirstPlayer',
