@@ -106,6 +106,11 @@ $game_options = [
         'tmdisplay' => totranslate('Fair Division'),
         'description' => totranslate('First player selects the possible Powers, choosing last among these'),
       ],
+      RANDOM_FAIR_DIVISION => [
+        'name' => totranslate('Randomized Fair Division'),
+        'tmdisplay' => totranslate('Randomized Fair Division'),
+        'description' => totranslate('First player selects the possible Powers among a random subset, choosing last among these'),
+      ],
     ],
     'displaycondition' => [
       [

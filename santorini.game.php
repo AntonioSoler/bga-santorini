@@ -147,7 +147,7 @@ class santorini extends Table
 
     // In fair division setup player 1 must build the offer
     $optionSetup = intval(self::getGameStateValue('optionSetup'));
-    if ($optionSetup == FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
+    if ($optionSetup == FAIR_DIVISION || $optionSetup == RANDOM_FAIR_DIVISION || $optionPowers == GODS_AND_HEROES) {
       $this->gamestate->nextState('offer');
       return;
     }
@@ -162,9 +162,13 @@ class santorini extends Table
     }
 
     // Choose first player
-    $players = $this->argChooseFirstPlayer()['players'];
-    $firstPlayer = $players[array_rand($players, 1)];
-    $this->chooseFirstPlayer($firstPlayer['id']);
+    $firstPlayer = $this->argChooseFirstPlayer('hand')['suggestion'];
+    foreach ($players as $player) {
+      if($player->getPower()->getId() == $firstPlayer){
+        $this->setGamestateValue('firstPlayer', $player->getId());
+      }
+    }
+    $this->gamestate->nextState('done');
   }
 
 
@@ -256,11 +260,14 @@ class santorini extends Table
   /*
    * argChooseFirstPlayer: is called in the fair division setup, when a the contestant choose who will start
    */
-  public function argChooseFirstPlayer()
+  public function argChooseFirstPlayer($location = 'offer')
   {
+    $powers = $this->powerManager->getPowerIdsInLocation($location);
+    $firstPowerSuggestion = $this->powerManager->getFirstPlayerSuggestion($powers);
     $arg = [
-      'powers' => $this->powerManager->getPowerIdsInLocation('offer'),
-      'power_name' => $this->powerManager->getFirstPlayerSuggestion(),
+      'powers' => $powers,
+      'power_name' => $this->powerManager->getPower($firstPowerSuggestion)->getName(),
+      'suggestion' => $firstPowerSuggestion,
     ];
 
     // Apply powers (Bia must start)

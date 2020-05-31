@@ -132,7 +132,7 @@ class PowerManager extends APP_GameClass
   public function getPower($powerId, $playerId = null)
   {
     if (!isset(self::$classes[$powerId])) {
-      throw new BgaVisibleSystemException("Power $powerId is not implemented");
+      throw new BgaVisibleSystemException("Power $powerId is not implemented ($playerId)");
     }
     return new self::$classes[$powerId]($this->game, $playerId);
   }
@@ -211,6 +211,13 @@ class PowerManager extends APP_GameClass
     $powerIds = array_values(array_map(function ($power) {
       return $power->getId();
     }, $powers));
+
+    $optionSetup = $this->game->getGameStateValue('optionSetup');
+    if($optionSetup == RANDOM_FAIR_DIVISION || $optionSetup == RANDOM){
+      $keys = array_rand($powerIds, ($optionSetup == RANDOM? 1 : 2)*$nPlayers);
+      $powerIds = array_intersect_key( $powerIds, array_flip($keys));
+    }
+
     $this->game->cards->moveCards($powerIds, 'deck');
     $this->game->cards->shuffle('deck');
   }
@@ -269,21 +276,20 @@ class PowerManager extends APP_GameClass
   /*
    * getFirstPlayerSuggestion: TODO
    */
-  public function getFirstPlayerSuggestion()
+  public function getFirstPlayerSuggestion($offer)
   {
     $minOrderAid = 100;
-    $powerName = "";
-    $offer = $this->getOffer();
-    foreach($offer as $powerCard){
-      $power = $this->getPower($powerCard['id']);
+    $powerId = 0;
+    foreach($offer as $powerId){
+      $power = $this->getPower($powerId);
       $o = $power->getOrderAid();
       if($o < $minOrderAid && $o){
         $minOrderAid = $o;
-        $powerName = $power->getName();
+        $powerId = $power->getId();
       }
     }
 
-    return $powerName;
+    return $powerId;
   }
 
 
