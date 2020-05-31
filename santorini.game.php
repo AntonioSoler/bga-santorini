@@ -157,8 +157,6 @@ class santorini extends Table
       // Give the player a random power and invoke power-specific setup
       $power = $player->addPower();
       $power->setup($player);
-
-      $this->cards->moveCards($this->powerManager->computeBannedIds('hand'), 'box');
     }
 
     // Choose first player

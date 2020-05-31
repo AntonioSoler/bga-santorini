@@ -29,10 +29,9 @@ class Bia extends SantoriniPower
       return $power == $pId;
     });
 
-    $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} must place its workers first'), [
+    $this->game->notifyAllPlayers('message', clienttranslate('${power_name} must place its workers first'), [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),
-      'player_name' => $this->getPlayer()->getName(),
     ]);
   }
 

@@ -214,8 +214,16 @@ class PowerManager extends APP_GameClass
 
     $optionSetup = $this->game->getGameStateValue('optionSetup');
     if($optionSetup == RANDOM_FAIR_DIVISION || $optionSetup == RANDOM){
-      $keys = array_rand($powerIds, ($optionSetup == RANDOM? 1 : 2)*$nPlayers);
-      $powerIds = array_intersect_key( $powerIds, array_flip($keys));
+      $nPowers = $optionSetup == RANDOM? $nPlayers : (min(3*$nPlayers,10));
+
+      $offer = [];
+      for($i = 0; $i < $nPowers; $i++){
+        $offer[] = $powerIds[array_rand($powerIds, 1)];
+        Utils::filter($powerIds, function($power) use ($offer){
+          return !in_array($power, $this->computeBannedIds($offer));
+        });
+      }
+      $powerIds = $offer;
     }
 
     $this->game->cards->moveCards($powerIds, 'deck');
@@ -226,16 +234,16 @@ class PowerManager extends APP_GameClass
    * computeBannedIds: is called during fair division setup, whenever a player add/remove an offer
    *    it should return the list of banned powers against current offer
    */
-  public function computeBannedIds($location = 'offer')
+  public function computeBannedIds($mixed = 'offer')
   {
-    $powers = $this->game->cards->getCardsInLocation($location);
+    $powers = is_array($mixed)? $mixed : $this->getPowerIdsInLocation($mixed);
     $ids = [];
     foreach ($powers as $power) {
       foreach (self::$bannedMatchups as $matchup) {
-        if ($matchup[0] == $power['id']) {
+        if ($matchup[0] == $power) {
           $ids[] = $matchup[1];
         }
-        if ($matchup[1] == $power['id']) {
+        if ($matchup[1] == $power) {
           $ids[] = $matchup[0];
         }
       }
