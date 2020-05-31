@@ -757,7 +757,7 @@ class santorini extends Table
 
     // Undo the turn
     $this->log->cancelTurn();
-    self::notifyAllPlayers('cancel', clienttranslate('${player_name} start its turn again'), [
+    self::notifyAllPlayers('cancel', clienttranslate('${player_name} restarts their turn'), [
       'placedPieces' => $this->board->getPlacedPieces(),
       'player_name' => self::getActivePlayerName(),
     ]);
