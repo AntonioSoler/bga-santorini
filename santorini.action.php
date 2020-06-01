@@ -144,6 +144,14 @@ class action_santorini extends APP_GameAction
     self::ajaxResponse();
   }
 
+
+  public function resign()
+  {
+    self::setAjaxMode();
+    $this->game->resign();
+    self::ajaxResponse();
+  }
+
   /*
    * TODO
    */

@@ -247,6 +247,7 @@ Board.prototype.toggleCoordsHelpers = function(b){
 		this.showCoordsHelpers();
 	else
 		this.hideCoordsHelpers();
+	this.render();
 };
 
 
@@ -287,7 +288,7 @@ Board.prototype.diff = function(pieces){
 	this._ids.forEach((mesh, id, object) => {
 		var piece = mesh.space;
 
-		var space = pieces.reduce( (carry, piece) => piece.id == id? piece : carry, null);
+		var space = pieces.reduce( (carry, npiece) => npiece.id == id? npiece : carry, null);
 		// Still exist => move it if needed
 		if(space != null){
 			if(piece.x != space.x || piece.y != space.y || piece.z != space.z)

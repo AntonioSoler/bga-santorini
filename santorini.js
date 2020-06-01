@@ -43,7 +43,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Setup the board (3d scene using threejs)
       var container = document.getElementById('scene-container');
       this.board = new Board(container, URL); // Setup player boards
-			this.board.toggleCoordsHelpers(this.prefs[100].value == 2);
+			this.setupPreference();
 
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
@@ -51,7 +51,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           _this.addPowerToPlayer(player.id, powerId, true);
         });
       });
-
 
       // Setup workers and buildings
       gamedatas.placedPieces.forEach(function(piece){
@@ -61,6 +60,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Setup game notifications
       this.setupNotifications();
     },
+
+		setupPreference: function(){
+			var _this = this;
+			var preferenceSelect = $('preference_control_100');
+			var updatePreference = function(){
+				var value = preferenceSelect.options[preferenceSelect.selectedIndex].value;
+				_this.board.toggleCoordsHelpers(value == 2);
+			};
+
+			dojo.connect(preferenceSelect, 'onchange', updatePreference);;
+			updatePreference();
+		},
 
 		// TODO
 		onScreenWidthChange: function() {
@@ -658,8 +669,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         return worker.works && worker.works.length > 0;
       });
 
+			// If no worker can work => restart or resign
+			if(this._selectableWorkers.length == 0){
+				this.gamedatas.gamestate.descriptionmyturn = this._action == "playerMove"? _("You cannot move a worker") : _("You cannot build");
+				this.updatePageTitle();
+				this.addActionButton('buttonResign', _('Resign'), this.onClickResign.bind(this), null, false, 'gray');
+			}
 			// If only one worker can work, automatically select it
-			if (this._selectableWorkers.length == 1)
+			else if (this._selectableWorkers.length == 1)
 				this.onClickSelectWorker(this._selectableWorkers[0]);
 			// Otherwise, let the user make the choice
 			else if (this._selectableWorkers.length > 1)
@@ -785,6 +802,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         return;
 
       this.takeAction("cancelPreviousWorks");
+      this.clearPossible();
+    },
+
+
+		/*
+     * onClickResign: is called when the active player decide to resign (when cannot move/build)
+     */
+    onClickResign: function () {
+      if (!this.checkAction('resign'))
+        return;
+
+      this.takeAction("resign");
       this.clearPossible();
     },
 
