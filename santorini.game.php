@@ -75,9 +75,9 @@ class santorini extends Table
 		$values[] = "('" . $pId . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "', '$team')";
 		// PLAYER STATISTICS, SEE stats.inc.php
 		self::initStat('player', 'level_0', 0, $pId);
-		self::initStat('player', 'level_1' 0, $pId);
-		self::initStat('player', 'level_2' 0, $pId);
-		self::initStat('player', 'level_3' 0, $pId);
+		self::initStat('player', 'level_1', 0, $pId);
+		self::initStat('player', 'level_2', 0, $pId);
+		self::initStat('player', 'level_3', 0, $pId);
 		self::initStat('player', 'moves', 0, $pId);
 	}
 	// TABLE STATISTICS, SEE stats.inc.php
