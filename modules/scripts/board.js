@@ -292,7 +292,12 @@ Board.prototype.diff = function(pieces){
 		// Still exist => move it if needed
 		if(space != null){
 			if(piece.x != space.x || piece.y != space.y || piece.z != space.z)
-				this.movePiece(piece, space, 0, "none");
+			{
+				if(this._board[piece.x][piece.y][piece.z].piece.id == id)
+					this._board[piece.x][piece.y][piece.z].piece = null;
+				this.addMeshToBoard(mesh, space);
+				this.moveMesh(mesh, space, 0, "none");
+			}
 		}
 		// Remove it
 		else {
@@ -399,9 +404,9 @@ Board.prototype.moveMesh = function(mesh, space, delay, animation){
 		.to({y:theta}, 300,  Ease.quadInOut)
 
 	Tween.get(mesh.position).wait(delay)
-		.to(tmp1, 700,  Ease.quadInOut)
-		.to(tmp2, 600,  Ease.quadInOut)
-		.to(target, 600,  Ease.quadInOut)
+		.to(tmp1, 600,  Ease.quadInOut)
+		.to(tmp2, 500,  Ease.quadInOut)
+		.to(target, 500,  Ease.quadInOut)
 		.addEventListener('change', () => this.render())
 };
 

@@ -970,9 +970,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['removeOffer', 500],
         ['powerAdded', 1200],
         ['workerPlaced', 1000],
-        ['workerMoved', 2000],
+        ['workerMoved', 1600],
         ['blockBuilt', 1000],
-        ['workerSwitched', 2000], 	// Happens with Apollo
+        ['workerSwitched', 1600], 	// Happens with Apollo
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
 				['updatePowerUI', 10], // Happens with Morpheus
