@@ -47,10 +47,47 @@
 
 */
 
-$stats_type = [
+$stats_type = array(
     // Statistics global to table
-    'table' => [],
+    'table' => array(
+      'buildings' => array(
+          'id' => 10,
+          'name' => totranslate('Buildings placed'),
+          'type' => 'int'
+      ),
+      'moves' => array(
+          'id' => 11,
+          'name' => totranslate('Moves'),
+          'type' => 'int'
+      ),
+    ),
 
     // Statistics existing for each player
-    'player' => []
-];
+    'player' => array(
+        'level_0' => array(
+            'id' => 10,
+            'name' => totranslate('Level 0 Buildings placed'),
+            'type' => 'int'
+        ),
+        'level_1' => array(
+            'id' => 22,
+            'name' => totranslate('Level 1 Buildings placed'),
+            'type' => 'int'
+        ),
+        'level_2' => array(
+            'id' => 23,
+            'name' => totranslate('Level 2 Buildings placed'),
+            'type' => 'int'
+        ),
+        'level_3' => array(
+            'id' => 21,
+            'name' => totranslate('Domes placed'),
+            'type' => 'int'
+        ),
+        'moves' => array(
+            'id' => 30,
+            'name' => totranslate('Moves'),
+            'type' => 'int'
+        ),
+    )
+);

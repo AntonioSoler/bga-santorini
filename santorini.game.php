@@ -70,10 +70,20 @@ class santorini extends Table
     $i = 0;
     $nTeams = count($players) == 3 ? 3 : 2;
     foreach ($players as $pId => $player) {
-      $team = $i++ % $nTeams;
-      $color = $gameInfos['player_colors'][$team];
-      $values[] = "('" . $pId . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "', '$team')";
-    }
+		$team = $i++ % $nTeams;
+		$color = $gameInfos['player_colors'][$team];
+		$values[] = "('" . $pId . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "', '$team')";
+		// PLAYER STATISTICS, SEE stats.inc.php
+		self::initStat('player', 'level_0', 0, $pId);
+		self::initStat('player', 'level_1' 0, $pId);
+		self::initStat('player', 'level_2' 0, $pId);
+		self::initStat('player', 'level_3' 0, $pId);
+		self::initStat('player', 'moves', 0, $pId);
+	}
+	// TABLE STATISTICS, SEE stats.inc.php
+	self::initStat('table', 'buildings', 0);
+    self::initStat('table', 'moves', 0);
+			
     self::DbQuery($sql . implode($values, ','));
     self::reloadPlayersBasicInfos();
 
@@ -794,6 +804,10 @@ class santorini extends Table
     } else {
       $msg = clienttranslate('${player_name} moves on ${level_name}');
     }
+	$pId = self::getActivePlayerId();
+	self::incStat(1, 'moves');
+    self::incStat(1, 'moves', $pId);
+	
     self::notifyAllPlayers('workerMoved', $msg, [
       'i18n' => ['level_name'],
       'piece' => $worker,
@@ -815,6 +829,9 @@ class santorini extends Table
     $type = 'lvl' . $space['arg'];
     self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$space['x']}', '{$space['y']}', '{$space['z']}') ");
     $this->log->addBuild($worker, $space);
+
+    self::incStat(1, 'buildings');
+    self::incStat(1, 'level_'.$space['arg'] , $pId);
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
