@@ -101,12 +101,17 @@ $game_options = [
       QUICK => [
         'name' => totranslate('Quick Setup'),
         'tmdisplay' => totranslate('Quick Setup'),
-        'description' => totranslate('BGA randomly builds the offer of possible Powers'),
+        'description' => totranslate('BGA randomly builds an offer'),
+      ],
+      TOURNAMENT => [
+        'name' => totranslate('Tournament Setup'),
+        'tmdisplay' => totranslate('Tournament Setup'),
+        'description' => totranslate('First player builds an offer from a limited set of power cards randomly selected by BGA'),
       ],
       CUSTOM => [
         'name' => totranslate('Custom Setup'),
         'tmdisplay' => totranslate('Custom Setup'),
-        'description' => totranslate('First player builds the offer of possible Powers'),
+        'description' => totranslate('First player builds an offer from all available powers cards'),
       ],
     ],
     'displaycondition' => [

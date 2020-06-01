@@ -201,37 +201,48 @@ class PowerManager extends APP_GameClass
    */
   public function preparePowers()
   {
-    $nextState = 'done';
     $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
-    if ($optionPowers != NONE) {
-      // Filter supported powers depending on the number of players and game option
-      $nPlayers = $this->game->playerManager->getPlayerCount();
-      $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
-        return $power->isSupported($nPlayers, $optionPowers);
-      });
+    if ($optionPowers == NONE) {
+      return 'done';
+    }
 
-      $powerIds = array_values(array_map(function ($power) {
-        return $power->getId();
-      }, $powers));
-      $this->game->cards->moveCards($powerIds, 'deck');
-      $this->game->cards->shuffle('deck');
+    // Filter supported powers depending on the number of players and game option
+    $nPlayers = $this->game->playerManager->getPlayerCount();
+    $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
+      return $power->isSupported($nPlayers, $optionPowers);
+    });
+    $powerIds = array_values(array_map(function ($power) {
+      return $power->getId();
+    }, $powers));
 
-      $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
-      if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
-        $nextState = 'chooseFirstPlayer';
-        $offer = [];
-        for ($i = 0; $i < $nPlayers; $i++) {
-          $offer[] = $powerIds[array_rand($powerIds, 1)];
-          Utils::filter($powerIds, function ($power) use ($offer) {
-            return !in_array($power, $this->computeBannedIds($offer));
-          });
-        }
-        $this->game->cards->moveCards($offer, 'offer');
-      } else {
-        $nextState = 'offer';
+    // Additional filtering for QUICK and TOURNAMENT
+    $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
+    if (($optionSetup == QUICK || $optionSetup == TOURNAMENT) && $optionPowers != GODS_AND_HEROES) {
+      $count = $optionSetup == QUICK ? $nPlayers : ($nPlayers + 1) * 2;
+      $offer = [];
+      for ($i = 0; $i < $count; $i++) {
+        $offer[] = $powerIds[array_rand($powerIds, 1)];
+        Utils::filter($powerIds, function ($power) use ($offer) {
+          // Remove the selected powers AND any banned powers
+          return !in_array($power, $offer) && !in_array($power, $this->computeBannedIds($offer));
+        });
+      }
+      $powerIds = $offer;
+      if (count($powerIds) != $count) {
+        throw new BgaVisibleSystemException("Wrong number of powers during setup (expected: $count, actual: " . count($powerIds) . ")");
       }
     }
-    return $nextState;
+
+    if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
+      // QUICK: Skip offer
+      $this->game->cards->moveCards($powerIds, 'offer');
+      return 'chooseFirstPlayer';
+    } else {
+      // TOURNAMENT and CUSTOM: Build offer
+      $this->game->cards->moveCards($powerIds, 'deck');
+      $this->game->cards->shuffle('deck');
+      return 'offer';
+    }
   }
 
   /*

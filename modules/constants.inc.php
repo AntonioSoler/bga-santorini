@@ -116,7 +116,8 @@ define('NONE', 6);
 
 define('OPTION_SETUP', 102);
 define('QUICK', 0);
-define('CUSTOM', 1);
+define('TOURNAMENT', 1);
+define('CUSTOM', 2);
 
 define('HELPERS', 100);
 define('HIDE', 1);
