@@ -19,6 +19,12 @@ class Selene extends SantoriniPower
   }
 
   /* * */
+  public function argPlayerPlaceWorker(&$arg)
+  {
+    $arg['displayType'] = true;
+  }
+
+
   protected function updateBuildArg(&$worker, $add)
   {
     foreach ($worker['works'] as &$work) {

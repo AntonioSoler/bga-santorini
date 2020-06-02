@@ -522,6 +522,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onEnteringStatePlayerPlaceWorker: function (args) {
       this.worker = args.worker;
       this.board.makeClickable(args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
+			if(args.displayType && this.isCurrentPlayerActive()){
+				$('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f'? _("female") : _("male") ) + ")";
+			}
     },
 
 
