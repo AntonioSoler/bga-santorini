@@ -55,7 +55,7 @@ class Circe extends SantoriniPower
       if($action != null){
         foreach($this->game->playerManager->getPlayer()->getPowers() as $power){
           if($power->getId() != $this->getId()){
-            $this->game->cards->moveCard($power->getId(), 'hand', $action['playerId']);
+            $this->game->powerManager->cards->moveCard($power->getId(), 'hand', $action['playerId']);
             $this->notify(false, $action['playerId'], $power);
           }
         }
@@ -66,7 +66,7 @@ class Circe extends SantoriniPower
 
     $this->game->log->addAction('stealPower', ['playerId' => $opponent->getId() ]);
     foreach($opponent->getPowers() as $power){
-      $this->game->cards->moveCard($power->getId(), 'hand', $this->game->getActivePlayerId());
+      $this->game->powerManager->cards->moveCard($power->getId(), 'hand', $this->game->getActivePlayerId());
       $this->notify(true, $opponent->getId(), $power);
     }
   }

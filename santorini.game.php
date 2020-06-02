@@ -37,10 +37,6 @@ class santorini extends Table
       'firstPlayer' => FIRST_PLAYER,
     ]);
 
-    // Initialize power deck
-    $this->cards = self::getNew('module.common.deck');
-    $this->cards->init('card');
-
     // Initialize logger, board, power manager and player manager
     $this->log   = new SantoriniLog($this);
     $this->board = new SantoriniBoard($this);
@@ -309,7 +305,6 @@ class santorini extends Table
   {
     $player = $this->playerManager->getPlayer();
     $power = $player->addPower($powerId);
-    $power->setup($player);
     $this->gamestate->nextState('done');
   }
 

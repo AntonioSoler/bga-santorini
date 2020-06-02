@@ -51,7 +51,7 @@ class SantoriniLog extends APP_GameClass
   {
     $args = [
       'from' => $this->game->board->getCoords($piece),
-      'to'   => $this->game->board->getCoords($to),
+      'to'   => $to,
     ];
     $this->insert(-1, $piece['id'], $action, $args);
   }

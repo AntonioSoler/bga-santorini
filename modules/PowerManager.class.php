@@ -90,9 +90,15 @@ class PowerManager extends APP_GameClass
     [BIA, TARTARUS],
     [CHARON, HECATE],
     [CIRCE, CLIO],
+    [CIRCE, EROS],
+    [CIRCE, GAEA],
+    [CIRCE, GRAEAE],
     [CIRCE, HECATE],
+    [CIRCE, JASON],
+    [CIRCE, MOERAE],
     [CIRCE, NYX],
     [CIRCE, PROTEUS],
+    [CIRCE, TARTARUS],
     [CLIO, NEMESIS],
     [ERIS, HECATE],
     [ERIS, PERSEPHONE],
@@ -121,9 +127,15 @@ class PowerManager extends APP_GameClass
 
 
   public $game;
+  public $cards;
   public function __construct($game)
   {
     $this->game = $game;
+
+    // Initialize power deck
+    $this->cards = self::getNew('module.common.deck');
+    $this->cards->init('card');
+    $this->cards->autoreshuffle = true;
   }
 
   /*
@@ -164,7 +176,7 @@ class PowerManager extends APP_GameClass
    */
   public function getPowersInLocation($location)
   {
-    $cards = $this->game->cards->getCardsInLocation($location);
+    $cards = $this->cards->getCardsInLocation($location);
     return array_values(array_map(function ($card) {
       return $this->getPower($card['type']);
     }, $cards));
@@ -175,7 +187,7 @@ class PowerManager extends APP_GameClass
    */
   public function getPowerIdsInLocation($location)
   {
-    $cards = $this->game->cards->getCardsInLocation($location);
+    $cards = $this->cards->getCardsInLocation($location);
     return array_values(array_map(function ($card) {
       return intval($card['type']);
     }, $cards));
@@ -215,6 +227,9 @@ class PowerManager extends APP_GameClass
       return $power->getId();
     }, $powers));
 
+    // Move cards to deck (useful for Chaos !!)
+    $this->cards->moveCards($powerIds, 'deck');
+
     // Additional filtering for QUICK and TOURNAMENT
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
     if (($optionSetup == QUICK || $optionSetup == TOURNAMENT) && $optionPowers != GODS_AND_HEROES) {
@@ -234,13 +249,13 @@ class PowerManager extends APP_GameClass
     }
 
     if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
-      // QUICK: Skip offer
-      $this->game->cards->moveCards($powerIds, 'offer');
+      // QUICK: Skip building offer
+      $this->cards->moveCards($powerIds, 'offer');
       return 'chooseFirstPlayer';
     } else {
       // TOURNAMENT and CUSTOM: Build offer
-      $this->game->cards->moveCards($powerIds, 'deck');
-      $this->game->cards->shuffle('deck');
+      $this->cards->moveCards($powerIds, 'deck');
+      $this->cards->shuffle('deck');
       return 'offer';
     }
   }
@@ -274,7 +289,7 @@ class PowerManager extends APP_GameClass
   public function addOffer($powerId)
   {
     // Move the power card to the selection
-    $this->game->cards->moveCard($powerId, 'offer');
+    $this->cards->moveCard($powerId, 'offer');
     $this->game->notifyAllPlayers('addOffer', '', [
       'powerId' => $powerId,
       'banned' => $this->computeBannedIds()
@@ -288,7 +303,7 @@ class PowerManager extends APP_GameClass
   public function removeOffer($powerId)
   {
     // Move the power card to the deck
-    $this->game->cards->moveCard($powerId, 'deck');
+    $this->cards->moveCard($powerId, 'deck');
     $this->game->notifyAllPlayers('removeOffer', '', [
       'powerId' => $powerId,
       'banned' => $this->computeBannedIds()
@@ -321,7 +336,7 @@ class PowerManager extends APP_GameClass
    */
   public function setFirstPlayerOffer($powerId)
   {
-    $this->game->cards->moveCard($powerId, 'offer', '1');
+    $this->cards->moveCard($powerId, 'offer', '1');
   }
 
 
@@ -330,7 +345,7 @@ class PowerManager extends APP_GameClass
    */
   public function getOffer()
   {
-    return array_values($this->game->cards->getCardsInLocation('offer'));
+    return array_values($this->cards->getCardsInLocation('offer'));
   }
 
 

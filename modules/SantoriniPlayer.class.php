@@ -15,7 +15,7 @@ class SantoriniPlayer extends APP_GameClass
         $this->zombie = $row['zombie'] == 1;
 
         // Load powers
-        $cards = $this->game->cards->getCardsInLocation('hand', $this->id);
+        $cards = $this->game->powerManager->cards->getCardsInLocation('hand', $this->id);
         foreach ($cards as $powerId => $card) {
             $this->powers[] = $this->game->powerManager->getPower($powerId, $this->id);
         }
@@ -98,14 +98,14 @@ class SantoriniPlayer extends APP_GameClass
     {
         if (empty($powerId)) {
             // Draw the next card from the deck
-            $powerId = ($this->game->cards->pickCard('deck', $this->id))['id'];
+            $powerId = ($this->game->powerManager->cards->pickCard('deck', $this->id))['id'];
         } else {
             // Draw a specific card
-            $card = $this->game->cards->getCard($powerId);
+            $card = $this->game->powerManager->cards->getCard($powerId);
             if($card['location_arg'] == 1){
               $this->game->setGameStateValue('firstPlayer', $this->id);
             }
-            $this->game->cards->moveCard($powerId, 'hand', $this->id);
+            $this->game->powerManager->cards->moveCard($powerId, 'hand', $this->id);
         }
         $power = $this->game->powerManager->getPower($powerId, $this->id);
         $this->powers[] = $power;
@@ -120,6 +120,8 @@ class SantoriniPlayer extends APP_GameClass
             'power_title' => $power->getTitle(),
         ]);
 
+        // Setup power
+        $power->setup();
         return $power;
     }
 
