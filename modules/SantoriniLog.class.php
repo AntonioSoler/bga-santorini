@@ -180,17 +180,18 @@ class SantoriniLog extends APP_GameClass
   /*
    * getLastActions : get works and actions of player (used to cancel previous action)
    */
-  public function getLastActions($actions = ['move', 'build', 'skippedWork', 'usedPower', 'skippedPower'], $pId = null)
+  public function getLastActions($actions = ['move', 'build', 'skippedWork', 'usedPower', 'skippedPower'], $pId = null, $offset = null)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
+    $offset = $offset ?: 0;
     $actionsNames = "'" . implode("','", $actions) . "'";
 
-    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC");
+    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset ORDER BY log_id DESC");
   }
 
-  public function getLastAction($action, $pId = null)
+  public function getLastAction($action, $pId = null, $offset = null)
   {
-    $actions = $this->getLastActions([$action]);
+    $actions = $this->getLastActions([$action], $pId, $offset);
     return count($actions) > 0 ? json_decode($actions[0]['action_arg'], true) : null;
   }
 

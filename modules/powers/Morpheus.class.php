@@ -20,11 +20,18 @@ class Morpheus extends SantoriniPower
   }
 
   /* * */
+  public function getUIData()
+  {
+    $data = parent::getUIData();
+    $data['stock'] = $this->computeStock();
+    return $data;
+  }
+
   public function computeStock()
   {
     $round = $this->game->getGameStateValue("currentRound");
     $pId = $this->playerId;
-    $builds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'build' AND `player_id` = '$pId'");
+    $builds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'morpheusBuild'");
     return $round - $builds['n'];
   }
 
@@ -51,6 +58,13 @@ class Morpheus extends SantoriniPower
   {
     $arg['skippable'] = true;
   }
+
+  public function playerBuild($worker, $work)
+  {
+    $this->game->log->addAction('morpheusBuild');
+    return false;
+  }
+
 
   public function afterPlayerBuild($worker, $work)
   {

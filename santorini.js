@@ -45,12 +45,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.board = new Board(container, URL); // Setup player boards
 			this.setupPreference();
 
-      gamedatas.fplayers.forEach(function (player) {
-        dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
-        player.powers.forEach(function (powerId) {
-          _this.addPowerToPlayer(player.id, powerId, true);
-        });
-      });
+			// Setup powers
+			this.setupPowers(gamedatas.fplayers);
 
       // Setup workers and buildings
       gamedatas.placedPieces.forEach(function(piece){
@@ -89,6 +85,27 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+		/*
+		 * setupPowers: give each player its corresponding power
+		 */
+		setupPowers: function(players){
+			var _this = this;
+
+			players.forEach(function (player) {
+				var container = $('power_container_' + player.id);
+				if(container != null){
+					dojo.empty(container);
+				}	else {
+ 			 		dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
+				}
+
+				player.powers.forEach(function (powerId) {
+					_this.addPowerToPlayer(player.id, powerId, false);
+				});
+ 		 	});
+		},
+
+
     /*
      * addPowerToPlayer:
      * 	add a power card to given player
@@ -106,12 +123,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 			powerDialog.setTitle(playerId == this.player_id? _("Your power") : _("Opponent's power") );
 			powerDialog.setContent(this.format_block( 'jstpl_powerDetail', this.getPower(powerId)));
  			powerDialog.replaceCloseCallback( function() { powerDialog.hide(); } );
- 			dojo.connect(card, "onclick", function(ev){
-				powerDialog.show();
-			});
-
+ 			dojo.connect(card, "onclick", function(ev){	powerDialog.show();	});
 			if(showDialog && playerId == this.player_id)
 				powerDialog.show();
+
+			if(powerId == this.powersIds.MORPHEUS){
+				var div = document.createElement("div");
+				div.id = 'morpheus-power-stock-' + playerId;
+				div.className = "morpheus-power-stock";
+				$('mini-card-' + playerId + "-" + powerId).appendChild(div);
+				div.innerHTML = power.stock;
+			}
     },
 
 
@@ -124,14 +146,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 			if(n.args.powerId == this.powersIds.MORPHEUS){
 				var div = $('morpheus-power-stock-' + n.args.playerId);
-				if(div == null){
-					div = document.createElement("div");
-					div.id = 'morpheus-power-stock-' + n.args.playerId;
-					div.className = "morpheus-power-stock";
-					$('mini-card-' + n.args.playerId + "-" + n.args.powerId).appendChild(div);
-				}
 				div.innerHTML = n.args.stock;
 			}
+		},
+
+
+		/*
+		 * notif_powersChanged:
+		 *   called whenever powers are changed (eg Circe, Chaos)
+		 */
+		notif_powersChanged: function (n) {
+			debug('Notif: chaging powers', n.args);
+			this.setupPowers(n.args.fplayers);
 		},
 
 		/*
@@ -979,6 +1005,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
 				['updatePowerUI', 10], // Happens with Morpheus
+				['powersChanged', 10], // Happens with Circe
       ];
 
       var _this = this;
