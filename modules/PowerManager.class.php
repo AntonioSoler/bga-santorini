@@ -120,10 +120,13 @@ class PowerManager extends APP_GameClass
     [HARPIES, HERMES],
     [HARPIES, MAENADS],
     [HARPIES, TRITON],
+    [HECATE, DIONYSUS],
+    [HECATE, MEDEA],
     [HECATE, MOERAE],
-    [HECATE, NYX],
     [HECATE, SCYLLA],
+    [HECATE, NYX],
     [HECATE, TARTARUS],
+    [HECATE, THESEUS],
     [HYPNUS, TERPSICHORE],
     [LIMUS, TERPSICHORE],
     [MEDUSA, NEMESIS],
@@ -132,6 +135,8 @@ class PowerManager extends APP_GameClass
     [NEMESIS, TERPSICHORE],
     [NEMESIS, THESEUS],
     [SELENE, GAEA],
+    [PERSEPHONE, TRITON], // CF PERSEPHONE
+    [PERSEPHONE, ARTEMIS],  // CF PERSEPHONE
     [TARTARUS, TERPSICHORE],
   ];
 
