@@ -55,7 +55,7 @@ $machinestates = array(
   /*
    * BGA framework initial state. Do not modify.
    */
-  ST_GAME_SETUP => [
+  ST_BGA_GAME_SETUP => [
     'name' => 'gameSetup',
     'description' => '',
     'type' => 'manager',
@@ -266,10 +266,20 @@ $machinestates = array(
     ],
   ],
 
+  ST_GAME_END => [
+    'name' => 'gameEndStats',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stGameEndStats',
+    'transitions' => [
+      'endgame' => ST_BGA_GAME_END,
+    ],
+  ],
+
   /*
    * BGA framework final state. Do not modify.
    */
-  ST_GAME_END => [
+  ST_BGA_GAME_END => [
     'name' => 'gameEnd',
     'description' => clienttranslate('End of game'),
     'type' => 'manager',

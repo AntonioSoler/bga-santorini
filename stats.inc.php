@@ -47,47 +47,98 @@
 
 */
 
-$stats_type = array(
-    // Statistics global to table
-    'table' => array(
-      'buildings' => array(
-          'id' => 10,
-          'name' => totranslate('Buildings placed'),
-          'type' => 'int'
-      ),
-      'moves' => array(
-          'id' => 11,
-          'name' => totranslate('Moves'),
-          'type' => 'int'
-      ),
-    ),
+require_once('modules/constants.inc.php');
+require_once("modules/PowerManager.class.php");
+require_once("modules/SantoriniPower.class.php");
+require_once("modules/SantoriniHeroPower.class.php");
+foreach (PowerManager::$classes as $className) {
+    require_once("modules/powers/$className.class.php");
+}
+$powerManager = new PowerManager(null);
+$powerLabels = $powerManager->getStatLabels();
 
-    // Statistics existing for each player
-    'player' => array(
-        'level_0' => array(
-            'id' => 10,
-            'name' => totranslate('Level 0 Buildings placed'),
+$stats_type = [
+    // Statistics global to table
+    'table' => [
+        'winPower' => [
+            'id' => STAT_POWER,
+            'name' => totranslate('Winning Power (2 or 3 players)'),
             'type' => 'int'
-        ),
-        'level_1' => array(
-            'id' => 22,
-            'name' => totranslate('Level 1 Buildings placed'),
+        ],
+        'winPower1' => [
+            'id' => STAT_POWER1,
+            'name' => totranslate('Winning Power (4 players)'),
             'type' => 'int'
-        ),
-        'level_2' => array(
-            'id' => 23,
-            'name' => totranslate('Level 2 Buildings placed'),
+        ],
+        'winPower2' => [
+            'id' => STAT_POWER2,
+            'name' => totranslate('Winning Power (4 players)'),
             'type' => 'int'
-        ),
-        'level_3' => array(
-            'id' => 21,
-            'name' => totranslate('Domes placed'),
-            'type' => 'int'
-        ),
-        'moves' => array(
-            'id' => 30,
+        ],
+        'move' => [
+            'id' => STAT_MOVE,
             'name' => totranslate('Moves'),
             'type' => 'int'
-        ),
-    )
-);
+        ],
+        'buildBlock' => [
+            'id' => STAT_BUILD_BLOCK,
+            'name' => totranslate('Blocks built'),
+            'type' => 'int'
+        ],
+        'buildDome' => [
+            'id' => STAT_BUILD_DOME,
+            'name' => totranslate('Domes built'),
+            'type' => 'int'
+        ],
+        'buildTower' => [
+            'id' => STAT_BUILD_TOWER,
+            'name' => totranslate('Complete Towers built'),
+            'type' => 'int'
+        ],
+    ],
+
+    // Statistics existing for each player
+    'player' => [
+        'playerPower' => [
+            'id' => STAT_POWER,
+            'name' => totranslate('Power'),
+            'type' => 'int'
+        ],
+        'usePower' => [
+            'id' => STAT_USE_POWER,
+            'name' => totranslate('Power uses'),
+            'type' => 'int'
+        ],
+        'move' => [
+            'id' => STAT_MOVE,
+            'name' => totranslate('Moves'),
+            'type' => 'int'
+        ],
+        'moveUp' => [
+            'id' => STAT_MOVE_UP,
+            'name' => totranslate('Moves up'),
+            'type' => 'int'
+        ],
+        'moveDown' => [
+            'id' => STAT_MOVE_DOWN,
+            'name' => totranslate('Moves down'),
+            'type' => 'int'
+        ],
+        'buildBlock' => [
+            'id' => STAT_BUILD_BLOCK,
+            'name' => totranslate('Blocks built'),
+            'type' => 'int'
+        ],
+        'buildDome' => [
+            'id' => STAT_BUILD_DOME,
+            'name' => totranslate('Domes built'),
+            'type' => 'int'
+        ],
+    ],
+
+    'value_labels' => [
+        STAT_POWER => $powerLabels,
+        STAT_POWER1 => $powerLabels,
+        STAT_POWER2 => $powerLabels,
+    ]
+];

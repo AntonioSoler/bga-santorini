@@ -181,6 +181,16 @@ class PowerManager extends APP_GameClass
     return $ui;
   }
 
+  public function getStatLabels() {
+    $labels = [
+      0 => ''
+    ];
+    foreach ($this->getPowers() as $power) {
+      $labels[$power->getId()] = $power->getName();
+    }
+    return $labels;
+  }
+
   /*
    * getPowersInLocation: return all the powers in a given location
    */

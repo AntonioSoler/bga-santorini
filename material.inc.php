@@ -26,7 +26,6 @@ require_once("modules/SantoriniLog.class.php");
 require_once("modules/SantoriniBoard.class.php");
 require_once("modules/PlayerManager.class.php");
 require_once("modules/PowerManager.class.php");
-require_once("modules/StatManager.class.php");
 require_once("modules/SantoriniPower.class.php");
 require_once("modules/SantoriniHeroPower.class.php");
 foreach (PowerManager::$classes as $className) {

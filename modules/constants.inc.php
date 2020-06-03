@@ -84,7 +84,7 @@ define('PEGASUS', 67);
 /*
  * State constants
  */
-define('ST_GAME_SETUP', 1);
+define('ST_BGA_GAME_SETUP', 1);
 define('ST_POWERS_SETUP', 10);
 define('ST_BUILD_OFFER', 12);
 define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
@@ -101,7 +101,8 @@ define('ST_BUILD', 7);
 define('ST_END_OF_TURN', 17);
 define('ST_USE_POWER', 15);
 
-define('ST_GAME_END', 99);
+define('ST_GAME_END', 98);
+define('ST_BGA_GAME_END', 99);
 
 /*
  * Options constants
@@ -122,6 +123,20 @@ define('CUSTOM', 2);
 define('HELPERS', 100);
 define('HIDE', 1);
 define('SHOW', 2);
+
+/*
+ * Game statistics constants
+ */
+define('STAT_POWER', 10);
+define('STAT_POWER1', 11);
+define('STAT_POWER2', 12);
+define('STAT_USE_POWER', 13);
+define('STAT_MOVE', 20);
+define('STAT_MOVE_UP', 21);
+define('STAT_MOVE_DOWN', 22);
+define('STAT_BUILD_BLOCK', 30);
+define('STAT_BUILD_DOME', 31);
+define('STAT_BUILD_TOWER', 32);
 
 /*
  * Variable constants

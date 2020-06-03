@@ -3,6 +3,7 @@
 /*
  * SantoriniLog: a class that allows to log some actions
  *   and then fetch these actions latter (useful for powers or rollback)
+ *   also responsible for managing game statistics
  */
 class SantoriniLog extends APP_GameClass
 {
@@ -12,6 +13,49 @@ class SantoriniLog extends APP_GameClass
     $this->game = $game;
   }
 
+  /*
+   * initStats: initialize statistics to 0 at start of game
+   */
+  public function initStats($players)
+  {
+    $this->game->initStat('table', 'winPower', 0);
+    $this->game->initStat('table', 'winPower1', 0);
+    $this->game->initStat('table', 'winPower2', 0);
+    $this->game->initStat('table', 'move', 0);
+    $this->game->initStat('table', 'buildBlock', 0);
+    $this->game->initStat('table', 'buildDome', 0);
+    $this->game->initStat('table', 'buildTower', 0);
+
+    foreach ($players as $pId => $player) {
+      $this->game->initStat('player', 'playerPower', 0, $pId);
+      $this->game->initStat('player', 'usePower', 0, $pId);
+      $this->game->initStat('player', 'move', 0, $pId);
+      $this->game->initStat('player', 'moveUp', 0, $pId);
+      $this->game->initStat('player', 'moveDown', 0, $pId);
+      $this->game->initStat('player', 'buildBlock', 0, $pId);
+      $this->game->initStat('player', 'buildDome', 0, $pId);
+    }
+  }
+
+  /*
+   * gameEndStats: compute end-of-game statistics
+   */
+  public function gameEndStats()
+  {
+    $this->game->setStat($this->game->board->getCompleteTowerCount(), 'buildTower');
+  }
+
+  public function incrementStats($stats, $value = 1)
+  {
+    foreach ($stats as $pId => $names) {
+      foreach ($names as $name) {
+        if ($pId == 'table') {
+          $pId = null;
+        }
+        $this->game->incStat($value, $name, $pId);
+      }
+    }
+  }
 
   ////////////////////////////////
   ////////////////////////////////
@@ -27,11 +71,33 @@ class SantoriniLog extends APP_GameClass
    *   - string $action : the name of the action
    *   - array $args : action arguments (eg space)
    */
-  public function insert($playerId, $pieceId, $action, $args)
+  public function insert($playerId, $pieceId, $action, $args = [])
   {
     $playerId = $playerId == -1 ? $this->game->getActivePlayerId() : $playerId;
     $round = $this->game->getGameStateValue("currentRound");
-    $actionArgs = is_array($args) ? json_encode($args) : $args;
+
+    if ($action == 'move') {
+      $args['stats'] = [
+        'table' => ['move'],
+        $playerId => ['move'],
+      ];
+      if ($args['to']['z'] > $args['from']['z']) {
+        $args['stats'][$playerId][] = 'moveUp';
+      } else if ($args['to']['z'] < $args['from']['z']) {
+        $args['stats'][$playerId][] = 'moveDown';
+      }
+    } else if ($action == 'build') {
+      $statName = $args['to']['arg'] == 3 ? 'buildDome' : 'buildBlock';
+      $args['stats'] = [
+        'table' => [$statName],
+        $playerId => [$statName],
+      ];
+    }
+    if (array_key_exists('stats', $args)) {
+      $this->incrementStats($args['stats']);
+    }
+
+    $actionArgs = json_encode($args);
     self::DbQuery("INSERT INTO log (`round`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$playerId', '$pieceId', '$action', '$actionArgs')");
   }
 
@@ -41,7 +107,7 @@ class SantoriniLog extends APP_GameClass
    */
   public function startTurn()
   {
-    $this->insert(-1, 0, 'startTurn', '{}');
+    $this->insert(-1, 0, 'startTurn');
   }
 
   /*
@@ -86,14 +152,14 @@ class SantoriniLog extends APP_GameClass
    */
   public function addRemoval($piece)
   {
-    $this->insert(-1, $piece['id'], 'removal', '{}');
+    $this->insert(-1, $piece['id'], 'removal');
   }
 
 
   /*
    * addAction: add a new action to log
    */
-  public function addAction($action, $args = '{}')
+  public function addAction($action, $args = [])
   {
     $this->insert(-1, 0, $action, $args);
   }
@@ -215,26 +281,29 @@ class SantoriniLog extends APP_GameClass
     $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC");
 
     $ids = [];
-    foreach($logs as $log){
+    foreach ($logs as $log) {
       $args = json_decode($log['action_arg'], true);
 
-      // Move/force : go back to initial position
-      if($log['action'] == 'move' or $log['action'] == 'force'){
+      if ($log['action'] == 'move' or $log['action'] == 'force') {
+        // Move/force : go back to initial position
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
-      }
-      // Build : remove the piece
-      else if($log['action'] == 'build'){
+      } else if ($log['action'] == 'build') {
+        // Build : remove the piece
         self::DbQuery("DELETE FROM piece WHERE x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
-      }
-      // Removal : put the piece back on the board
-      else if($log['action'] == 'removal'){
+      } else if ($log['action'] == 'removal') {
+        // Removal : put the piece back on the board
         self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$log['piece_id']}");
+      }
+
+      if (array_key_exists('stats', $args)) {
+        // Undo statistics
+        $this->incrementStats($args['stats'], -1);
       }
 
       $ids[] = $log['log_id'];
     }
 
     // Remove the logs
-    self::DbQuery("DELETE FROM log WHERE `player_id` = '$pId' AND `log_id` IN (". implode($ids, ',') .")");
+    self::DbQuery("DELETE FROM log WHERE `player_id` = '$pId' AND `log_id` IN (" . implode($ids, ',') . ")");
   }
 }

@@ -102,10 +102,14 @@ class SantoriniPlayer extends APP_GameClass
         } else {
             // Draw a specific card
             $card = $this->game->powerManager->cards->getCard($powerId);
-            if($card['location_arg'] == 1){
-              $this->game->setGameStateValue('firstPlayer', $this->id);
+            if ($card['location_arg'] == 1) {
+                $this->game->setGameStateValue('firstPlayer', $this->id);
             }
             $this->game->powerManager->cards->moveCard($powerId, 'hand', $this->id);
+            if (count($this->powers) == 0) {
+                // Record the power ID in game statistics
+                $this->game->setStat($powerId, 'playerPower', $this->id);
+            }
         }
         $power = $this->game->powerManager->getPower($powerId, $this->id);
         $this->powers[] = $power;

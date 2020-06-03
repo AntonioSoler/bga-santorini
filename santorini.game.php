@@ -42,7 +42,6 @@ class santorini extends Table
     $this->board = new SantoriniBoard($this);
     $this->powerManager = new PowerManager($this);
     $this->playerManager = new PlayerManager($this);
-    $this->statManager = new StatManager($this);
   }
 
   protected function getGameName()
@@ -67,15 +66,15 @@ class santorini extends Table
     $i = 0;
     $nTeams = count($players) == 3 ? 3 : 2;
     foreach ($players as $pId => $player) {
-  		$team = $i++ % $nTeams;
-  		$color = $gameInfos['player_colors'][$team];
-  		$values[] = "('" . $pId . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "', '$team')";
-  	}
+      $team = $i++ % $nTeams;
+      $color = $gameInfos['player_colors'][$team];
+      $values[] = "('" . $pId . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "', '$team')";
+    }
     self::DbQuery($sql . implode($values, ','));
     self::reloadPlayersBasicInfos();
 
     // Init stats
-    $this->statManager->init($players);
+    $this->log->initStats($players);
 
     // Create power cards
     $this->powerManager->createCards();
@@ -477,6 +476,16 @@ class santorini extends Table
     return $arg['win'];
   }
 
+  /*
+   * stGameEndStats:
+   *   final state before end of game used to calculate end statistics
+   */
+  public function stGameEndStats()
+  {
+    $this->log->gameEndStats();
+    $this->gamestate->nextState('endgame');
+  }
+
 
   /*
    * announceWin: this function is called just before the game ends
@@ -485,19 +494,20 @@ class santorini extends Table
   public function announceWin($playerId, $win = true)
   {
     $players = $win ? $this->playerManager->getTeammates($playerId) : $this->playerManager->getOpponents($playerId);
-
-    // 2v2 setup
     if (count($players) == 2) {
+      // 4 players
       self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} win!'), [
         'player_name' => $players[0]->getName(),
         'player_name2' => $players[1]->getName(),
       ]);
-    }
-    // 2 or 3 players setup
-    else {
+      $this->setStat($this->getStat('playerPower', $players[0]->getId()), 'winPower1');
+      $this->setStat($this->getStat('playerPower', $players[1]->getId()), 'winPower2');
+    } else {
+      // 2 or 3 players
       self::notifyAllPlayers('message', clienttranslate('${player_name} wins!'), [
         'player_name' => $players[0]->getName(),
       ]);
+      $this->setStat($this->getStat('playerPower', $players[0]->getId()), 'winPower');
     }
 
     self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team = {$players[0]->getTeam()}");
@@ -509,21 +519,22 @@ class santorini extends Table
   /*
    * announceLoose: this function is called when a player cannot move and build during its turn
    */
-   public function announceLose($msg = null, $args = null){
-     $msg = $msg ?: clienttranslate('${player_name} cannot move/build and is eliminated!');
-     $args = $args ?: ['player_name' => self::getActivePlayerName()];
-     self::notifyAllPlayers('message', $msg, $args);
+  public function announceLose($msg = null, $args = null)
+  {
+    $msg = $msg ?: clienttranslate('${player_name} cannot move/build and is eliminated!');
+    $args = $args ?: ['player_name' => self::getActivePlayerName()];
+    self::notifyAllPlayers('message', $msg, $args);
 
-     $pId = self::getActivePlayerId();
-     if ($this->playerManager->getPlayerCount() != 3) {
-       // 1v1 or 2v2 => end of the game
-       self::announceWin($pId, false);
-     } else {
-       // 3 players => eliminate the player
-       $this->playerManager->eliminate($pId);
-       $this->gamestate->nextState('endturn');
-     }
-   }
+    $pId = self::getActivePlayerId();
+    if ($this->playerManager->getPlayerCount() != 3) {
+      // 1v1 or 2v2 => end of the game
+      self::announceWin($pId, false);
+    } else {
+      // 3 players => eliminate the player
+      $this->playerManager->eliminate($pId);
+      $this->gamestate->nextState('endturn');
+    }
+  }
 
 
   /////////////////////////////////////////
@@ -689,7 +700,7 @@ class santorini extends Table
         return;
       }
 
-      if (!$state['args']['cancelable']){
+      if (!$state['args']['cancelable']) {
         $this->announceLose();
       }
     }
@@ -794,8 +805,6 @@ class santorini extends Table
     if (!$this->powerManager->$stateName($worker, $work)) {
       // Otherwise, do the work
       $this->$stateName($worker, $work);
-      // Update stats
-      $this->statManager->$stateName($worker, $work);
     }
 
     // Apply post-work powers
@@ -827,7 +836,7 @@ class santorini extends Table
     } else {
       $msg = clienttranslate('${player_name} moves on ${level_name}');
     }
-	  $pId = self::getActivePlayerId();
+    $pId = self::getActivePlayerId();
 
     self::notifyAllPlayers('workerMoved', $msg, [
       'i18n' => ['level_name'],
