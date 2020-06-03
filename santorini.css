@@ -273,7 +273,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
-    z-index: 2;
 }
 
 .power-card .power-name {
@@ -287,7 +286,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    z-index: 3;
 }
 
 
@@ -300,7 +298,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
-    z-index: 4;
 }
 
 /* Fair division setup uses small cards */
