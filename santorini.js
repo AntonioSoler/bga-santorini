@@ -146,7 +146,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 			if(n.args.powerId == this.powersIds.MORPHEUS){
 				var div = $('morpheus-power-stock-' + n.args.playerId);
-				div.innerHTML = n.args.stock;
+				if(div)
+					div.innerHTML = n.args.stock;
 			}
 		},
 

@@ -29,10 +29,9 @@ class Morpheus extends SantoriniPower
 
   public function computeStock()
   {
-    $round = $this->game->getGameStateValue("currentRound");
-    $pId = $this->playerId;
+    $rounds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'morpheusStart'");
     $builds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'morpheusBuild'");
-    return $round - $builds['n'];
+    return $rounds['n'] - $builds['n'];
   }
 
   public function updateUI()
@@ -44,8 +43,9 @@ class Morpheus extends SantoriniPower
     ]);
   }
 
-  public function startOfTurn()
+  public function startPlayerTurn()
   {
+    $this->game->log->addAction('morpheusStart');
     $this->updateUI();
   }
 

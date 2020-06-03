@@ -195,6 +195,15 @@ class SantoriniLog extends APP_GameClass
     return count($actions) > 0 ? json_decode($actions[0]['action_arg'], true) : null;
   }
 
+
+  public function getActions($actions, $pId = null)
+  {
+    $pId = $pId ?: $this->game->getActivePlayerId();
+    $actionsNames = "'" . implode("','", $actions) . "'";
+
+    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' ORDER BY log_id DESC");
+  }
+
   ////////////////////////////////
   ////////////////////////////////
   //////////   Cancel   //////////
