@@ -33,6 +33,7 @@ class Hermes extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $arg['skippable'] = true;
+    $arg['mayMoveAgain'] = true;
 
     // No move before => usual rule
     $move = $this->game->log->getLastMove();

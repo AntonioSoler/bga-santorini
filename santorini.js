@@ -857,6 +857,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 		 */
     notif_automatic: function (n) {
       debug('Notif: automatic work incoming', n.args);
+			this.clearPossible();
     },
 
     /*

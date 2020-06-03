@@ -29,14 +29,24 @@ class Triton extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg["mayMoveAgain"] = "perimeter";
     // No move before => usual rule
-    $move = $this->game->log->getLastMove();
-    if ($move == null) {
+    $moves = $this->game->log->getLastMoves();
+    if (count($moves) == 0) {
       return;
     }
 
-    Utils::filterWorkersById($arg, $move['pieceId']);
+    Utils::filterWorkersById($arg, $moves[0]['pieceId']);
     $arg['skippable'] = true;
+
+    // Don't let Triton move back to a space already moved to (needed against Aphrodite to make sure it gets blocked)
+    Utils::filterWorks($arg, function($space, $worker) use ($moves){
+      foreach($moves as $move){
+        if($this->game->board->isSameSpace($space, $move['to']))
+          return false;
+      }
+      return true;
+    });
   }
 
   public function stateAfterMove()

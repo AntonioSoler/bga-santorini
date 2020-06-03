@@ -293,7 +293,7 @@ Board.prototype.diff = function(pieces){
 		if(space != null){
 			if(piece.x != space.x || piece.y != space.y || piece.z != space.z)
 			{
-				if(this._board[piece.x][piece.y][piece.z].piece.id == id)
+				if(this._board[piece.x][piece.y][piece.z].piece.pieceId == id)
 					this._board[piece.x][piece.y][piece.z].piece = null;
 				this.addMeshToBoard(mesh, space);
 				this.moveMesh(mesh, space, 0, "none");
@@ -335,6 +335,7 @@ Board.prototype.addPiece = function(piece, animation){
 
 	var mesh = this._meshManager.createMesh(piece.name || piece.type);
 	mesh.name = piece.name;
+	mesh.pieceId = piece.id;
 	mesh.position.copy(animation == "fall"? sky : center);
 	mesh.material.opacity = (animation == "fall" || animation == "none") ? 1 : 0;
 	mesh.rotation.set(0, (Math.floor(Math.random() * 4) - 1)*Math.PI/2, 0);
@@ -343,7 +344,6 @@ Board.prototype.addPiece = function(piece, animation){
 	this.addMeshToBoard(mesh, piece);
 
 	// If building => add text on layer 1
-	console.log(piece);
 	if(['lvl0', 'lvl1', 'lvl2'].includes(piece.type)){
 		var textMesh = this.computeText(parseInt(piece.type[3]) + 1, 0.5);
 		textMesh.position.set(0, lvlHeights[parseInt(piece.z) + 1] - lvlHeights[piece.z],0);

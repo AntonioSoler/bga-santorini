@@ -632,6 +632,7 @@ class santorini extends Table
 
     $arg = [
       'cancelable' => $this->log->getLastActions() != null,
+      'mayMoveAgain' => false,
       'skippable' => false,
       'workers' => $workers,
     ];

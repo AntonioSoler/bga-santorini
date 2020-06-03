@@ -31,7 +31,8 @@ class Aphrodite extends SantoriniPower
   }
 
 
-  public function startOpponentTurn() {
+  public function startOpponentTurn()
+  {
     $oppWorkers = $this->game->board->getPlacedActiveWorkers();
     $forcedWorkers = [];
     foreach($oppWorkers as $worker){
@@ -46,13 +47,60 @@ class Aphrodite extends SantoriniPower
   }
 
 
-  public function endOpponentTurn() {
+  public function getForcedWorkers()
+  {
     $action = $this->game->log->getLastAction('forcedWorkers');
     if($action == null){
+      return null;
+    }
+    return $action['workers'];
+  }
+
+
+  public function argOpponentMove(&$arg)
+  {
+    $forcedWorkers = $this->getForcedWorkers();
+    if($forcedWorkers == null){
       return;
     }
 
-    $forcedWorkers = $action['workers'];
+    // Allow skip only if condition is satisfied
+    if($arg['skippable']){
+      foreach($arg['workers'] as $worker){
+        $arg['skippable'] = $arg['skippable'] && ((!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($worker));
+      }
+    }
+
+
+    // Last move => must be neighboring
+    if($arg['mayMoveAgain'] === false){
+      Utils::filterWorks($arg, function($space, $worker) use ($forcedWorkers){
+        return (!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($space);
+      });
+
+      if(empty($arg['workers'])){
+        $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: your last move must be to a space neighboring one of its Workers '), [
+          'i18n' => ['power_name'],
+          'power_name' => $this->getName(),
+        ]);
+      }
+    }
+    // Last move if not on perimeter => must be neighboring
+    else if($arg['mayMoveAgain'] === 'perimeter'){
+      Utils::filterWorks($arg, function($space, $worker) use ($forcedWorkers){
+        return (!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($space) || $this->game->board->isPerimeter($space);
+      });
+    }
+
+  }
+
+  public function endOpponentTurn()
+  {
+    $forcedWorkers = $this->getForcedWorkers();
+    if($forcedWorkers == null){
+      return;
+    }
+
     $oppWorkers = $this->game->board->getPlacedActiveWorkers();
     foreach($oppWorkers as $worker){
       if (!(in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($worker)){
