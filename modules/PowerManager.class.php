@@ -237,9 +237,6 @@ class PowerManager extends APP_GameClass
       return $power->getId();
     }, $powers));
 
-    // Move cards to deck (useful for Chaos !!)
-    $this->cards->moveCards($powerIds, 'deck');
-
     // Additional filtering for QUICK and TOURNAMENT
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
     if (($optionSetup == QUICK || $optionSetup == TOURNAMENT) && $optionPowers != GODS_AND_HEROES) {
