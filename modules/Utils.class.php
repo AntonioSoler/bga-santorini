@@ -74,6 +74,25 @@ abstract class Utils extends APP_GameClass
     });
   }
 
+  public static function mergeWorkers(&$arg, $workers)
+  {
+    foreach($workers as $worker){
+      $found = false;
+      foreach($arg['workers'] as &$worker2){
+        if($worker['id'] == $worker2['id']){
+          $found = true;
+          foreach($worker['works'] as $work){
+            if(!in_array($work, $worker2['works']))
+              $worker2['works'][] = $work;
+          }
+        }
+      }
+
+      if(!$found){
+        $arg['workers'][] = $worker;
+      }
+    }
+  }
 
   public static function &getWorkerOrCreate(&$arg, &$sworker)
   {

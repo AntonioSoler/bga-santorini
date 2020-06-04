@@ -22,8 +22,10 @@ class Apollo extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
+    $workers = $this->game->board->getPlacedWorkers($this->playerId);
     $allWorkers = $this->game->board->getPlacedWorkers();
-    foreach ($arg["workers"] as &$worker) {
+    foreach ($workers as &$worker) {
+      $worker['works'] = [];
       foreach ($allWorkers as $worker2) {
         if ($worker['player_id'] == $worker2['player_id']) {
           continue;
@@ -34,6 +36,8 @@ class Apollo extends SantoriniPower
         }
       }
     }
+
+    Utils::mergeWorkers($arg, $workers);
   }
 
   public function playerMove($worker, $work)

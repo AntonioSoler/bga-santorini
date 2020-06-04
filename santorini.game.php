@@ -423,7 +423,7 @@ class santorini extends Table
    */
   public function stStartOfTurn()
   {
-    if($this->log->getLastAction('additionalTurn') == null){
+    if(!$this->log->isAdditionalTurn()){
       $this->log->startTurn();
     }
 
@@ -548,7 +548,9 @@ class santorini extends Table
    */
   public function argUsePower()
   {
-    $arg = [];
+    $arg = [
+      'cancelable' => $this->log->getLastActions() != null
+    ];
     $this->powerManager->argUsePower($arg);
     return $arg;
   }

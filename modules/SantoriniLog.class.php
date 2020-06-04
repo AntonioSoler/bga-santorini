@@ -270,6 +270,14 @@ class SantoriniLog extends APP_GameClass
     return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' ORDER BY log_id DESC");
   }
 
+
+  public function isAdditionalTurn($pId = null)
+  {
+    $pId = $pId ?: $this->game->getActivePlayerId();
+    $action = self::getObjectFromDb("SELECT * FROM log WHERE `action` IN ('startTurn', 'additionalTurn') ORDER BY log_id DESC LIMIT 1");
+    return ($action != null && $action['player_id'] == $pId && $action['action'] == 'additionalTurn');
+  }
+
   ////////////////////////////////
   ////////////////////////////////
   //////////   Cancel   //////////

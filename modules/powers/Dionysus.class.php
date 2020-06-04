@@ -19,18 +19,11 @@ class Dionysus extends SantoriniPower
   }
 
   /* * */
-  public function isAdditionalTurn()
-  {
-    $action = $this->game->log->getLastAction("additionalTurn");
-    return $action != null;
-  }
-
-
   // TODO: filter only Opponent workers in Athena Aphrodite Hypnus Limus Hades
   public function argPlayerMove(&$arg)
   {
     // Usual turn => usual rule
-    if (!$this->isAdditionalTurn()) {
+    if (!$this->game->log->isAdditionalTurn()) {
       return;
     }
 
@@ -47,7 +40,7 @@ class Dionysus extends SantoriniPower
   public function argPlayerBuild(&$arg)
   {
     // Usual turn => usual rule
-    if (!$this->isAdditionalTurn()) {
+    if (!$this->game->log->isAdditionalTurn()) {
       return;
     }
 
@@ -86,14 +79,14 @@ class Dionysus extends SantoriniPower
 
   public function checkPlayerWinning(&$arg)
   {
-    if ($this->isAdditionalTurn()) {
+    if ($this->game->log->isAdditionalTurn()) {
       $arg['win'] = false;
     }
   }
 
   public function checkOpponentWinning(&$arg)
   {
-    if ($this->isAdditionalTurn()) {
+    if ($this->game->log->isAdditionalTurn()) {
       $arg['win'] = false;
     }
   }
