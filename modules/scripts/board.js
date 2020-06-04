@@ -83,10 +83,6 @@ Board.prototype.initScene = function(){
 
 	// Camera
 	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, isMobile()? 250 : 150 );
-	this._camera.position.set( 0, 14, 15 );
-	if(isMobile())
-		this._camera.position.set( 0, 20, 25 );
-	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 	// Lights
 	this._scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF, 1 ) );
@@ -150,8 +146,36 @@ Board.prototype.initScene = function(){
 
 	document.addEventListener( 'mousedown', (event) => this._mouseDown = true );
 	document.addEventListener( 'mouseup', (event) => this._mouseDown = false );
+
+	// Rotate the camera
+	this._cameraAngle = { theta : 0};
+	var anim = Tween.get(this._cameraAngle, { loop:-1 }).to({ theta : 2*Math.PI}, 16000, Ease.linear)
+	.addEventListener('change', () => {
+		this._camera.position.x = Math.cos(this._cameraAngle.theta)*30;
+		this._camera.position.y = 12;
+		this._camera.position.z = Math.sin(this._cameraAngle.theta)*30;
+		this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+		this.render();
+	});
+	this._onScene = false;
 };
 
+
+/*
+ * TODO
+ */
+Board.prototype.enterScene = function(){
+	if(this._onScene)
+		return;
+
+	this._onScene = true;
+	Tween.removeTweens(this._cameraAngle);
+
+	this._camera.position.set( 0, 14, 15 );
+	if(isMobile())
+		this._camera.position.set( 0, 20, 25 );
+	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+};
 
 
 
@@ -284,10 +308,8 @@ Board.prototype.reset = function(){
 Board.prototype.diff = function(pieces){
 	this.clearClickable();
 	this.clearHighlights();
-console.log(pieces);
-console.log(this._ids);
 
-	this._ids = this._ids.filter((mesh, id) => {
+	this._ids.slice().map((mesh, id) => {
 		var piece = mesh.space;
 
 		var space = pieces.reduce( (carry, npiece) => npiece.id == id? npiece : carry, null);
@@ -300,13 +322,12 @@ console.log(this._ids);
 				this.addMeshToBoard(mesh, space);
 				this.moveMesh(mesh, space, 0, "none");
 			}
-			return true;
 		}
 		// Remove it
 		else {
 			this._scene.remove(mesh);
 			this._board[piece.x][piece.y][piece.z].piece = null;
-			return false;
+			delete this._ids[id];
 		}
 	});
 

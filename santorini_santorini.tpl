@@ -51,6 +51,19 @@ var jstpl_powerDetail = `<div class="power-detail">
 
 
 
+var jstpl_powerDialog = `<div class="power-dialog">
+	<div class="power-dialog-background">
+		<div class="power-card power-\${id} \${type}"></div>
+		<div class="power-info \${type}">
+			<div class="power-name">\${name}</div>
+			<div class="power-title">\${title}</div>
+			<ul class="power-text"><li>\${textList}</li></ul>
+		</div>
+	</div>
+</div>`;
+
+
+
 var jstpl_token = '<div id="token-\${token}" class="token token-\${token}"></div>';
 var jstpl_tokenPrompt = `<table class="token-prompt">
 	<tr>

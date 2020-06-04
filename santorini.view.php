@@ -40,6 +40,6 @@ class view_santorini_santorini extends game_view
     $current_player_id = $g_user->get_id();
     $template = self::getGameName() . '_' . self::getGameName();
     $this->tpl['TITLE_OFFER'] = self::_("Powers On Offer:");
-    $this->tpl['TITLE_DECK'] = self::_("All Powers:");
+    $this->tpl['TITLE_DECK'] = self::_("Available Powers:");
   }
 }

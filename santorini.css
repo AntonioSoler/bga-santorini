@@ -23,6 +23,23 @@ html {
   background-color:#76cfe9;
 }
 
+
+#play-area-scaler {
+  display:grid;
+}
+
+#play-area-scaler #power-offer-container,
+#play-area-scaler #power-choose-container,
+#play-area-scaler #play-area {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+#play-area-scaler #power-offer-container,
+#play-area-scaler #power-choose-container {
+  z-index:2;
+}
+
 div#popin_chooseArg {
     background-image: url('img/dialog.png');
     background-size: contain;
@@ -205,10 +222,63 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     justify-content: space-evenly;
 }
 
+
+.power-dialog {
+  position:relative;
+  width:300px;
+  padding:102px 34px 27px 34px;
+}
+
+.power-dialog-background {
+  width:100%;
+  height:100%;
+  background-color:#f0e3d4;
+}
+
+.power-dialog .power-card {
+  border-radius:0;
+  box-shadow:none;
+  background-size:100%;
+}
+.power-dialog .power-card::before {
+  display:none;
+}
+
+.power-dialog .power-info .power-name,
+.power-dialog .power-info .power-title {
+  text-align: center;
+}
+
+.power-dialog .power-info .power-text {
+  padding:0 15px;
+}
+
+.power-dialog .power-info .power-text li {
+  list-style-type: none;
+  margin-left:0;
+  text-align: justify;
+}
+
+.power-dialog::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:4;
+  border-image-slice: 187 80 34 72;
+  border-image-width: 102px 34px 27px 34px;
+  border-image-outset: 0px 0px 0px 0px;
+  border-image-repeat: stretch repeat;
+  border-image-source: url(img/dialog.png);
+}
+
 #play-area {
     display: flex;
     pointer-events: visible;
 }
+
 
 #prompt-container {
     background: #f0f0f0;
@@ -349,7 +419,8 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 
-#power-choose-container .power-detail .first {
+#power-choose-container .power-detail .first,
+#power-choose-container .power-dialog .first {
   position: absolute;
   top: 12px;
   right: 12px;

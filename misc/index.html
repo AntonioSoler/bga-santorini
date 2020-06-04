@@ -31,9 +31,33 @@ float:right;
 div#log canvas {
 	background-color:red;
 }
+
+div#test {
+	position:absolute;
+	top:10;
+	left:10;
+	width:400px;
+	height:500px;
+	border-image-slice: 187 80 34 72;
+	border-image-width: 102px 34px 27px 34px;
+	border-image-outset: 0px 0px 0px 0px;
+	border-image-repeat: stretch repeat;
+	border-image-source: url(../img/dialog.png);
+}
+
+div#tester {
+	padding: 102px 34px 27px 34px;width: 100%;height: 100%;box-sizing: border-box;
+}
+
+div#test3 {
+	width:100%;
+	height:100%;
+	background-color:#faecdb;
+}
 </style>
 	</head>
 	<body>
+<div id="test"><div id="tester"><div id="test3"></div></div></div>
 <div id="page-content">
     <div id="container"></div>
     <div id="sliderX"></div>
