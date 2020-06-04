@@ -423,7 +423,9 @@ class santorini extends Table
    */
   public function stStartOfTurn()
   {
-    $this->log->startTurn();
+    if($this->log->getLastAction('additionalTurn') == null){
+      $this->log->startTurn();
+    }
 
     // Apply power
     $this->powerManager->startOfTurn();
@@ -444,10 +446,8 @@ class santorini extends Table
 
     // Apply power
     $this->powerManager->endOfTurn();
-    // TODO : some power can do stuff at the end of the turn
-    //    $state = $this->powerManager->stateStartOfTurn() ?: 'move';
-    //    $this->gamestate->nextState($state);
-    $this->gamestate->nextState('next');
+    $state = $this->powerManager->stateEndOfTurn() ?: 'next';
+    $this->gamestate->nextState($state);
   }
 
   /*
@@ -630,26 +630,33 @@ class santorini extends Table
   /////////////////////////////////////////
 
   /*
+   * argPlayerWork: init the works
+   */
+  public function argPlayerWork($action, $workers = null)
+  {
+    $arg = [
+      'cancelable' => $this->log->getLastActions() != null,
+      'skippable' => false,
+      'workers' => $workers ?: $this->board->getPlacedActiveWorkers(),
+    ];
+
+    foreach ($arg['workers'] as &$worker) {
+      $worker["works"] = $this->board->getNeighbouringSpaces($worker, $action);
+    }
+    Utils::cleanWorkers($arg);
+
+    return $arg;
+  }
+
+
+  /*
    * argPlayerMove: give the list of accessible unnocupied spaces for each worker
    */
   public function argPlayerMove()
   {
-    // Return for each worker of this player the spaces he can move to
-    $workers = $this->board->getPlacedActiveWorkers();
-    foreach ($workers as &$worker) {
-      $worker["works"] = $this->board->getNeighbouringSpaces($worker, 'move');
-    }
-    Utils::cleanWorkers($arg);
-
-    $arg = [
-      'cancelable' => $this->log->getLastActions() != null,
-      'mayMoveAgain' => false,
-      'skippable' => false,
-      'workers' => $workers,
-    ];
-
+    $arg = $this->argPlayerWork('move');
+    $arg['mayMoveAgain'] = false;
     $this->powerManager->argPlayerMove($arg);
-    Utils::cleanWorkers($arg);
     return $arg;
   }
 
@@ -659,24 +666,15 @@ class santorini extends Table
    */
   public function argPlayerBuild()
   {
-    $arg = [
-      'cancelable' => $this->log->getLastActions() != null,
-      'skippable' => false,
-      'workers' => [],
-    ];
+    $arg = $this->argPlayerWork('build');
 
     // Return available spaces neighbouring the moved worker
     $move = $this->log->getLastMove();
     if (!is_null($move)) {
-      $worker = $this->board->getPiece($move['pieceId']);
-      $worker['works'] = $this->board->getNeighbouringSpaces($worker, 'build');
-      $arg['workers'][] = $worker;
+      Utils::filterWorkersById($arg, $move['pieceId']);
     }
-    Utils::cleanWorkers($arg);
 
-    // Apply power
     $this->powerManager->argPlayerBuild($arg);
-    Utils::cleanWorkers($arg);
     return $arg;
   }
 

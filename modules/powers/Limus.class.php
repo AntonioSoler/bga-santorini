@@ -24,7 +24,7 @@ class Limus extends SantoriniPower
   {
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
     foreach ($myWorkers as &$worker) {
-      Utils::filterWorks($arg, function (&$space, $oppworker) use ($worker) {
+      Utils::filterWorksUnlessMine($arg, $myWorkers, function (&$space, $oppworker) use ($worker) {
         // can build only a dome or at a non-neighbouring space
         if (!$this->game->board->isNeighbour($space, $worker, 'build')) {
           return true;

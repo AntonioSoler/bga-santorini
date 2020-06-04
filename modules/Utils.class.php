@@ -22,6 +22,7 @@ abstract class Utils extends APP_GameClass
     }
   }
 
+
   public static function filterWorkersById(&$arg, $wId, $same = true)
   {
     self::filterWorkers($arg, function (&$worker) use ($wId, $same) {
@@ -62,6 +63,15 @@ abstract class Utils extends APP_GameClass
     }
 
     self::cleanWorkers($arg);
+  }
+
+
+  public static function filterWorksUnlessMine(&$arg, $workers, $filter)
+  {
+    $workersIds = array_map(function($worker){ return $worker['id'];}, $workers);
+    Utils::filterWorks($arg, function (&$space, &$worker) use ($filter, $workersIds) {
+      return in_array($worker['id'], $workersIds) || $filter($space, $worker);
+    });
   }
 
 

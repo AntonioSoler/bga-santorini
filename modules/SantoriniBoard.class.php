@@ -120,9 +120,9 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPlacedOpponentWorkers: return all placed workers of opponents of active player
    */
-  public function getPlacedOpponentWorkers()
+  public function getPlacedOpponentWorkers($pId = null)
   {
-    return $this->game->board->getPlacedWorkers($this->game->playerManager->getOpponentsIds());
+    return $this->game->board->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId));
   }
 
 
@@ -245,6 +245,7 @@ class SantoriniBoard extends APP_GameClass
       return $this->isNeighbour($piece, $space, $action);
     }));
   }
+
 
   /*
    * getCompleteTowerCount: Return the number of Complete Towers (domes on level 3)

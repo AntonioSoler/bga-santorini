@@ -284,8 +284,10 @@ Board.prototype.reset = function(){
 Board.prototype.diff = function(pieces){
 	this.clearClickable();
 	this.clearHighlights();
+console.log(pieces);
+console.log(this._ids);
 
-	this._ids.forEach((mesh, id, object) => {
+	this._ids = this._ids.filter((mesh, id) => {
 		var piece = mesh.space;
 
 		var space = pieces.reduce( (carry, npiece) => npiece.id == id? npiece : carry, null);
@@ -298,12 +300,13 @@ Board.prototype.diff = function(pieces){
 				this.addMeshToBoard(mesh, space);
 				this.moveMesh(mesh, space, 0, "none");
 			}
+			return true;
 		}
 		// Remove it
 		else {
 			this._scene.remove(mesh);
 			this._board[piece.x][piece.y][piece.z].piece = null;
-			object.splice(id, 1);
+			return false;
 		}
 	});
 

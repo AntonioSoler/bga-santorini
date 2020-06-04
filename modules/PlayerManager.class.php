@@ -104,7 +104,7 @@ class PlayerManager extends APP_GameClass
    */
   public function getOpponentsIds($pId = -1)
   {
-    if ($pId == -1) {
+    if ($pId == -1 || $pId == null) {
       $pId = $this->game->getActivePlayerId();
     }
 

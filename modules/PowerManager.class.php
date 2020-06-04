@@ -86,6 +86,7 @@ class PowerManager extends APP_GameClass
     [ATLAS, GAEA],
     [APHRODITE, NEMESIS],
     [APHRODITE, URANIA],
+    [ASTERIA, HADES],
     [BIA, NEMESIS],
     [BIA, TARTARUS],
     [CHARON, HECATE],
@@ -137,6 +138,8 @@ class PowerManager extends APP_GameClass
     [SELENE, GAEA],
     [PERSEPHONE, TRITON], // CF PERSEPHONE
     [PERSEPHONE, ARTEMIS],  // CF PERSEPHONE
+    [PERSEPHONE, CHARON],  // CF PERSEPHONE
+    [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE
     [TARTARUS, TERPSICHORE],
   ];
 
@@ -678,6 +681,13 @@ class PowerManager extends APP_GameClass
   }
 
 
+  /*
+   * stateStartOfTurn: is called at the end of the player turn.
+   */
+  public function stateEndOfTurn()
+  {
+    return $this->getNewState('stateEndOfTurn', _("Can't figure next state at the end of the turn"));
+  }
 
   /////////////////////////////////////
   /////////////////////////////////////

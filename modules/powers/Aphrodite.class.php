@@ -33,7 +33,7 @@ class Aphrodite extends SantoriniPower
 
   public function startOpponentTurn()
   {
-    $oppWorkers = $this->game->board->getPlacedActiveWorkers();
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
     $forcedWorkers = [];
     foreach($oppWorkers as $worker){
       if($this->isNeighbouring($worker)){
@@ -101,7 +101,7 @@ class Aphrodite extends SantoriniPower
       return;
     }
 
-    $oppWorkers = $this->game->board->getPlacedActiveWorkers();
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
     foreach($oppWorkers as $worker){
       if (!(in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($worker)){
         continue;

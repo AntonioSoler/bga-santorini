@@ -18,6 +18,11 @@
 @import url('santorini.powers.css');
 @import url('santorini.tokens.css');
 
+html {
+  background-image:none !important;
+  background-color:#76cfe9;
+}
+
 div#popin_chooseArg {
     background-image: url('img/dialog.png');
     background-size: contain;

@@ -261,6 +261,7 @@ $machinestates = array(
     'type' => 'game',
     'action' => 'stEndOfTurn',
     'transitions' => [
+      'additionalTurn' => ST_START_OF_TURN,
       'next' => ST_NEXT_PLAYER,
       'endgame' => ST_GAME_END,
     ],

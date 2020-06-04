@@ -21,7 +21,9 @@ class Hades extends SantoriniPower
   /* * */
   public function argOpponentMove(&$arg)
   {
-    Utils::filterWorks($arg, function ($space, $worker) {
+    // Useful against Dionysus
+    $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
+    Utils::filterWorksUnlessMine($arg, $myWorkers, function ($space, $worker){
       return $space['z'] >= $worker['z'];
     });
   }

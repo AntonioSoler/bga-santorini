@@ -180,6 +180,10 @@ abstract class SantoriniPower extends APP_GameClass
   public function endOpponentTurn()
   {
   }
+  public function stateEndOfTurn()
+  {
+    return null;
+  }
 
   public function checkPlayerWinning(&$arg)
   {

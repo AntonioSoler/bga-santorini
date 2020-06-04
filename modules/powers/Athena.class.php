@@ -34,7 +34,9 @@ class Athena extends SantoriniPower
       return;
     }
 
-    Utils::filterWorks($arg, function ($space, $worker) {
+    // Useful against Dionysos
+    $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
+    Utils::filterWorksUnlessMine($arg, $myWorkers, function ($space, $worker) {
       return $space['z'] <= $worker['z'];
     });
   }

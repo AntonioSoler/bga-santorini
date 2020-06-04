@@ -20,7 +20,7 @@ class Persephone extends SantoriniPower
 
 /*
 DISCLAIMER :
-This is a very basic version of Persephone that will not work against power that may move more than once.
+This is a very basic version of Persephone that will not work against power that may move more than once (or that may free some space using their power)
 That is why I added some banned matchups that are not in the rulebook.
 If one wants to improve this, it will also have to change Triton behaviour : already visited spaces cannot be moved on again
   (useful against Aphrodite to make sure we can be blocked and then resign at some point)
