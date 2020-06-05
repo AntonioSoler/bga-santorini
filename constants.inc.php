@@ -93,6 +93,7 @@ define('ST_CHOOSE_FIRST_PLAYER', 18);
 
 define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);
+define('ST_PLACE_RAM', 41);
 
 define('ST_NEXT_PLAYER', 5);
 define('ST_START_OF_TURN', 16);

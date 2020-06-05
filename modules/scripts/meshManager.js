@@ -85,6 +85,10 @@ const Meshes = [
 		g:'mWorker',
 		s:0.9
 	},
+	{
+		n:'ram',
+		s:0.42,
+	},
 ];
 
 

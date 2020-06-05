@@ -324,13 +324,23 @@ class santorini extends Table
   {
     // First switch to first player if no worker placed
     $placedWorkers = $this->board->getPlacedWorkers();
-    if (count($placedWorkers) == 0)
+    if (count($placedWorkers) == 0) {
       $this->gamestate->changeActivePlayer($this->getGameStateValue('firstPlayer'));
+    }
 
-    // Get all the remeaning workers of all players
+    // Get all remaining workers for all players
     $workers = $this->board->getAvailableWorkers();
     if (count($workers) == 0) {
-      $this->gamestate->nextState('done');
+      $optionPowers = intval($this->getGameStateValue('optionPowers'));
+      if ($optionPowers == GOLDEN_FLEECE) {
+        // Create the Ram figure
+        self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
+        // Switch to first player
+        $this->gamestate->changeActivePlayer($this->getGameStateValue('firstPlayer'));
+        $this->gamestate->nextState('ram');
+      } else {
+        $this->gamestate->nextState('done');
+      }
       return;
     }
 
@@ -365,6 +375,18 @@ class santorini extends Table
   }
 
   /*
+   * argPlaceRam: give the list of accessible unnocupied spaces and the id/type of Ram figure we want to add
+   */
+  public function argPlaceRam()
+  {
+    $arg = [
+      'worker' => $this->board->getRam(),
+      'accessibleSpaces' => $this->board->getAccessibleSpaces()
+    ];
+    return $arg;
+  }
+
+  /*
    * placeWorker: place a new worker on the board
    *  - int $id : the piece id we want to move from deck to board
    *  - int $x,$y,$z : the new location on the board
@@ -375,12 +397,12 @@ class santorini extends Table
 
     $stateArgs = $this->gamestate->state()['args'];
     if ($stateArgs['worker']['id'] != $workerId) {
-      throw new BgaVisibleSystemException('You cannot place this worker');
+      throw new BgaVisibleSystemException('You cannot place this piece');
     }
 
     $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
     if (!in_array($space, $stateArgs['accessibleSpaces'])) {
-      throw new BgaUserException(_("You cannot place this worker here"));
+      throw new BgaUserException(_("This space is not available"));
     }
 
     // Place the worker in this space
@@ -388,7 +410,8 @@ class santorini extends Table
 
     // Notify
     $piece = $this->board->getPiece($workerId);
-    self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places a worker'), [
+    $msg = $piece['type'] == 'ram' ? clienttranslate('${player_name} places the Ram figure') : clienttranslate('${player_name} places a worker');
+    self::notifyAllPlayers('workerPlaced', $msg, [
       'i18n' => [],
       'piece' => $piece,
       'player_name' => self::getActivePlayerName(),

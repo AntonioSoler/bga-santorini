@@ -65,18 +65,19 @@ class SantoriniBoard extends APP_GameClass
   /*
    * TODO
    */
-  public function playerFilter($pIds = -1){
+  public function playerFilter($pIds = -1)
+  {
     $filter = "";
     if ($pIds != -1) {
-      if(!is_array($pIds)){
+      if (!is_array($pIds)) {
         $pIds = [$pIds];
       }
       $ids = [];
-      foreach($pIds as $pId){
+      foreach ($pIds as $pId) {
         $ids = array_merge($ids, $this->game->playerManager->getTeammatesIds($pId));
       }
 
-      $filter = " AND player_id IN (". implode(',', $ids) .")";
+      $filter = " AND player_id IN (" . implode(',', $ids) . ")";
     }
 
     return $filter;
@@ -89,6 +90,14 @@ class SantoriniBoard extends APP_GameClass
   public function getAvailableWorkers($pId = -1)
   {
     return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId));
+  }
+
+  /*
+   * getRam: return the Ram figure for Golden Fleece variant
+   */
+  public function getRam()
+  {
+    return self::getObjectFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE type = 'ram'");
   }
 
 
@@ -165,11 +174,11 @@ class SantoriniBoard extends APP_GameClass
     for ($x = 0; $x < 5; $x++) {
       for ($y = 0; $y < 5; $y++) {
         $z = 0;
-        $blocked = false; // If we see a worker or a dome, the space is not accessible
+        $blocked = false; // If we see a worker, ram, or dome, the space is not accessible
         // Find next free space above ground
         for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
           $p = $board[$x][$y][$z];
-          $blocked = ($p['type'] == 'worker' || $p['type'] == 'lvl3');
+          $blocked = ($p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3');
         }
 
         if ($blocked || $z > 3) {

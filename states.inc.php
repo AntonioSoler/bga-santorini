@@ -145,6 +145,7 @@ $machinestates = array(
     'transitions' => [
       'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
       'next' => ST_PLACE_WORKER,
+      'ram' => ST_PLACE_RAM,
       'done' => ST_NEXT_PLAYER,
     ],
     'updateGameProgression' => true,
@@ -160,6 +161,19 @@ $machinestates = array(
     'transitions' => [
       'zombiePass' => ST_NEXT_PLAYER_PLACE_WORKER,
       'workerPlaced' => ST_NEXT_PLAYER_PLACE_WORKER,
+    ],
+  ],
+
+  ST_PLACE_RAM => [
+    'name' => 'playerPlaceRam',
+    'description' => clienttranslate('${actplayer} must place the Ram figure'),
+    'descriptionmyturn' => clienttranslate('${you} must place the Ram figure'),
+    'type' => 'activeplayer',
+    'args' => 'argPlaceRam',
+    'possibleactions' => ['placeWorker'],
+    'transitions' => [
+      'zombiePass' => ST_GAME_END,
+      'workerPlaced' => ST_NEXT_PLAYER,
     ],
   ],
 
@@ -201,7 +215,7 @@ $machinestates = array(
     'i18n' => array('power_name'),
     'type' => 'activeplayer',
     'args' => 'argUsePower',
-    'possibleactions' => [ 'use', 'skip', 'cancel' ],
+    'possibleactions' => ['use', 'skip', 'cancel'],
     'transitions' => [
       'cancel' => ST_START_OF_TURN,
       'move' => ST_MOVE,
