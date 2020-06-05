@@ -18,7 +18,7 @@
  */
 
 require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
-require_once('modules/constants.inc.php');
+require_once('constants.inc.php');
 
 class santorini extends Table
 {

@@ -47,7 +47,7 @@
 
 */
 
-require_once('modules/constants.inc.php');
+require_once('constants.inc.php');
 require_once("modules/PowerManager.class.php");
 require_once("modules/SantoriniPower.class.php");
 require_once("modules/SantoriniHeroPower.class.php");
