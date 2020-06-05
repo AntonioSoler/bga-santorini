@@ -34,6 +34,7 @@ var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${
 var jstpl_powerContainer = '<div id="power_container_${id}" class="power-container"></div>';
 
 var jstpl_miniCard = `<div class="mini-card power-\${id} \${type}" title="\${name}" data-power="\${id}">
+	<div class="power-name">\${name}</div>
 	<div class="power-avatar"></div>
 	<div class="power-pictogram"></div>
 </div>`;

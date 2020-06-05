@@ -24,7 +24,7 @@
  *
  */
 
-require_once("modules/constants.inc.php");
+require_once("constants.inc.php");
 
 $game_options = [
   OPTION_POWERS => [

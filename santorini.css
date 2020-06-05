@@ -127,6 +127,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-repeat: no-repeat;
     background-size: contain;
     overflow: hidden;
+    border-radius: 8px;
+}
+
+.power-container .mini-card .power-name {
+    font-size: 17px;
+    padding-top: 1px;
 }
 
 .power-container .mini-card .power-avatar {
@@ -143,10 +149,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-container .mini-card .power-pictogram {
     position: absolute;
-    width: 160px;
-    height: 80px;
-    left: 60px;
-    top: 20px;
+    width: 150px;
+    height: 72px;
+    left: 65px;
+    top: 30px;
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -163,7 +169,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-name {
   font: 24px 'Caveat Brush', cursive;
   text-transform: uppercase;
-  color: #333;
+  color: #443;
 }
 
 .hero .power-name, .hero .power-title {
