@@ -41,9 +41,7 @@ class Aphrodite extends SantoriniPower
       }
     }
 
-    if(!empty($forcedWorkers)){
-      $this->game->log->addAction('forcedWorkers', ['workers' => $forcedWorkers ]);
-    }
+    $this->game->log->addAction('forcedWorkers', ['workers' => $forcedWorkers ]);
   }
 
 
@@ -101,13 +99,11 @@ class Aphrodite extends SantoriniPower
       return;
     }
 
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
-    foreach($oppWorkers as $worker){
-      if (!(in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($worker)){
-        continue;
+    foreach($this->getForcedWorkers() as $workerId){
+      $move = $this->game->log->getLastMoveOfWorker($workerId);
+      if(!$this->isNeighbouring($move['to'])){
+        $this->game->announceLose( clienttranslate('${player_name} looses the game because it did not respect Aphrodite restrictions.') );
       }
-
-      $this->game->announceLose( clienttranslate('${player_name} looses the game because it did not respect Aphrodite restrictions.') );
     }
   }
 }

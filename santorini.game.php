@@ -638,6 +638,9 @@ class santorini extends Table
       'skippable' => false,
       'workers' => $workers ?: $this->board->getPlacedActiveWorkers(),
     ];
+    if($action == 'move'){
+      $arg['mayMoveAgain'] = false;
+    }
 
     foreach ($arg['workers'] as &$worker) {
       $worker["works"] = $this->board->getNeighbouringSpaces($worker, $action);
@@ -654,7 +657,6 @@ class santorini extends Table
   public function argPlayerMove()
   {
     $arg = $this->argPlayerWork('move');
-    $arg['mayMoveAgain'] = false;
     $this->powerManager->argPlayerMove($arg);
     return $arg;
   }

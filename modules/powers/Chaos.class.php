@@ -24,6 +24,7 @@ class Chaos extends SantoriniPower
   {
     $card = $this->game->powerManager->cards->pickCard('deck', $this->playerId);
     $power = $this->game->powerManager->getPower($card['id']);
+    $this->game->log->addAction('powerChanged');
     $this->game->notifyAllPlayers('powersChanged', clienttranslate('${power_name}: ${player_name} has a new power : ${power_name2}'), [
       'i18n' => ['power_name', 'power_name2'],
       'power_name' => $this->getName(),

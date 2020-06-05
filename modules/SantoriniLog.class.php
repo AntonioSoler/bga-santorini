@@ -221,6 +221,16 @@ class SantoriniLog extends APP_GameClass
     return (count($moves) == 1) ? $moves[0] : null;
   }
 
+ /*
+  * getLastMoveOfWorker: fetch the last move of worker of current round if it exists, null otherwise
+  */
+ public function getLastMoveOfWorker($workerId)
+ {
+   $pId = $this->game->getActivePlayerId();
+   return self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'move' AND `piece_id` = $workerId AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC LIMIT 1");
+ }
+
+
 
   /*
    * getLastBuilds: fetch last builds of player of current round

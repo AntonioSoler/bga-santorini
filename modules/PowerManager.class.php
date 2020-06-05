@@ -342,17 +342,17 @@ class PowerManager extends APP_GameClass
   public function getFirstPlayerSuggestion($offer)
   {
     $minOrderAid = 100;
-    $powerId = 0;
+    $minPowerId = 0;
     foreach ($offer as $powerId) {
       $power = $this->getPower($powerId);
       $o = $power->getOrderAid();
-      if ($o < $minOrderAid && $o) {
+      if ($o < $minOrderAid && $o >= 0) {
         $minOrderAid = $o;
-        $powerId = $power->getId();
+        $minPowerId = $powerId;
       }
     }
 
-    return $powerId;
+    return $minPowerId;
   }
 
 

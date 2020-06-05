@@ -28,7 +28,7 @@ class Hypnus extends SantoriniPower
   public function startOpponentTurn()
   {
     // If at least two workers remeaining
-    foreach($this->game->playerManager->getOpponents() as $opponent){
+    foreach($this->game->playerManager->getOpponents($this->playerId) as $opponent){
       $workers = $this->game->board->getPlacedWorkers($opponent->getId());
       if (count($workers) < 2){
         continue;
