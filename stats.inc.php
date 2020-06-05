@@ -60,21 +60,6 @@ $powerLabels = $powerManager->getStatLabels();
 $stats_type = [
     // Statistics global to table
     'table' => [
-        'winPower' => [
-            'id' => STAT_POWER,
-            'name' => totranslate('Winning Power (2 or 3 players)'),
-            'type' => 'int'
-        ],
-        'winPower1' => [
-            'id' => STAT_POWER1,
-            'name' => totranslate('Winning Power (4 players)'),
-            'type' => 'int'
-        ],
-        'winPower2' => [
-            'id' => STAT_POWER2,
-            'name' => totranslate('Winning Power (4 players)'),
-            'type' => 'int'
-        ],
         'move' => [
             'id' => STAT_MOVE,
             'name' => totranslate('Moves'),
@@ -138,7 +123,5 @@ $stats_type = [
 
     'value_labels' => [
         STAT_POWER => $powerLabels,
-        STAT_POWER1 => $powerLabels,
-        STAT_POWER2 => $powerLabels,
     ]
 ];

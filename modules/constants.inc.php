@@ -128,8 +128,6 @@ define('SHOW', 2);
  * Game statistics constants
  */
 define('STAT_POWER', 10);
-define('STAT_POWER1', 11);
-define('STAT_POWER2', 12);
 define('STAT_USE_POWER', 13);
 define('STAT_MOVE', 20);
 define('STAT_MOVE_UP', 21);

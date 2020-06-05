@@ -423,7 +423,7 @@ class santorini extends Table
    */
   public function stStartOfTurn()
   {
-    if(!$this->log->isAdditionalTurn()){
+    if (!$this->log->isAdditionalTurn()) {
       $this->log->startTurn();
     }
 
@@ -500,14 +500,11 @@ class santorini extends Table
         'player_name' => $players[0]->getName(),
         'player_name2' => $players[1]->getName(),
       ]);
-      $this->setStat($this->getStat('playerPower', $players[0]->getId()), 'winPower1');
-      $this->setStat($this->getStat('playerPower', $players[1]->getId()), 'winPower2');
     } else {
       // 2 or 3 players
       self::notifyAllPlayers('message', clienttranslate('${player_name} wins!'), [
         'player_name' => $players[0]->getName(),
       ]);
-      $this->setStat($this->getStat('playerPower', $players[0]->getId()), 'winPower');
     }
 
     self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team = {$players[0]->getTeam()}");

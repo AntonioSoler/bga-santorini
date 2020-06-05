@@ -18,9 +18,6 @@ class SantoriniLog extends APP_GameClass
    */
   public function initStats($players)
   {
-    $this->game->initStat('table', 'winPower', 0);
-    $this->game->initStat('table', 'winPower1', 0);
-    $this->game->initStat('table', 'winPower2', 0);
     $this->game->initStat('table', 'move', 0);
     $this->game->initStat('table', 'buildBlock', 0);
     $this->game->initStat('table', 'buildDome', 0);
