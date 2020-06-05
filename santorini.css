@@ -20,12 +20,25 @@
 
 html {
   background-image:none !important;
-  background-color:#76cfe9;
+  background-color:#76cfe9; /*#153665*/
 }
 
 
 #play-area-scaler {
   display:grid;
+}
+
+#frame {
+  display:none;
+/*
+  background-image:url("img/frame.png");
+  background-size:cover;
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+*/
 }
 
 #play-area-scaler #power-offer-container,
@@ -224,14 +237,15 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 
 .power-dialog {
-  width:300px;
+  width:350px;
 }
 
 
 .power-dialog .power-card {
+  width:300px;
   transform:scale(0.8);
-
 }
+
 .power-info-background {
   width:100%;
   height:100%;
@@ -242,23 +256,24 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-dialog .power-info {
   position:relative;
-  padding:82px 16px 17px 22px;
+  padding:99px 16px 17px 22px
 }
 
 .power-dialog .power-info .power-title {
-  position:absolute;
-  top: -63px;
+  position: absolute;
+  top: -72px;
   width: 100%;
   text-align: center;
   color: white;
   z-index: 10;
   font-family: 'Caveat Brush';
-  font-size: 1.2em;
+  font-size: 1.4em;
 }
 
 .power-dialog .power-info .power-text {
-  padding: 5px 10px 0px;
+  padding: 7px 12px 0px;
   font-size: 0.9em;
+  font-family: 'Open Sans';
 }
 
 .power-dialog .power-info .power-text li {
@@ -277,7 +292,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   z-index:4;
   border-style:solid;
   border-image-slice: 187 80 34 72;
-  border-image-width: 82px 22px 24px 22px;
+  border-image-width: 100px 22px 24px 22px;
   border-image-outset: 0px 0px 0px 0px;
   border-image-repeat: stretch repeat;
   border-image-source: url(img/dialog.png);

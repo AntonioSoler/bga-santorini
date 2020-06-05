@@ -1,6 +1,7 @@
 {OVERALL_GAME_HEADER}
 
 <div id="play-area-scaler">
+	<div id="frame"></div>
 	<div id="power-offer-container">
 		<div id="grid-powers">
 			<div class="power-section">

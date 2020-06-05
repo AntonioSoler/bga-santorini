@@ -105,31 +105,6 @@ Board.prototype.initScene = function(){
 		setTimeout(updateSize, 200);
 	}, false );
 
-	const getRealMouseCoords = (px,py) => {
-		var rect = this._renderer.domElement.getBoundingClientRect();
-
-		return {
-			x : (px - rect.left) / rect.width * 2 - 1,
-			y : -(py - rect.top) / rect.height * 2 + 1
-		}
-	};
-
-	// Controls
-	var controls = new OrbitControls( this._camera, this._renderer.domElement );
-	controls.enablePan = false;
-	controls.maxPolarAngle = Math.PI * 0.45;
-	controls.minDistance = ZOOM_MIN;
-	controls.maxDistance = isMobile()? ZOOM_MAX_MOBILE : ZOOM_MAX;
-	controls.mouseButtons = {
-		LEFT: THREE.MOUSE.ROTATE,
-		RIGHT: THREE.MOUSE.ROTATE
-	}
-  controls.addEventListener('change', this.render.bind(this));
-	controls.addEventListener("click", (ev) => {
-		this._mouse = getRealMouseCoords(ev.posX, ev.posY);
-		this.raycasting(false);
-	})
-
 
 	// Raycasting
 	this._raycaster = new THREE.Raycaster();
@@ -139,7 +114,7 @@ Board.prototype.initScene = function(){
 
 	document.addEventListener( 'mousemove', (event) => {
 		event.preventDefault();
-		this._mouse = getRealMouseCoords(event.clientX, event.clientY);
+		this._mouse = this.getRealMouseCoords(event.clientX, event.clientY);
 		if(!this._mouseDown && this._clickable.length > 0)
 			this.raycasting(true);
 	}, false );
@@ -161,8 +136,18 @@ Board.prototype.initScene = function(){
 };
 
 
+Board.prototype.getRealMouseCoords = function(px,py){
+	var rect = this._renderer.domElement.getBoundingClientRect();
+
+	return {
+		x : (px - rect.left) / rect.width * 2 - 1,
+		y : -(py - rect.top) / rect.height * 2 + 1
+	}
+};
+
+
 /*
- * TODO
+ * enterScene : players start to play on the 3D board => stop animation and add controls
  */
 Board.prototype.enterScene = function(){
 	if(this._onScene)
@@ -175,6 +160,22 @@ Board.prototype.enterScene = function(){
 	if(isMobile())
 		this._camera.position.set( 0, 20, 25 );
 	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+
+	// Controls
+	var controls = new OrbitControls( this._camera, this._renderer.domElement );
+	controls.enablePan = false;
+	controls.maxPolarAngle = Math.PI * 0.45;
+	controls.minDistance = ZOOM_MIN;
+	controls.maxDistance = isMobile()? ZOOM_MAX_MOBILE : ZOOM_MAX;
+	controls.mouseButtons = {
+		LEFT: THREE.MOUSE.ROTATE,
+		RIGHT: THREE.MOUSE.ROTATE
+	}
+  controls.addEventListener('change', this.render.bind(this));
+	controls.addEventListener("click", (ev) => {
+		this._mouse = this.getRealMouseCoords(ev.posX, ev.posY);
+		this.raycasting(false);
+	})
 };
 
 
