@@ -9,7 +9,7 @@ class Adonis extends SantoriniHeroPower
     $this->name  = clienttranslate('Adonis');
     $this->title = clienttranslate('Devastatingly Handsome');
     $this->text  = [
-      clienttranslate("End of Your Turn: Once, choose one of your Workers and an opponent Worker. If possible, the Workers must be neighboring at the end of your opponent's next turn."),
+      clienttranslate("[End of Your Turn:] Once, choose one of your Workers and an opponent Worker. If possible, the Workers must be neighboring at the end of your opponent's next turn."),
       clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2];

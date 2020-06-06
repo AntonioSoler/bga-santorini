@@ -9,7 +9,7 @@ class Apollo extends SantoriniPower
     $this->name  = clienttranslate('Apollo');
     $this->title = clienttranslate('God Of Music');
     $this->text  = [
-      clienttranslate("Your Move: Your Worker may move into an opponent Worker's space by forcing their Worker to the space yours just vacated.")
+      clienttranslate("[Your Move:] Your Worker may move into an opponent Worker's space by forcing their Worker to the space yours just vacated.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

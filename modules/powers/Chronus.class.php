@@ -9,7 +9,7 @@ class Chronus extends SantoriniPower
     $this->name  = clienttranslate('Chronus');
     $this->title = clienttranslate('God of Time');
     $this->text  = [
-      clienttranslate("Win Condition: You also win when there are at least five Complete Towers on the board.")
+      clienttranslate("[Win Condition:] You also win when there are at least five Complete Towers on the board.")
     ];
     $this->playerCount = [2];
     $this->golden  = false;

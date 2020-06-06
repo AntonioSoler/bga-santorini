@@ -9,7 +9,7 @@ class Zeus extends SantoriniPower
     $this->name  = clienttranslate('Zeus');
     $this->title = clienttranslate('God of the Sky');
     $this->text  = [
-      clienttranslate("Your Build: Your Worker may build a block under itself.")
+      clienttranslate("[Your Build:] Your Worker may build a block under itself.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

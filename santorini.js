@@ -958,7 +958,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       power.type = power.hero ? 'hero' : '';
 
       // TODO map for translation
-      power.textList = power.text.join('</p><p>');
+      power.textList = power.text.map(function(t) {
+        t = _(t);
+        t = t.replace(/\[/g, '<b>').replace(/\]/g, '</b>');
+        return t;
+      }).join('</p><p>');
       return power;
     },
 

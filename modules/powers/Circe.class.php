@@ -9,7 +9,7 @@ class Circe extends SantoriniPower
     $this->name  = clienttranslate('Circe');
     $this->title = clienttranslate('Divine Enchantress');
     $this->text  = [
-      clienttranslate("Start of Your Turn: If an opponent's Workers do not neighbor each other, you alone have use of their power until your next turn.")
+      clienttranslate("[Start of Your Turn:] If an opponent's Workers do not neighbor each other, you alone have use of their power until your next turn.")
     ];
     $this->playerCount = [2];
     $this->golden  = false;

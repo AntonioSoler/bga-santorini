@@ -9,7 +9,7 @@ class Pegasus extends SantoriniPower
     $this->name  = clienttranslate('Pegasus');
     $this->title = clienttranslate('Winged Horse');
     $this->text  = [
-      clienttranslate("Your Move: Your Worker may move up more than one level, but cannot win the game by doing so.")
+      clienttranslate("[Your Move:] Your Worker may move up more than one level, but cannot win the game by doing so.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

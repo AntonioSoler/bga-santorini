@@ -9,7 +9,7 @@ class Atalanta extends SantoriniHeroPower
     $this->name  = clienttranslate('Atalanta');
     $this->title = clienttranslate('Swift Huntress');
     $this->text  = [
-      clienttranslate("Your Move: Once, your Worker moves any number of additional times.")
+      clienttranslate("[Your Move:] Once, your Worker moves any number of additional times.")
     ];
     $this->playerCount = [2];
     $this->golden  = false;

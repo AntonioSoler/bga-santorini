@@ -9,7 +9,7 @@ class Nemesis extends SantoriniPower
     $this->name  = clienttranslate('Nemesis');
     $this->title = clienttranslate('Goddess of Retribution');
     $this->text  = [
-      clienttranslate("End of Your Turn: If none of an opponent's Workers neighbor yours, you may force both of your Workers to spaces occupied by two of an opponent's Workers, and vice versa."),
+      clienttranslate("[End of Your Turn:] If none of an opponent's Workers neighbor yours, you may force both of your Workers to spaces occupied by two of an opponent's Workers, and vice versa."),
       clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2, 3, 4];

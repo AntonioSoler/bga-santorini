@@ -9,7 +9,7 @@ class Dionysus extends SantoriniPower
     $this->name  = clienttranslate('Dionysus');
     $this->title = clienttranslate('God of Wine');
     $this->text  = [
-      clienttranslate("Your Build: Each time a Worker you control creates a Complete Tower, you may take an additional turn using an opponent Worker instead of your own. No player can win during these additional turns.")
+      clienttranslate("[Your Build:] Each time a Worker you control creates a Complete Tower, you may take an additional turn using an opponent Worker instead of your own. No player can win during these additional turns.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

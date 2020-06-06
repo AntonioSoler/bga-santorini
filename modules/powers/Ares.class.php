@@ -9,7 +9,7 @@ class Ares extends SantoriniPower
     $this->name  = clienttranslate('Ares');
     $this->title = clienttranslate('God of War');
     $this->text  = [
-      clienttranslate("End of Your Turn: You may remove an unoccupied block (not dome) neighboring your unmoved Worker. You also remove any Tokens on the block.")
+      clienttranslate("[End of Your Turn:] You may remove an unoccupied block (not dome) neighboring your unmoved Worker. You also remove any Tokens on the block.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;

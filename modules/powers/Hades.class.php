@@ -9,7 +9,7 @@ class Hades extends SantoriniPower
     $this->name  = clienttranslate('Hades');
     $this->title = clienttranslate('God of the Underworld');
     $this->text  = [
-      clienttranslate("Opponent's Turn: Opponent Workers cannot move down.")
+      clienttranslate("[Opponent's Turn:] Opponent Workers cannot move down.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

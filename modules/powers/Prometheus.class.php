@@ -9,7 +9,7 @@ class Prometheus extends SantoriniPower
     $this->name  = clienttranslate('Prometheus');
     $this->title = clienttranslate('Titan Benefactor of Mankind');
     $this->text  = [
-      clienttranslate("Your Turn: If your Worker does not move up, it may build both before and after moving.")
+      clienttranslate("[Your Turn:] If your [Worker] does not [move up], it may [build] both before and after [moving].")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

@@ -9,7 +9,7 @@ class Poseidon extends SantoriniPower
     $this->name  = clienttranslate('Poseidon');
     $this->title = clienttranslate('God of the Sea');
     $this->text  = [
-      clienttranslate("End of Your Turn: If your unmoved Worker is on the ground level, it may build up to three times.")
+      clienttranslate("[End of Your Turn:] If your unmoved Worker is on the ground level, it may build up to three times.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

@@ -9,7 +9,7 @@ class Atlas extends SantoriniPower
     $this->name  = clienttranslate('Atlas');
     $this->title = clienttranslate('Titan Shouldering the Heavens');
     $this->text  = [
-      clienttranslate("Your Build: Your Worker may build a dome at any level.")
+      clienttranslate("[Your Build:] Your Worker may build a dome at any level.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

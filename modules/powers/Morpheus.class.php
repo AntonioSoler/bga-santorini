@@ -9,8 +9,8 @@ class Morpheus extends SantoriniPower
     $this->name  = clienttranslate('Morpheus');
     $this->title = clienttranslate('God of Dreams');
     $this->text  = [
-      clienttranslate("Start of Your Turn: Place a coin on your God Power card."),
-      clienttranslate("Your Build: Your Worker cannot build as normal. Instead, spend any number of coins from your God Power card (even zero) and build that many times."),
+      clienttranslate("[Start of Your Turn:] Place a coin on your God Power card."),
+      clienttranslate("[Your Build:] Your Worker cannot build as normal. Instead, spend any number of coins from your God Power card (even zero) and build that many times."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;

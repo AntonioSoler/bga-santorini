@@ -9,7 +9,7 @@ class Hestia extends SantoriniPower
     $this->name  = clienttranslate('Hestia');
     $this->title = clienttranslate('Goddess of Hearth and Home');
     $this->text  = [
-      clienttranslate("Your Build: Your Worker may build one additional time, but this cannot be on a perimeter space.")
+      clienttranslate("[Your Build:] Your Worker may build one additional time, but this cannot be on a perimeter space.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

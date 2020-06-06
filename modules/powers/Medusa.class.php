@@ -9,7 +9,7 @@ class Medusa extends SantoriniPower
     $this->name  = clienttranslate('Medusa');
     $this->title = clienttranslate('Petrifying Gorgon');
     $this->text  = [
-      clienttranslate("End of Your Turn: If possible, your Workers build in lower neighboring spaces that are occupied by opponent Workers, removing the opponent Workers from the game.")
+      clienttranslate("[End of Your Turn:] If possible, your Workers build in lower neighboring spaces that are occupied by opponent Workers, removing the opponent Workers from the game.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
