@@ -242,7 +242,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 #grid-detail {
-    flex: 0 0 330px;
+    flex: 0 0 300px;
 }
 
 #power-choose-container {
@@ -312,7 +312,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     height: 418px;
     position: relative;
     background-repeat: no-repeat;
-    background-size: 90%;
+    background-size: 215px;
     background-position: center;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
