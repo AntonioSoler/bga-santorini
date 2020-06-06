@@ -20,6 +20,8 @@
 //@ sourceURL=santorini.js
 var isDebug = true;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
+var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
+
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
   return declare("bgagame.santorini", ebg.core.gamegui, {
     /*
@@ -41,9 +43,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       console.log(this.prefs);
 
       // Setup the board (3d scene using threejs)
-      var container = document.getElementById('scene-container');
+      var container = document.createElement('div');
+			container.id = 'scene-container';
+			dojo.place(container, $('left-side-wrapper'));
       this.board = new Board(container, URL); // Setup player boards
       this.setupPreference();
+
+			// Setup the frame
+			var leftCloud = document.createElement('div');
+			leftCloud.id = "left-cloud";
+			dojo.place(leftCloud, $('overall-content'));
+			var rightCloud = document.createElement('div');
+			rightCloud.id = "right-cloud";
+			dojo.place(rightCloud, $('overall-content'));
 
       // Setup powers
       this.setupPowers(gamedatas.fplayers);
@@ -72,6 +84,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     // TODO
     onScreenWidthChange: function () {
       dojo.style('page-content', 'zoom', 'normal');
+			if($('scene-container')){
+				dojo.style('scene-container', 'marginTop', (dojo.style('left-side', 'marginTop') + $('page-title').offsetHeight) + "px");
+				dojo.style('play-area', 'min-height', (window.outerHeight - ((isMobile()? 100 : 200) + dojo.style('left-side', 'marginTop') )) + "px");
+
+			}
     },
 
 
@@ -975,8 +992,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
       //      dojo.style('play-area', 'display', container == 'board' ? 'block' : 'none');
       dojo.style('play-area', 'display', 'block');
-      if (container == 'board')
+      if (container == 'board' && !this.board._onScene){
         this.board.enterScene();
+			}
     },
 
 

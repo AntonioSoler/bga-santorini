@@ -5,11 +5,11 @@ import { Tween, Ease } 		from './tweenjs.min.js';
 
 var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
 
-const canvasHeight = () => isMobile()? 400 : 600; //Math.min(600, document.getElementById("page-content").offsetHeight);
+const canvasHeight = () => (window.outerHeight - ((isMobile()? 100 : 200) + dojo.style('left-side', 'marginTop') )); //Math.min(600, document.getElementById("page-content").offsetHeight);
 const canvasWidth = () => document.getElementById("page-content").offsetWidth;
 
 // Zoom limits
-var ZOOM_MIN = 10;
+var ZOOM_MIN = 15;
 var ZOOM_MAX = 30;
 var ZOOM_MAX_MOBILE = 50;
 
@@ -78,8 +78,8 @@ var Board = function(container, url){
 Board.prototype.initScene = function(){
 	// Scene
 	this._scene = new THREE.Scene();
-	this._scene.background = new THREE.Color(0x29a9e0);
-	this._scene.background.convertLinearToGamma( 2 );
+//	this._scene.background = new THREE.Color(0x29a9e0);
+//	this._scene.background.convertLinearToGamma( 2 );
 
 	// Camera
 	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, isMobile()? 250 : 150 );
@@ -88,7 +88,7 @@ Board.prototype.initScene = function(){
 	this._scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF, 1 ) );
 
 	// Renderer
-	this._renderer = new THREE.WebGLRenderer({ antialias: true, precision:"lowp", powerPreference: "high-performance" });
+	this._renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, precision:"lowp", powerPreference: "high-performance" });
 	this._renderer.setPixelRatio( window.devicePixelRatio );
 	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;
@@ -124,11 +124,11 @@ Board.prototype.initScene = function(){
 
 	// Rotate the camera
 	this._cameraAngle = { theta : 0};
-	var anim = Tween.get(this._cameraAngle, { loop:-1 }).to({ theta : 2*Math.PI}, 16000, Ease.linear)
+	var anim = Tween.get(this._cameraAngle, { loop:-1 }).to({ theta : 2*Math.PI}, 35000, Ease.linear)
 	.addEventListener('change', () => {
-		this._camera.position.x = Math.cos(this._cameraAngle.theta)*30;
-		this._camera.position.y = 12;
-		this._camera.position.z = Math.sin(this._cameraAngle.theta)*30;
+		this._camera.position.x = Math.cos(this._cameraAngle.theta)*40;
+		this._camera.position.y = 16;
+		this._camera.position.z = Math.sin(this._cameraAngle.theta)*40;
 		this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.render();
 	});
@@ -156,13 +156,29 @@ Board.prototype.enterScene = function(){
 	this._onScene = true;
 	Tween.removeTweens(this._cameraAngle);
 
-	this._camera.position.set( 0, 14, 15 );
+
+	this._camera.position.set( 0, 25, 26 );
+//	this._camera.position.set( 0, 20, 21 );
 	if(isMobile())
 		this._camera.position.set( 0, 20, 25 );
 	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
+
+	if($('left-cloud')){
+		setTimeout( () => {
+			$('left-cloud').style.left = "-10vw";
+			$('right-cloud').style.right = "-10vw";
+			Tween.get(this._camera.position).to({ x:0, y:20, z:21}, 2000).addEventListener('change', () => {
+				this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+				this.render();
+			});
+		}, 2000);
+
+	}
+
+
 	// Controls
-	var controls = new OrbitControls( this._camera, this._renderer.domElement );
+	var controls = new OrbitControls( this._camera, document.getElementById('play-area') );
 	controls.enablePan = false;
 	controls.maxPolarAngle = Math.PI * 0.45;
 	controls.minDistance = ZOOM_MIN;

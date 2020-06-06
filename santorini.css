@@ -18,28 +18,96 @@
 @import url('santorini.powers.css');
 @import url('santorini.tokens.css');
 
+:root{
+  --card-width:min(40vw, 250px);
+}
+
 html {
   background-image:none !important;
   background-color:#76cfe9; /*#153665*/
 }
 
+#overall-content {
+  position:relative;
+}
+
+#left-cloud {
+  position:fixed;
+  top:0;
+  left:0;
+  width:28vw;
+  height:100vh;
+  z-index:2;
+  background-image:url('img/cloud-left.png');
+  background-size:cover;
+  background-position:right;
+  transition:left 2s;
+}
+
+#right-cloud {
+  position:fixed;
+  top:0;
+  right:0;
+  width:40vw;
+  height:100vh;
+  z-index:2;
+  background-image:url('img/cloud-right.png');
+  background-size:cover;
+  transition:right 2s;
+}
+
+
+
+#left-side-wrapper {
+  position:relative;
+}
+
+#scene-container {
+  text-align: center;
+  outline: none;
+  position:absolute;
+  top:0;
+  z-index:1;
+}
+
+#scene-container canvas {
+  outline: none;
+}
+
+
+@media (max-width: 2300px) {
+  #left-side {
+    position:relative;
+    z-index:3;
+  }
+}
+@media (min-width: 2300px) {
+  #page-title {
+    position: relative;
+    z-index: 2;
+  }
+
+  #page-content, .whiteblock.debug_section, #pagesection_howtoplay {
+    position:relative;
+    z-index:4;
+  }
+
+
+}
+
+
+#right-side {
+  position: relative;
+  z-index: 4;
+}
+
+
 
 #play-area-scaler {
   display:grid;
+  outline: none;
 }
 
-#frame {
-  display:none;
-/*
-  background-image:url("img/frame.png");
-  background-size:cover;
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-*/
-}
 
 #play-area-scaler #power-offer-container,
 #play-area-scaler #power-choose-container,
@@ -163,7 +231,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-name {
-  font: 24px 'Caveat Brush', cursive;
+  font: calc(var(--card-width)*0.11) 'Caveat Brush', cursive;
   text-transform: uppercase;
   color: #443;
 }
@@ -187,13 +255,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-title {
     position: absolute;
-    top: 25px;
+    top: 6%;
     width: 100%;
-    height: 55px;
-    font: 13px 'Amita', sans-serif;
+    height: 14%;
+    font: calc(var(--card-width)*0.05) 'Amita', sans-serif;
+    line-height:calc(var(--card-width)*0.165);
     text-align: center;
-    line-height: 42px;
-    white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
     color: #fff;
@@ -201,6 +268,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-image: url('img/title.png');
     background-repeat: no-repeat;
     background-position: center center;
+    background-size:contain;
 }
 
 .hero .power-title {
@@ -211,6 +279,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     margin: 0 15px;
     position:relative;
 }
+#power-offer-container .power-detail { position:fixed; }
 
 #power-offer-container {
     display: flex;
@@ -221,12 +290,19 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     margin: 0 10px;
 }
 
+
+.power-section {
+    background: rgba(255, 255, 255, .6);
+    margin: 6px 0 18px;
+    border-radius:10px;
+    padding: 5px 10px;
+}
+
 .card-container {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
     align-content: flex-start;
-    background: rgba(255, 255, 255, .25);
     min-height: 166px;
     margin: 6px 0 18px;
 }
@@ -246,6 +322,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
+    align-items: center;
 }
 
 .power-info-background {
@@ -294,23 +371,15 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     display: none;
 }
 
-#scene-container {
-    text-align: center;
-    outline: none;
-}
-
-#scene-container canvas {
-    outline: none;
-}
 
 .power-card {
     margin: 0 auto;
-    width: 250px;
-    height: 418px;
+    width: var(--card-width);
+    height:calc(var(--card-width)*1.67);
     position: relative;
     background-repeat: no-repeat;
-    background-size: 215px;
-    background-position: center 30px;
+    background-size: calc(var(--card-width) * 0.85);
+    background-position: center 36%;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
@@ -338,21 +407,23 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     top: 0;
     left: 0;
     width: 100%;
-    text-align: center;
-    line-height: 34px;
+    height: 8%;
     text-shadow: 1px 1px 2px white;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
 
 .power-card .power-pictogram {
     position: absolute;
-    bottom: 4px;
-    left: 45px;
-    width: 160px;
-    height: 80px;
+    bottom: 1%;
+    left: 18%;
+    width: 64%;
+    height: 18%;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -362,7 +433,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-ext {
     box-sizing: border-box;
-    width: 250px;
+    width: var(--card-width);
     margin: 0 auto 10px;
     background-image: url('img/card-ext.png');
     background-repeat: repeat-y;

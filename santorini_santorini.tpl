@@ -1,7 +1,6 @@
 {OVERALL_GAME_HEADER}
 
 <div id="play-area-scaler">
-	<div id="frame"></div>
 	<div id="power-offer-container">
 		<div id="grid-powers">
 			<div class="power-section">
@@ -19,7 +18,6 @@
 	<div id="play-area">
 		<div id="prompt-container"></div>
 		<div id="token-container"></div>
-		<div id="scene-container"></div>
 	</div>
 </div>
 
