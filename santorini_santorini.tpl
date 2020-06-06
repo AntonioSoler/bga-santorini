@@ -42,30 +42,13 @@ var jstpl_miniCard = `<div class="mini-card power-\${id} \${type}" title="\${nam
 var jstpl_powerDetail = `<div class="power-detail">
 	<div class="power-card power-\${id} \${type}">
 		<div class="power-name">\${name}</div>
+		<div class="power-title">\${title}</div>
 		<div class="power-pictogram"></div>
 	</div>
-	<div class="power-info \${type}">
-		<div class="power-name">\${name}</div>
-		<div class="power-title">\${title}</div>
-		<ul class="power-text"><li>\${textList}</li></ul>
+	<div class="power-ext \${type}">
+		<p>\${textList}</p>
 	</div>
 </div>`;
-
-
-
-var jstpl_powerDialog = `<div class="power-dialog">
-		<div class="power-card power-\${id} \${type}">
-			<div class="power-name">\${name}</div>
-			<div class="power-pictogram"></div>
-		</div>
-		<div class="power-info \${type}">
-			<div class="power-info-background">
-				<div class="power-title">\${title}</div>
-				<ul class="power-text"><li>\${textList}</li></ul>
-			</div>
-		</div>
-</div>`;
-
 
 
 var jstpl_token = '<div id="token-\${token}" class="token token-\${token}"></div>';

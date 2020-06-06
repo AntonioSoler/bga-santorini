@@ -158,10 +158,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-position: center;
 }
 
-.power-detail {
-    width: 300px;
-}
-
 .power-detail.power-dummy div {
   display:none;
 }
@@ -190,8 +186,22 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-title {
+    position: absolute;
+    top: 27px;
+    width: 100%;
+    height: 55px;
+    font-size: 13px;
     font-style: italic;
-    margin-bottom: .5em;
+    text-align: center;
+    line-height: 42px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: #fff;
+    text-shadow: 1px 1px 4px black;
+    background-image: url('img/title.png');
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .power-text li {
@@ -241,67 +251,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     justify-content: space-evenly;
 }
 
-
-.power-dialog {
-  width:350px;
-}
-
-
-.power-dialog .power-card {
-  width:300px;
-  transform:scale(0.8);
-}
-
 .power-info-background {
   width:100%;
   height:100%;
   background-color:#f0e3d4;
   position:relative;
   padding-bottom:1px;
-}
-
-.power-dialog .power-info {
-  position:relative;
-  padding:99px 16px 17px 22px
-}
-
-.power-dialog .power-info .power-title {
-  position: absolute;
-  top: -72px;
-  width: 100%;
-  text-align: center;
-  color: white;
-  z-index: 10;
-  font-family: 'Caveat Brush';
-  font-size: 1.4em;
-}
-
-.power-dialog .power-info .power-text {
-  padding: 7px 12px 0px;
-  font-size: 0.9em;
-  font-family: 'Open Sans';
-}
-
-.power-dialog .power-info .power-text li {
-  list-style-type: none;
-  margin-left:0;
-  text-align: justify;
-}
-
-.power-dialog .power-info::after {
-  content:"";
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:4;
-  border-style:solid;
-  border-image-slice: 187 80 34 72;
-  border-image-width: 100px 22px 24px 22px;
-  border-image-outset: 0px 0px 0px 0px;
-  border-image-repeat: stretch repeat;
-  border-image-source: url(img/dialog.png);
 }
 
 #play-area {
@@ -352,14 +307,15 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-card {
-    margin: 0 auto 10px;
-    width: 300px;
-    height: 465px;
+    margin: 0 auto;
+    width: 250px;
+    height: 418px;
     position: relative;
     background-repeat: no-repeat;
     background-size: 90%;
     background-position: center;
-    border-radius: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
 }
 .power-card.power-0 {
@@ -373,11 +329,11 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     left: 0;
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
     background-image: url('img/card.png');
     background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center center;
+    background-size: 100%;
 }
 
 .power-card .power-name {
@@ -396,13 +352,34 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-card .power-pictogram {
     position: absolute;
-    bottom: 1.5%;
+    bottom: 2.5%;
     left: 15%;
-    width: 70%;
+    width: 69%;
     height: 16%;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
+}
+
+/* Extended cards showing full text */
+
+.power-ext {
+    box-sizing: border-box;
+    width: 250px;
+    margin: 0 auto 10px;
+    background-image: url('img/card-ext.png');
+    background-repeat: repeat-y;
+    background-size: 100%;
+    padding: 0 26px 12px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
+    font-size: 13px;
+}
+
+.power-ext p {
+    margin: 0;
+    padding-top: 12px;
 }
 
 /* Fair division setup uses small cards */
@@ -449,8 +426,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 
-#power-choose-container .power-detail .first,
-#power-choose-container .power-dialog .first {
+#power-choose-container .power-detail .first {
   position: absolute;
   top: 12px;
   right: 12px;

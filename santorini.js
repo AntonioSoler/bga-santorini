@@ -438,7 +438,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.focusContainer('powers-choose');
       args.powers.forEach(function (powerId) {
         var power = _this.getPower(powerId);
-        var div = dojo.place(_this.format_block('jstpl_powerDialog', power), $('power-choose-container'));
+        var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
         div.id = "power-choose-" + power.id;
       });
 
@@ -481,7 +481,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Display remeaining powers
       args.offer.forEach(function (powerCard) {
         var power = _this.getPower(powerCard.id);
-        var div = dojo.place(_this.format_block('jstpl_powerDialog', power), $('power-choose-container'));
+        var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
         if (powerCard.location_arg == 1) {
           var mark = document.createElement("div");
           mark.className = "first";
@@ -958,7 +958,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       power.type = power.hero ? 'hero' : '';
 
       // TODO map for translation
-      power.textList = power.text.join('</li><li>');
+      power.textList = power.text.join('</p><p>');
       return power;
     },
 
