@@ -227,7 +227,11 @@ class SantoriniLog extends APP_GameClass
  public function getLastMoveOfWorker($workerId)
  {
    $pId = $this->game->getActivePlayerId();
-   return self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'move' AND `piece_id` = $workerId AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC LIMIT 1");
+   $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'additionalTurn' OR (`action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1)) ORDER BY log_id DESC LIMIT 1");
+   if($move == null || $move['action'] == 'additionalTurn'){
+     return null;
+   }
+   return json_decode($move['action_arg'], true);
  }
 
 

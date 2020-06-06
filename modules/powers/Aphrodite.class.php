@@ -101,7 +101,7 @@ class Aphrodite extends SantoriniPower
 
     foreach($this->getForcedWorkers() as $workerId){
       $move = $this->game->log->getLastMoveOfWorker($workerId);
-      if(!$this->isNeighbouring($move['to'])){
+      if($move != null && !$this->isNeighbouring($move['to'])){
         $this->game->announceLose( clienttranslate('${player_name} looses the game because it did not respect Aphrodite restrictions.') );
       }
     }

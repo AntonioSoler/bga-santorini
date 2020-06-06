@@ -128,6 +128,10 @@ class PlayerManager extends APP_GameClass
   */
   public function eliminate($pId)
   {
+    if($this->game->getActivePlayerId() == $pId){
+      $this->game->gamestate->nextState('endturn');
+    }
+
     self::DbQuery("UPDATE piece SET location = 'box' WHERE type IN ('worker') AND player_id = $pId");
     $this->game->eliminatePlayer($pId);
   }
