@@ -14,13 +14,9 @@
  */
 
 @import url('../../../css/csslayer.css');
-@import url('https://fonts.googleapis.com/css2?family=Amita&family=Caveat+Brush&family=Lato:wght@400;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amita:wght@700&family=Caveat+Brush&family=Lato:wght@400;900&display=swap');
 @import url('santorini.powers.css');
 @import url('santorini.tokens.css');
-
-:root{
-  --card-width:min(40vw, 250px);
-}
 
 html {
   background-image:none !important;
@@ -101,20 +97,6 @@ html {
   z-index: 4;
 }
 
-
-
-#play-area-scaler {
-  display:grid;
-  outline: none;
-}
-
-
-#play-area-scaler #power-offer-container,
-#play-area-scaler #power-choose-container,
-#play-area-scaler #play-area {
-  grid-column: 1;
-  grid-row: 1;
-}
 
 #play-area-scaler #power-offer-container,
 #play-area-scaler #power-choose-container {
@@ -231,7 +213,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-name {
-  font: calc(var(--card-width)*0.11) 'Caveat Brush', cursive;
+  font: 24px 'Caveat Brush', cursive;
   text-transform: uppercase;
   color: #443;
 }
@@ -255,31 +237,30 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-title {
     position: absolute;
-    top: 6%;
+    top: 25px;
     width: 100%;
-    height: 14%;
-    font: calc(var(--card-width)*0.05) 'Amita', sans-serif;
-    line-height:calc(var(--card-width)*0.165);
+    height: 55px;
+    font: 700 14px/42px 'Amita', sans-serif;
     text-align: center;
-    text-overflow: ellipsis;
     overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #fff;
     text-shadow: 1px 1px 3px black;
     background-image: url('img/title.png');
     background-repeat: no-repeat;
     background-position: center center;
-    background-size:contain;
 }
 
 .hero .power-title {
     background-image: url('img/title-hero.png');
 }
 
-#power-offer-container .power-detail, #power-choose-container .power-detail {
-    margin: 0 15px;
-    position:relative;
+#power-offer-container .power-detail,
+#power-choose-container .power-detail {
+    position: relative;
+    margin: 0 10px 10px 10px;
 }
-#power-offer-container .power-detail { position:fixed; }
 
 #power-offer-container {
     display: flex;
@@ -287,15 +268,18 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 #grid-powers {
     flex: 1 1 auto;
-    margin: 0 10px;
+    margin: 0 0 0 10px;
 }
-
 
 .power-section {
     background: rgba(255, 255, 255, .6);
-    margin: 6px 0 18px;
-    border-radius:10px;
-    padding: 5px 10px;
+    border-radius: 10px;
+}
+
+.power-section p {
+    font-weight: bold;
+    padding: 5px;
+    margin: 0;
 }
 
 .card-container {
@@ -304,7 +288,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     justify-content: space-evenly;
     align-content: flex-start;
     min-height: 166px;
-    margin: 6px 0 18px;
+    margin-bottom: 15px;
 }
 
 .card-container:empty::before {
@@ -315,14 +299,19 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 #grid-detail {
-    flex: 0 0 300px;
+    flex: 0 0 270px;
+}
+
+#grid-detail.fixed .power-detail {
+    position: fixed;
+    top: 49px;
 }
 
 #power-choose-container {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
-    align-items: center;
+    margin-top: 15px;
 }
 
 .power-info-background {
@@ -374,12 +363,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-card {
     margin: 0 auto;
-    width: var(--card-width);
-    height:calc(var(--card-width)*1.67);
+    width: 250px;
+    height: 418px;
     position: relative;
     background-repeat: no-repeat;
-    background-size: calc(var(--card-width) * 0.85);
-    background-position: center 36%;
+    background-size: 215px;
+    background-position: center 30px;
     border-top-left-radius: 15px;
     border-top-right-radius: 15px;
     box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
@@ -407,23 +396,21 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     top: 0;
     left: 0;
     width: 100%;
-    height: 8%;
+    text-align: center;
+    line-height: 34px;
     text-shadow: 1px 1px 2px white;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
 
 .power-card .power-pictogram {
     position: absolute;
-    bottom: 1%;
-    left: 18%;
-    width: 64%;
-    height: 18%;
+    bottom: 4px;
+    left: 45px;
+    width: 160px;
+    height: 80px;
     background-position: center center;
     background-repeat: no-repeat;
     background-size: contain;
@@ -433,7 +420,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-ext {
     box-sizing: border-box;
-    width: var(--card-width);
+    width: 250px;
     margin: 0 auto 10px;
     background-image: url('img/card-ext.png');
     background-repeat: repeat-y;
@@ -463,7 +450,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-size: 125%;
     background-position: 50% 20%;
     border-radius: 8px;
-    margin: 8px;
+    margin: 6px;
 }
 
 .power-card.small.wait {

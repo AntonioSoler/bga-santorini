@@ -27,7 +27,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /*
      * Constructor
      */
-    constructor: function () { },
+    constructor: function () {
+      // Fix mobile viewport (remove CSS zoom)
+      this.default_viewport = 'width=550, user-scalable=no';
+    },
 
     /*
      * Setup:
@@ -42,20 +45,24 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       debug('SETUP', gamedatas);
       console.log(this.prefs);
 
+      // Mobile fix position of card selection
+      // TODO this needs to happen AFTER the BGA adaptStatusBar()
+      dojo.connect(window, "scroll", this, dojo.hitch(this, "onScroll"));
+
       // Setup the board (3d scene using threejs)
       var container = document.createElement('div');
-			container.id = 'scene-container';
-			dojo.place(container, $('left-side-wrapper'));
+      container.id = 'scene-container';
+      dojo.place(container, $('left-side-wrapper'));
       this.board = new Board(container, URL); // Setup player boards
       this.setupPreference();
 
-			// Setup the frame
-			var leftCloud = document.createElement('div');
-			leftCloud.id = "left-cloud";
-			dojo.place(leftCloud, $('overall-content'));
-			var rightCloud = document.createElement('div');
-			rightCloud.id = "right-cloud";
-			dojo.place(rightCloud, $('overall-content'));
+      // Setup the frame
+      var leftCloud = document.createElement('div');
+      leftCloud.id = "left-cloud";
+      dojo.place(leftCloud, $('overall-content'));
+      var rightCloud = document.createElement('div');
+      rightCloud.id = "right-cloud";
+      dojo.place(rightCloud, $('overall-content'));
 
       // Setup powers
       this.setupPowers(gamedatas.fplayers);
@@ -83,12 +90,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
     // TODO
     onScreenWidthChange: function () {
-      dojo.style('page-content', 'zoom', 'normal');
-			if($('scene-container')){
-				dojo.style('scene-container', 'marginTop', (dojo.style('left-side', 'marginTop') + $('page-title').offsetHeight) + "px");
-				dojo.style('play-area', 'min-height', (window.outerHeight - ((isMobile()? 100 : 200) + dojo.style('left-side', 'marginTop') )) + "px");
+      if ($('scene-container')) {
+        dojo.style('scene-container', 'marginTop', (dojo.style('left-side', 'marginTop') + $('page-title').offsetHeight) + "px");
+        dojo.style('play-area', 'min-height', (window.outerHeight - ((isMobile() ? 100 : 200) + dojo.style('left-side', 'marginTop'))) + "px");
+      }
+    },
 
-			}
+    onScroll: function () {
+      var isFixed = dojo.hasClass("page-title", "fixed-page-title");
+      dojo.toggleClass("grid-detail", "fixed", isFixed);
     },
 
 
@@ -975,7 +985,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       power.type = power.hero ? 'hero' : '';
 
       // TODO map for translation
-      power.textList = power.text.map(function(t) {
+      power.textList = power.text.map(function (t) {
         t = _(t);
         t = t.replace(/\[/g, '<b>').replace(/\]/g, '</b>');
         return t;
@@ -992,9 +1002,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
       //      dojo.style('play-area', 'display', container == 'board' ? 'block' : 'none');
       dojo.style('play-area', 'display', 'block');
-      if (container == 'board' && !this.board._onScene){
+      if (container == 'board' && !this.board._onScene) {
         this.board.enterScene();
-			}
+      }
     },
 
 
