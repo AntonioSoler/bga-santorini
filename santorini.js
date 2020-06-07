@@ -20,7 +20,10 @@
 //@ sourceURL=santorini.js
 var isDebug = true;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
-var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
+var isMobile = function(){
+	return document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
+};
+
 
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
   return declare("bgagame.santorini", ebg.core.gamegui, {
@@ -30,6 +33,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     constructor: function () {
       // Fix mobile viewport (remove CSS zoom)
       this.default_viewport = 'width=550, user-scalable=no';
+			this._focusedContainer = null;
     },
 
     /*
@@ -40,29 +44,31 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * Params :
      *  - mixed gamedatas : contains all datas retrieved by the getAllDatas PHP method.
      */
+		 onChangePreference: function(){
+			 console.log("test2");
+		 },
+
     setup: function (gamedatas) {
       var _this = this;
       debug('SETUP', gamedatas);
-      console.log(this.prefs);
+      console.log(this);
 
       // Mobile fix position of card selection
       // TODO this needs to happen AFTER the BGA adaptStatusBar()
-      dojo.connect(window, "scroll", this, dojo.hitch(this, "onScroll"));
+      dojo.connect(window, "scroll", this, this.onScroll.bind(this));
 
       // Setup the board (3d scene using threejs)
-      var container = document.createElement('div');
-      container.id = 'scene-container';
-      dojo.place(container, $('left-side-wrapper'));
-      this.board = new Board(container, URL); // Setup player boards
+			dojo.place(this.format_block('jstpl_scene', {}), $('overall-content'));
+      this.board = new Board($('scene-container'), URL); // Setup player boards
       this.setupPreference();
 
-      // Setup the frame
-      var leftCloud = document.createElement('div');
-      leftCloud.id = "left-cloud";
-      dojo.place(leftCloud, $('overall-content'));
-      var rightCloud = document.createElement('div');
-      rightCloud.id = "right-cloud";
-      dojo.place(rightCloud, $('overall-content'));
+
+			var target = document.getElementById('loader_mask');
+			var observer = new MutationObserver(function(mutations) {
+				if(target.style.display == 'none')
+					_this.onLoaderOff();
+			});
+			observer.observe(target, { attributes : true, attributeFilter : ['style'] });
 
       // Setup powers
       this.setupPowers(gamedatas.fplayers);
@@ -76,7 +82,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.setupNotifications();
     },
 
-    setupPreference: function () {
+
+		setupPreference: function () {
       var _this = this;
       var preferenceSelect = $('preference_control_100');
       var updatePreference = function () {
@@ -88,17 +95,35 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       updatePreference();
     },
 
+
+
+		onLoaderOff: function(){
+			this.onScreenWidthChange();
+
+			if(this._focusedContainer == 'powers-offer')
+				dojo.style('power-offer-container', 'opacity', '1');
+			if(this._focusedContainer == 'powers-choose')
+				dojo.style('power-choose-container', 'opacity', '1');
+
+			if(this._focusedContainer == 'board')
+				this.board.enterScene();
+			else
+				this.board.onLoad();
+		},
+
     // TODO
     onScreenWidthChange: function () {
       if ($('scene-container')) {
-        dojo.style('scene-container', 'marginTop', (dojo.style('left-side', 'marginTop') + $('page-title').offsetHeight) + "px");
-        dojo.style('play-area', 'min-height', (window.outerHeight - ((isMobile() ? 100 : 200) + dojo.style('left-side', 'marginTop'))) + "px");
+				dojo.style('santorini-logo', 'width', document.getElementById("left-side").offsetWidth + "px");
+        dojo.style('3d-scene', 'marginTop', $('play-area-scaler').getBoundingClientRect()['top'] + "px");
+        dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
+				this.board.updateSize();
       }
     },
 
     onScroll: function () {
-      var isFixed = dojo.hasClass("page-title", "fixed-page-title");
-      dojo.toggleClass("grid-detail", "fixed", isFixed);
+//      var isFixed = dojo.hasClass("page-title", "fixed-page-title");
+//      dojo.toggleClass("grid-detail", "fixed", isFixed);
     },
 
 
@@ -467,6 +492,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         var power = _this.getPower(powerId);
         var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
         div.id = "power-choose-" + power.id;
+
+				if (_this.isCurrentPlayerActive()){
+					dojo.style(div, "cursor", "pointer");
+					dojo.connect(div, 'onclick', function(ev){
+						_this.onClickChooseFirstPlayer(powerId);
+					})
+				}
       });
 
       if (this.isCurrentPlayerActive())
@@ -479,7 +511,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     chooseFirstPlayerActionsButtons: function (powers) {
       var _this = this;
       powers.forEach(function (powerId) {
-        _this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function () { _this.onClickChooseFirstPlayer(powerId) }, null, false, 'gray');
+        _this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function () { _this.onClickChooseFirstPlayer(powerId) }, null, false, 'blue');
       });
     },
 
@@ -998,13 +1030,20 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * 	show and hide containers depending on state
      */
     focusContainer: function focusContainer(container) {
+			if(this._focusedContainer != null && this._focusedContainer == container)
+				return;
+
+			if(this._focusedContainer != null){
+				if(container == "board")
+					this.board.enterScene();
+				if(container == "powers-choose")
+					dojo.style('power-choose-container', 'opacity', '1');
+			}
+
+			this._focusedContainer = container;
       dojo.style('power-offer-container', 'display', container == 'powers-offer' ? 'flex' : 'none');
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
-      //      dojo.style('play-area', 'display', container == 'board' ? 'block' : 'none');
       dojo.style('play-area', 'display', 'block');
-      if (container == 'board' && !this.board._onScene) {
-        this.board.enterScene();
-      }
     },
 
 

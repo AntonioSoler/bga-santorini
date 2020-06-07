@@ -27,8 +27,43 @@ html {
   position:relative;
 }
 
-#left-cloud {
+
+#scene-container {
+  outline: none;
   position:fixed;
+  top:0;
+  z-index:1;
+  width:100%;
+  height:100%;
+}
+
+#scene-container canvas {
+  position:absolute;
+  outline: none;
+  top:0;
+  left:0;
+  z-index:1;
+}
+
+
+#santorini-logo {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2;
+  background-image: url('img/santorini-logo.png');
+  background-size: 30%;
+  background-position: center 20%;
+  transition: opacity 1s;
+  background-repeat: no-repeat;
+  background-color: rgba(255,255,255,0.5);
+  opacity: 0.7;
+}
+
+#left-cloud {
+  position:absolute;
   top:0;
   left:0;
   width:28vw;
@@ -41,7 +76,7 @@ html {
 }
 
 #right-cloud {
-  position:fixed;
+  position:absolute;
   top:0;
   right:0;
   width:40vw;
@@ -58,17 +93,7 @@ html {
   position:relative;
 }
 
-#scene-container {
-  text-align: center;
-  outline: none;
-  position:absolute;
-  top:0;
-  z-index:1;
-}
 
-#scene-container canvas {
-  outline: none;
-}
 
 
 @media (max-width: 2300px) {
@@ -99,9 +124,12 @@ html {
 
 
 #play-area-scaler #power-offer-container,
-#play-area-scaler #power-choose-container {
+#play-area-scaler #power-choose-container {
   z-index:2;
+  opacity:0;
+  transition:opacity 3s;
 }
+
 
 div#popin_chooseArg {
     background-image: url('img/dialog.png');
@@ -206,6 +234,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+}
+
+.power-detail {
+  z-index:6;
 }
 
 .power-detail.power-dummy div {
@@ -325,6 +357,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 #play-area {
     display: flex;
     pointer-events: visible;
+    outline:none;
 }
 
 

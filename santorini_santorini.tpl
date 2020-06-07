@@ -25,6 +25,13 @@
 const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
 document.write('<script src="' + URL + '/modules/scripts/board.js" type="module"><\/script>');
 
+var jstpl_scene = `<div id="scene-container">
+	<div id="santorini-logo"></div>
+	<div id="left-cloud"></div>
+	<div id="right-cloud"></div>
+</div>`;
+
+
 var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${id} \${type} small \${implemented}" data-power="\${id}">
 	<div class="power-name">\${name}</div>
 </div>`;

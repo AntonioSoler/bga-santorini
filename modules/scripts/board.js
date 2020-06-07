@@ -5,12 +5,12 @@ import { Tween, Ease } 		from './tweenjs.min.js';
 
 var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
 
-const canvasHeight = () => (window.outerHeight - ((isMobile()? 100 : 200) + dojo.style('left-side', 'marginTop') )); //Math.min(600, document.getElementById("page-content").offsetHeight);
-const canvasWidth = () => document.getElementById("page-content").offsetWidth;
+const canvasHeight = () => (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100));
+const canvasWidth = () => document.getElementById("left-side").offsetWidth;
 
 // Zoom limits
 var ZOOM_MIN = 15;
-var ZOOM_MAX = 30;
+var ZOOM_MAX = 40;
 var ZOOM_MAX_MOBILE = 50;
 
 // Fall animation
@@ -83,6 +83,8 @@ Board.prototype.initScene = function(){
 
 	// Camera
 	this._camera = new THREE.PerspectiveCamera( 30, canvasWidth() / canvasHeight(), 1, isMobile()? 250 : 150 );
+	this._camera.position.set(40, 16, 0);
+	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 
 	// Lights
 	this._scene.add( new THREE.HemisphereLight( 0xFFFFFF, 0xFFFFFF, 1 ) );
@@ -90,21 +92,9 @@ Board.prototype.initScene = function(){
 	// Renderer
 	this._renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, precision:"lowp", powerPreference: "high-performance" });
 	this._renderer.setPixelRatio( window.devicePixelRatio );
-	this._renderer.setSize( canvasWidth(), canvasHeight() );
 	this._renderer.outputEncoding = THREE.sRGBEncoding;
 	this._container.appendChild(this._renderer.domElement);
-
-	var updateSize = () => {
-		this._camera.aspect = canvasWidth() / canvasHeight();
-		this._camera.updateProjectionMatrix();
-		this._renderer.setSize( canvasWidth(), canvasHeight() );
-		this.render();
-	};
-	window.addEventListener( 'resize', () => {
-		updateSize();
-		setTimeout(updateSize, 200);
-	}, false );
-
+	this._renderer.domElement.id = '3d-scene';
 
 	// Raycasting
 	this._raycaster = new THREE.Raycaster();
@@ -112,17 +102,20 @@ Board.prototype.initScene = function(){
 	this._mouse = { x : 0, y : 0};
 	this._mouseDown = false;
 
-	document.addEventListener( 'mousemove', (event) => {
+	document.getElementById('play-area').addEventListener( 'mousemove', (event) => {
 		event.preventDefault();
 		this._mouse = this.getRealMouseCoords(event.clientX, event.clientY);
 		if(!this._mouseDown && this._clickable.length > 0)
 			this.raycasting(true);
 	}, false );
 
-	document.addEventListener( 'mousedown', (event) => this._mouseDown = true );
-	document.addEventListener( 'mouseup', (event) => this._mouseDown = false );
+	document.getElementById('play-area').addEventListener( 'mousedown', (event) => this._mouseDown = true );
+	document.getElementById('play-area').addEventListener( 'mouseup', (event) => this._mouseDown = false );
 
-	// Rotate the camera
+	this._enterScene = false;
+};
+
+Board.prototype.onLoad = function(){
 	this._cameraAngle = { theta : 0};
 	var anim = Tween.get(this._cameraAngle, { loop:-1 }).to({ theta : 2*Math.PI}, 35000, Ease.linear)
 	.addEventListener('change', () => {
@@ -132,8 +125,16 @@ Board.prototype.initScene = function(){
 		this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
 		this.render();
 	});
-	this._onScene = false;
 };
+
+
+Board.prototype.updateSize = function(){
+	this._camera.aspect = canvasWidth() / canvasHeight();
+	this._camera.updateProjectionMatrix();
+	this._renderer.setSize( canvasWidth(), canvasHeight() );
+	this.render();
+};
+
 
 
 Board.prototype.getRealMouseCoords = function(px,py){
@@ -150,32 +151,24 @@ Board.prototype.getRealMouseCoords = function(px,py){
  * enterScene : players start to play on the 3D board => stop animation and add controls
  */
 Board.prototype.enterScene = function(){
-	if(this._onScene)
+	if(this._enterScene)
 		return;
+	this._enterScene = true;
 
-	this._onScene = true;
-	Tween.removeTweens(this._cameraAngle);
-
-
-	this._camera.position.set( 0, 25, 26 );
-//	this._camera.position.set( 0, 20, 21 );
-	if(isMobile())
-		this._camera.position.set( 0, 20, 25 );
-	this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
-
+	if(this._cameraAngle)
+		Tween.removeTweens(this._cameraAngle);
 
 	if($('left-cloud')){
-		setTimeout( () => {
-			$('left-cloud').style.left = "-10vw";
-			$('right-cloud').style.right = "-10vw";
-			Tween.get(this._camera.position).to({ x:0, y:20, z:21}, 2000).addEventListener('change', () => {
-				this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
-				this.render();
-			});
-		}, 2000);
+		$('left-cloud').style.left = "-10vw";
+		$('right-cloud').style.right = "-10vw";
+		$('santorini-logo').style.opacity = "0";
 
+		var target = { x:this._camera.position.x*0.5, y:20, z:this._camera.position.z*0.5};
+		Tween.get(this._camera.position).to(target, 2000).addEventListener('change', () => {
+			this._camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+			this.render();
+		});
 	}
-
 
 	// Controls
 	var controls = new OrbitControls( this._camera, document.getElementById('play-area') );
@@ -251,7 +244,7 @@ Board.prototype.computeText = function(text, size){
 			new THREE.PlaneGeometry(size, size),
 			new THREE.MeshBasicMaterial( {map: text, side:THREE.DoubleSide, transparent: true } )
 		);
-	textMesh.rotation.set(-Math.PI/2,0,0);
+	textMesh.rotation.set(-Math.PI/2,0,Math.PI/2);
 	textMesh.layers.set(1);
 
 	return textMesh;
@@ -262,7 +255,7 @@ Board.prototype.initCoordsHelpers = function(){
 	var cols = ['A','B','C','D','E'];
 	for(var i = 0; i < 5; i++){
 		var textMesh = this.computeText(cols[i])
-		textMesh.position.set(xCenters[i], 0.01, zCenters[4] + 1.6);
+		textMesh.position.set(xCenters[4] + 1.7, 0.01, zCenters[4-i]);
 		this._scene.add( textMesh );
 	}
 
@@ -270,7 +263,7 @@ Board.prototype.initCoordsHelpers = function(){
 	var rows = ['5','4','3','2','1'];
 	for(var i = 0; i < 5; i++){
 		var textMesh = this.computeText(rows[i])
-		textMesh.position.set(xCenters[0] - 1.6, 0.01, zCenters[i]);
+		textMesh.position.set(xCenters[i], 0.01, zCenters[4] + 1.6);
 		this._scene.add( textMesh );
 	}
 };
@@ -388,7 +381,7 @@ Board.prototype.addPiece = function(piece, animation){
 	if(['lvl0', 'lvl1', 'lvl2'].includes(piece.type)){
 		var textMesh = this.computeText(parseInt(piece.type[3]) + 1, 0.5);
 		textMesh.position.set(0, lvlHeights[parseInt(piece.z) + 1] - lvlHeights[piece.z],0);
-		textMesh.rotation.set(-Math.PI/2, 0, -mesh.rotation.y);
+		textMesh.rotation.set(-Math.PI/2, 0, -mesh.rotation.y + Math.PI/2);
 		mesh.add(textMesh);
 	}
 
