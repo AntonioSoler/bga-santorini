@@ -46,22 +46,20 @@ html {
 }
 
 
-#santorini-logo {
+#santorini-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
   z-index: 2;
-  background-image: url('img/santorini-logo.png');
-  background-size: 30%;
-  background-position: center 20%;
   transition: opacity 1s;
   background-repeat: no-repeat;
   background-color: rgba(255,255,255,0.5);
   opacity: 0.7;
 }
 
+/*clouds PNG Designed By 588ku from <a href="https://pngtree.com/">Pngtree.com</a>*/
 #left-cloud {
   position:absolute;
   top:0;

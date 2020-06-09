@@ -54,10 +54,19 @@ div#test3 {
 	height:100%;
 	background-color:#faecdb;
 }
+
+#play-area {
+	position: absolute;
+	top:0;
+	left:0;
+	width: 100%;
+	height:100%;
+}
 </style>
 	</head>
 	<body>
 <div id="page-content">
+		<div id="play-area"></div>
     <div id="container"></div>
     <div id="sliderX"></div>
     <div id="sliderY"></div>
@@ -73,7 +82,7 @@ window.board = new Board(container, "http://192.168.1.29/" );
 board.enterScene();
 
 var piece1 = {
-	x:0,y:4,z:0, type:'lvl0',
+	x:0,y:4,z:0, type:'ram',
 };
 var piece2 = {
 	x:1,y:3,z:0, name:'m0worker',

@@ -5,8 +5,9 @@ import { Tween, Ease } 		from './tweenjs.min.js';
 
 var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
 
-const canvasHeight = () => (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100));
-const canvasWidth = () => document.getElementById("left-side").offsetWidth;
+window['$'] = function(id){ return document.getElementById(id); };
+const canvasHeight = () => 600; //(Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, $('scene-container').getBoundingClientRect()['height']) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100));
+const canvasWidth = () => 1000; //document.getElementById("left-side").offsetWidth;
 
 // Zoom limits
 var ZOOM_MIN = 15;
@@ -61,6 +62,7 @@ var Board = function(container, url){
 
 	this.initScene();
 	this.initBoard();
+	this.updateSize();
 };
 
 
@@ -161,7 +163,7 @@ Board.prototype.enterScene = function(){
 	if($('left-cloud')){
 		$('left-cloud').style.left = "-10vw";
 		$('right-cloud').style.right = "-10vw";
-		$('santorini-logo').style.opacity = "0";
+		$('santorini-overlay').style.opacity = "0";
 
 		var target = { x:this._camera.position.x*0.5, y:20, z:this._camera.position.z*0.5};
 		Tween.get(this._camera.position).to(target, 2000).addEventListener('change', () => {
@@ -197,6 +199,10 @@ Board.prototype.enterScene = function(){
  *  - marks
  */
 Board.prototype.initBoard = function(){
+	this._logo = new THREE.Sprite(new THREE.SpriteMaterial({map: new THREE.TextureLoader().load(this._url + "img/santorini-logo.png")}));
+	this._logo.scale.set(20,10,20);
+	this._scene.add(this._logo);
+
 	var sea = this._meshManager.createMesh('sea');
 	sea.rotation.set(0,Math.PI,0);
 	sea.position.set(0,-2.8,0);
@@ -289,6 +295,11 @@ Board.prototype.toggleCoordsHelpers = function(b){
  * Render the scene
  */
 Board.prototype.render = function() {
+	// Update logo pos
+	var norme = Math.sqrt(this._camera.position.x*this._camera.position.x + this._camera.position.z * this._camera.position.z);
+	if(norme != 0)
+		this._logo.position.set(-this._camera.position.x*40/norme, 10, -this._camera.position.z*40/norme);
+
 	this._renderer.render( this._scene, this._camera );
 };
 
