@@ -356,13 +356,25 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * buildOfferActionButtons: show confirm button if the count is correct
      */
     buildOfferActionButtons: function () {
-      if (this.isCurrentPlayerActive()) {
-        this.removeActionButtons();
+      if (!this.isCurrentPlayerActive())
+				return;
 
-        if (this._nMissingPowers == 0) {
-          this.addActionButton('buttonConfirmOffer', _('Confirm'), 'onClickConfirmOffer', null, false, 'blue');
-        }
-      }
+      this.removeActionButtons();
+
+			if(this._displayedPower){
+				var powerDiv = $('power-small-' + this._displayedPower),
+	        isBanned = powerDiv.classList.contains('banned'),
+	        isSelected = powerDiv.classList.contains('selected');
+
+				if(isSelected)
+					this.addActionButton('buttonRemoveFromOffer', _('Remove from offer'), this.removeOffer.bind(this), null, false, 'red');
+				else if(this._nMissingPowers > 0 && !isBanned)
+					this.addActionButton('buttonAddToOffer', _('Add to offer'),this.addOffer.bind(this), null, false, 'blue');
+			}
+
+			// Enough pwers : confirm button
+			if (this._nMissingPowers == 0)
+				this.addActionButton('buttonConfirmOffer', _('Confirm offer'), 'onClickConfirmOffer', null, false, 'blue');
     },
 
 		/*
@@ -387,6 +399,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         isDisplayed = powerDiv.classList.contains('displayed'),
         isSelected = powerDiv.classList.contains('selected'),
         isWait = powerDiv.classList.contains('wait'); // Everyone may view details on first click
+			this._displayedPower = powerId;
 
       if (!isDisplayed) {
         // Mark only this card as displayed
@@ -399,17 +412,25 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Otherwise, active player may select/unselect the power
       else if (!isWait && isActive) {
         // Already selected => unselect it
-        if (isSelected) {
-          powerDiv.classList.add('wait');
-          this.takeAction("removeOffer", { powerId: powerId });
-        }
+        if (isSelected)
+					this.removeOffer();
         // Not yet select + still need powers => select it
-        else if (this._nMissingPowers > 0 && !isBanned) {
-          powerDiv.classList.add('wait');
-          this.takeAction("addOffer", { powerId: powerId });
-        }
+        else if (this._nMissingPowers > 0 && !isBanned)
+        	this.addOffer();
       }
+
+			this.buildOfferActionButtons();
     },
+
+		addOffer: function(){
+			$('power-small-' + this._displayedPower).classList.add('wait');
+			this.takeAction("addOffer", { powerId: this._displayedPower });
+		},
+
+		removeOffer: function(){
+			$('power-small-' + this._displayedPower).classList.add('wait');
+			this.takeAction("removeOffer", { powerId: this._displayedPower });
+		},
 
 
     /*
