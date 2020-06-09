@@ -34,6 +34,7 @@ class santorini extends Table
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
       'optionAutomatic' => OPTION_AUTOMATIC,
+      'optionConfirm' => OPTION_CONFIRM,
       'currentRound' => CURRENT_ROUND,
       'firstPlayer' => FIRST_PLAYER,
     ]);
@@ -460,6 +461,24 @@ class santorini extends Table
     $this->gamestate->nextState($state);
   }
 
+  /*
+   * stPreEndOfTurn: called just before the end of each player turn
+   */
+  public function stPreEndOfTurn()
+  {
+    if($this->getGameStateValue('optionConfirm') == NO_CONFIRM){
+      $this->gamestate->nextState('confirm');
+    }
+  }
+
+  /*
+   * confirmTurn: called whenever a player confirm its turn
+   */
+  public function confirmTurn()
+  {
+    $this->gamestate->nextState('confirm');
+  }
+
 
   /*
    * stEndOfTurn: called at the end of each player turn
@@ -788,8 +807,7 @@ class santorini extends Table
   {
     self::checkAction('cancel');
 
-    $args = $this->gamestate->state()['args'];
-    if (!$args['cancelable']) {
+    if ($this->log->getLastActions() == null) {
       throw new BgaUserException(_("You have nothing to cancel"));
     }
 

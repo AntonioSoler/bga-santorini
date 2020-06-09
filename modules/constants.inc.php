@@ -99,6 +99,7 @@ define('ST_NEXT_PLAYER', 5);
 define('ST_START_OF_TURN', 16);
 define('ST_MOVE', 6);
 define('ST_BUILD', 7);
+define('ST_PRE_END_OF_TURN', 19);
 define('ST_END_OF_TURN', 17);
 define('ST_USE_POWER', 15);
 
@@ -124,6 +125,10 @@ define('CUSTOM', 2);
 define('OPTION_AUTOMATIC', 103);
 define('MANUAL', 0);
 define('AUTOMATIC', 1);
+
+define('OPTION_CONFIRM', 104);
+define('NO_CONFIRM', 0);
+define('CONFIRM', 1);
 
 
 define('HELPERS', 100);

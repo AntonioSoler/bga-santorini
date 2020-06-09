@@ -248,7 +248,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       }
 
       // Stop here if it's not the current player's turn for some states
-      if (["playerUsePower", "playerPlaceWorker", "playerPlaceRam", "playerMove", "playerBuild", "gameEnd"].includes(stateName)) {
+      if (["playerUsePower", "playerPlaceWorker", "playerPlaceRam", "playerMove", "playerBuild", "confirmTurn", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
         if (!this.isCurrentPlayerActive()) return;
       }
@@ -297,6 +297,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
         }
       }
+
+			if ((stateName == "confirmTurn")) {
+				this.addActionButton('buttonConfirm', _('Confirm'), 'onClickConfirm', null, false, 'blue');
+				this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
+			}
     },
 
 
@@ -900,6 +905,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       this.takeAction("cancelPreviousWorks");
       this.clearPossible();
+    },
+
+
+		/*
+     * onClickConfirm: is called when the active player decide to confirm its turn
+     */
+    onClickConfirm: function () {
+      if (!this.checkAction('confirm'))
+        return;
+
+      this.takeAction("confirmTurn");
     },
 
 

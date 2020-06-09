@@ -238,7 +238,7 @@ $machinestates = array(
     'possibleactions' => ['playerMove', 'skip', 'cancel', 'resign', 'endgame'],
     'transitions' => [
       'zombiePass' => ST_END_OF_TURN,
-      'endturn'    => ST_END_OF_TURN,
+      'endturn'    => ST_PRE_END_OF_TURN,
       'endgame'    => ST_GAME_END,
       'done'       => ST_BUILD,
       'skip'       => ST_BUILD,
@@ -259,14 +259,29 @@ $machinestates = array(
     'possibleactions' => ['playerBuild', 'skip', 'cancel', 'resign', 'endgame'],
     'transitions' => [
       'zombiePass' => ST_END_OF_TURN,
-      'endturn'    => ST_END_OF_TURN,
+      'endturn'    => ST_PRE_END_OF_TURN,
       'endgame'    => ST_GAME_END,
-      'done'       => ST_END_OF_TURN,
-      'skip'       => ST_END_OF_TURN,
+      'done'       => ST_PRE_END_OF_TURN,
+      'skip'       => ST_PRE_END_OF_TURN,
       'cancel'     => ST_START_OF_TURN,
       'move'       => ST_MOVE,
       'buildAgain' => ST_BUILD,
       'power'      => ST_USE_POWER,
+    ],
+  ],
+
+  ST_PRE_END_OF_TURN => [
+    'name' => 'confirmTurn',
+    'description' => clienttranslate('${actplayer} must confirm or restart its turn'),
+    'descriptionmyturn' => clienttranslate('${you} must confirm or restart your turn'),
+    'action' => 'stPreEndOfTurn',
+    'type' => 'activeplayer',
+    'possibleactions' => ['confirm','cancel'],
+    'transitions' => [
+      'zombiePass' => ST_END_OF_TURN,
+      'endturn'    => ST_END_OF_TURN,
+      'confirm'    => ST_END_OF_TURN,
+      'cancel'     => ST_START_OF_TURN,
     ],
   ],
 

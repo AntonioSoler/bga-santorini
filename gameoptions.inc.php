@@ -139,6 +139,23 @@ $game_options = [
       ],
     ],
   ],
+
+  OPTION_CONFIRM => [
+    'name' => totranslate('Confirm turn'),
+    'values' => [
+      NO_CONFIRM => [
+        'name' => totranslate('No confirm'),
+        'tmdisplay' => totranslate('No confirm'),
+        'description' => totranslate("After the last action of a player's turn, the game switch to next player"),
+      ],
+      CONFIRM => [
+        'name' => totranslate('Confirm'),
+        'tmdisplay' => totranslate('Confirm'),
+        'description' => totranslate("After the last action of a player's turn, the player has to confirm/undo its turn"),
+      ],
+    ],
+  ],
+
 ];
 
 
