@@ -23,7 +23,7 @@ class Morpheus extends SantoriniPower
   public function getUIData()
   {
     $data = parent::getUIData();
-    $data['stock'] = $this->computeStock();
+    $data['counter'] = $this->computeStock();
     return $data;
   }
 
@@ -39,7 +39,7 @@ class Morpheus extends SantoriniPower
     $this->game->notifyAllPlayers('updatePowerUI', '', [
       'playerId' => $this->playerId,
       'powerId' => $this->getId(),
-      'stock' => $this->computeStock()
+      'counter' => $this->computeStock()
     ]);
   }
 

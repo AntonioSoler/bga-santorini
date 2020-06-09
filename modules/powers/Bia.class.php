@@ -49,7 +49,7 @@ class Bia extends SantoriniPower
     $y = 2 * $work['y'] - $worker['y'];
 
     // If there is no opponent in the next space -> return null
-    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$x} AND y = {$y} AND type = 'worker'");
+    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$x} AND y = {$y} AND type = 'worker' AND location = 'board'");
     if ($worker2 == null || $worker2['player_id'] == $worker['player_id']) {
       return;
     }

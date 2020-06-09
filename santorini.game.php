@@ -33,6 +33,7 @@ class santorini extends Table
     self::initGameStateLabels([
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
+      'optionAutomatic' => OPTION_AUTOMATIC,
       'currentRound' => CURRENT_ROUND,
       'firstPlayer' => FIRST_PLAYER,
     ]);
@@ -730,7 +731,7 @@ class santorini extends Table
       }
     }
     // Only one work possible => do it but notify player first
-    else if (count($state['args']['workers']) == 1 && !$state['args']['skippable']) {
+    else if ($this->getGameStateValue('optionAutomatic') == AUTOMATIC && count($state['args']['workers']) == 1 && !$state['args']['skippable']) {
       $worker = $state['args']['workers'][0];
       if (count($worker['works']) > 1) {
         return;

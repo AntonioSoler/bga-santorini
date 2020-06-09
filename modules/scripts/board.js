@@ -5,9 +5,9 @@ import { Tween, Ease } 		from './tweenjs.min.js';
 
 var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
 
-window['$'] = function(id){ return document.getElementById(id); };
-const canvasHeight = () => 600; //(Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, $('scene-container').getBoundingClientRect()['height']) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100));
-const canvasWidth = () => 1000; //document.getElementById("left-side").offsetWidth;
+//window['$'] = function(id){ return document.getElementById(id); };
+const canvasHeight = () => (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, $('scene-container').getBoundingClientRect()['height']) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100));
+const canvasWidth = () => document.getElementById("left-side").offsetWidth;
 
 // Zoom limits
 var ZOOM_MIN = 15;
@@ -494,6 +494,7 @@ Board.prototype.switchPiece = function(piece1, piece2){
 Board.prototype.removePiece = function(piece){
 	var mesh = this._board[piece.x][piece.y][piece.z].piece;
 	this._board[piece.x][piece.y][piece.z].piece = null;
+	delete this._ids[piece.id];
 
 	return new Promise((resolve, reject) => {
 		Tween.get(mesh.material).to({ opacity:0 }, fallAnimation.duration,  Ease.quadInOut)
@@ -615,21 +616,21 @@ Board.prototype.makeClickable = function(objects, callback, action){
 			// Disk animation
 			mark = new THREE.Mesh(
 				new THREE.CircleGeometry( 0.728, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: color, opacity:0.7,	transparent: true, side:THREE.DoubleSide, })
+				new THREE.MeshPhysicalMaterial({ color: color, opacity:0.7,	transparent: true, side:THREE.DoubleSide, })
 			);
 		}
 		// Show square
 		else if(action == "playerBuild"){
 			mark = new THREE.Mesh(
 				new THREE.PlaneBufferGeometry(1.4,1.4).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({ color: color, opacity:0.5,	transparent: true, side:THREE.DoubleSide,})
+				new THREE.MeshPhysicalMaterial({ color: color, opacity:0.5,	transparent: true, side:THREE.DoubleSide,})
 			);
 		}
 		// Ring animation
 		else {
 			mark = new THREE.Mesh(
 				new THREE.RingGeometry( 0.4, 0.53, 32 ).rotateX(-Math.PI/2),
-				new THREE.MeshPhongMaterial({	color: color, opacity:0.8,	transparent: true,	side:THREE.DoubleSide,})
+				new THREE.MeshPhysicalMaterial({	color: color, opacity:0.8,	transparent: true,	side:THREE.DoubleSide,})
 			);
 		}
 

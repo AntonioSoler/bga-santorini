@@ -122,6 +122,23 @@ $game_options = [
       ],
     ],
   ],
+
+
+  OPTION_AUTOMATIC => [
+    'name' => totranslate('Automatic'),
+    'values' => [
+      MANUAL => [
+        'name' => totranslate('No automatic actions'),
+        'tmdisplay' => totranslate('No automatic actions'),
+        'description' => totranslate('Players have to click to make the action, even if only one available'),
+      ],
+      AUTOMATIC => [
+        'name' => totranslate('Automatic action'),
+        'tmdisplay' => totranslate('Automatic action'),
+        'description' => totranslate('If only one action is available, the game will automatically make it'),
+      ],
+    ],
+  ],
 ];
 
 

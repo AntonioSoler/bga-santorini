@@ -56,6 +56,7 @@ var jstpl_powerDetail = `<div class="power-detail">
 </div>`;
 
 
+var jstpl_powerCounter = '<div id="power-counter-\${playerId}-\${powerId}" class="power-counter">\${n}</div>';
 var jstpl_token = '<div id="token-\${token}" class="token token-\${token}"></div>';
 var jstpl_tokenPrompt = `<table class="token-prompt">
 	<tr>

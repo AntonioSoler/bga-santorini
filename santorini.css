@@ -137,20 +137,22 @@ div#popin_chooseArg {
     background-color: transparent;
     border: none;
     box-shadow: none;
-    width: 550px;
-    height: 400px;
+    width: 30vw;
+    height: 21.8vw;
+    min-height:218px;
 }
 
 div#popin_chooseArg h2 {
-    color: white;
-    margin-top: 40px;
-    text-align: center;
-    width: 100%;
+  color: white;
+  margin-top: 7.5%;
+  width: 100%;
+  text-align: center;
+  font-size: calc(11px + 0.7vw);
 }
 
 div#popin_chooseArg_contents {
     width: 77%;
-    margin: 85px auto;
+    margin: 15% auto;
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -158,13 +160,13 @@ div#popin_chooseArg_contents {
 }
 
 div#popin_chooseArg_contents div.arg-prompt {
-    width: 150px;
-    height: 150px;
-    margin: 15px;
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    cursor: pointer;
+  width: 40%;
+  margin: 5%;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  cursor: pointer;
+  padding-bottom: 37%;
 }
 
 div#popin_chooseArg_contents div.arg-prompt.arg-0 {
@@ -184,8 +186,8 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 #popin_chooseArg_close {
-    top: 25px;
-    right: -14px;
+  top: 8%;
+  right: -2%;
 }
 
 /* Player boards */
@@ -533,7 +535,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   z-index:5;
 }
 
-.mini-card .morpheus-power-stock {
+.mini-card .power-counter {
   position: absolute;
   top: 0;
   right: 0;

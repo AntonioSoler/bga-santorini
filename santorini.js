@@ -115,7 +115,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onScreenWidthChange: function () {
       if ($('scene-container')) {
 				dojo.style('santorini-overlay', 'width', document.getElementById("left-side").offsetWidth + "px");
-        dojo.style('3d-scene', 'marginTop', $('play-area-scaler').getBoundingClientRect()['top'] + "px");
+        dojo.style('3d-scene', 'marginTop', ($('play-area-scaler').getBoundingClientRect()['top'] - $('overall-content').getBoundingClientRect()['top']) + "px");
         dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
 				this.board.updateSize();
       }
@@ -179,12 +179,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (showDialog && playerId == this.player_id)
         powerDialog.show();
 
-      if (powerId == this.powersIds.MORPHEUS) {
-        var div = document.createElement("div");
-        div.id = 'morpheus-power-stock-' + playerId;
-        div.className = "morpheus-power-stock";
-        $('mini-card-' + playerId + "-" + powerId).appendChild(div);
-        div.innerHTML = power.stock;
+      if (powerId == this.powersIds.MORPHEUS || powerId == this.powersIds.CHAOS) {
+				var data = {
+					playerId: playerId,
+					powerId: powerId,
+					n:power.counter,
+				};
+				dojo.place(this.format_block('jstpl_powerCounter', data), 'mini-card-' + playerId + "-" + powerId);
       }
     },
 
@@ -196,10 +197,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     notif_updatePowerUI: function (n) {
       debug('Notif: updating power UI', n.args);
 
-      if (n.args.powerId == this.powersIds.MORPHEUS) {
-        var div = $('morpheus-power-stock-' + n.args.playerId);
+      if (n.args.powerId == this.powersIds.MORPHEUS || n.args.powerId == this.powersIds.CHAOS) {
+        var div = $('power-counter-' + n.args.playerId + "-" + n.args.powerId);
         if (div)
-          div.innerHTML = n.args.stock;
+          div.innerHTML = n.args.counter;
       }
     },
 
