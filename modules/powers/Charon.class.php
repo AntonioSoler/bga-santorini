@@ -68,7 +68,7 @@ class Charon extends SantoriniPower
     $newSpace = $this->game->board->getSpaceBehind($worker2, $worker, $accessibleSpaces);
 
     // Ferry worker
-    self::DbQuery("UPDATE piece SET x = {$newSpace['x']}, y = {$newSpace['y']}, z = {$newSpace['z']} WHERE id = {$worker2['id']}");
+    $this->game->board->setPieceAt($worker2, $newSpace);
     $this->game->log->addForce($worker2, $newSpace);
 
     // Notify (same text as Minotaur to help translators)

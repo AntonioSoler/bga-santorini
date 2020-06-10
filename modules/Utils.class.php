@@ -26,9 +26,12 @@ abstract class Utils extends APP_GameClass
   public static function filterWorkersById(&$arg, $wId, $same = true)
   {
     self::filterWorkers($arg, function (&$worker) use ($wId, $same) {
-      return ($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId);
+      return is_array($wId)?
+          ( ($same && in_array($worker['id'], $wId)) || (!$same && !in_array($worker['id'],$wId) ))
+        : ( ($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId) );
     });
   }
+
 
   public static function cleanWorkers(&$arg)
   {

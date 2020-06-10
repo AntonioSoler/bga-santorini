@@ -220,7 +220,7 @@ $machinestates = array(
       'cancel' => ST_START_OF_TURN,
       'move' => ST_MOVE,
       'build' => ST_BUILD,
-      'endturn' => ST_END_OF_TURN,
+      'endturn' => ST_PRE_END_OF_TURN,
       'endgame' => ST_GAME_END,
     ],
   ],

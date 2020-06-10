@@ -47,7 +47,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPieceAt($space)
   {
-    return self::getNonEmptyObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}");
+    return self::getObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}");
   }
 
 
@@ -278,4 +278,17 @@ class SantoriniBoard extends APP_GameClass
 
     return (count($spaces) == 1) ? $spaces[0] : null;
   }
+
+
+/*##########################
+######### Setters ##########
+##########################*/
+  /*
+   * setPieceAt: update location of an already existing piece
+   */
+  public function setPieceAt($piece, $space)
+  {
+    self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
+  }
+
 }

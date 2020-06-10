@@ -54,26 +54,30 @@ class Aphrodite extends SantoriniPower
     return $action['workers'];
   }
 
+  public function canFinishHere($worker, $space)
+  {
+    $forcedWorkers = $this->getForcedWorkers();
+    return $forcedWorkers == null || (!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($space);
+  }
 
   public function argOpponentMove(&$arg)
   {
-    $forcedWorkers = $this->getForcedWorkers();
-    if($forcedWorkers == null){
+    if($this->getForcedWorkers() == null){
       return;
     }
 
     // Allow skip only if condition is satisfied
     if($arg['skippable']){
       foreach($arg['workers'] as $worker){
-        $arg['skippable'] = $arg['skippable'] && ((!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($worker));
+        $arg['skippable'] = $arg['skippable'] && $this->canFinishHere($worker, $worker);
       }
     }
 
 
     // Last move => must be neighboring
     if($arg['mayMoveAgain'] === false){
-      Utils::filterWorks($arg, function($space, $worker) use ($forcedWorkers){
-        return (!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($space);
+      Utils::filterWorks($arg, function($space, $worker){
+        return $this->canFinishHere($worker, $space);
       });
 
       if(empty($arg['workers'])){
@@ -85,8 +89,8 @@ class Aphrodite extends SantoriniPower
     }
     // Last move if not on perimeter => must be neighboring
     else if($arg['mayMoveAgain'] === 'perimeter'){
-      Utils::filterWorks($arg, function($space, $worker) use ($forcedWorkers){
-        return (!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($space) || $this->game->board->isPerimeter($space);
+      Utils::filterWorks($arg, function($space, $worker) {
+        return $this->canFinishHere($worker, $space) || $this->game->board->isPerimeter($space);
       });
     }
 

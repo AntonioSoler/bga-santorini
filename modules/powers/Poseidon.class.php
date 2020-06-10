@@ -28,14 +28,10 @@ class Poseidon extends SantoriniPower
       return;}
 
     // Otherwise, let the unmoved worker, which is on the ground floor, do another build (not mandatory)
-    $move = $this->game->log->getLastMove(); // may be a different worker because of opponent powers
+    $arg = $this->game->argPlayerWork('build');
     $arg['skippable'] = true;
-
-    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    foreach ($arg['workers'] as &$worker) {
-      if ($worker['id'] != $move['pieceId']){
-        $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');}
-    }
+    $move = $this->game->log->getLastMove();
+    Utils::filterWorkersById($arg, $move['pieceId'], false);
   }
 
 

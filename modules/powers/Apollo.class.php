@@ -23,14 +23,11 @@ class Apollo extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
-    $allWorkers = $this->game->board->getPlacedWorkers();
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
+
     foreach ($workers as &$worker) {
       $worker['works'] = [];
-      foreach ($allWorkers as $worker2) {
-        if ($worker['player_id'] == $worker2['player_id']) {
-          continue;
-        }
-
+      foreach ($oppWorkers as $worker2) {
         if ($this->game->board->isNeighbour($worker, $worker2, 'move')) {
           $worker['works'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
         }
@@ -43,15 +40,15 @@ class Apollo extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is free, we can do a classic move -> return false
-    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
+    $worker2 = $this->game->board->getPieceAt($work);
     if ($worker2 == null) {
       return false;
     }
 
     // Switch workers
-    self::DbQuery("UPDATE piece SET x = {$worker2['x']}, y = {$worker2['y']}, z = {$worker2['z']} WHERE id = {$worker['id']}");
-    self::DbQuery("UPDATE piece SET x = {$worker['x']}, y = {$worker['y']}, z = {$worker['z']} WHERE id = {$worker2['id']}");
+    $this->game->board->setPieceAt($worker, $worker2);
     $this->game->log->addMove($worker, $worker2);
+    $this->game->board->setPieceAt($worker2, $worker);
     $this->game->log->addForce($worker2, $worker);
 
     // Notify

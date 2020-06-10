@@ -35,11 +35,8 @@ class Prometheus extends SantoriniPower
       return;
     }
 
+    $arg = $this->game->argPlayerWork('build');
     $arg['skippable'] = true;
-    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    foreach ($arg['workers'] as &$worker) {
-      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
-    }
   }
 
 

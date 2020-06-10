@@ -31,9 +31,7 @@ class Terpsichore extends SantoriniPower
     $workersIds = array_map(function ($move) {
       return $move['pieceId'];
     }, $moves);
-    Utils::filterWorkers($arg, function ($worker) use ($workersIds) {
-      return !in_array($worker['id'], $workersIds);
-    });
+    Utils::filterWorkersById($arg, $workersIds, false);
   }
 
   public function stateAfterMove()
@@ -49,12 +47,8 @@ class Terpsichore extends SantoriniPower
       return $build['pieceId'];
     }, $builds);
 
-    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    foreach ($arg['workers'] as &$worker) {
-      if (!in_array($worker['id'], $workersIds)) {
-        $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
-      }
-    }
+    $arg = $this->game->argPlayerWork('build');
+    Utils::filterWorkersById($arg, $workersIds, false);
   }
 
   public function stateAfterBuild()

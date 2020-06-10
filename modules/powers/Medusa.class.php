@@ -51,7 +51,7 @@ class Medusa extends SantoriniPower
 
     foreach ($arg['workers'] as $worker) {
       foreach ($worker['works'] as $work) {
-        $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
+        $worker2 = $this->game->board->getPieceAt($work);
         if ($worker2 == null) {
           // Might happens if the only worker already killed the piece just before
           continue;

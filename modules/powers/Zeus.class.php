@@ -37,7 +37,7 @@ class Zeus extends SantoriniPower
   public function playerBuild($worker, $work)
   {
     // If space is free, we can do a classic build -> return false
-    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']} AND id = {$worker['id']}");
+    $worker2 = $this->game->board->getPieceAt($work);
     if ($worker2 == null) {
       return false;
     }
@@ -48,7 +48,7 @@ class Zeus extends SantoriniPower
     if ($space['z'] > 3) {
       throw new BgaUserException(_("Zeus: This worker would go too high"));
     }
-    self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$worker['id']}");
+    $this->game->board->setPieceAt($worker, $space);
     $this->game->log->addForce($worker, $space);
 
     // Build under it

@@ -47,14 +47,14 @@ class Minotaur extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
+    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
     if ($worker2 != null) {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
       $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
       if (is_null($space)) {
         throw new BgaVisibleSystemException("Minotaur: No available space behind opponent worker");
       }
-      self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$worker2['id']}");
+      $this->game->board->setPieceAt($worker2, $space);
       $this->game->log->addForce($worker2, $space);
 
       // Notify (same text as Charon to help translators)

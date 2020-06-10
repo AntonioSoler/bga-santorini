@@ -63,7 +63,7 @@ class Chaos extends SantoriniPower
     // Remove all non simple gods
     $cards = array_map(function($card){ return $card['id']; }, $this->game->powerManager->cards->getCardsInLocation('deck'));
     $this->game->powerManager->cards->moveCards($cards, 'box');
-    for($i = 0; $i < 10; $i++){
+    for($i = 1; $i <= 10; $i++){
       $card = $this->game->powerManager->cards->getCard($i);
       if($card['location'] == 'box'){
         $this->game->powerManager->cards->moveCard($i, 'deck');
