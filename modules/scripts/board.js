@@ -7,7 +7,7 @@ var isMobile = () => document.getElementById("ebd-body") && document.getElementB
 
 //window['$'] = function(id){ return document.getElementById(id); };
 const canvasHeight = () => (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, $('scene-container').getBoundingClientRect()['height']) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100));
-const canvasWidth = () => document.getElementById("left-side").offsetWidth;
+const canvasWidth = () => document.getElementById("left-side").getBoundingClientRect()['width'];
 
 // Zoom limits
 var ZOOM_MIN = 15;
@@ -298,7 +298,7 @@ Board.prototype.render = function() {
 	// Update logo pos
 	var norme = Math.sqrt(this._camera.position.x*this._camera.position.x + this._camera.position.z * this._camera.position.z);
 	if(norme != 0)
-		this._logo.position.set(-this._camera.position.x*40/norme, 10, -this._camera.position.z*40/norme);
+		this._logo.position.set(-this._camera.position.x*100/norme, 2, -this._camera.position.z*100/norme);
 
 	this._renderer.render( this._scene, this._camera );
 };

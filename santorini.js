@@ -113,9 +113,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
     // TODO
     onScreenWidthChange: function () {
-      if ($('scene-container')) {
+      dojo.style('page-content', 'zoom', 'normal');
+	    if ($('scene-container')) {
 				dojo.style('santorini-overlay', 'width', document.getElementById("left-side").offsetWidth + "px");
-        dojo.style('3d-scene', 'marginTop', ($('play-area-scaler').getBoundingClientRect()['top'] - $('overall-content').getBoundingClientRect()['top']) + "px");
+        dojo.style('3d-scene', 'marginTop', ($('page-content').getBoundingClientRect()['top'] - $('overall-content').getBoundingClientRect()['top']) + "px");
         dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
 				this.board.updateSize();
       }
@@ -524,21 +525,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 					dojo.style(div, "cursor", "pointer");
 					dojo.connect(div, 'onclick', function(ev){
 						_this.onClickChooseFirstPlayer(powerId);
-					})
+					});
+					_this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function () { _this.onClickChooseFirstPlayer(powerId) }, null, false, 'blue');
 				}
-      });
-
-      if (this.isCurrentPlayerActive())
-        this.chooseFirstPlayerActionsButtons(args.powers);
-    },
-
-    /*
-     * chooseFirstPlayerActionsButtons: let the contestant choose who will start
-     */
-    chooseFirstPlayerActionsButtons: function (powers) {
-      var _this = this;
-      powers.forEach(function (powerId) {
-        _this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function () { _this.onClickChooseFirstPlayer(powerId) }, null, false, 'blue');
       });
     },
 
@@ -581,10 +570,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           dojo.connect(div, 'onclick', function (e) {
             return _this.onClickChoosePower(power.id);
           });
+					_this.addActionButton('buttonChoosePower' + power.id, _this.getPower(power.id).name, function () { _this.onClickChoosePower(power.id) }, null, false, 'blue');
         }
       });
     },
-
 
     /*
      * onClickChoosePower:
