@@ -74,7 +74,7 @@ $machinestates = array(
     'type' => 'game',
     'action' => 'stPowersSetup',
     'transitions' => [
-      'done' => ST_NEXT_PLAYER_PLACE_WORKER,
+      'placeWorker' => ST_NEXT_PLAYER_PLACE_WORKER,
       'offer' => ST_BUILD_OFFER,
       'chooseFirstPlayer' => ST_CHOOSE_FIRST_PLAYER
     ],
@@ -90,6 +90,7 @@ $machinestates = array(
     'transitions' => [
       'zombiePass' => ST_GAME_END,
       'done' => ST_CHOOSE_FIRST_PLAYER,
+      'placeWorker' => ST_NEXT_PLAYER_PLACE_WORKER,
     ],
   ],
 

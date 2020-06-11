@@ -300,9 +300,9 @@ class SantoriniBoard extends APP_GameClass
   /*
    * setPieceAt: update location of an already existing piece
    */
-  public function setPieceAt($piece, $space)
+  public function setPieceAt($piece, $space, $location = 'board')
   {
-    self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
+    self::DbQuery("UPDATE piece SET location = '$location', x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
   }
 
 }

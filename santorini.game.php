@@ -135,6 +135,11 @@ class santorini extends Table
       }
     }
 
+    // Create the Ram figure
+    if(intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE){
+      self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
+    }
+
     // Prepare a deck with all possible powers for this game (if needed)
     $nextState = $this->powerManager->preparePowers();
     $this->gamestate->nextState($nextState);
@@ -157,7 +162,7 @@ class santorini extends Table
   public function argBuildOffer()
   {
     return [
-      'count'  => $this->playerManager->getPlayerCount(),
+      'count'  => intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE? 1 : $this->playerManager->getPlayerCount(),
       'deck'   => $this->powerManager->getPowerIdsInLocation('deck'),
       'offer'  => $this->powerManager->getPowerIdsInLocation('offer'),
       'banned' => $this->powerManager->computeBannedIds(),
@@ -195,34 +200,41 @@ class santorini extends Table
   public function confirmOffer()
   {
     self::checkAction('confirmOffer');
-    $nPlayers = $this->playerManager->getPlayerCount();
+    $n = $this->argBuildOffer()['count'];
     $powers = $this->powerManager->getPowersInLocation('offer');
-    if (count($powers) != $nPlayers) {
-      $msg = sprintf(self::_("You must offer exactly %d powers"), $nPlayers);
+    if (count($powers) != $n) {
+      $msg = sprintf(self::_("You must offer exactly %d powers"), $n);
       throw new BgaUserException($msg);
     }
 
     // Send notification message
-    $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
-    if ($nPlayers == 3) {
-      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
-    } else if ($nPlayers == 4) {
-      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
-    }
-    $args = [
-      'i18n' => [],
-      'player_name' => self::getActivePlayerName()
-    ];
+    if(intval($this->getGameStateValue('optionPowers')) != GOLDEN_FLEECE){
+      $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
+      if ($nPlayers == 3) {
+        $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
+      } else if ($nPlayers == 4) {
+        $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
+      }
+      $args = [
+        'i18n' => [],
+        'player_name' => self::getActivePlayerName()
+      ];
 
-    $i = 1;
-    foreach ($powers as $power) {
-      $argName = "power_name$i";
-      $args['i18n'][] = $argName;
-      $args[$argName] = $power->getName();
-      $i++;
+      $i = 1;
+      foreach ($powers as $power) {
+        $argName = "power_name$i";
+        $args['i18n'][] = $argName;
+        $args[$argName] = $power->getName();
+        $i++;
+      }
+      self::notifyAllPlayers('buildOffer', $msg, $args);
+      $this->gamestate->nextState('done');
+
+    // GOLDEN FLEECE
+    } else {
+      $this->powerManager->prepareGoldenFleece($powers[0]->getId());
+      $this->gamestate->nextState('placeWorker');
     }
-    self::notifyAllPlayers('buildOffer', $msg, $args);
-    $this->gamestate->nextState('done');
   }
 
 
@@ -333,12 +345,8 @@ class santorini extends Table
     // Get all remaining workers for all players
     $workers = $this->board->getAvailableWorkers();
     if (count($workers) == 0) {
-      $optionPowers = intval($this->getGameStateValue('optionPowers'));
-      if ($optionPowers == GOLDEN_FLEECE) {
-        // Create the Ram figure
-        self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
-        // Switch to first player
-        $this->gamestate->changeActivePlayer($this->getGameStateValue('firstPlayer'));
+      if(intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE){
+        $this->activeNextPlayer();
         $this->gamestate->nextState('ram');
       } else {
         $this->gamestate->nextState('done');
@@ -408,7 +416,7 @@ class santorini extends Table
     }
 
     // Place the worker in this space
-    self::DbQuery("UPDATE piece SET location = 'board', x = '$x', y = '$y', z = '$z' WHERE id = '$workerId'");
+    $this->board->setPieceAt($stateArgs['worker'], $space);
 
     // Notify
     $piece = $this->board->getPiece($workerId);

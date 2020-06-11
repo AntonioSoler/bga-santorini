@@ -338,7 +338,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         });
       });
 
-      this._nMissingPowers = this.gamedatas.fplayers.length - args.offer.length;
+      this._nMissingPowers = args.count - args.offer.length;
 
       // Display remeaining powers
       args.deck.forEach(function (powerId) {

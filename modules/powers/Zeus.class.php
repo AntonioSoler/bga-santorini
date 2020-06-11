@@ -59,7 +59,7 @@ class Zeus extends SantoriniPower
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
-    $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${power_name}: ${player_name} builds a block under themself') . $this->board->getMsgCoords($worker), [
+    $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${power_name}: ${player_name} builds a block under themself') . $this->game->board->getMsgCoords($worker), [
       'i18n' => ['power_name'],
       'piece' => $piece,
       'power_name' => $this->getName(),

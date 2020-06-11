@@ -17,7 +17,7 @@ class SantoriniPlayer extends APP_GameClass
         // Load powers
         $cards = $this->game->powerManager->cards->getCardsInLocation('hand', $this->id);
         foreach ($cards as $powerId => $card) {
-            $this->powers[] = $this->game->powerManager->getPower($powerId, $this->id);
+            $this->powers[] = $this->game->powerManager->getPower($card['type'], $this->id);
         }
     }
 

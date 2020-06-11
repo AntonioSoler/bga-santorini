@@ -56,7 +56,7 @@ class Ares extends SantoriniPower
     // TODO : remove token
 
     // Notify
-    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block') . $this->board->getMsgCoords($piece), [
+    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block') . $this->game->board->getMsgCoords($piece), [
       'i18n' => ['power_name'],
       'piece' => $piece,
       'power_name' => $this->getName(),
