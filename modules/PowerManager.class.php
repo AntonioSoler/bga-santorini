@@ -732,7 +732,9 @@ class PowerManager extends APP_GameClass
    */
   public function startOfTurn()
   {
-    $this->checkGoldenFleece();
+    if(intval($this->game->getGameStateValue('optionPowers')) == GOLDEN_FLEECE){
+      $this->checkGoldenFleece();
+    }
     $this->applyPower(["startPlayerTurn", "startOpponentTurn"], []);
   }
 
