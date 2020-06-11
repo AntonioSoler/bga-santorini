@@ -238,13 +238,18 @@ class SantoriniBoard extends APP_GameClass
   /*
    * isNeighbour : check distance between two spaces to move/build
    */
-  public function isNeighbour($a, $b, $action)
+  public function isNeighbour($a, $b, $action, $torus = false)
   {
     $ok = true;
 
     // Neighbouring : can't be same place, and should be planar coordinate distant
     $ok = $ok && !self::isSameSpace($a, $b);
-    $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
+    if(!$torus){
+      $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
+    } else {
+      $ok = $ok && min(abs($a['x'] - $b['x']), abs($a['x'] + 5 - $b['x']), abs($a['x'] - $b['x'] - 5)) <= 1
+                && min(abs($a['y'] - $b['y']), abs($a['y'] + 5 - $b['y']), abs($a['y'] - $b['y'] - 5)) <= 1;
+    }
 
     // For moving, the new height can't be more than +1
     if ($action == 'move') {
@@ -261,11 +266,11 @@ class SantoriniBoard extends APP_GameClass
    *  - mixed $piece : contains all the informations (type, location, player_id) about the piece we use to move/build
    *  - string $action : specifies what kind of action we want to do with this piece (move/build)
    */
-  public function getNeighbouringSpaces($piece, $action)
+  public function getNeighbouringSpaces($piece, $action, $torus = false)
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
-    return array_values(array_filter($this->getAccessibleSpaces($action), function ($space) use ($piece, $action) {
-      return $this->isNeighbour($piece, $space, $action);
+    return array_values(array_filter($this->getAccessibleSpaces($action), function ($space) use ($piece, $action, $torus) {
+      return $this->isNeighbour($piece, $space, $action, $torus);
     }));
   }
 

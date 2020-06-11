@@ -210,9 +210,9 @@ class santorini extends Table
     // Send notification message
     if(intval($this->getGameStateValue('optionPowers')) != GOLDEN_FLEECE){
       $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
-      if ($nPlayers == 3) {
+      if ($n == 3) {
         $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
-      } else if ($nPlayers == 4) {
+      } else if ($n == 4) {
         $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
       }
       $args = [
@@ -685,7 +685,7 @@ class santorini extends Table
   /*
    * argPlayerWork: init the works
    */
-  public function argPlayerWork($action, $workers = null)
+  public function argPlayerWork($action, $workers = null, $torus = false)
   {
     $arg = [
       'cancelable' => $this->log->getLastActions() != null,
@@ -697,7 +697,7 @@ class santorini extends Table
     }
 
     foreach ($arg['workers'] as &$worker) {
-      $worker["works"] = $this->board->getNeighbouringSpaces($worker, $action);
+      $worker["works"] = $this->board->getNeighbouringSpaces($worker, $action, $torus);
     }
     Utils::cleanWorkers($arg);
 
@@ -874,11 +874,13 @@ class santorini extends Table
    *  - obj $worker : the piece id we want to move
    *  - obj $space : the new location on the board
    */
-  public function playerMove($worker, $space)
+  public function playerMove($worker, $space, $notifyOnly = false)
   {
-    // Move worker
-    self::DbQuery("UPDATE piece SET x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$worker['id']}");
-    $this->log->addMove($worker, $space);
+    if(!$notifyOnly){
+      // Move worker
+      $this->board->setPieceAt($worker, $space);
+      $this->log->addMove($worker, $space);
+    }
 
     // Notify
     if ($space['z'] > $worker['z']) {
