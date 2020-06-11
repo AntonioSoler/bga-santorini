@@ -26,8 +26,8 @@ const hoveringColor = 0x000000;
 const highlightColor= 0x0012AA;
 
 const lvlHeights = [0, 1.24, 2.44, 3.25];
-const xCenters = [-4.2, -2.12, -0.04, 2.12, 4.2];
-const zCenters = [-4.2, -2.12, 0, 2.13, 4.15];
+const xCenters = [4.2, 2.12, -0.04, -2.12, -4.2];
+const zCenters = [4.15, 2.13, 0, -2.12, -4.2];
 
 
 var Board = function(container, url){
@@ -261,15 +261,15 @@ Board.prototype.initCoordsHelpers = function(){
 	var cols = ['A','B','C','D','E'];
 	for(var i = 0; i < 5; i++){
 		var textMesh = this.computeText(cols[i])
-		textMesh.position.set(xCenters[4] + 1.7, 0.01, zCenters[4-i]);
+		textMesh.position.set(xCenters[0] + 1.7, 0.01, zCenters[i]);
 		this._scene.add( textMesh );
 	}
 
 	// Rows
-	var rows = ['5','4','3','2','1'];
+	var rows = ['1','2','3','4','5'];
 	for(var i = 0; i < 5; i++){
 		var textMesh = this.computeText(rows[i])
-		textMesh.position.set(xCenters[i], 0.01, zCenters[4] + 1.6);
+		textMesh.position.set(xCenters[i], 0.01, zCenters[0] + 1.6);
 		this._scene.add( textMesh );
 	}
 };
@@ -298,7 +298,7 @@ Board.prototype.render = function() {
 	// Update logo pos
 	var norme = Math.sqrt(this._camera.position.x*this._camera.position.x + this._camera.position.z * this._camera.position.z);
 	if(norme != 0)
-		this._logo.position.set(-this._camera.position.x*100/norme, 2, -this._camera.position.z*100/norme);
+		this._logo.position.set(-this._camera.position.x*100/norme, 4, -this._camera.position.z*100/norme);
 
 	this._renderer.render( this._scene, this._camera );
 };

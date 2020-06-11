@@ -47,7 +47,7 @@ class Minotaur extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$work['x']} AND y = {$work['y']} AND z = {$work['z']}");
+    $worker2 = $this->game->board->getPieceAt($work);
     if ($worker2 != null) {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
       $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
@@ -58,7 +58,7 @@ class Minotaur extends SantoriniPower
       $this->game->log->addForce($worker2, $space);
 
       // Notify (same text as Charon to help translators)
-      $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name}'), [
+      $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name}') . $this->board->getMsgCoords($worker2, $space), [
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $space,

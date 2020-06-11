@@ -33,6 +33,20 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
+   * getMsgCoords: return a string to log move/build in the following format (A4 -> A3)
+   */
+  public static function getMsgCoords($worker, $space = null)
+  {
+    $cols = ['A', 'B', 'C', 'D', 'E'];
+    $msg = ' ('.$cols[$worker['y']].((int) $worker['x']  + 1);
+    if($space != null)
+      $msg .= ' -> ' .$cols[$space['y']].((int) $space['x']  + 1);
+    $msg .= ')';
+    return $msg;
+  }
+
+
+  /*
    * getPiece: return all info about a piece
    * params : int $id
    */

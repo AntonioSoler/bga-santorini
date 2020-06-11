@@ -413,7 +413,7 @@ class santorini extends Table
     // Notify
     $piece = $this->board->getPiece($workerId);
     $msg = $piece['type'] == 'ram' ? clienttranslate('${player_name} places the Ram figure') : clienttranslate('${player_name} places a worker');
-    self::notifyAllPlayers('workerPlaced', $msg, [
+    self::notifyAllPlayers('workerPlaced', $msg . $this->board->getMsgCoords($space), [
       'i18n' => [],
       'piece' => $piece,
       'player_name' => self::getActivePlayerName(),
@@ -882,7 +882,7 @@ class santorini extends Table
     }
     $pId = self::getActivePlayerId();
 
-    self::notifyAllPlayers('workerMoved', $msg, [
+    self::notifyAllPlayers('workerMoved', $msg . $this->board->getMsgCoords($worker, $space), [
       'i18n' => ['level_name'],
       'piece' => $worker,
       'space' => $space,
@@ -906,7 +906,7 @@ class santorini extends Table
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
-    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds a ${piece_name} on ${level_name}'), [
+    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds a ${piece_name} on ${level_name}') . $this->board->getMsgCoords($worker, $space), [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
       'piece' => $piece,
@@ -927,7 +927,7 @@ class santorini extends Table
     $this->log->addRemoval($worker);
 
     // Notify
-    $this->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} kills ${player_name2}'), [
+    $this->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} kills ${player_name2}') . $this->board->getMsgCoords($worker), [
       'i18n' => ['power_name'],
       'piece' => $worker,
       'power_name' => $powerName,
