@@ -98,6 +98,7 @@ class santorini extends Table
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
       'placedPieces' => $this->board->getPlacedPieces(),
       'powers' => $this->powerManager->getUiData(),
+      'goldenFleece' => (intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE)? $this->powerManager->getGoldenFleecePowerId() : null
     ];
   }
 

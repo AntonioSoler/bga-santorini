@@ -78,6 +78,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         _this.board.addPiece(piece);
       });
 
+			// Setup golden fleece
+			if(gamedatas.goldenFleece && gamedatas.goldenFleece != null)
+				this.addGoldenFleece(gamedatas.goldenFleece);
+
       // Setup game notifications
       this.setupNotifications();
     },
@@ -94,8 +98,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       dojo.connect(preferenceSelect, 'onchange', updatePreference);;
       updatePreference();
     },
-
-
 
 		onLoaderOff: function(){
 			this.onScreenWidthChange();
@@ -612,6 +614,34 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
+
+		////////////////////////////////////
+    ////////////////////////////////////
+    ////////    Golden Fleece   ////////
+    ////////////////////////////////////
+    ////////////////////////////////////
+
+		addGoldenFleece: function(powerId){
+			var power = this.getPower(powerId);
+			var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('play-area'));
+			div.classList.add('golden');
+			this.addTooltipHtml('power-small-' + power.id, this.format_block('jstpl_powerDetail', power));
+
+			var powerDialog = new ebg.popindialog();
+			powerDialog.create('powerDialogRam');
+			powerDialog.setTitle(_("Ram's power"));
+			powerDialog.setContent(this.format_block('jstpl_powerDetail', power));
+			powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
+			dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+		},
+
+
+		notif_ramPowerSet: function(n){
+			debug('Notif: ram power was set', n.args);
+			this.addGoldenFleece(n.args.powerId);
+		},
+
+
     ///////////////////////////////////////
     ///////////////////////////////////////
     ////////    Worker placement   ////////
@@ -1111,6 +1141,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['workerPlaced', 1000],
         ['workerMoved', 1600],
         ['blockBuilt', 1000],
+				['ramPowerSet', 1000],
         ['workerSwitched', 1600], 	// Happens with Apollo
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
