@@ -13,7 +13,7 @@ class Chaos extends SantoriniPower
       clienttranslate("[Any Time:] You have the Power of the face-up God Power. You must discard your current God Power and draw a new one after any turn in which at least one dome is built. If you run out of God Powers, shuffle them to create a new deck and draw the top one.")
     ];
     $this->playerCount = [2, 3, 4];
-    $this->golden  = true;
+    $this->golden  = false; // TODO the rules allow this
     $this->orderAid = 34;
 
     $this->implemented = true;
