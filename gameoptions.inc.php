@@ -122,51 +122,17 @@ $game_options = [
       ],
     ],
   ],
-
-
-  OPTION_AUTOMATIC => [
-    'name' => totranslate('Automatic'),
-    'values' => [
-      MANUAL => [
-        'name' => totranslate('No automatic actions'),
-        'tmdisplay' => totranslate('No automatic actions'),
-        'description' => totranslate('Players have to click to make the action, even if only one available'),
-      ],
-      AUTOMATIC => [
-        'name' => totranslate('Automatic action'),
-        'tmdisplay' => totranslate('Automatic action'),
-        'description' => totranslate('If only one action is available, the game will automatically make it'),
-      ],
-    ],
-  ],
-
-  OPTION_CONFIRM => [
-    'name' => totranslate('Confirm turn'),
-    'values' => [
-      NO_CONFIRM => [
-        'name' => totranslate('No confirm'),
-        'tmdisplay' => totranslate('No confirm'),
-        'description' => totranslate("After the last action of a player's turn, the game switch to next player"),
-      ],
-      CONFIRM => [
-        'name' => totranslate('Confirm'),
-        'tmdisplay' => totranslate('Confirm'),
-        'description' => totranslate("After the last action of a player's turn, the player has to confirm/undo its turn"),
-      ],
-    ],
-  ],
-
 ];
 
 
 
 $game_preferences = [
   HELPERS => [
-    'name' => totranslate('Display height markers on board'),
+    'name' => totranslate('Display board coordinates/height'),
     'needReload' => false,
     'values' => [
-      SHOW => ['name' => totranslate('Show')],
-      HIDE => ['name' => totranslate('Hide')],
+      ENABLED => ['name' => totranslate('Enabled')],
+      DISABLED => ['name' => totranslate('Disaled')],
     ]
   ]
 ];

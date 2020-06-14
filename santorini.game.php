@@ -33,8 +33,6 @@ class santorini extends Table
     self::initGameStateLabels([
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
-      'optionAutomatic' => OPTION_AUTOMATIC,
-      'optionConfirm' => OPTION_CONFIRM,
       'currentRound' => CURRENT_ROUND,
       'firstPlayer' => FIRST_PLAYER,
     ]);
@@ -475,17 +473,7 @@ class santorini extends Table
   }
 
   /*
-   * stPreEndOfTurn: called just before the end of each player turn
-   */
-  public function stPreEndOfTurn()
-  {
-    if ($this->getGameStateValue('optionConfirm') == NO_CONFIRM) {
-      $this->gamestate->nextState('confirm');
-    }
-  }
-
-  /*
-   * confirmTurn: called whenever a player confirm its turn
+   * confirmTurn: called whenever a player confirm their turn
    */
   public function confirmTurn()
   {
@@ -761,21 +749,6 @@ class santorini extends Table
       if (!$state['args']['cancelable']) {
         $this->announceLose();
       }
-    }
-    // Only one work possible => do it but notify player first
-    else if ($this->getGameStateValue('optionAutomatic') == AUTOMATIC && count($state['args']['workers']) == 1 && !$state['args']['skippable']) {
-      $worker = $state['args']['workers'][0];
-      if (count($worker['works']) > 1) {
-        return;
-      }
-      $work = $worker['works'][0];
-      if (is_array($work['arg']) && count($work['arg']) > 1) {
-        return;
-      }
-      $arg = is_array($work['arg']) ? $work['arg'][0] : $work['arg'];
-
-      self::notifyPlayer(self::getActivePlayerId(), 'automatic', clienttranslate('Next action will be done automatically since it\'s the only one available'), []);
-      $this->work($worker['id'], $work['x'], $work['y'], $work['z'], $arg, true);
     }
   }
 

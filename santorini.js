@@ -90,7 +90,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var preferenceSelect = $('preference_control_100');
       var updatePreference = function () {
         var value = preferenceSelect.options[preferenceSelect.selectedIndex].value;
-        _this.board.toggleCoordsHelpers(value == 2);
+        _this.board.toggleCoordsHelpers(value == 1);
       };
 
       dojo.connect(preferenceSelect, 'onchange', updatePreference);;
@@ -1022,15 +1022,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /////////////////////
 
     /*
-     * notif_automatic:
-     *   called whenever a worker has only one choice
-     */
-    notif_automatic: function (n) {
-      debug('Notif: automatic work incoming', n.args);
-      this.clearPossible();
-    },
-
-    /*
      * notif_workerMoved:
      *   called whenever a worker is moved on the board
      */
@@ -1182,7 +1173,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     setupNotifications: function () {
       var notifs = [
         ['cancel', 1000],
-        ['automatic', 1000],
         ['addOffer', 500],
         ['removeOffer', 500],
         ['powerAdded', 1200],

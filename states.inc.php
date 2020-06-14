@@ -273,9 +273,8 @@ $machinestates = array(
 
   ST_PRE_END_OF_TURN => [
     'name' => 'confirmTurn',
-    'description' => clienttranslate('${actplayer} must confirm or restart its turn'),
+    'description' => clienttranslate('${actplayer} must confirm or restart their turn'),
     'descriptionmyturn' => clienttranslate('${you} must confirm or restart your turn'),
-    'action' => 'stPreEndOfTurn',
     'type' => 'activeplayer',
     'possibleactions' => ['confirm','cancel'],
     'transitions' => [

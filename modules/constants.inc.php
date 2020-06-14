@@ -122,18 +122,9 @@ define('QUICK', 0);
 define('TOURNAMENT', 1);
 define('CUSTOM', 2);
 
-define('OPTION_AUTOMATIC', 103);
-define('MANUAL', 0);
-define('AUTOMATIC', 1);
-
-define('OPTION_CONFIRM', 104);
-define('NO_CONFIRM', 0);
-define('CONFIRM', 1);
-
-
 define('HELPERS', 100);
-define('HIDE', 1);
-define('SHOW', 2);
+define('ENABLED', 1);
+define('DISABLED', 2);
 
 /*
  * Game statistics constants
