@@ -23,7 +23,7 @@ class Ares extends SantoriniPower
   {
     $arg = [];
     $this->argUsePower($arg);
-    return (count($arg['workers']) > 0)? 'power' : null;
+    return (count($arg['workers']) > 0) ? 'power' : null;
   }
 
 
@@ -36,7 +36,7 @@ class Ares extends SantoriniPower
 
     $move = $this->game->log->getLastMove();
     Utils::filterWorkersById($arg, $move['pieceId'], false);
-    Utils::filterWorks($arg, function($space, $worker){
+    Utils::filterWorks($arg, function ($space, $worker) {
       return $space['z'] > 0;
     });
   }
@@ -56,21 +56,22 @@ class Ares extends SantoriniPower
     // TODO : remove token
 
     // Notify
-    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block') . $this->game->board->getMsgCoords($piece), [
+    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block (${coords})'), [
       'i18n' => ['power_name'],
       'piece' => $piece,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
+      'coords' => $this->game->board->getMsgCoords($piece),
     ]);
-   }
+  }
 
-   public function stateAfterUsePower()
-   {
-     return 'endturn';
-   }
+  public function stateAfterUsePower()
+  {
+    return 'endturn';
+  }
 
-   public function stateAfterSkipPower()
-   {
-     return 'endturn';
-   }
+  public function stateAfterSkipPower()
+  {
+    return 'endturn';
+  }
 }

@@ -33,15 +33,15 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
-   * getMsgCoords: return a string to log move/build in the following format (A4 -> A3)
+   * getMsgCoords: return a string to log move/build in the following format: A4 -> A3
    */
   public static function getMsgCoords($worker, $space = null)
   {
     $cols = ['A', 'B', 'C', 'D', 'E'];
-    $msg = ' ('.$cols[$worker['y']].((int) $worker['x']  + 1);
-    if($space != null)
-      $msg .= ' -> ' .$cols[$space['y']].((int) $space['x']  + 1);
-    $msg .= ')';
+    $msg = $cols[$worker['y']] . ((int) $worker['x']  + 1);
+    if ($space != null) {
+      $msg .= ' -> ' . $cols[$space['y']] . ((int) $space['x']  + 1);
+    }
     return $msg;
   }
 
@@ -244,11 +244,11 @@ class SantoriniBoard extends APP_GameClass
 
     // Neighbouring : can't be same place, and should be planar coordinate distant
     $ok = $ok && !self::isSameSpace($a, $b);
-    if(!$torus){
+    if (!$torus) {
       $ok = $ok && abs($a['x'] - $b['x']) <= 1 && abs($a['y'] - $b['y']) <= 1;
     } else {
       $ok = $ok && min(abs($a['x'] - $b['x']), abs($a['x'] + 5 - $b['x']), abs($a['x'] - $b['x'] - 5)) <= 1
-                && min(abs($a['y'] - $b['y']), abs($a['y'] + 5 - $b['y']), abs($a['y'] - $b['y'] - 5)) <= 1;
+        && min(abs($a['y'] - $b['y']), abs($a['y'] + 5 - $b['y']), abs($a['y'] - $b['y'] - 5)) <= 1;
     }
 
     // For moving, the new height can't be more than +1
@@ -299,9 +299,10 @@ class SantoriniBoard extends APP_GameClass
   }
 
 
-/*##########################
-######### Setters ##########
-##########################*/
+  /*##########################
+  ######### Setters ##########
+  ##########################*/
+
   /*
    * setPieceAt: update location of an already existing piece
    */
@@ -309,5 +310,4 @@ class SantoriniBoard extends APP_GameClass
   {
     self::DbQuery("UPDATE piece SET location = '$location', x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
   }
-
 }

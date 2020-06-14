@@ -23,7 +23,7 @@ class Charon extends SantoriniPower
   {
     $arg = [];
     $this->argUsePower($arg);
-    return (count($arg['workers']) > 0)? 'power' : null;
+    return (count($arg['workers']) > 0) ? 'power' : null;
   }
 
 
@@ -39,13 +39,13 @@ class Charon extends SantoriniPower
     foreach ($arg['workers'] as &$worker) {
       foreach ($oppWorkers as $worker2) {
         // Only possible if workers are neighbors
-        if (!$this->game->board->isNeighbour($worker, $worker2, '')){
+        if (!$this->game->board->isNeighbour($worker, $worker2, '')) {
           continue;
         }
 
         // Check space behind is free
         $space = $this->game->board->getSpaceBehind($worker2, $worker, $accessibleSpaces);
-        if (!is_null($space)){
+        if (!is_null($space)) {
           $worker['works'][] = $this->game->board->getCoords($worker2);
         }
       }
@@ -72,7 +72,7 @@ class Charon extends SantoriniPower
     $this->game->log->addForce($worker2, $newSpace);
 
     // Notify (same text as Minotaur to help translators)
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name}') . $this->game->board->getMsgCoords($worker2, $newSpace), [
+    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name} (${coords})'), [
       'i18n' => ['power_name', 'level_name'],
       'piece' => $worker2,
       'space' => $newSpace,
@@ -80,6 +80,7 @@ class Charon extends SantoriniPower
       'player_name' => $this->game->getActivePlayerName(),
       'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
       'level_name' => $this->game->levelNames[intval($newSpace['z'])],
+      'coords' => $this->game->board->getMsgCoords($worker2, $newSpace),
     ]);
   }
 
@@ -94,7 +95,8 @@ class Charon extends SantoriniPower
   }
 
 
-  public function argPlayerMove(&$arg){
+  public function argPlayerMove(&$arg)
+  {
     $action = $this->game->log->getLastAction('usedPower');
     // No power used before => usual rule
     if ($action == null) {
