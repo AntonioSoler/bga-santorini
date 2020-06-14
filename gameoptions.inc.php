@@ -55,7 +55,7 @@ $game_options = [
       GOLDEN_FLEECE => [
         'name' => totranslate('Golden Fleece Variant'),
         'tmdisplay' => totranslate('Golden Fleece Variant'),
-        'description' => totranslate('One powerful ability is available to any player touching the Ram figure'),
+        'description' => totranslate('One powerful ability is available to any player neighboring the Ram figure'),
         'nobeginner' => true,
       ],
       NONE => [

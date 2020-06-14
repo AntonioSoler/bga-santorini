@@ -90,7 +90,7 @@ $machinestates = array(
     'transitions' => [
       'zombiePass' => ST_GAME_END,
       'done' => ST_CHOOSE_FIRST_PLAYER,
-      'placeWorker' => ST_NEXT_PLAYER_PLACE_WORKER,
+      'goldenFleece' => ST_POWERS_NEXT_PLAYER_CHOOSE,
     ],
   ],
 

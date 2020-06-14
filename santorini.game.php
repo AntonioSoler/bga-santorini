@@ -98,7 +98,7 @@ class santorini extends Table
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
       'placedPieces' => $this->board->getPlacedPieces(),
       'powers' => $this->powerManager->getUiData(),
-      'goldenFleece' => (intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE)? $this->powerManager->getGoldenFleecePowerId() : null
+      'goldenFleece' => $this->powerManager->getGoldenFleecePowerId(),
     ];
   }
 
@@ -137,7 +137,7 @@ class santorini extends Table
     }
 
     // Create the Ram figure
-    if(intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE){
+    if ($this->powerManager->isGoldenFleece()) {
       self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
     }
 
@@ -163,7 +163,7 @@ class santorini extends Table
   public function argBuildOffer()
   {
     return [
-      'count'  => intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE? 1 : $this->playerManager->getPlayerCount(),
+      'count'  => $this->playerManager->getPlayerCount(),
       'deck'   => $this->powerManager->getPowerIdsInLocation('deck'),
       'offer'  => $this->powerManager->getPowerIdsInLocation('offer'),
       'banned' => $this->powerManager->computeBannedIds(),
@@ -209,32 +209,29 @@ class santorini extends Table
     }
 
     // Send notification message
-    if(intval($this->getGameStateValue('optionPowers')) != GOLDEN_FLEECE){
-      $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
-      if ($n == 3) {
-        $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
-      } else if ($n == 4) {
-        $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
-      }
-      $args = [
-        'i18n' => [],
-        'player_name' => self::getActivePlayerName()
-      ];
+    $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
+    if ($n == 3) {
+      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
+    } else if ($n == 4) {
+      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
+    }
+    $args = [
+      'i18n' => [],
+      'player_name' => self::getActivePlayerName()
+    ];
+    $i = 1;
+    foreach ($powers as $power) {
+      $argName = "power_name$i";
+      $args['i18n'][] = $argName;
+      $args[$argName] = $power->getName();
+      $i++;
+    }
+    self::notifyAllPlayers('buildOffer', $msg, $args);
 
-      $i = 1;
-      foreach ($powers as $power) {
-        $argName = "power_name$i";
-        $args['i18n'][] = $argName;
-        $args[$argName] = $power->getName();
-        $i++;
-      }
-      self::notifyAllPlayers('buildOffer', $msg, $args);
-      $this->gamestate->nextState('done');
-
-    // GOLDEN FLEECE
+    if ($this->powerManager->isGoldenFleece()) {
+      $this->gamestate->nextState('goldenFleece');
     } else {
-      $this->powerManager->prepareGoldenFleece($powers[0]->getId());
-      $this->gamestate->nextState('placeWorker');
+      $this->gamestate->nextState('done');
     }
   }
 
@@ -297,6 +294,8 @@ class santorini extends Table
     $remainingPowers = $this->powerManager->getOffer();
     if (count($remainingPowers) > 1) {
       $this->gamestate->nextState('next');
+    } else if ($this->powerManager->isGoldenFleece()) {
+      $this->gamestate->nextState('done');
     } else {
       $this->choosePower($remainingPowers[0]['id']);
     }
@@ -313,12 +312,16 @@ class santorini extends Table
   }
 
   /*
-   * choosePower: is called in the fair division setup, when a player picked a power from the remeaning ones
+   * choosePower: is called in the fair division setup, when a player picked a power from the offer
    */
   public function choosePower($powerId)
   {
-    $player = $this->playerManager->getPlayer();
-    $power = $player->addPower($powerId);
+    if ($this->powerManager->isGoldenFleece()) {
+      $this->powerManager->prepareGoldenFleece($powerId);
+    } else {
+      $player = $this->playerManager->getPlayer();
+      $power = $player->addPower($powerId);
+    }
     $this->gamestate->nextState('done');
   }
 
@@ -346,7 +349,7 @@ class santorini extends Table
     // Get all remaining workers for all players
     $workers = $this->board->getAvailableWorkers();
     if (count($workers) == 0) {
-      if(intval($this->getGameStateValue('optionPowers')) == GOLDEN_FLEECE){
+      if ($this->powerManager->isGoldenFleece()) {
         $this->activeNextPlayer();
         $this->gamestate->nextState('ram');
       } else {
@@ -444,7 +447,7 @@ class santorini extends Table
   public function stNextPlayer()
   {
     $pId = $this->activeNextPlayer();
-    if($this->playerManager->getPlayer($pId)->isEliminated()){
+    if ($this->playerManager->getPlayer($pId)->isEliminated()) {
       $pId = $this->activeNextPlayer();
     }
     self::giveExtraTime($pId);
@@ -476,7 +479,7 @@ class santorini extends Table
    */
   public function stPreEndOfTurn()
   {
-    if($this->getGameStateValue('optionConfirm') == NO_CONFIRM){
+    if ($this->getGameStateValue('optionConfirm') == NO_CONFIRM) {
       $this->gamestate->nextState('confirm');
     }
   }
@@ -694,7 +697,7 @@ class santorini extends Table
       'skippable' => false,
       'workers' => $workers ?: $this->board->getPlacedActiveWorkers(),
     ];
-    if($action == 'move'){
+    if ($action == 'move') {
       $arg['mayMoveAgain'] = false;
     }
 
@@ -878,7 +881,7 @@ class santorini extends Table
    */
   public function playerMove($worker, $space, $notifyOnly = false)
   {
-    if(!$notifyOnly){
+    if (!$notifyOnly) {
       // Move worker
       $this->board->setPieceAt($worker, $space);
       $this->log->addMove($worker, $space);

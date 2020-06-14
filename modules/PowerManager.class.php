@@ -189,7 +189,8 @@ class PowerManager extends APP_GameClass
     return $ui;
   }
 
-  public function getStatLabels() {
+  public function getStatLabels()
+  {
     $labels = [
       0 => ''
     ];
@@ -258,7 +259,7 @@ class PowerManager extends APP_GameClass
     // Additional filtering for QUICK and TOURNAMENT
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
     if (($optionSetup == QUICK || $optionSetup == TOURNAMENT) && $optionPowers != GODS_AND_HEROES) {
-      $count = $optionSetup == QUICK ? ($optionPowers == GOLDEN_FLEECE? 1 :$nPlayers) : ($nPlayers + 1) * 2;
+      $count = $optionSetup == QUICK ? ($optionPowers == GOLDEN_FLEECE ? 1 : $nPlayers) : ($nPlayers + 1) * 2;
       $offer = [];
       for ($i = 0; $i < $count; $i++) {
         $offer[] = $powerIds[array_rand($powerIds, 1)];
@@ -277,8 +278,7 @@ class PowerManager extends APP_GameClass
       // QUICK: Go to place worker
       $this->prepareGoldenFleece($powerIds[0]);
       return 'placeWorker';
-    }
-    else if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
+    } else if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
       // QUICK: Skip building offer
       $this->cards->moveCards($powerIds, 'offer');
       return 'chooseFirstPlayer';
@@ -387,13 +387,19 @@ class PowerManager extends APP_GameClass
   ///////////////////////////////////////
   ///////////////////////////////////////
 
+  public function isGoldenFleece()
+  {
+    return intval($this->game->getGameStateValue('optionPowers')) == GOLDEN_FLEECE;
+  }
+
   public function prepareGoldenFleece($powerId)
   {
     $power = $this->getPower($powerId);
-    $this->game->notifyAllPlayers('ramPowerSet', clienttranslate('Ram figure will grant the power of ${power_name}'),[
+    $this->game->notifyAllPlayers('ramPowerSet', clienttranslate('Golden Fleece: Neighbor the Ram figure at the start of your turn to use the power of ${power_name}, ${power_title}'), [
+      'i18n' => ['power_name', 'power_title'],
       'power_name' => $power->getName(),
+      'power_title' => $power->getTitle(),
       'powerId' => $power->getId(),
-      'i18n' => ['power_name']
     ]);
     $this->cards->moveCard($powerId, 'ramCard');
     self::DbQuery("INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ('$powerId', 0, 'ram', 0), ('$powerId', 0, 'ram', 0)");
@@ -401,54 +407,47 @@ class PowerManager extends APP_GameClass
 
   public function getGoldenFleecePowerId()
   {
-    return empty($this->cards->getCardsInLocation('ramCard')) ? null : array_values($this->cards->getCardsInLocation('ramCard'))[0]['type'];
+    $ramCard = $this->cards->getCardsInLocation('ramCard');
+    return empty($ramCard) ? null : array_values($ramCard)[0]['type'];
+  }
+
+  public function getGoldenFleecePower()
+  {
+    $powerId = $this->getGoldenFleecePowerId();
+    return $this->game->powerManager->getPower($powerId);
   }
 
   public function checkGoldenFleece()
   {
     $ram = $this->game->board->getRam();
-    $goldenFleece = $this->getGoldenFleecePowerId();
-    $power = $this->game->powerManager->getPower($goldenFleece);
-    foreach($this->game->playerManager->getPlayers() as $player){
-      $pId = $player->getId();
-      $workers = $this->game->board->getPlacedWorkers($pId);
-      Utils::filterWorkers($workers, function($worker) use ($ram){
-        return $this->game->board->isNeighbour($worker, $ram, '');
-      });
+    $playerId = $this->game->getActivePlayerId();
+    $workers = $this->game->board->getPlacedWorkers($playerId);
+    Utils::filterWorkers($workers, function ($worker) use ($ram) {
+      return $this->game->board->isNeighbour($worker, $ram, '');
+    });
+    
+    $power = $this->getGoldenFleecePower();
+    $playerGoldenFleeceCards = array_values($this->cards->getCardsOfTypeInLocation($power->getId(), null, 'hand', $playerId));
 
-      $playerGoldenFleeceCards = array_values($this->cards->getCardsOfTypeInLocation($goldenFleece, null, 'hand', $pId));
-
-      // Neighbouring ram => gain power
-      if(count($workers) > 0){
-        if(count($playerGoldenFleeceCards) > 0){
-          continue; // The player already have the power => keep it
-        }
-
-        $cardId = array_values($this->cards->getCardsInLocation('ram'))[0]['id'];
-        $this->cards->moveCard($cardId, 'hand', $pId);
-        $this->game->log->addAction('powerChanged');
-        $this->game->notifyAllPlayers('powersChanged', clienttranslate('Ram figure grants ${player_name} a new power : ${power_name}'), [
-          'i18n' => ['power_name'],
-          'power_name' => $power->getName(),
-          'player_name' => $player->getName(),
-          'fplayers' => $this->game->playerManager->getUiData(),
-        ]);
-      }
-      // Not neighbouring => lose power
-      else {
-        if(count($playerGoldenFleeceCards) == 0){
-          continue; // The player don't have the power => nothing to do
-        }
-
-        $this->cards->moveCard($playerGoldenFleeceCards[0]['id'], 'ram');
-        $this->game->log->addAction('powerChanged');
-        $this->game->notifyAllPlayers('powersChanged', clienttranslate('${player_name} lose the ability of ${power_name}'), [
-          'i18n' => ['power_name'],
-          'power_name' => $power->getName(),
-          'player_name' => $this->game->getActivePlayerName(),
-          'fplayers' => $this->game->playerManager->getUiData(),
-        ]);
-      }
+    // Neighbouring ram => gain power
+    if (count($workers) > 0 && count($playerGoldenFleeceCards) == 0) {
+      $this->cards->pickCard('ram', $playerId);
+      $this->game->log->addAction('powerChanged');
+      $this->game->notifyAllPlayers('powersChanged', clienttranslate('Golden Fleece: ${player_name} gains the power of ${power_name}'), [
+        'i18n' => ['power_name'],
+        'power_name' => $power->getName(),
+        'player_name' => $this->game->getActivePlayerName(),
+        'fplayers' => $this->game->playerManager->getUiData(),
+      ]);
+    } else if (count($workers) == 0 && count($playerGoldenFleeceCards) > 0) {
+      $this->cards->moveCard($playerGoldenFleeceCards[0]['id'], 'ram');
+      $this->game->log->addAction('powerChanged');
+      $this->game->notifyAllPlayers('powersChanged', clienttranslate('Golden Fleece: ${player_name} loses the power of ${power_name}'), [
+        'i18n' => ['power_name'],
+        'power_name' => $power->getName(),
+        'player_name' => $this->game->getActivePlayerName(),
+        'fplayers' => $this->game->playerManager->getUiData(),
+      ]);
     }
   }
 
@@ -735,7 +734,7 @@ class PowerManager extends APP_GameClass
    */
   public function startOfTurn()
   {
-    if(intval($this->game->getGameStateValue('optionPowers')) == GOLDEN_FLEECE){
+    if ($this->isGoldenFleece()) {
       $this->checkGoldenFleece();
     }
     $this->applyPower(["startPlayerTurn", "startOpponentTurn"], []);
