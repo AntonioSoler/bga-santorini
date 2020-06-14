@@ -20,8 +20,9 @@
 //@ sourceURL=santorini.js
 var isDebug = true;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
-var isMobile = function(){
-	return document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
+var isMobile = function () {
+  var body = document.getElementById("ebd-body");
+  return body != null && body.classList.contains('mobile_version');
 };
 
 
@@ -33,7 +34,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     constructor: function () {
       // Fix mobile viewport (remove CSS zoom)
       this.default_viewport = 'width=550, user-scalable=no';
-			this._focusedContainer = null;
+      this._focusedContainer = null;
     },
 
     /*
@@ -44,31 +45,27 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * Params :
      *  - mixed gamedatas : contains all datas retrieved by the getAllDatas PHP method.
      */
-		 onChangePreference: function(){
-			 console.log("test2");
-		 },
-
     setup: function (gamedatas) {
       var _this = this;
       debug('SETUP', gamedatas);
-      console.log(this);
 
       // Mobile fix position of card selection
       // TODO this needs to happen AFTER the BGA adaptStatusBar()
       dojo.connect(window, "scroll", this, this.onScroll.bind(this));
 
       // Setup the board (3d scene using threejs)
-			dojo.place(this.format_block('jstpl_scene', {}), $('overall-content'));
+      dojo.place(this.format_block('jstpl_scene', {}), $('overall-content'));
       this.board = new Board($('scene-container'), URL); // Setup player boards
       this.setupPreference();
 
 
-			var target = document.getElementById('loader_mask');
-			var observer = new MutationObserver(function(mutations) {
-				if(target.style.display == 'none')
-					_this.onLoaderOff();
-			});
-			observer.observe(target, { attributes : true, attributeFilter : ['style'] });
+      var target = document.getElementById('loader_mask');
+      var observer = new MutationObserver(function (mutations) {
+        if (target.style.display == 'none') {
+          _this.onLoaderOff();
+        }
+      });
+      observer.observe(target, { attributes: true, attributeFilter: ['style'] });
 
       // Setup powers
       this.setupPowers(gamedatas.fplayers);
@@ -78,16 +75,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         _this.board.addPiece(piece);
       });
 
-			// Setup golden fleece
-			if(gamedatas.goldenFleece && gamedatas.goldenFleece != null)
-				this.addGoldenFleece(gamedatas.goldenFleece);
+      // Setup golden fleece
+      if (gamedatas.goldenFleece) {
+        this.addGoldenFleece(gamedatas.goldenFleece);
+      }
 
       // Setup game notifications
       this.setupNotifications();
     },
 
 
-		setupPreference: function () {
+    setupPreference: function () {
       var _this = this;
       var preferenceSelect = $('preference_control_100');
       var updatePreference = function () {
@@ -99,28 +97,27 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       updatePreference();
     },
 
-		onLoaderOff: function(){
-			this.onScreenWidthChange();
-
-			if(this._focusedContainer == 'powers-offer')
-				dojo.style('power-offer-container', 'opacity', '1');
-			if(this._focusedContainer == 'powers-choose')
-				dojo.style('power-choose-container', 'opacity', '1');
-
-			if(this._focusedContainer == 'board')
-				this.board.enterScene();
-			else
-				this.board.onLoad();
-		},
+    onLoaderOff: function () {
+      this.onScreenWidthChange();
+      if (this._focusedContainer == 'powers-offer') {
+        dojo.style('power-offer-container', 'opacity', '1');
+      } else if (this._focusedContainer == 'powers-choose') {
+        dojo.style('power-choose-container', 'opacity', '1');
+      } else if (this._focusedContainer == 'board') {
+        this.board.enterScene();
+      } else {
+        this.board.onLoad();
+      }
+    },
 
     // TODO
     onScreenWidthChange: function () {
       dojo.style('page-content', 'zoom', 'normal');
-	    if ($('scene-container')) {
-				dojo.style('santorini-overlay', 'width', document.getElementById("left-side").offsetWidth + "px");
+      if ($('scene-container')) {
+        dojo.style('santorini-overlay', 'width', document.getElementById("left-side").offsetWidth + "px");
         dojo.style('3d-scene', 'marginTop', ($('page-content').getBoundingClientRect()['top'] - $('overall-content').getBoundingClientRect()['top']) + "px");
-        dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene')? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
-				this.board.updateSize();
+        dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene') ? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
+        this.board.updateSize();
       }
     },
 
@@ -145,7 +142,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 		 */
     setupPowers: function (players) {
       var _this = this;
-
       players.forEach(function (player) {
         var container = $('power_container_' + player.id);
         if (container != null) {
@@ -153,7 +149,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         } else {
           dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
         }
-
         player.powers.forEach(function (powerId) {
           _this.addPowerToPlayer(player.id, powerId, false);
         });
@@ -179,16 +174,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       powerDialog.setContent(this.format_block('jstpl_powerDetail', this.getPower(powerId)));
       powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
       dojo.connect(card, "onclick", function (ev) { powerDialog.show(); });
-      if (showDialog && playerId == this.player_id)
+      if (showDialog && playerId == this.player_id) {
         powerDialog.show();
+      }
 
       if (powerId == this.powersIds.MORPHEUS || powerId == this.powersIds.CHAOS) {
-				var data = {
-					playerId: playerId,
-					powerId: powerId,
-					n:power.counter,
-				};
-				dojo.place(this.format_block('jstpl_powerCounter', data), 'mini-card-' + playerId + "-" + powerId);
+        var data = {
+          playerId: playerId,
+          powerId: powerId,
+          n: power.counter,
+        };
+        dojo.place(this.format_block('jstpl_powerCounter', data), 'mini-card-' + playerId + "-" + powerId);
       }
     },
 
@@ -199,11 +195,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 		 */
     notif_updatePowerUI: function (n) {
       debug('Notif: updating power UI', n.args);
-
       if (n.args.powerId == this.powersIds.MORPHEUS || n.args.powerId == this.powersIds.CHAOS) {
         var div = $('power-counter-' + n.args.playerId + "-" + n.args.powerId);
-        if (div)
+        if (div) {
           div.innerHTML = n.args.counter;
+        }
       }
     },
 
@@ -224,6 +220,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       data = data || {};
       data.lock = true;
       callback = callback || function (res) { };
+      this.stopActionTimer();
       this.ajaxcall("/santorini/santorini/" + action + ".html", data, this, callback);
     },
 
@@ -253,13 +250,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Stop here if it's not the current player's turn for some states
       if (["playerUsePower", "playerPlaceWorker", "playerPlaceRam", "playerMove", "playerBuild", "confirmTurn", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
-        if (!this.isCurrentPlayerActive()) return;
+        if (!this.isCurrentPlayerActive()) {
+          return;
+        }
       }
 
       // Call appropriate method
       var methodName = "onEnteringState" + stateName.charAt(0).toUpperCase() + stateName.slice(1);
-      if (this[methodName] !== undefined)
+      if (this[methodName] !== undefined) {
         this[methodName](args.args);
+      }
     },
 
 
@@ -274,8 +274,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       debug('Leaving state: ' + stateName);
 
       // Don't remove the power cards
-      if (stateName == 'powersPlayerChoose')
+      if (stateName == 'powersPlayerChoose') {
         return;
+      }
 
       this.clearPossible();
     },
@@ -285,28 +286,60 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * 	called by BGA framework before onEnteringState
      *  in this method you can manage "action buttons" that are displayed in the action status bar (ie: the HTML links in the status bar).
      */
-    onUpdateActionButtons: function (stateName, args) {
+    onUpdateActionButtons: function (stateName, args, suppressTimers) {
       debug('Update action buttons: ' + stateName, args); // Make sure it the player's turn
+      this.stopActionTimer();
 
-      if (!this.isCurrentPlayerActive())
+      if (!this.isCurrentPlayerActive()) {
         return;
+      }
 
       if ((stateName == "playerMove" || stateName == "playerBuild" || stateName == "playerUsePower")) {
         if (args.skippable) {
           this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
         }
-
         if (args.cancelable) {
           this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
         }
       }
 
-			if ((stateName == "confirmTurn")) {
-				this.addActionButton('buttonConfirm', _('Confirm'), 'onClickConfirm', null, false, 'blue');
-				this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
-			}
+      if (stateName == "confirmTurn") {
+        this.addActionButton('buttonConfirm', _('Confirm'), 'onClickConfirm', null, false, 'blue');
+        this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
+        if (!suppressTimers) {
+          this.startActionTimer('buttonConfirm');
+        }
+      }
     },
 
+    startActionTimer: function (buttonId) {
+      var _this = this;
+      this.actionTimerLabel = $(buttonId).innerHTML;
+      this.actionTimerSeconds = 15;
+      this.actionTimerFunction = function () {
+        var button = $(buttonId);
+        if (button == null) {
+          _this.stopActionTimer();
+        } else if (_this.actionTimerSeconds-- > 1) {
+          debug('Timer ' + buttonId + ' has ' + _this.actionTimerSeconds + ' seconds left');
+          button.innerHTML = _this.actionTimerLabel + ' (' + _this.actionTimerSeconds + ')';
+        } else {
+          debug('Timer ' + buttonId + ' execute');
+          button.click();
+        }
+      };
+      this.actionTimerFunction();
+      this.actionTimerId = window.setInterval(this.actionTimerFunction, 1000);
+      debug('Timer #' + this.actionTimerId + ' ' + buttonId + ' start');
+    },
+
+    stopActionTimer: function () {
+      if (this.actionTimerId != null) {
+        debug('Timer #' + this.actionTimerId + ' stop');
+        window.clearInterval(this.actionTimerId);
+        delete this.actionTimerId;
+      }
+    },
 
     ///////////////////////////////////////
     ///////////////////////////////////////
@@ -359,25 +392,28 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * buildOfferActionButtons: show confirm button if the count is correct
      */
     buildOfferActionButtons: function () {
-      if (!this.isCurrentPlayerActive())
-				return;
+      if (!this.isCurrentPlayerActive()) {
+        return;
+      }
 
       this.removeActionButtons();
 
-			if(this._displayedPower){
-				var powerDiv = $('power-small-' + this._displayedPower),
-	        isBanned = powerDiv.classList.contains('banned'),
-	        isSelected = powerDiv.classList.contains('selected');
+      if (this._displayedPower) {
+        var powerDiv = $('power-small-' + this._displayedPower),
+          isBanned = powerDiv.classList.contains('banned'),
+          isSelected = powerDiv.classList.contains('selected');
 
-				if(isSelected)
-					this.addActionButton('buttonRemoveFromOffer', _('Remove from offer'), this.removeOffer.bind(this), null, false, 'red');
-				else if(this._nMissingPowers > 0 && !isBanned)
-					this.addActionButton('buttonAddToOffer', _('Add to offer'),this.addOffer.bind(this), null, false, 'blue');
-			}
+        if (isSelected) {
+          this.addActionButton('buttonRemoveFromOffer', _('Remove from offer'), this.removeOffer.bind(this), null, false, 'red');
+        } else if (this._nMissingPowers > 0 && !isBanned) {
+          this.addActionButton('buttonAddToOffer', _('Add to offer'), this.addOffer.bind(this), null, false, 'blue');
+        }
+      }
 
-			// Enough pwers : confirm button
-			if (this._nMissingPowers == 0)
-				this.addActionButton('buttonConfirmOffer', _('Confirm offer'), 'onClickConfirmOffer', null, false, 'blue');
+      // Enough powers : confirm button
+      if (this._nMissingPowers == 0) {
+        this.addActionButton('buttonConfirmOffer', _('Confirm'), 'onClickConfirmOffer', null, false, 'blue');
+      }
     },
 
 		/*
@@ -386,8 +422,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     updateBannedPowers: function (bannedIds) {
       dojo.query(".power-card.small").removeClass("banned");
       bannedIds.forEach(function (powerId) {
-        if ($("power-small-" + powerId))
+        if ($("power-small-" + powerId)) {
           dojo.addClass("power-small-" + powerId, "banned");
+        }
       });
     },
 
@@ -402,7 +439,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         isDisplayed = powerDiv.classList.contains('displayed'),
         isSelected = powerDiv.classList.contains('selected'),
         isWait = powerDiv.classList.contains('wait'); // Everyone may view details on first click
-			this._displayedPower = powerId;
+      this._displayedPower = powerId;
 
       if (!isDisplayed) {
         // Mark only this card as displayed
@@ -411,29 +448,29 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
         var power = this.getPower(powerId);
         dojo.place(this.format_block('jstpl_powerDetail', power), 'grid-detail', 'only');
-      }
-      // Otherwise, active player may select/unselect the power
-      else if (!isWait && isActive) {
+      } else if (!isWait && isActive) {
+        // Otherwise, active player may select/unselect the power
         // Already selected => unselect it
-        if (isSelected)
-					this.removeOffer();
-        // Not yet select + still need powers => select it
-        else if (this._nMissingPowers > 0 && !isBanned)
-        	this.addOffer();
+        if (isSelected) {
+          this.removeOffer();
+        } else if (this._nMissingPowers > 0 && !isBanned) {
+          // Not yet select + still need powers => select it
+          this.addOffer();
+        }
       }
 
-			this.buildOfferActionButtons();
+      this.buildOfferActionButtons();
     },
 
-		addOffer: function(){
-			$('power-small-' + this._displayedPower).classList.add('wait');
-			this.takeAction("addOffer", { powerId: this._displayedPower });
-		},
+    addOffer: function () {
+      $('power-small-' + this._displayedPower).classList.add('wait');
+      this.takeAction("addOffer", { powerId: this._displayedPower });
+    },
 
-		removeOffer: function(){
-			$('power-small-' + this._displayedPower).classList.add('wait');
-			this.takeAction("removeOffer", { powerId: this._displayedPower });
-		},
+    removeOffer: function () {
+      $('power-small-' + this._displayedPower).classList.add('wait');
+      this.takeAction("removeOffer", { powerId: this._displayedPower });
+    },
 
 
     /*
@@ -475,15 +512,20 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var dummy = this.format_block('jstpl_powerSmall', this.getPower(0));
       // Find the right position
       var nextPower = dojo.query('#cards-deck .power-card').reduce(function (acc, div) {
-        if (acc != null) return acc;
-        if (div.getAttribute('data-power') > n.args.powerId) return div;
+        if (acc != null) {
+          return acc;
+        }
+        if (div.getAttribute('data-power') > n.args.powerId) {
+          return div;
+        }
       }, null);
 
       // Insert it
-      if (nextPower !== null)
+      if (nextPower !== null) {
         dummy = dojo.place(dummy, nextPower, 'before');
-      else
+      } else {
         dummy = dojo.place(dummy, $('cards-deck'), 'last');
+      }
 
       // Slide the real card to the position of the dummy
       var powerDivId = 'power-small-' + n.args.powerId;
@@ -507,7 +549,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *   during fair division setup, when player 1 confirms they are done building the offer
      */
     onClickConfirmOffer: function () {
-      if (!this.checkAction('confirmOffer')) return false;
+      if (!this.checkAction('confirmOffer')) {
+        return false;
+      }
       this.takeAction("confirmOffer");
     },
 
@@ -523,13 +567,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         var div = dojo.place(_this.format_block('jstpl_powerDetail', power), $('power-choose-container'));
         div.id = "power-choose-" + power.id;
 
-				if (_this.isCurrentPlayerActive()){
-					dojo.style(div, "cursor", "pointer");
-					dojo.connect(div, 'onclick', function(ev){
-						_this.onClickChooseFirstPlayer(powerId);
-					});
-					_this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function () { _this.onClickChooseFirstPlayer(powerId) }, null, false, 'blue');
-				}
+        if (_this.isCurrentPlayerActive()) {
+          dojo.style(div, "cursor", "pointer");
+          dojo.connect(div, 'onclick', function (ev) {
+            _this.onClickChooseFirstPlayer(powerId);
+          });
+          _this.addActionButton('buttonFirstPlayer' + powerId, _this.getPower(powerId).name, function () { _this.onClickChooseFirstPlayer(powerId) }, null, false, 'blue');
+        }
       });
     },
 
@@ -537,9 +581,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickChooseFirstPlayer: is called when the contestant clicked on the player who will start
      */
     onClickChooseFirstPlayer: function (powerId) {
-      if (!this.checkAction('chooseFirstPlayer'))
+      if (!this.checkAction('chooseFirstPlayer')) {
         return false;
-
+      }
       this.takeAction("chooseFirstPlayer", { powerId: powerId });
     },
 
@@ -572,7 +616,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           dojo.connect(div, 'onclick', function (e) {
             return _this.onClickChoosePower(power.id);
           });
-					_this.addActionButton('buttonChoosePower' + power.id, _this.getPower(power.id).name, function () { _this.onClickChoosePower(power.id) }, null, false, 'blue');
+          _this.addActionButton('buttonChoosePower' + power.id, _this.getPower(power.id).name, function () { _this.onClickChoosePower(power.id) }, null, false, 'blue');
         }
       });
     },
@@ -582,9 +626,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *   during fair division, when a player cladojo.place(ims a power
      */
     onClickChoosePower: function (powerId) {
-      if (!this.checkAction('choosePower'))
+      if (!this.checkAction('choosePower')) {
         return false;
-
+      }
       this.takeAction("choosePower", { powerId: powerId });
     },
 
@@ -600,9 +644,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var playerId = n.args.player_id,
         powerId = n.args.power_id;
       var powerChooseCard = $("power-choose-" + powerId);
-      if (powerChooseCard == null)
+      if (powerChooseCard == null) {
         this.addPowerToPlayer(playerId, powerId);
-      else {
+      } else {
         powerChooseCard.style.height = powerChooseCard.offsetHeight + "px";
         powerChooseCard.classList.add("power-dummy");
         var phantom = this.format_block('jstpl_powerDetail', this.getPower(powerId));
@@ -615,31 +659,31 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 
 
-		////////////////////////////////////
+    ////////////////////////////////////
     ////////////////////////////////////
     ////////    Golden Fleece   ////////
     ////////////////////////////////////
     ////////////////////////////////////
 
-		addGoldenFleece: function(powerId){
-			var power = this.getPower(powerId);
-			var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('play-area'));
-			div.classList.add('golden');
-			this.addTooltipHtml('power-small-' + power.id, this.format_block('jstpl_powerDetail', power));
+    addGoldenFleece: function (powerId) {
+      var power = this.getPower(powerId);
+      var div = dojo.place(this.format_block('jstpl_powerSmall', power), $('play-area'));
+      div.classList.add('golden');
+      this.addTooltipHtml('power-small-' + power.id, this.format_block('jstpl_powerDetail', power));
 
-			var powerDialog = new ebg.popindialog();
-			powerDialog.create('powerDialogRam');
-			powerDialog.setTitle(_("Ram's power"));
-			powerDialog.setContent(this.format_block('jstpl_powerDetail', power));
-			powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
-			dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
-		},
+      var powerDialog = new ebg.popindialog();
+      powerDialog.create('powerDialogRam');
+      powerDialog.setTitle(_("Ram's power"));
+      powerDialog.setContent(this.format_block('jstpl_powerDetail', power));
+      powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
+      dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+    },
 
 
-		notif_ramPowerSet: function(n){
-			debug('Notif: ram power was set', n.args);
-			this.addGoldenFleece(n.args.powerId);
-		},
+    notif_ramPowerSet: function (n) {
+      debug('Notif: ram power was set', n.args);
+      this.addGoldenFleece(n.args.powerId);
+    },
 
 
     ///////////////////////////////////////
@@ -673,9 +717,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     onClickPlaceWorker: function (space) {
       // Check that this action is possible at this moment
-      if (!this.checkAction('placeWorker'))
+      if (!this.checkAction('placeWorker')) {
         return false;
-
+      }
       this.clearPossible();
       space.workerId = this.worker.id;
       this.takeAction("placeWorker", space);
@@ -762,8 +806,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this._powerId = args.power;
 
       for (var power in this.powersIds) {
-        if (this.powersIds[power] == args.power)
+        if (this.powersIds[power] == args.power) {
           this['usePower' + power.charAt(0) + power.slice(1).toLowerCase()](args);
+        }
       }
     },
 
@@ -835,8 +880,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Select the worker, highlight it and let the use change selection (if any other choices)
       this._selectedWorker = worker;
       this.board.highlightPiece(worker);
-      if (this._selectableWorkers.length > 1)
+      if (this._selectableWorkers.length > 1) {
         this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
+      }
       // TODO : automatically choose if only one space ?
 
       this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
@@ -862,11 +908,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      *  a space may have some args denoting some choices (eg type of block for Atlas)
      */
     onClickSpace: function (space) {
-      if (space.arg == null)
+      if (space.arg == null) {
         return this.onClickSpaceArg(space, null);
-      if (space.arg.length == 1)
+      } else if (space.arg.length == 1) {
         return this.onClickSpaceArg(space, space.arg[0]);
-
+      }
       return this.dialogChooseArg(space);
     },
 
@@ -899,8 +945,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     onClickSpaceArg: function (space, arg) {
       if ((this._powerId == null && !this.checkAction(this._action))
-        || (!this._powerId == null && !this.checkAction("use")))
+        || (!this._powerId == null && !this.checkAction("use"))) {
         return;
+      }
 
       var data = {
         workerId: this._selectedWorker.id,
@@ -912,9 +959,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Not using power => normal work
       if (this._powerId == null) {
         this.takeAction("work", data);
-      }
-      // Power work
-      else {
+      } else {
+        // Power work
         data.powerId = this._powerId;
         this.takeAction("usePowerWork", data);
       }
@@ -927,45 +973,45 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * onClickSkip: is called when the active player decide to skip work
      */
     onClickSkip: function () {
-      if (!this.checkAction('skip'))
+      if (!this.checkAction('skip')) {
         return;
-
+      }
       var action = (this.gamedatas.gamestate.name == "playerUsePower") ? "skipPower" : "skipWork";
       this.takeAction(action);
       this.clearPossible();
     },
 
 
-		/*
+    /*
      * onClickCancel: is called when the active player decide to cancel previous works
      */
     onClickCancel: function () {
-      if (!this.checkAction('cancel'))
+      if (!this.checkAction('cancel')) {
         return;
-
+      }
       this.takeAction("cancelPreviousWorks");
       this.clearPossible();
     },
 
 
-		/*
+    /*
      * onClickConfirm: is called when the active player decide to confirm its turn
      */
     onClickConfirm: function () {
-      if (!this.checkAction('confirm'))
+      if (!this.checkAction('confirm')) {
         return;
-
+      }
       this.takeAction("confirmTurn");
     },
 
 
-		/*
+    /*
      * onClickResign: is called when the active player decide to resign (when cannot move/build)
      */
     onClickResign: function () {
-      if (!this.checkAction('resign'))
+      if (!this.checkAction('resign')) {
         return;
-
+      }
       this.takeAction("resign");
       this.clearPossible();
     },
@@ -975,10 +1021,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     //// Work Notifs ////
     /////////////////////
 
-		/*
-		 * notif_automatic:
-		 *   called whenever a worker has only one choice
-		 */
+    /*
+     * notif_automatic:
+     *   called whenever a worker has only one choice
+     */
     notif_automatic: function (n) {
       debug('Notif: automatic work incoming', n.args);
       this.clearPossible();
@@ -1011,7 +1057,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.board.switchPiece(n.args.piece1, n.args.piece2);
     },
 
-		/*
+    /*
      * notif_blockBuilt:
      *   called whenever a new block is built under a worker using Zeus
      */
@@ -1021,7 +1067,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 
-		/*
+    /*
      * notif_pieceRemoved:
      *   called whenever a piece is removed/killed (eg Bia, Medusa, Ares)
      */
@@ -1087,17 +1133,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      * 	show and hide containers depending on state
      */
     focusContainer: function focusContainer(container) {
-			if(this._focusedContainer != null && this._focusedContainer == container)
-				return;
+      if (this._focusedContainer != null && this._focusedContainer == container) {
+        return;
+      }
 
-			if(this._focusedContainer != null){
-				if(container == "board")
-					this.board.enterScene();
-				if(container == "powers-choose")
-					dojo.style('power-choose-container', 'opacity', '1');
-			}
+      if (this._focusedContainer != null) {
+        if (container == "board") {
+          this.board.enterScene();
+        } else if (container == "powers-choose") {
+          dojo.style('power-choose-container', 'opacity', '1');
+        }
+      }
 
-			this._focusedContainer = container;
+      this._focusedContainer = container;
       dojo.style('power-offer-container', 'display', container == 'powers-offer' ? 'flex' : 'none');
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
       dojo.style('play-area', 'display', 'block');
@@ -1110,7 +1158,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     clearPossible: function clearPossible() {
       this.removeActionButtons();
-      this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args);
+      this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args, true);
 
       dojo.empty('grid-powers');
       dojo.query('#power-detail').removeClass().addClass('power-card power-0');
@@ -1141,7 +1189,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['workerPlaced', 1000],
         ['workerMoved', 1600],
         ['blockBuilt', 1000],
-				['ramPowerSet', 1000],
+        ['ramPowerSet', 1000],
         ['workerSwitched', 1600], 	// Happens with Apollo
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
