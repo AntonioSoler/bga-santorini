@@ -150,7 +150,7 @@ class santorini extends Table
   ///////////////////////////////////////
   // The fair division process goes as follows :
   //  - the contestant pick n powers
-  //  - contestant choose the first power to place its worker
+  //  - contestant choose the first power to place worker
   //  - each player choose one power (contestant is last to choose)
   //////////////////////////////////////
 
@@ -561,12 +561,15 @@ class santorini extends Table
 
 
   /*
-   * announceLoose: this function is called when a player cannot move and build during its turn
+   * announceLoose: this function is called when a player cannot move and build during their turn
    */
   public function announceLose($msg = null, $args = null)
   {
     $msg = $msg ?: clienttranslate('${player_name} cannot move/build and is eliminated!');
-    $args = $args ?: ['player_name' => self::getActivePlayerName()];
+    if (!is_array($args)) {
+      $args = [];
+    }
+    $args['player_name'] = self::getActivePlayerName();
     self::notifyAllPlayers('message', $msg, $args);
 
     $pId = self::getActivePlayerId();
@@ -600,7 +603,7 @@ class santorini extends Table
   }
 
   /*
-   * usePower: called when a player decide to use its (non-basic) power
+   * usePower: called when a player decide to use their (non-basic) power
    *
   public function usePower($powerId, $action)
   {
@@ -620,7 +623,7 @@ class santorini extends Table
 
 
   /*
-   * usePowerWork: called when a player decide to use its (non-basic) power which behave like a work
+   * usePowerWork: called when a player decide to use their (non-basic) power which behave like a work
    */
   public function usePowerWork($powerId, $wId, $x, $y, $z, $actionArg)
   {

@@ -500,7 +500,7 @@ class PowerManager extends APP_GameClass
 
 
   /*
-   * argPlaceWorker: is called when a player has to place one of its worker
+   * argPlaceWorker: is called when a player has to place a worker
    */
   public function argPlaceWorker(&$arg)
   {
@@ -515,7 +515,7 @@ class PowerManager extends APP_GameClass
   ///////////////////////////////////
 
   /*
-   * argUsePower: is called when a player may use its power
+   * argUsePower: is called when a player may use their power
    */
   public function argUsePower(&$arg)
   {
@@ -523,7 +523,7 @@ class PowerManager extends APP_GameClass
   }
 
   /*
-   * usePower: is called when a player want to use its power
+   * usePower: is called when a player want to use their power
    */
   public function usePower($powerId, $action)
   {
@@ -538,7 +538,7 @@ class PowerManager extends APP_GameClass
 
 
   /*
-   * stateAfterSkipPower: is called whenever a player used its (non-standard) power
+   * stateAfterSkipPower: is called whenever a player used their (non-standard) power
    */
   public function stateAfterSkipPower()
   {
@@ -546,7 +546,7 @@ class PowerManager extends APP_GameClass
   }
 
   /*
-   * stateAfterUsePower: is called whenever a player used its (non-standard) power
+   * stateAfterUsePower: is called whenever a player used their (non-standard) power
    */
   public function stateAfterUsePower()
   {

@@ -129,7 +129,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 		/*
 		 * notif_cancel:
-		 *   called whenever a player restart its turn
+		 *   called whenever a player restart their turn
 		 */
     notif_cancel: function (n) {
       debug('Notif: cancel turn', n.args);
@@ -138,7 +138,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 
 		/*
-		 * setupPowers: give each player its corresponding power
+		 * setupPowers: give each player their corresponding powers
 		 */
     setupPowers: function (players) {
       var _this = this;
@@ -349,7 +349,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     // As stated in the rulebook, the fair division process goes as follows :
     //  - the contestant pick n powers
     //  - each player choose one power (contestant is last to choose)
-    //  - contestant choose the first player to place its worker TODO
+    //  - contestant choose the first player to place worker TODO
     //////////////////////////////////////
 
 
@@ -800,7 +800,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
 		/*
-     * onEnteringStatePlayerUsePower: the active player can use its (non-basic) power
+     * onEnteringStatePlayerUsePower: the active player can use their (non-basic) power
      */
     onEnteringStatePlayerUsePower: function (args) {
       this._powerId = args.power;
@@ -995,7 +995,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
 
     /*
-     * onClickConfirm: is called when the active player decide to confirm its turn
+     * onClickConfirm: is called when the active player decide to confirm their turn
      */
     onClickConfirm: function () {
       if (!this.checkAction('confirm')) {
