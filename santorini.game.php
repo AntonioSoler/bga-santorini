@@ -443,9 +443,9 @@ class santorini extends Table
    * stNextPlayer:
    *   go to next player
    */
-  public function stNextPlayer()
+  public function stNextPlayer($next = true)
   {
-    $pId = $this->activeNextPlayer();
+    $pId = $next? $this->activeNextPlayer() : $this->getActivePlayerId();
     if ($this->playerManager->getPlayer($pId)->isEliminated()) {
       $pId = $this->activeNextPlayer();
     }
@@ -579,11 +579,20 @@ class santorini extends Table
       self::announceWin($pId, false);
     } else {
       // 3 players => eliminate the player
-      $this->playerManager->eliminate($pId);
-      $this->gamestate->nextState('endturn');
+      $this->gamestate->nextState("eliminate");
     }
   }
 
+  /*
+   * stEliminatePlayer: this function is called when the active player is eliminated
+   */
+  public function stEliminatePlayer()
+  {
+    $pId = $this->getActivePlayerId();
+    $this->activeNextPlayer();
+    $this->playerManager->eliminate($pId);
+    $this->stNextPlayer(false);
+  }
 
   /////////////////////////////////////////
   /////////////////////////////////////////
@@ -944,8 +953,8 @@ class santorini extends Table
   public function zombieTurn($state, $activePlayer)
   {
     if (array_key_exists('zombiePass', $state['transitions'])) {
-      $this->playerManager->eliminate($activePlayer);
       $this->gamestate->nextState('zombiePass');
+      $this->playerManager->eliminate($activePlayer);
     } else {
       throw new BgaVisibleSystemException('Zombie player ' . $activePlayer . ' stuck in unexpected state ' . $state['name']);
     }

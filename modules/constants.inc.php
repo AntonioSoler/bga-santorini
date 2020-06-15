@@ -103,6 +103,8 @@ define('ST_PRE_END_OF_TURN', 19);
 define('ST_END_OF_TURN', 17);
 define('ST_USE_POWER', 15);
 
+define('ST_ELIMINATE_PLAYER', 20);
+
 define('ST_GAME_END', 98);
 define('ST_BGA_GAME_END', 99);
 

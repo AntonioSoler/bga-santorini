@@ -201,6 +201,7 @@ $machinestates = array(
       'build' => ST_BUILD,
       'endgame' => ST_GAME_END,
       'power' => ST_USE_POWER,
+      'eliminate' => ST_ELIMINATE_PLAYER,
     ],
   ],
 
@@ -223,6 +224,7 @@ $machinestates = array(
       'build' => ST_BUILD,
       'endturn' => ST_PRE_END_OF_TURN,
       'endgame' => ST_GAME_END,
+      'eliminate' => ST_ELIMINATE_PLAYER,
     ],
   ],
 
@@ -245,6 +247,7 @@ $machinestates = array(
       'skip'       => ST_BUILD,
       'cancel'     => ST_START_OF_TURN,
       'moveAgain'  => ST_MOVE,
+      'eliminate'  => ST_ELIMINATE_PLAYER,
     ],
   ],
 
@@ -268,6 +271,7 @@ $machinestates = array(
       'move'       => ST_MOVE,
       'buildAgain' => ST_BUILD,
       'power'      => ST_USE_POWER,
+      'eliminate'  => ST_ELIMINATE_PLAYER,
     ],
   ],
 
@@ -282,6 +286,7 @@ $machinestates = array(
       'endturn'    => ST_END_OF_TURN,
       'confirm'    => ST_END_OF_TURN,
       'cancel'     => ST_START_OF_TURN,
+      'eliminate'  => ST_ELIMINATE_PLAYER,
     ],
   ],
 
@@ -296,6 +301,17 @@ $machinestates = array(
       'endgame' => ST_GAME_END,
     ],
   ],
+
+  ST_ELIMINATE_PLAYER => [
+    'name' => 'eliminatePlayer',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stEliminatePlayer',
+    'transitions' => [
+      'play' => ST_START_OF_TURN,
+    ],
+  ],
+
 
   ST_GAME_END => [
     'name' => 'gameEndStats',
