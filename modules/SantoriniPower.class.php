@@ -63,14 +63,13 @@ abstract class SantoriniPower extends APP_GameClass
       'title'     => $this->title,
       'text'      => $this->text,
       'hero'      => get_parent_class($this) == 'SantoriniHeroPower',
-      'implemented' => $this->implemented ? 'implemented' : 'not-implemented',
     ];
   }
 
   public function isSupported($nPlayers, $optionPowers)
   {
     $isHero = $this instanceof SantoriniHeroPower;
-    return ($this->implemented)
+    return $this->implemented
       && in_array($nPlayers, $this->getPlayerCount())
       && (($optionPowers == GODS_AND_HEROES)
         || ($optionPowers == SIMPLE && $this->isSimple())

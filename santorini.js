@@ -80,6 +80,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         this.addGoldenFleece(gamedatas.goldenFleece);
       }
 
+      // Handle for cancelled notification messages
+      dojo.subscribe('addMoveToLog', this, 'santorini_addMoveToLog');
+
       // Setup game notifications
       this.setupNotifications();
     },
@@ -134,8 +137,32 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     notif_cancel: function (n) {
       debug('Notif: cancel turn', n.args);
       this.board.diff(n.args.placedPieces);
+      this.cancelNotifications(n.args.moveIds);
     },
 
+    /* 
+     * cancelNotifications: cancel past notification log messages the given move IDs
+     */
+    cancelNotifications(moveIds) {
+      for (var logId in this.log_to_move_id) {
+        var moveId = +this.log_to_move_id[logId];
+        if (moveIds.includes(moveId)) {
+          debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
+          dojo.addClass('log_' + logId, 'cancel');
+        }
+      }
+    },
+
+    /*
+     * addMoveToLog: called by BGA framework when a new notification message is logged.
+     * cancel it immediately if needed.
+     */
+    santorini_addMoveToLog: function (logId, moveId) {
+      if (this.gamedatas.cancelMoveIds && this.gamedatas.cancelMoveIds.includes(+moveId)) {
+        debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
+        dojo.addClass('log_' + logId, 'cancel');
+      }
+    },
 
 		/*
 		 * setupPowers: give each player their corresponding powers
@@ -1106,7 +1133,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         name: '',
         title: '',
         text: [],
-        implemented: "implemented"
       };
       power.type = power.hero ? 'hero' : '';
 

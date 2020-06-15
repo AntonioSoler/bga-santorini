@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `card` (
 CREATE TABLE IF NOT EXISTS `log` (
   `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `round` int(11) NOT NULL,
+  `move_id` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
   `piece_id` int(11),
   `action` varchar(16) NOT NULL,
@@ -40,3 +41,5 @@ CREATE TABLE IF NOT EXISTS `log` (
 
 
 ALTER TABLE `player` ADD `player_team` INT(1) UNSIGNED NOT NULL;
+
+ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0;

@@ -520,17 +520,24 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-image: url('img/card-small-displayed.png');
 }
 
-.power-card.small.banned::before {
-  background-image:none;
-  background-color:rgba(200,0,0,0.5);
-  cursor:not-allowed;
+.power-card.small.banned {
+  cursor: not-allowed;
 }
 
+.power-card.small.banned::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.6);
+}
 
-.power-card.small.not-implemented::before {
-  background-image:none;
-  background-color:rgba(0,0,0,0.6);
-  cursor:not-allowed;
+.power-card.small.banned .power-name {
+  text-decoration: line-through;
+  color: #c62828;
 }
 
 .power-card.small .power-name {
@@ -570,6 +577,17 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   line-height: 27px;
   font-size: 18px;
   font-weight: bold;
+}
+
+/* Cancelled notification messages */
+
+.log.cancel {
+  color: #c62828 !important;
+  text-decoration: line-through;
+}
+
+.log.cancel .roundedbox {
+  background-color: rgba(255, 205, 210, 0.6);
 }
 
 /*********************

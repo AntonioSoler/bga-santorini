@@ -72,6 +72,7 @@ class SantoriniLog extends APP_GameClass
   {
     $playerId = $playerId == -1 ? $this->game->getActivePlayerId() : $playerId;
     $round = $this->game->getGameStateValue("currentRound");
+    $moveId = self::getUniqueValueFromDB("SELECT `global_value` FROM `global` WHERE `global_id` = 3");
 
     if ($action == 'move') {
       $args['stats'] = [
@@ -95,7 +96,7 @@ class SantoriniLog extends APP_GameClass
     }
 
     $actionArgs = json_encode($args);
-    self::DbQuery("INSERT INTO log (`round`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$playerId', '$pieceId', '$action', '$actionArgs')");
+    self::DbQuery("INSERT INTO log (`round`, `move_id`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$moveId', '$playerId', '$pieceId', '$action', '$actionArgs')");
   }
 
 
@@ -221,18 +222,18 @@ class SantoriniLog extends APP_GameClass
     return (count($moves) == 1) ? $moves[0] : null;
   }
 
- /*
+  /*
   * getLastMoveOfWorker: fetch the last move of worker of current round if it exists, null otherwise
   */
- public function getLastMoveOfWorker($workerId)
- {
-   $pId = $this->game->getActivePlayerId();
-   $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'additionalTurn' OR (`action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1)) ORDER BY log_id DESC LIMIT 1");
-   if($move == null || $move['action'] == 'additionalTurn'){
-     return null;
-   }
-   return json_decode($move['action_arg'], true);
- }
+  public function getLastMoveOfWorker($workerId)
+  {
+    $pId = $this->game->getActivePlayerId();
+    $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'additionalTurn' OR (`action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1)) ORDER BY log_id DESC LIMIT 1");
+    if ($move == null || $move['action'] == 'additionalTurn') {
+      return null;
+    }
+    return json_decode($move['action_arg'], true);
+  }
 
 
 
@@ -300,6 +301,7 @@ class SantoriniLog extends APP_GameClass
     $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC");
 
     $ids = [];
+    $moveIds = [];
     foreach ($logs as $log) {
       $args = json_decode($log['action_arg'], true);
 
@@ -319,10 +321,26 @@ class SantoriniLog extends APP_GameClass
         $this->incrementStats($args['stats'], -1);
       }
 
-      $ids[] = $log['log_id'];
+      $ids[] = intval($log['log_id']);
+      if ($log['action'] != 'startTurn') {
+        $moveIds[] = intval($log['move_id']);
+      }
     }
 
     // Remove the logs
-    self::DbQuery("DELETE FROM log WHERE `player_id` = '$pId' AND `log_id` IN (" . implode($ids, ',') . ")");
+    self::DbQuery("DELETE FROM log WHERE `player_id` = '$pId' AND `log_id` IN (" . implode(',', $ids) . ")");
+
+    // Cancel the game notifications
+    self::DbQuery("UPDATE gamelog SET `cancel` = 1 WHERE `gamelog_move_id` IN (" . implode(',', $moveIds) . ")");
+    return $moveIds;
+  }
+
+  /*
+   * getCancelMoveIds : get all cancelled move IDs from BGA gamelog, used for styling the notifications on page reload
+   */
+  public function getCancelMoveIds()
+  {
+    $moveIds = self::getObjectListFromDb("SELECT `gamelog_move_id` FROM gamelog WHERE `cancel` = 1 ORDER BY 1", true);
+    return array_map('intval', $moveIds);
   }
 }

@@ -32,7 +32,7 @@ var jstpl_scene = `<div id="scene-container">
 </div>`;
 
 
-var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${id} \${type} small \${implemented}" data-power="\${id}">
+var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${id} \${type} small" data-power="\${id}">
 	<div class="power-name">\${name}</div>
 </div>`;
 

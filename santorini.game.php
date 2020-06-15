@@ -97,6 +97,7 @@ class santorini extends Table
       'placedPieces' => $this->board->getPlacedPieces(),
       'powers' => $this->powerManager->getUiData(),
       'goldenFleece' => $this->powerManager->getGoldenFleecePowerId(),
+      'cancelMoveIds' => $this->log->getCancelMoveIds(),
     ];
   }
 
@@ -801,10 +802,11 @@ class santorini extends Table
     }
 
     // Undo the turn
-    $this->log->cancelTurn();
+    $moveIds = $this->log->cancelTurn();
     self::notifyAllPlayers('cancel', clienttranslate('${player_name} restarts their turn'), [
       'placedPieces' => $this->board->getPlacedPieces(),
       'player_name' => self::getActivePlayerName(),
+      'moveIds' => $moveIds,
     ]);
 
     // Apply power
