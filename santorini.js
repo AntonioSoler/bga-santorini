@@ -143,7 +143,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     /* 
      * cancelNotifications: cancel past notification log messages the given move IDs
      */
-    cancelNotifications(moveIds) {
+    cancelNotifications: function(moveIds) {
       for (var logId in this.log_to_move_id) {
         var moveId = +this.log_to_move_id[logId];
         if (moveIds.includes(moveId)) {
