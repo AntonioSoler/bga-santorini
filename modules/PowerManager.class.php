@@ -244,7 +244,7 @@ class PowerManager extends APP_GameClass
   {
     $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
     if ($optionPowers == NONE) {
-      return 'done';
+      return 'placeWorker';
     }
 
     // Filter supported powers depending on the number of players and game option
