@@ -106,7 +106,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         dojo.style('power-offer-container', 'opacity', '1');
       } else if (this._focusedContainer == 'powers-choose') {
         dojo.style('power-choose-container', 'opacity', '1');
-      } else if (this._focusedContainer == 'board') {
+			}
+
+			if (this._focusedContainer == 'board') {
         this.board.enterScene();
       } else {
         this.board.onLoad();
@@ -140,7 +142,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.cancelNotifications(n.args.moveIds);
     },
 
-    /* 
+    /*
      * cancelNotifications: cancel past notification log messages the given move IDs
      */
     cancelNotifications: function(moveIds) {
@@ -595,7 +597,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         div.id = "power-choose-" + power.id;
 
         if (_this.isCurrentPlayerActive()) {
-          dojo.style(div, "cursor", "pointer");
+					dojo.addClass(div.id, 'clickable');
           dojo.connect(div, 'onclick', function (ev) {
             _this.onClickChooseFirstPlayer(powerId);
           });
@@ -639,7 +641,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         div.id = "power-choose-" + power.id;
 
         if (_this.isCurrentPlayerActive()) {
-          dojo.style(div, "cursor", "pointer");
+					dojo.addClass(div.id, 'clickable');
           dojo.connect(div, 'onclick', function (e) {
             return _this.onClickChoosePower(power.id);
           });

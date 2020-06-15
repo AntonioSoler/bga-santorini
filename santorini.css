@@ -295,6 +295,14 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     margin: 0 10px 10px 10px;
 }
 
+
+#power-choose-container .power-detail.clickable {
+  cursor: pointer;
+}
+#power-choose-container .power-detail.clickable:hover {
+  transform:scale(1.1);
+}
+
 #power-offer-container {
     display: flex;
 }
@@ -344,7 +352,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
-    margin-top: 15px;
+    margin-top: 50px;
 }
 
 .power-info-background {
@@ -515,6 +523,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-image: url('img/card-small.png');
     border-radius: 8px;
 }
+.power-card.small:hover::before {
+    background-image: url('img/card-small-hovered.png');
+}
+
 
 .power-card.small.displayed::before {
     background-image: url('img/card-small-displayed.png');

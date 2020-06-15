@@ -132,7 +132,7 @@ $game_preferences = [
     'needReload' => false,
     'values' => [
       ENABLED => ['name' => totranslate('Enabled')],
-      DISABLED => ['name' => totranslate('Disaled')],
+      DISABLED => ['name' => totranslate('Disabled')],
     ]
   ]
 ];

@@ -683,9 +683,9 @@ class PowerManager extends APP_GameClass
   {
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
-    $r = array_filter(array_map(function ($power) use ($method) {
+    $r = array_values(array_filter(array_map(function ($power) use ($method) {
       return $power->$method();
-    }, $player->getPowers()));
+    }, $player->getPowers())));
     if (count($r) > 1) {
       throw new BgaUserException($msg);
     }

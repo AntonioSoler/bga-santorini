@@ -108,7 +108,7 @@ class santorini extends Table
    */
   public function getGameProgression()
   {
-    return count($this->board->getPlacedPieces()) / 100;
+    return count($this->board->getPlacedPieces());
   }
 
 

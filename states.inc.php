@@ -203,6 +203,7 @@ $machinestates = array(
       'power' => ST_USE_POWER,
       'eliminate' => ST_ELIMINATE_PLAYER,
     ],
+    'updateGameProgression' => true,
   ],
 
   /*
