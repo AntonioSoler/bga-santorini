@@ -525,6 +525,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-card.small::before {
     background-image: url('img/card-small.png');
     border-radius: 8px;
+    transition: background-image 250ms ease;
 }
 .power-card.small:hover::before {
     background-image: url('img/card-small-hovered.png');
