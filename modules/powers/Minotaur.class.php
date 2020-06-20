@@ -54,8 +54,9 @@ class Minotaur extends SantoriniPower
       if (is_null($space)) {
         throw new BgaVisibleSystemException("Minotaur: No available space behind opponent worker");
       }
+      $stats = [[$this->playerId, 'usePower']];
       $this->game->board->setPieceAt($worker2, $space);
-      $this->game->log->addForce($worker2, $space);
+      $this->game->log->addForce($worker2, $space, $stats);
 
       // Notify (same text as Charon to help translators)
       $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name} (${coords})'), [

@@ -42,7 +42,7 @@ class Aphrodite extends SantoriniPower
       }
     }
 
-    $this->game->log->addAction('forcedWorkers', ['workers' => $forcedWorkers]);
+    $this->game->log->addAction('forcedWorkers', [], ['workers' => $forcedWorkers]);
   }
 
 

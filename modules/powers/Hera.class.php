@@ -37,6 +37,7 @@ class Hera extends SantoriniPower
 
     // Stop the win
     $arg['win'] = false;
+    $arg['winStats'] = [[$this->playerId, 'usePower']];
     $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} cannot win by moving into a perimeter space'), [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),

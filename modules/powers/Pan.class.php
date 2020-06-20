@@ -33,6 +33,7 @@ class Pan extends SantoriniPower
 
     // Pan wins
     $arg['win'] = true;
+    $arg['winStats'] = [[$this->playerId, 'usePower']];
     $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} moved down two or more levels'), [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),

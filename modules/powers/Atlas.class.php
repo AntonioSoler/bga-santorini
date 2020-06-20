@@ -30,4 +30,12 @@ class Atlas extends SantoriniPower
       }
     }
   }
+
+  public function afterPlayerBuild($worker, $work)
+  {
+    if ($work['to']['arg'] == 3 && $work['to']['z'] != 3) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
+  }
 }

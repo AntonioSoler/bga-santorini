@@ -33,6 +33,7 @@ class Chronus extends SantoriniPower
 
     // Chronus wins
     $arg['win'] = true;
+    $arg['winStats'] = [[$this->playerId, 'usePower']];
     $arg['pId'] = $this->playerId;
     $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${count} Complete Towers are on the board'), [
       'i18n' => ['power_name'],

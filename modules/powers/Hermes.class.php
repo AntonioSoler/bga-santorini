@@ -66,4 +66,14 @@ class Hermes extends SantoriniPower
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
     }
   }
+
+  public function endPlayerTurn()
+  {
+    $moves = $this->game->log->getLastMoves($this->playerId);
+    $build = $this->game->log->getLastBuild($this->playerId);
+    if (count($moves) != 1 || $build['pieceId'] != $moves[0]['pieceId']) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
+  }
 }

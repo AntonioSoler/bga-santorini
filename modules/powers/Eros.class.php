@@ -45,8 +45,9 @@ class Eros extends SantoriniPower
 
   public function checkPlayerWinning(&$arg)
   {
-    if ($arg['win'])
+    if ($arg['win']) {
       return;
+    }
 
     $move = $this->game->log->getLastWork();
     $workers = $this->game->board->getPlacedActiveWorkers();
@@ -68,6 +69,7 @@ class Eros extends SantoriniPower
 
     // Eros wins
     $arg['win'] = true;
+    $arg['winStats'] = [[$this->playerId, 'usePower']];
     $msg = clienttranslate('${power_name}: ${player_name} has neighboring workers on ${level_name}');
     $this->game->notifyAllPlayers('message', $msg, [
       'i18n' => ['power_name'],

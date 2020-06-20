@@ -39,7 +39,12 @@ class Hephaestus extends SantoriniPower
 
   public function stateAfterBuild()
   {
-    $build = $this->game->log->getLastBuild();
-    return (count($this->game->log->getLastBuilds()) == 1 && $build['to']['z'] <= 1) ? 'buildAgain' : null;
+    $builds = $this->game->log->getLastBuilds();
+    $count = count($builds);
+    if ($count > 1) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
+    return ($count == 1 && $builds[0]['to']['z'] <= 1) ? 'buildAgain' : null;
   }
 }

@@ -26,9 +26,9 @@ abstract class Utils extends APP_GameClass
   public static function filterWorkersById(&$arg, $wId, $same = true)
   {
     self::filterWorkers($arg, function (&$worker) use ($wId, $same) {
-      return is_array($wId)?
-          ( ($same && in_array($worker['id'], $wId)) || (!$same && !in_array($worker['id'],$wId) ))
-        : ( ($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId) );
+      return is_array($wId)
+        ? (($same && in_array($worker['id'], $wId)) || (!$same && !in_array($worker['id'], $wId)))
+        : (($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId));
     });
   }
 
@@ -71,7 +71,9 @@ abstract class Utils extends APP_GameClass
 
   public static function filterWorksUnlessMine(&$arg, $workers, $filter)
   {
-    $workersIds = array_map(function($worker){ return $worker['id'];}, $workers);
+    $workersIds = array_map(function ($worker) {
+      return $worker['id'];
+    }, $workers);
     Utils::filterWorks($arg, function (&$space, &$worker) use ($filter, $workersIds) {
       return in_array($worker['id'], $workersIds) || $filter($space, $worker);
     });
@@ -79,19 +81,19 @@ abstract class Utils extends APP_GameClass
 
   public static function mergeWorkers(&$arg, $workers)
   {
-    foreach($workers as $worker){
+    foreach ($workers as $worker) {
       $found = false;
-      foreach($arg['workers'] as &$worker2){
-        if($worker['id'] == $worker2['id']){
+      foreach ($arg['workers'] as &$worker2) {
+        if ($worker['id'] == $worker2['id']) {
           $found = true;
-          foreach($worker['works'] as $work){
-            if(!in_array($work, $worker2['works']))
+          foreach ($worker['works'] as $work) {
+            if (!in_array($work, $worker2['works']))
               $worker2['works'][] = $work;
           }
         }
       }
 
-      if(!$found){
+      if (!$found) {
         $arg['workers'][] = $worker;
       }
     }
@@ -129,5 +131,13 @@ abstract class Utils extends APP_GameClass
     }
 
     return ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => $actionArg];
+  }
+
+
+  public static function getMoveIds($works)
+  {
+    return array_map(function ($work) {
+      return intval($work['moveId']);
+    }, $works);
   }
 }

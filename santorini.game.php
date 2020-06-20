@@ -445,7 +445,7 @@ class santorini extends Table
    */
   public function stNextPlayer($next = true)
   {
-    $pId = $next? $this->activeNextPlayer() : $this->getActivePlayerId();
+    $pId = $next ? $this->activeNextPlayer() : $this->getActivePlayerId();
     if ($this->playerManager->getPlayer($pId)->isEliminated()) {
       $pId = $this->activeNextPlayer();
     }
@@ -518,6 +518,9 @@ class santorini extends Table
 
     // Apply powers
     $this->powerManager->checkWinning($arg);
+    if (array_key_exists('winStats', $arg)) {
+      $this->log->incrementStats($arg['winStats']);
+    }
     if ($arg['win']) {
       $this->announceWin($arg['pId']);
     }
@@ -648,7 +651,8 @@ class santorini extends Table
 
     // Use power
     $this->powerManager->usePower($powerId, [$wId, $work]);
-    $this->log->addAction("usedPower", [$wId, $work]);
+    $stats = [[self::getActivePlayerId(), 'usePower']];
+    $this->log->addAction("usedPower", $stats, [$wId, $work]);
 
     $state = $this->powerManager->stateAfterUsePower();
     if ($state == null) {
@@ -975,5 +979,11 @@ class santorini extends Table
    */
   public function upgradeTableDb($from_version)
   {
+    /*
+    if ($from_version < 2006150952) {
+      self::DbQuery("ALTER TABLE `log` ADD `move_id` INT(11) NOT NULL DEFAULT 0");
+      self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
+    }
+    */
   }
 }

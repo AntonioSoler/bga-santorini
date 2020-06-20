@@ -61,11 +61,13 @@ class Chaos extends SantoriniPower
   public function setup()
   {
     // Remove all non simple gods
-    $cards = array_map(function($card){ return $card['id']; }, $this->game->powerManager->cards->getCardsInLocation('deck'));
+    $cards = array_map(function ($card) {
+      return $card['id'];
+    }, $this->game->powerManager->cards->getCardsInLocation('deck'));
     $this->game->powerManager->cards->moveCards($cards, 'box');
-    for($i = 1; $i <= 10; $i++){
+    for ($i = 1; $i <= 10; $i++) {
       $card = $this->game->powerManager->cards->getCard($i);
-      if($card['location'] == 'box'){
+      if ($card['location'] == 'box') {
         $this->game->powerManager->cards->moveCard($i, 'deck');
       }
     }
@@ -79,17 +81,17 @@ class Chaos extends SantoriniPower
   {
     $works = $this->game->log->getLastBuilds();
     $dome = false;
-    for($i = 0; !$dome && $i < count($works); $i++){
+    for ($i = 0; !$dome && $i < count($works); $i++) {
       $dome = $works[$i]['to']['arg'] == 3;
     }
 
-    if(!$dome){
+    if (!$dome) {
       return;
     }
 
     // Discard current
-    foreach($this->game->playerManager->getPlayer($this->playerId)->getPowers() as $power){
-      if($power->getId() != $this->getId()){
+    foreach ($this->game->playerManager->getPlayer($this->playerId)->getPowers() as $power) {
+      if ($power->getId() != $this->getId()) {
         $this->game->powerManager->cards->moveCard($power->getId(), 'discard');
       }
     }
@@ -98,12 +100,13 @@ class Chaos extends SantoriniPower
     $this->pickNewPower();
   }
 
-  public function endPlayerTurn(){
+  public function endPlayerTurn()
+  {
     $this->endOfTurn();
   }
 
-  public function endOpponentTurn(){
+  public function endOpponentTurn()
+  {
     $this->endOfTurn();
   }
-
 }

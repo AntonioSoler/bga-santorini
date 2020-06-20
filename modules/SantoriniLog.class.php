@@ -13,6 +13,12 @@ class SantoriniLog extends APP_GameClass
     $this->game = $game;
   }
 
+  /////////////////////////////////
+  /////////////////////////////////
+  ///////  Game Statistics  ///////
+  /////////////////////////////////
+  /////////////////////////////////
+
   /*
    * initStats: initialize statistics to 0 at start of game
    */
@@ -42,15 +48,42 @@ class SantoriniLog extends APP_GameClass
     $this->game->setStat($this->game->board->getCompleteTowerCount(), 'buildTower');
   }
 
-  public function incrementStats($stats, $value = 1)
+  /*
+   * incrementStats: adjust individual game statistics
+   *   - array $stats: format is array of [ playerId, name, value ].
+   *     example: [ ['table', 'move'], [23647584, 'move'], ... ]
+   *       - playerId: the player ID for a player state, or 'table' for a table stat
+   *       - name: the state name, such as 'move' or 'usePower'
+   *       - value (optional): amount to add, defaults to 1 
+   *   - boolean $subtract: true if the values should be decremented
+   */
+  public function incrementStats($stats, $subtract = false)
   {
-    foreach ($stats as $pId => $names) {
-      foreach ($names as $name) {
-        if ($pId == 'table') {
-          $pId = null;
-        }
-        $this->game->incStat($value, $name, $pId);
+    // $this->game->notifyAllPlayers('message', "incrementStats: " . json_encode($stats, JSON_PRETTY_PRINT), []);
+    foreach ($stats as $stat) {
+      if (!is_array($stat)) {
+        throw new BgaVisibleSystemException("Game statistics error: Not an array");
       }
+
+      $pId = $stat[0];
+      if ($pId == 'table' || empty($pId)) {
+        $pId = null;
+      }
+
+      $name = $stat[1];
+      if (empty($name)) {
+        throw new BgaVisibleSystemException("Game statistics error: Missing name");
+      }
+
+      $value = 1;
+      if (count($stat) > 2) {
+        $value = $stat[2];
+      }
+      if ($subtract) {
+        $value = $value * -1;
+      }
+
+      $this->game->incStat($value, $name, $pId);
     }
   }
 
@@ -66,40 +99,38 @@ class SantoriniLog extends APP_GameClass
    *   - $playerId: the player who is making the action
    *   - $pieceId : the piece whose is making the action
    *   - string $action : the name of the action
+   *   - array $stats: game statistics simple array (e.g. [ ['table', 'move'], ['287392', 'usePower'], ... ]
    *   - array $args : action arguments (eg space)
    */
-  public function insert($playerId, $pieceId, $action, $args = [])
+  public function insert($playerId, $pieceId, $action, $stats = [], $args = [])
   {
     $playerId = $playerId == -1 ? $this->game->getActivePlayerId() : $playerId;
     $round = $this->game->getGameStateValue("currentRound");
     $moveId = self::getUniqueValueFromDB("SELECT `global_value` FROM `global` WHERE `global_id` = 3");
 
     if ($action == 'move') {
-      $args['stats'] = [
-        'table' => ['move'],
-        $playerId => ['move'],
-      ];
+      $stats[] = ['table', 'move'];
+      $stats[] = [$playerId, 'move'];
       if ($args['to']['z'] > $args['from']['z']) {
-        $args['stats'][$playerId][] = 'moveUp';
+        $stats[] = [$playerId, 'moveUp'];
       } else if ($args['to']['z'] < $args['from']['z']) {
-        $args['stats'][$playerId][] = 'moveDown';
+        $stats[] = [$playerId, 'moveDown'];
       }
     } else if ($action == 'build') {
       $statName = $args['to']['arg'] == 3 ? 'buildDome' : 'buildBlock';
-      $args['stats'] = [
-        'table' => [$statName],
-        $playerId => [$statName],
-      ];
+      $stats[] = ['table', $statName];
+      $stats[] = [$playerId, $statName];
     }
-    if (array_key_exists('stats', $args)) {
-      $this->incrementStats($args['stats']);
+    if (!empty($stats)) {
+      $this->incrementStats($stats);
+      $args['stats'] = $stats;
     }
 
     $actionArgs = json_encode($args);
 
     // TODO : remove
     $test = self::getUniqueValueFromDB("SHOW COLUMNS FROM log WHERE Field = 'move_id'");
-    if(is_null($test)){
+    if (is_null($test)) {
       self::DbQuery("ALTER TABLE `log` ADD `move_id` INT(11) NOT NULL DEFAULT 0");
     }
 
@@ -118,55 +149,55 @@ class SantoriniLog extends APP_GameClass
   /*
    * addWork: add a new work entry to log
    */
-  private function addWork($piece, $to, $action)
+  private function addWork($piece, $to, $action, $stats = [])
   {
     $args = [
       'from' => $this->game->board->getCoords($piece),
       'to'   => $to,
     ];
-    $this->insert(-1, $piece['id'], $action, $args);
+    $this->insert(-1, $piece['id'], $action, $stats, $args);
   }
 
   /*
    * addMove: add a new move entry to log
    */
-  public function addMove($piece, $space)
+  public function addMove($piece, $space, $stats = [])
   {
-    $this->addWork($piece, $space, 'move');
+    $this->addWork($piece, $space, 'move', $stats);
   }
 
   /*
    * addBuild: add a new build entry to log
    */
-  public function addBuild($piece, $space)
+  public function addBuild($piece, $space, $stats = [])
   {
-    $this->addWork($piece, $space, 'build');
+    $this->addWork($piece, $space, 'build', $stats);
   }
 
   /*
    * addForce: add a new forced move entry to log (eg. Appolo or Minotaur)
    */
-  public function addForce($piece, $space)
+  public function addForce($piece, $space, $stats = [])
   {
-    $this->addWork($piece, $space, 'force');
+    $this->addWork($piece, $space, 'force', $stats);
   }
 
 
   /*
    * addRemoval: add a piece removal entry to log (eg. Bia or Ares)
    */
-  public function addRemoval($piece)
+  public function addRemoval($piece, $stats = [])
   {
-    $this->insert(-1, $piece['id'], 'removal');
+    $this->insert(-1, $piece['id'], 'removal', $stats);
   }
 
 
   /*
    * addAction: add a new action to log
    */
-  public function addAction($action, $args = [])
+  public function addAction($action, $stats = [], $args = [])
   {
-    $this->insert(-1, 0, $action, $args);
+    $this->insert(-1, 0, $action, $stats, $args);
   }
 
 
@@ -195,6 +226,7 @@ class SantoriniLog extends APP_GameClass
       $args = json_decode($work['action_arg'], true);
       return [
         'action' => $work['action'],
+        'moveId' => $work['move_id'],
         'pieceId' => $work['piece_id'],
         'from' => $args['from'],
         'to' => $args['to'],
@@ -325,12 +357,12 @@ class SantoriniLog extends APP_GameClass
 
       if (array_key_exists('stats', $args)) {
         // Undo statistics
-        $this->incrementStats($args['stats'], -1);
+        $this->incrementStats($args['stats'], true);
       }
 
       $ids[] = intval($log['log_id']);
       if ($log['action'] != 'startTurn') {
-        $moveIds[] = array_key_exists('move_id', $log)? intval($log['move_id']) : 0; // TODO remove the array_key_exists
+        $moveIds[] = array_key_exists('move_id', $log) ? intval($log['move_id']) : 0; // TODO remove the array_key_exists
       }
     }
 
@@ -339,7 +371,7 @@ class SantoriniLog extends APP_GameClass
 
     // TODO : remove
     $test = self::getUniqueValueFromDB("SHOW COLUMNS FROM gamelog WHERE Field = 'cancel'");
-    if(is_null($test)){
+    if (is_null($test)) {
       self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
     }
 
@@ -354,15 +386,8 @@ class SantoriniLog extends APP_GameClass
   public function getCancelMoveIds()
   {
     // TODO : remove
-    $test = self::DbQuery("SHOW COLUMNS FROM gamelog WHERE Field = 'cancel'");
-    if(empty($test)){
-      self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
-    }
-
-
-    // TODO : remove
     $test = self::getUniqueValueFromDB("SHOW COLUMNS FROM gamelog WHERE Field = 'cancel'");
-    if(is_null($test)){
+    if (is_null($test)) {
       self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
     }
 

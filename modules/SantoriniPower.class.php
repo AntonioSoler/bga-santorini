@@ -172,7 +172,6 @@ abstract class SantoriniPower extends APP_GameClass
     return null;
   }
 
-  //  public function stateEndOfTurn()  { return null; }
   public function endPlayerTurn()
   {
   }

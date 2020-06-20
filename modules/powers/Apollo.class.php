@@ -46,10 +46,11 @@ class Apollo extends SantoriniPower
     }
 
     // Switch workers
+    $stats = [[$this->playerId, 'usePower']];
     $this->game->board->setPieceAt($worker, $worker2);
     $this->game->log->addMove($worker, $worker2);
     $this->game->board->setPieceAt($worker2, $worker);
-    $this->game->log->addForce($worker2, $worker);
+    $this->game->log->addForce($worker2, $worker, $stats);
 
     // Notify
     $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${power_name}: ${player_name} forces a swap with ${player_name2}'), [

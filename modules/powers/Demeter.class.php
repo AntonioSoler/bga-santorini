@@ -36,9 +36,13 @@ class Demeter extends SantoriniPower
     });
   }
 
-
   public function stateAfterBuild()
   {
-    return count($this->game->log->getLastBuilds()) == 1 ? 'buildAgain' : null;
+    $count = count($this->game->log->getLastBuilds());
+    if ($count > 1) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
+    return $count == 1 ? 'buildAgain' : null;
   }
 }

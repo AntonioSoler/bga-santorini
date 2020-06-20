@@ -24,7 +24,7 @@ class Athena extends SantoriniPower
   {
     // Handle vs Circe and Chaos
     $action = self::getObjectFromDb("SELECT * FROM log WHERE (`action` = 'move' AND `player_id` = {$this->playerId}) OR (`action` IN  ('stealPower', 'returnPower', 'powerChanged')) ORDER BY log_id DESC LIMIT 1");
-    if($action != null && $action['action'] != 'move'){
+    if ($action != null && $action['action'] != 'move') {
       return false;
     }
 
@@ -32,6 +32,14 @@ class Athena extends SantoriniPower
     return array_reduce($moves, function ($movedUp, $move) {
       return $movedUp || $move['to']['z'] > $move['from']['z'];
     }, false);
+  }
+
+  public function afterPlayerMove($worker, $work)
+  {
+    if ($this->hasMovedUp()) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
   }
 
   public function argOpponentMove(&$arg)

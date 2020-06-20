@@ -19,7 +19,8 @@ class Hypnus extends SantoriniPower
   }
 
   /* * */
-  protected static function cmpZ($worker1, $worker2){
+  protected static function cmpZ($worker1, $worker2)
+  {
     if ($worker1['z'] == $worker2['z'])
       return 0;
     return ($worker1['z'] > $worker2['z']) ? -1 : 1;
@@ -28,16 +29,16 @@ class Hypnus extends SantoriniPower
   public function startOpponentTurn()
   {
     // If at least two workers remeaining
-    foreach($this->game->playerManager->getOpponents($this->playerId) as $opponent){
+    foreach ($this->game->playerManager->getOpponents($this->playerId) as $opponent) {
       $workers = $this->game->board->getPlacedWorkers($opponent->getId());
-      if (count($workers) < 2){
+      if (count($workers) < 2) {
         continue;
       }
 
       // Sort them by height and see if first one is strictly higher
       usort($workers, 'self::cmpZ');
-      if(self::cmpZ($workers[0], $workers[1]) != 0){
-        $this->game->log->addAction('blockedWorker', ['wId' => $workers[0]['id'] ]);
+      if (self::cmpZ($workers[0], $workers[1]) != 0) {
+        $this->game->log->addAction('blockedWorker', [], ['wId' => $workers[0]['id']]);
       }
     }
   }
@@ -45,7 +46,7 @@ class Hypnus extends SantoriniPower
   public function argOpponentMove(&$arg)
   {
     $action = $this->game->log->getLastAction('blockedWorker');
-    if($action != null){
+    if ($action != null) {
       Utils::filterWorkersById($arg, $action['wId'], false);
     }
   }

@@ -66,4 +66,12 @@ class Prometheus extends SantoriniPower
     // TODO : check the state is "build" ?
     return is_null($this->game->log->getLastMove()) ? 'move' : null;
   }
+
+  public function endPlayerTurn()
+  {
+    if (count($this->game->log->getLastBuilds($this->playerId)) > 1) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
+  }
 }
