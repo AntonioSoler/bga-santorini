@@ -296,11 +296,14 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 
+#power-choose-container .power-detail {
+  transition: transform 250ms ease;
+}
 #power-choose-container .power-detail.clickable {
   cursor: pointer;
 }
 #power-choose-container .power-detail.clickable:hover {
-  transform:scale(1.1);
+  transform: scale(1.05);
 }
 
 #power-offer-container {
