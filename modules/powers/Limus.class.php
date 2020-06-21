@@ -37,4 +37,12 @@ class Limus extends SantoriniPower
       });
     }
   }
+
+  public function endOpponentTurn()
+  {
+    // No accurate way to calculate 'usePower' stat, so just count opponent turns
+    // (e.g., without Limus,  the opponent may have made a different move/build)
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->log->addAction('stats', $stats);
+  }
 }

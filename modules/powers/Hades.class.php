@@ -19,12 +19,19 @@ class Hades extends SantoriniPower
   }
 
   /* * */
+
   public function argOpponentMove(&$arg)
   {
     // Useful against Dionysus
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
-    Utils::filterWorksUnlessMine($arg, $myWorkers, function ($space, $worker){
+    Utils::filterWorksUnlessMine($arg, $myWorkers, function ($space, $worker) {
       return $space['z'] >= $worker['z'];
     });
+  }
+
+  public function endOpponentTurn()
+  {
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->log->addAction('stats', $stats);
   }
 }
