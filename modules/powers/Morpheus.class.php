@@ -65,7 +65,6 @@ class Morpheus extends SantoriniPower
     return false;
   }
 
-
   public function afterPlayerBuild($worker, $work)
   {
     $this->updateUI();
@@ -74,5 +73,14 @@ class Morpheus extends SantoriniPower
   public function stateAfterBuild()
   {
     return $this->computeStock() > 0 ? 'buildAgain' : null;
+  }
+
+  public function endPlayerTurn()
+  {
+    $value = abs(count($this->game->log->getLastBuilds()) - 1);
+    if ($value != 0) {
+      $stats = [[$this->playerId, 'usePower', $value]];
+      $this->game->log->addAction('stats', $stats);
+    }
   }
 }

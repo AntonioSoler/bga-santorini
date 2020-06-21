@@ -52,4 +52,14 @@ class Selene extends SantoriniPower
       $this->updateBuildArg($worker, $worker['id'] == $move['pieceId']);
     }
   }
+
+  public function playerBuild($worker, $work)
+  {
+    $move = $this->game->log->getLastMove();
+    if (substr($worker['type_arg'], 0, 1) == 'f' && $work['arg'] == 3 && ($work['z'] != 3 || $worker['id'] != $move['pieceId'])) {
+      // Female built dome on non-standard level or without moving
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+    }
+  }
 }

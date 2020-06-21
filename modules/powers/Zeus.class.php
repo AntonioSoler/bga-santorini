@@ -52,10 +52,10 @@ class Zeus extends SantoriniPower
     $this->game->log->addForce($worker, $space);
 
     // Build under it
-    $pId = $this->game->getActivePlayerId();
+    $stats = [[$this->playerId, 'usePower']];
     $type = 'lvl' . $work['arg'];
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$work['x']}', '{$work['y']}', '{$work['z']}') ");
-    $this->game->log->addBuild($worker, $work);
+    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$this->playerId', '$type', 'board', '{$work['x']}', '{$work['y']}', '{$work['z']}') ");
+    $this->game->log->addBuild($worker, $work, $stats);
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");

@@ -18,7 +18,7 @@ class Persephone extends SantoriniPower
     $this->implemented = true;
   }
 
-/*
+  /*
 DISCLAIMER :
 This is a very basic version of Persephone that will not work against power that may move more than once (or that may free some space using their power)
 That is why I added some banned matchups that are not in the rulebook.
@@ -38,8 +38,10 @@ If one wants to improve this, it will also have to change Triton behaviour : alr
       }
     }
 
-    if($canMoveUp){
-      Utils::filterWorks($arg, function($space, $worker){
+    if ($canMoveUp) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
+      Utils::filterWorks($arg, function ($space, $worker) {
         return $space['z'] > $worker['z'];
       });
     }
