@@ -42,7 +42,10 @@ class Aphrodite extends SantoriniPower
       }
     }
 
-    $this->game->log->addAction('forcedWorkers', [], ['workers' => $forcedWorkers]);
+    if (!empty($forcedWorkers)) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('forcedWorkers', $stats, ['workers' => $forcedWorkers]);
+    }
   }
 
 
@@ -58,7 +61,7 @@ class Aphrodite extends SantoriniPower
   public function canFinishHere($worker, $space)
   {
     $forcedWorkers = $this->getForcedWorkers();
-    return $forcedWorkers == null || (!in_array($worker['id'], $forcedWorkers)) || $this->isNeighbouring($space);
+    return $forcedWorkers == null || !in_array($worker['id'], $forcedWorkers) || $this->isNeighbouring($space);
   }
 
   public function argOpponentMove(&$arg)

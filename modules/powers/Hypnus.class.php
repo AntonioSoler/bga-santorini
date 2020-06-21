@@ -38,7 +38,8 @@ class Hypnus extends SantoriniPower
       // Sort them by height and see if first one is strictly higher
       usort($workers, 'self::cmpZ');
       if (self::cmpZ($workers[0], $workers[1]) != 0) {
-        $this->game->log->addAction('blockedWorker', [], ['wId' => $workers[0]['id']]);
+        $stats = [[$this->playerId, 'usePower']];
+        $this->game->log->addAction('blockedWorker', $stats, ['wId' => $workers[0]['id']]);
       }
     }
   }

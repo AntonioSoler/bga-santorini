@@ -57,9 +57,9 @@ class Dionysus extends SantoriniPower
     if ($work['z'] == 3) {
       $action = $this->game->log->getLastAction("additionalTurn");
       $n = $action == null ? 0 : ($action['n'] + 1);
-      $this->game->log->addAction("towerCompleted", [], ['n' => $n]);
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction("towerCompleted", $stats , ['n' => $n]);
     }
-
     return false;
   }
 
