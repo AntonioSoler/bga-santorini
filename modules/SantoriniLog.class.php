@@ -62,7 +62,7 @@ class SantoriniLog extends APP_GameClass
     // $this->game->notifyAllPlayers('message', "incrementStats: " . json_encode($stats, JSON_PRETTY_PRINT), []);
     foreach ($stats as $stat) {
       if (!is_array($stat)) {
-        throw new BgaVisibleSystemException("Game statistics error: Not an array");
+        throw new BgaVisibleSystemException("incrementStats: Not an array");
       }
 
       $pId = $stat[0];
@@ -72,7 +72,7 @@ class SantoriniLog extends APP_GameClass
 
       $name = $stat[1];
       if (empty($name)) {
-        throw new BgaVisibleSystemException("Game statistics error: Missing name");
+        throw new BgaVisibleSystemException("incrementStats: Missing name");
       }
 
       $value = 1;
@@ -353,6 +353,10 @@ class SantoriniLog extends APP_GameClass
       } else if ($log['action'] == 'removal') {
         // Removal : put the piece back on the board
         self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$log['piece_id']}");
+      } else if ($log['action'] == 'powerRemoved' && $args['reason'] == 'hero') {
+        // Discard hero power : put the power back
+        $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
+        $this->game->powerManager->addPower($power, 'hero');
       }
 
       if (array_key_exists('stats', $args)) {

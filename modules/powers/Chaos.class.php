@@ -42,19 +42,11 @@ class Chaos extends SantoriniPower
   }
 
 
-
   public function pickNewPower()
   {
     $card = $this->game->powerManager->cards->pickCard('deck', $this->playerId);
-    $power = $this->game->powerManager->getPower($card['id']);
-    $this->game->log->addAction('powerChanged');
-    $this->game->notifyAllPlayers('powersChanged', clienttranslate('${power_name}: ${player_name} has a new power : ${power_name2}'), [
-      'i18n' => ['power_name', 'power_name2'],
-      'power_name' => $this->getName(),
-      'power_name2' => $power->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-      'fplayers' => $this->game->playerManager->getUiData(),
-    ]);
+    $power = $this->game->powerManager->getPower($card['id'], $this->playerId);
+    $this->game->powerManager->addPower($power, 'chaos');
     $this->updateUI();
   }
 
@@ -89,10 +81,10 @@ class Chaos extends SantoriniPower
       return;
     }
 
-    // Discard current
-    foreach ($this->game->playerManager->getPlayer($this->playerId)->getPowers() as $power) {
-      if ($power->getId() != $this->getId()) {
-        $this->game->powerManager->cards->moveCard($power->getId(), 'discard');
+    // Discard current Simple God power
+    foreach ($this->getPlayer()->getPowers() as $power) {
+      if ($power->isSimple()) {
+        $this->game->powerManager->removePower($power, 'chaos');
       }
     }
 

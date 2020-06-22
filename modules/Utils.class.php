@@ -140,4 +140,11 @@ abstract class Utils extends APP_GameClass
       return intval($work['moveId']);
     }, $works);
   }
+
+  public static function getPowerIds($powers)
+  {
+    return array_map(function ($power) {
+      return intval($power->getId());
+    }, $powers);
+  }
 }

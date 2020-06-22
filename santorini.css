@@ -374,13 +374,13 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 
-#play-area .power-card.golden {
+#power-ram {
   position:absolute;
   top:50px;
   right:2px;
 }
 
-#play-area .power-card.golden::after {
+#power-ram::after {
   content: '';
   display: block;
   background-image: url('img/ram.png');
@@ -561,38 +561,35 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     line-height: 18px;
 }
 
-
-#power-choose-container .power-detail .first {
+.power-counter {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
+  width: 25px;
+  height: 25px;
+  border-radius: 100%;
   color: white;
-  background-color: #25a1e7;
-  border-radius: 15px;
-  border: 1px solid black;
-  text-align: center;
-  line-height: 27px;
-  font-size: 18px;
+  background-color: #01579b;
+  line-height: 25px;
+  font-size: 15px;
   font-weight: bold;
-  z-index:5;
+  text-align: center;
 }
 
-.mini-card .power-counter {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 28px;
-  height: 28px;
-  color: white;
-  background-color: #25a1e7;
-  border-radius: 15px;
-  border: 1px solid black;
-  text-align: center;
-  line-height: 27px;
-  font-size: 18px;
-  font-weight: bold;
+/* Chaos: on top of the deck */
+.mini-card.power-14 .power-counter {
+  top: 75px;
+  left: 130px;
+}
+
+/* Morpheus: on top of the equal sign */
+.mini-card.power-25 .power-counter {
+  top: 40px;
+  left: 174px;
+}
+
+/* First player marker */
+#power-choose-container .power-detail .power-counter {
+  top: 7px;
+  right: 7px;
 }
 
 /* Cancelled notification messages */

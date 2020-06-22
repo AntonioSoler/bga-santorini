@@ -11,4 +11,11 @@ abstract class SantoriniHeroPower extends SantoriniPower
   {
     return false;
   }
+
+  public function preEndPlayerTurn()
+  {
+    if ($this->game->log->getLastAction('heroPower') != null) {
+      $this->game->powerManager->removePower($this, 'hero');
+    }
+  }
 }

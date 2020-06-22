@@ -94,39 +94,17 @@ class SantoriniPlayer extends APP_GameClass
         return $this->powers;
     }
 
-    public function addPower($powerId = null)
+    public function addPlayerPower($power)
     {
-        if (empty($powerId)) {
-            // Draw the next card from the deck
-            $powerId = ($this->game->powerManager->cards->pickCard('deck', $this->id))['id'];
-        } else {
-            // Draw a specific card
-            $card = $this->game->powerManager->cards->getCard($powerId);
-            if ($card['location_arg'] == 1) {
-                $this->game->setGameStateValue('firstPlayer', $this->id);
-            }
-            $this->game->powerManager->cards->moveCard($powerId, 'hand', $this->id);
-            if (count($this->powers) == 0) {
-                // Record the power ID in game statistics
-                $this->game->setStat($powerId, 'playerPower', $this->id);
-            }
-        }
-        $power = $this->game->powerManager->getPower($powerId, $this->id);
         $this->powers[] = $power;
+        $power->setPlayerId($this->getId());
+    }
 
-        // Notify
-        $this->game->notifyAllPlayers('powerAdded', clienttranslate('${player_name} receives ${power_name}, ${power_title}'), [
-            'i18n' => ['power_name', 'power_title'],
-            'player_id' => $this->getId(),
-            'player_name' => $this->getName(),
-            'power_id' => $power->getId(),
-            'power_name' => $power->getName(),
-            'power_title' => $power->getTitle(),
-        ]);
-
-        // Setup power
-        $power->setup();
-        return $power;
+    public function removePlayerPower($power)
+    {
+        $this->powers = array_filter($this->powers, function ($p) use ($power) {
+            return $p->getId() != $power->getId();
+        });
     }
 
     /*

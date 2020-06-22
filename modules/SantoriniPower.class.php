@@ -78,6 +78,11 @@ abstract class SantoriniPower extends APP_GameClass
         || ($optionPowers == GOLDEN_FLEECE && $this->isGoldenFleece()));
   }
 
+  public function setPlayerId($newPlayerId)
+  {
+    $this->playerId = $newPlayerId;
+  }
+
   public function getPlayer()
   {
     return $this->game->playerManager->getPlayer($this->playerId);
@@ -94,50 +99,55 @@ abstract class SantoriniPower extends APP_GameClass
   public function argPlayerPlaceWorker(&$arg)
   {
   }
+
   public function argOpponentPlaceWorker(&$arg)
   {
   }
-
 
   public function stateStartOfTurn()
   {
     return null;
   }
+
   public function startPlayerTurn()
   {
   }
+
   public function startOpponentTurn()
   {
   }
 
-
   public function argUsePower(&$arg)
   {
   }
+
   public function stateAfterUsePower()
   {
     return null;
   }
+
   public function stateAfterSkipPower()
   {
     return null;
   }
 
-
-
   public function argPlayerMove(&$arg)
   {
   }
+
   public function argOpponentMove(&$arg)
   {
   }
+
   public function playerMove($worker, $work)
   {
     return false;
   }
+
   public function afterPlayerMove($worker, $work)
   {
   }
+
   public function afterOpponentMove($worker, $work)
   {
   }
@@ -145,9 +155,11 @@ abstract class SantoriniPower extends APP_GameClass
   public function argPlayerBuild(&$arg)
   {
   }
+
   public function argOpponentBuild(&$arg)
   {
   }
+
   public function playerBuild($worker, $work)
   {
     return false;
@@ -155,6 +167,7 @@ abstract class SantoriniPower extends APP_GameClass
   public function afterPlayerBuild($worker, $work)
   {
   }
+
   public function afterOpponentBuild($worker, $work)
   {
   }
@@ -163,21 +176,33 @@ abstract class SantoriniPower extends APP_GameClass
   {
     return null;
   }
+
   public function stateAfterBuild()
   {
     return null;
   }
+
   public function stateAfterSkip()
   {
     return null;
   }
 
+  public function preEndPlayerTurn()
+  {
+  }
+
+  public function preEndOpponentTurn()
+  {
+  }
+
   public function endPlayerTurn()
   {
   }
+
   public function endOpponentTurn()
   {
   }
+
   public function stateEndOfTurn()
   {
     return null;
@@ -186,6 +211,7 @@ abstract class SantoriniPower extends APP_GameClass
   public function checkPlayerWinning(&$arg)
   {
   }
+
   public function checkOpponentWinning(&$arg)
   {
   }

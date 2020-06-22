@@ -177,7 +177,7 @@ class santorini extends Table
   {
     self::checkAction('addOffer');
     if (in_array($powerId, $this->powerManager->computeBannedIds())) {
-      throw new BgaUserException("This power is not compatible with some already selected powers");
+      throw new BgaUserException(_("This power is not compatible with some already selected powers"));
     }
 
     $this->powerManager->addOffer($powerId);
@@ -208,11 +208,11 @@ class santorini extends Table
     }
 
     // Send notification message
-    $msg = clienttranslate('${player_name} offers ${power_name1} and ${power_name2} for selection');
+    $msg = clienttranslate('${player_name} offers powers ${power_name1} and ${power_name2} for selection');
     if ($n == 3) {
-      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
+      $msg = clienttranslate('${player_name} offers powers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
     } else if ($n == 4) {
-      $msg = clienttranslate('${player_name} offers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
+      $msg = clienttranslate('${player_name} offers powers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
     }
     $args = [
       'i18n' => [],
@@ -319,7 +319,8 @@ class santorini extends Table
       $this->powerManager->prepareGoldenFleece($powerId);
     } else {
       $player = $this->playerManager->getPlayer();
-      $power = $player->addPower($powerId);
+      $power = $this->powerManager->getPower($powerId, $player->getId());
+      $power = $this->powerManager->addPower($power, 'setup');
     }
     $this->gamestate->nextState('done');
   }
@@ -410,7 +411,7 @@ class santorini extends Table
 
     $stateArgs = $this->gamestate->state()['args'];
     if ($stateArgs['worker']['id'] != $workerId) {
-      throw new BgaVisibleSystemException('You cannot place this piece');
+      throw new BgaUserException(_('You cannot place this piece'));
     }
 
     $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
@@ -481,9 +482,17 @@ class santorini extends Table
     $this->gamestate->nextState('confirm');
   }
 
+  /*
+   * stPreEndOfTurn: called at the end of each player turn, before the player confirms
+   */
+  public function stPreEndOfTurn()
+  {
+    // Apply power
+    $this->powerManager->preEndOfTurn();
+  }
 
   /*
-   * stEndOfTurn: called at the end of each player turn
+   * stEndOfTurn: called at the end of each player turn, after the player confirms
    */
   public function stEndOfTurn()
   {
@@ -656,7 +665,7 @@ class santorini extends Table
 
     $state = $this->powerManager->stateAfterUsePower();
     if ($state == null) {
-      throw new BgaUserException(_("Don't know what to do after the use of power"));
+      throw new BgaVisibleSystemException("stateAfterUsePower: Missing next state");
     }
     $this->gamestate->nextState($state);
   }
@@ -679,7 +688,7 @@ class santorini extends Table
     // Apply power
     $state = $this->powerManager->stateAfterSkipPower();
     if ($state == null) {
-      throw new BgaUserException(_("Don't know what to do after the skip of power"));
+      throw new BgaVisibleSystemException("stateAfterSkipPower: Missing next state");
     }
     $this->gamestate->nextState($state);
   }

@@ -100,7 +100,7 @@ class PowerManager extends APP_GameClass
     [CIRCE, NYX],
     [CIRCE, PROTEUS],
     [CIRCE, TARTARUS],
-    // Additional, ban Circle and any hero
+    // Additionally, ban Circe and any hero
     [CIRCE, ACHILLES],
     [CIRCE, ADONIS],
     [CIRCE, ATALANTA],
@@ -162,7 +162,7 @@ class PowerManager extends APP_GameClass
   public function getPower($powerId, $playerId = null)
   {
     if (!isset(self::$classes[$powerId])) {
-      throw new BgaVisibleSystemException("Power $powerId is not implemented ($playerId)");
+      throw new BgaVisibleSystemException("getPower: Unknown power $powerId (player: $playerId)");
     }
     return new self::$classes[$powerId]($this->game, $playerId);
   }
@@ -270,7 +270,7 @@ class PowerManager extends APP_GameClass
       }
       $powerIds = $offer;
       if (count($powerIds) != $count) {
-        throw new BgaVisibleSystemException("Wrong number of powers during setup (expected: $count, actual: " . count($powerIds) . ")");
+        throw new BgaVisibleSystemException("preparePowers: Wrong number of powers (expected: $count, actual: " . count($powerIds) . ")");
       }
     }
 
@@ -421,7 +421,7 @@ class PowerManager extends APP_GameClass
   {
     $ram = $this->game->board->getRam();
     $power = $this->getGoldenFleecePower();
-    foreach($this->game->playerManager->getPlayers() as $player){
+    foreach ($this->game->playerManager->getPlayers() as $player) {
       $playerId = $player->getId();
       $workers = $this->game->board->getPlacedWorkers($playerId);
       Utils::filterWorkers($workers, function ($worker) use ($ram) {
@@ -433,24 +433,96 @@ class PowerManager extends APP_GameClass
       // Neighbouring ram => gain power
       if (count($workers) > 0 && count($playerGoldenFleeceCards) == 0) {
         $this->cards->pickCard('ram', $playerId);
-        $this->game->log->addAction('powerChanged');
-        $this->game->notifyAllPlayers('powersChanged', clienttranslate('Golden Fleece: ${player_name} gains the power of ${power_name}'), [
-          'i18n' => ['power_name'],
-          'power_name' => $power->getName(),
-          'player_name' => $player->getName(),
-          'fplayers' => $this->game->playerManager->getUiData(),
-        ]);
+        $this->notifyPower($player, $power, 'powerAdded', 'ram');
       } else if (count($workers) == 0 && count($playerGoldenFleeceCards) > 0) {
         $this->cards->moveCard($playerGoldenFleeceCards[0]['id'], 'ram');
-        $this->game->log->addAction('powerChanged');
-        $this->game->notifyAllPlayers('powersChanged', clienttranslate('Golden Fleece: ${player_name} loses the power of ${power_name}'), [
-          'i18n' => ['power_name'],
-          'power_name' => $power->getName(),
-          'player_name' => $player->getName(),
-          'fplayers' => $this->game->playerManager->getUiData(),
-        ]);
+        $this->notifyPower($player, $power, 'powerRemoved', 'ram');
       }
     }
+  }
+
+  public function addPower($power, $reason = null)
+  {
+    $player = $power->getPlayer();
+    if ($player == null) {
+      throw new BgaVisibleSystemException("addPower: Missing player (powerId: {$power->getId()})");
+    }
+    if ($reason == 'setup') {
+      // Check the card for first player indicator
+      $card = $this->game->powerManager->cards->getCard($power->getId());
+      if ($card['location_arg'] == 1) {
+        $this->game->setGameStateValue('firstPlayer', $player->getId());
+      }
+      if (count($player->getPowers()) == 0) {
+        // Record the power ID in game statistics
+        $this->game->setStat($power->getId(), 'playerPower', $player->getId());
+      }
+    }
+    if ($reason == 'setup' || $reason == 'hero') {
+      // Draw the card
+      $this->game->powerManager->cards->moveCard($power->getId(), 'hand', $player->getId());
+    }
+    $this->notifyPower($player, $power, 'powerAdded', $reason);
+    $player->addPlayerPower($power);
+    $power->setup();
+  }
+
+  public function removePower($power, $reason = null)
+  {
+    $player = $power->getPlayer();
+    if ($player == null) {
+      throw new BgaVisibleSystemException("removePower: Missing player (powerId: {$power->getId()})");
+    }
+    $moveTo = $reason == 'chaos' ? 'discard' : 'box';
+    $this->cards->moveCard($power->getId(), $moveTo);
+    $this->notifyPower($player, $power, 'powerRemoved', $reason);
+    $player->removePlayerPower($power);
+  }
+
+
+  public function movePower($power, $newPlayer, $reason = null)
+  {
+    if ($newPlayer == null) {
+      throw new BgaVisibleSystemException("movePower: Missing new player (powerId: {$power->getId()})");
+    }
+    $oldPlayer = $power->getPlayer();
+    if ($oldPlayer == null) {
+      throw new BgaVisibleSystemException("movePower: Missing old player (powerId: {$power->getId()})");
+    }
+    $this->game->powerManager->cards->moveCard($power->getId(), 'hand', $newPlayer->getId());
+    $this->notifyPower($newPlayer, $power, 'powerMoved', $reason);
+    $oldPlayer->removePlayerPower($power);
+    $newPlayer->addPlayerPower($power);
+  }
+
+  private function notifyPower($player, $power, $action = 'powerAdded', $reason = null)
+  {
+    $actionArgs['player_id'] = $player->getId();
+    $actionArgs['power_id'] = $power->getId();
+    $actionArgs['reason'] = $reason;
+    $this->game->log->addAction($action, [], $actionArgs);
+
+    $args = [
+      'i18n' => ['power_name'],
+      'player_id' => $player->getId(),
+      'player_name' => $player->getName(),
+      'power_id' => $power->getId(),
+      'power_name' => $power->getName(),
+      'reason' => $reason,
+    ];
+    $msg = '';
+    if ($action == 'powerAdded' && $reason != 'hero') {
+      // No notification message when cancelling hero power discard
+      $msg = clienttranslate('${player_name} gains power ${power_name}');
+    } else if ($action == 'powerRemoved') {
+      $msg = clienttranslate('${player_name} discards power ${power_name}');
+    } else if ($action == 'powerMoved') {
+      $oldPlayer = $power->getPlayer();
+      $args['player_id2'] = $oldPlayer->getId();
+      $args['player_name2'] = $oldPlayer->getName();
+      $msg = clienttranslate('${player_name} gains power ${power_name} from ${player_name2}');
+    }
+    $this->game->notifyAllPlayers($action, $msg, $args);
   }
 
 
@@ -544,7 +616,7 @@ class PowerManager extends APP_GameClass
    */
   public function stateAfterSkipPower()
   {
-    return $this->getNewState("stateAfterSkipPower", _("Can't figure next state after skip power"));
+    return $this->getNewState("stateAfterSkipPower");
   }
 
   /*
@@ -552,7 +624,7 @@ class PowerManager extends APP_GameClass
    */
   public function stateAfterUsePower()
   {
-    return $this->getNewState("stateAfterUsePower", _("Can't figure next state after use power"));
+    return $this->getNewState("stateAfterUsePower");
   }
 
 
@@ -679,15 +751,17 @@ class PowerManager extends APP_GameClass
    *   - after a work / skip
    *   - at the beggining of the turn
    */
-  public function getNewState($method, $msg)
+  public function getNewState($method)
   {
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
+    $powers = $player->getPowers();
     $r = array_values(array_filter(array_map(function ($power) use ($method) {
       return $power->$method();
-    }, $player->getPowers())));
+    }, $powers)));
     if (count($r) > 1) {
-      throw new BgaUserException($msg);
+      $powerIds = implode(', ', Utils::getPowerIds($powers));
+      throw new BgaVisibleSystemException("getNewState: Multiple values for $method (player: $playerId, power: $powerIds)");
     }
 
     if (count($r) == 1) {
@@ -706,7 +780,7 @@ class PowerManager extends APP_GameClass
   public function stateAfterWork($action)
   {
     $name = "stateAfter" . $action;
-    return $this->getNewState($name, _("Can't figure next state after action"));
+    return $this->getNewState($name);
   }
 
   /*
@@ -742,6 +816,19 @@ class PowerManager extends APP_GameClass
     $this->applyPower(["startPlayerTurn", "startOpponentTurn"], []);
   }
 
+  /*
+   * preEndOfTurn: called at the end of the turn, before the player confirms.
+   *   player can preview and cancel/undo (e.g., discard hero power)
+   */
+  public function preEndOfTurn()
+  {
+    $this->applyPower(["preEndPlayerTurn", "preEndOpponentTurn"], []);
+  }
+
+  /*
+   * endOfTurn: called at the end of the turn, after the player confirms.
+   *   player cannot preview (e.g., Chaos draw new power)
+   */
   public function endOfTurn()
   {
     $this->applyPower(["endPlayerTurn", "endOpponentTurn"], []);
@@ -753,7 +840,7 @@ class PowerManager extends APP_GameClass
    */
   public function stateStartOfTurn()
   {
-    return $this->getNewState('stateStartOfTurn', _("Can't figure next state at the beginning of the turn"));
+    return $this->getNewState('stateStartOfTurn');
   }
 
   /*
@@ -761,16 +848,15 @@ class PowerManager extends APP_GameClass
    */
   public function stateAfterSkip()
   {
-    return $this->getNewState('stateAfterSkip', _("Can't figure next state after a skip"));
+    return $this->getNewState('stateAfterSkip');
   }
 
-
   /*
-   * stateStartOfTurn: is called at the end of the player turn.
+   * stateStartOfTurn: is called at the end of the player turn, after the player confirms
    */
   public function stateEndOfTurn()
   {
-    return $this->getNewState('stateEndOfTurn', _("Can't figure next state at the end of the turn"));
+    return $this->getNewState('stateEndOfTurn');
   }
 
   /////////////////////////////////////
