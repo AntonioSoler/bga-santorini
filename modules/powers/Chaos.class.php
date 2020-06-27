@@ -29,7 +29,7 @@ class Chaos extends SantoriniPower
 
   public function computeDeck()
   {
-    return $this->game->powerManager->cards->countCardInLocation('deck');
+    return intval($this->game->powerManager->cards->countCardInLocation('deck'));
   }
 
   public function updateUI()
@@ -52,12 +52,13 @@ class Chaos extends SantoriniPower
 
   public function setup()
   {
-    // Remove all non simple gods
-    $cards = array_map(function ($card) {
-      return $card['id'];
-    }, $this->game->powerManager->cards->getCardsInLocation('deck'));
-    $this->game->powerManager->cards->moveCards($cards, 'box');
+    // Recreate the deck with just non-banned Simple Gods
+    $banned = $this->game->powerManager->computeBannedIds('hand');
+    $this->game->powerManager->cards->moveAllCardsInLocation('deck', 'box');
     for ($i = 1; $i <= 10; $i++) {
+      if (in_array($i, $banned)) {
+        continue;
+      }
       $card = $this->game->powerManager->cards->getCard($i);
       if ($card['location'] == 'box') {
         $this->game->powerManager->cards->moveCard($i, 'deck');

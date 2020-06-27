@@ -252,7 +252,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 		 */
     notif_updatePowerUI: function (n) {
       debug('Notif: updating power UI', n.args);
-      this.gamedatas.powers[powerId].counter = n.args.counter;
+      this.gamedatas.powers[n.args.powerId].counter = n.args.counter;
       var div = $('power-counter-' + n.args.playerId + "-" + n.args.powerId);
       if (div) {
         div.innerHTML = n.args.counter;
