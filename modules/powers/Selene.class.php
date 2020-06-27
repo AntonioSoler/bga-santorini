@@ -9,7 +9,7 @@ class Selene extends SantoriniPower
     $this->name  = clienttranslate('Selene');
     $this->title = clienttranslate('Goddess of the Moon');
     $this->text  = [
-      clienttranslate("[Your Build:] Instead of your normal build, your female Worker may build a dome at any level regardless of which Worker moved. ")
+      clienttranslate("[Instead of Your Build:] Your female Worker may build a dome at any level regardless of which Worker moved.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
@@ -19,24 +19,10 @@ class Selene extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerPlaceWorker(&$arg)
   {
     $arg['displayType'] = true;
-  }
-
-
-  protected function updateBuildArg(&$worker, $add)
-  {
-    foreach ($worker['works'] as &$work) {
-      if ($add) {
-        if (!in_array(3, $work['arg'])) {
-          $work['arg'][] = 3;
-        }
-      } else {
-        $work['arg'] = [3];
-        $work['dialog'] = true;
-      }
-    }
   }
 
   public function argPlayerBuild(&$arg)
@@ -50,7 +36,7 @@ class Selene extends SantoriniPower
     foreach ($fworkers as &$fworker) {
       $worker = &Utils::getWorkerOrCreate($arg, $fworker);
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
-      $this->updateBuildArg($worker, $worker['id'] == $move['pieceId']);
+      Utils::updateWorkerArgsBuildDome($worker, $worker['id'] == $move['pieceId']);
     }
   }
 

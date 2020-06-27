@@ -32,10 +32,7 @@ class Polyphemus extends SantoriniHeroPower
     $arg['skippable'] = true;
     $worker = $this->game->board->getPiece($builds[0]['pieceId']);
     $worker['works'] = $this->game->board->getAccessibleSpaces('build');
-    foreach ($worker['works'] as &$work) {
-      $work['arg'] = [3];
-      $work['dialog'] = true;
-    }
+    Utils::updateWorkerArgsBuildDome($worker, false);
     $arg['workers'] = [$worker];
   }
 

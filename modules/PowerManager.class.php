@@ -675,7 +675,7 @@ class PowerManager extends APP_GameClass
    * playerWork: is called whenever a player try to do some work (move/build).
    *    This is called after checking that the work is valid using argPlayerWork.
    *    This should return true if we want to bypass the usual work function:
-   *      eg, Appolo can 'switch' instead of 'move'
+   *      eg, Apollo can 'switch' instead of 'move'
    */
   public function playerWork($worker, $work, $action)
   {

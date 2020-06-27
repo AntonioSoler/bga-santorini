@@ -40,6 +40,20 @@ abstract class Utils extends APP_GameClass
     });
   }
 
+  // For Selene, Heracles, Polyphemus
+  public static function updateWorkerArgsBuildDome(&$worker, $add)
+  {
+    foreach ($worker['works'] as &$work) {
+      if ($add) {
+        if (!in_array(3, $work['arg'])) {
+          $work['arg'][] = 3;
+        }
+      } else {
+        $work['arg'] = [3];
+        $work['dialog'] = true;
+      }
+    }
+  }
 
 
 

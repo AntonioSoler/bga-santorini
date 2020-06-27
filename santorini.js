@@ -18,7 +18,7 @@
 	*/
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
-var isDebug = true;
+var isDebug = window.location.host == 'studio.boardgamearena.com';
 var debug = isDebug ? console.info.bind(window.console) : function () { };
 var isMobile = function () {
   var body = document.getElementById("ebd-body");
@@ -359,6 +359,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
     startActionTimer: function (buttonId) {
+      if (isDebug) {
+        debug('Ignoring startActionTimer(' + buttonId + ') because isDebug=true');
+        return;
+      }
+
       var _this = this;
       this.actionTimerLabel = $(buttonId).innerHTML;
       this.actionTimerSeconds = 15;
