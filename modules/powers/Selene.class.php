@@ -34,6 +34,7 @@ class Selene extends SantoriniPower
         }
       } else {
         $work['arg'] = [3];
+        $work['dialog'] = true;
       }
     }
   }

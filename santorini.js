@@ -984,7 +984,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onClickSpace: function (space) {
       if (space.arg == null) {
         return this.onClickSpaceArg(space, null);
-      } else if (space.arg.length == 1) {
+      } else if (space.arg.length == 1 && !space.dialog) {
         return this.onClickSpaceArg(space, space.arg[0]);
       }
       return this.dialogChooseArg(space);
