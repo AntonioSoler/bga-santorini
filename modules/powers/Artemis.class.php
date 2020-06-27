@@ -9,7 +9,7 @@ class Artemis extends SantoriniPower
     $this->name  = clienttranslate('Artemis');
     $this->title = clienttranslate('Goddess of the Hunt');
     $this->text  = [
-      clienttranslate("[Your Move:] Your [Worker] may [move] one additional time, but not back to its initial space.")
+      clienttranslate("[Your Move:] Your Worker may move one additional time, but not back to its initial space.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
