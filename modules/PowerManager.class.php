@@ -260,6 +260,9 @@ class PowerManager extends APP_GameClass
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
     if (($optionSetup == QUICK || $optionSetup == TOURNAMENT) && $optionPowers != GODS_AND_HEROES) {
       $count = $optionSetup == QUICK ? ($optionPowers == GOLDEN_FLEECE ? 1 : $nPlayers) : ($nPlayers + 1) * 2;
+      if (count($powerIds) < $count) {
+        throw new BgaVisibleSystemException("preparePowers: Not enough powers available (expected: $count, actual: " . count($powerIds) . ")");
+      }
       $offer = [];
       for ($i = 0; $i < $count; $i++) {
         $offer[] = $powerIds[array_rand($powerIds, 1)];
