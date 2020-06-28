@@ -531,6 +531,8 @@ class santorini extends Table
       $this->log->incrementStats($arg['winStats']);
     }
     if ($arg['win']) {
+      // Still call preEndOfTurn to calculate player statistics
+      $this->powerManager->preEndOfTurn();
       $this->announceWin($arg['pId']);
     }
     return $arg['win'];
@@ -585,10 +587,12 @@ class santorini extends Table
     $args['player_name'] = self::getActivePlayerName();
     self::notifyAllPlayers('message', $msg, $args);
 
+    // Still call preEndOfTurn to calculate player statistics
+    $this->powerManager->preEndOfTurn();
     $pId = self::getActivePlayerId();
     if ($this->playerManager->getPlayerCount() != 3) {
       // 1v1 or 2v2 => end of the game
-      self::announceWin($pId, false);
+      $this->announceWin($pId, false);
     } else {
       // 3 players => eliminate the player
       $this->gamestate->nextState("eliminate");
@@ -704,7 +708,7 @@ class santorini extends Table
   /*
    * argPlayerWork: init the works
    */
-  public function argPlayerWork($action, $workers = null, $torus = false)
+  public function argPlayerWork($action, $workers = null)
   {
     $arg = [
       'cancelable' => $this->log->getLastActions() != null,
@@ -714,9 +718,11 @@ class santorini extends Table
     if ($action == 'move') {
       $arg['mayMoveAgain'] = false;
     }
+    $player = $this->playerManager->getPlayer();
+    $powerIds = $player->getPowerIds();
 
     foreach ($arg['workers'] as &$worker) {
-      $worker["works"] = $this->board->getNeighbouringSpaces($worker, $action, $torus);
+      $worker["works"] = $this->board->getNeighbouringSpaces($worker, $action, $powerIds);
     }
     Utils::cleanWorkers($arg);
 

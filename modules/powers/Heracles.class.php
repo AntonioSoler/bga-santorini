@@ -49,7 +49,6 @@ class Heracles extends SantoriniHeroPower
 
   public function preEndPlayerTurn()
   {
-    $builds = $this->game->log->getLastBuilds($this->playerId);
     if ($this->didSpecialBuild()) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('heroPower', $stats);

@@ -89,9 +89,20 @@ class SantoriniPlayer extends APP_GameClass
         return array_key_exists($index, $this->powers) ? $this->powers[$index] : null;
     }
 
+    public function getPowerId($index = 0)
+    {
+        $power = $this->getPower($index);
+        return $power != null ? $power->getId() : null;
+    }
+
     public function getPowers()
     {
         return $this->powers;
+    }
+
+    public function getPowerIds()
+    {
+        return Utils::getPowerIds($this->powers);
     }
 
     public function addPlayerPower($power)

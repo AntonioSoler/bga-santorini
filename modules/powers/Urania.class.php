@@ -19,16 +19,6 @@ class Urania extends SantoriniPower
   }
 
   /* * */
-  public function argPlayerWork(&$arg, $action)
-  {
-    $arg = $this->game->argPlayerWork($action, $this->game->board->getPlacedWorkers($this->playerId), true);
-  }
-
-  public function argPlayerMove(&$arg)
-  {
-    $this->argPlayerWork($arg, 'move');
-  }
-
 
   public function playerMove($worker, $work)
   {
@@ -37,7 +27,7 @@ class Urania extends SantoriniPower
       return false;
     }
 
-    // Otherwise, do a forced then a move
+    // Otherwise, do a force then a move
     $dx = abs($worker['x'] - $work['x']) <= 1 ? 0 : ($worker['x'] < $work['x'] ? 1 : -1);
     $dy = abs($worker['y'] - $work['y']) <= 1 ? 0 : ($worker['y'] < $work['y'] ? 1 : -1);
     $space = [
@@ -54,15 +44,5 @@ class Urania extends SantoriniPower
     $this->game->playerMove($worker, $work, true);
 
     return true;
-  }
-
-  public function argPlayerBuild(&$arg)
-  {
-    $this->argPlayerWork($arg, 'build');
-
-    $move = $this->game->log->getLastMove();
-    if (!is_null($move)) {
-      Utils::filterWorkersById($arg, $move['pieceId']);
-    }
   }
 }
