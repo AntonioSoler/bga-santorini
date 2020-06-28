@@ -28,6 +28,8 @@ const highlightColor = 0x0012AA;
 const lvlHeights = [0, 1.24, 2.44, 3.25];
 const xCenters = [4.2, 2.12, -0.04, -2.12, -4.2];
 const zCenters = [4.15, 2.13, 0, -2.12, -4.2];
+const startPos = new THREE.Vector3(40, 24, 0);
+const enterPos = new THREE.Vector3(20, 24, 0);
 
 
 var Board = function (container, url) {
@@ -86,7 +88,7 @@ Board.prototype.initScene = function () {
 
 	// Camera
 	this._camera = new THREE.PerspectiveCamera(30, canvasWidth() / canvasHeight(), 1, isMobile() ? 250 : 150);
-	this._camera.position.set(40, 16, 0);
+	this._camera.position.copy(startPos);
 	this._camera.lookAt(new THREE.Vector3(0, 0, 0));
 
 	// Lights
@@ -123,9 +125,9 @@ Board.prototype.onLoad = function () {
 	this._cameraAngle = { theta: 0 };
 	var anim = Tween.get(this._cameraAngle, { loop: -1 }).to({ theta: 2 * Math.PI }, 35000, Ease.linear)
 		.addEventListener('change', () => {
-			this._camera.position.x = Math.cos(this._cameraAngle.theta) * 40;
-			this._camera.position.y = 16;
-			this._camera.position.z = Math.sin(this._cameraAngle.theta) * 40;
+			this._camera.position.x = Math.cos(this._cameraAngle.theta) * startPos.x;
+			this._camera.position.y = startPos.y;
+			this._camera.position.z = Math.sin(this._cameraAngle.theta) * startPos.x;
 			this._camera.lookAt(new THREE.Vector3(0, 0, 0));
 			this.render();
 		});
@@ -167,8 +169,7 @@ Board.prototype.enterScene = function () {
 		$('right-cloud').style.right = "-10vw";
 		$('santorini-overlay').style.opacity = "0";
 
-		var target = { x: this._camera.position.x * 0.5, y: 20, z: this._camera.position.z * 0.5 };
-		Tween.get(this._camera.position).to(target, 2000).addEventListener('change', () => {
+		Tween.get(this._camera.position).to(enterPos, 2000).addEventListener('change', () => {
 			this._camera.lookAt(new THREE.Vector3(0, 0, 0));
 			this.render();
 		});
