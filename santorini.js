@@ -49,15 +49,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var _this = this;
       debug('SETUP', gamedatas);
 
-      // Mobile fix position of card selection
-      // TODO this needs to happen AFTER the BGA adaptStatusBar()
-      dojo.connect(window, "scroll", this, this.onScroll.bind(this));
-
       // Setup the board (3d scene using threejs)
       dojo.place(this.format_block('jstpl_scene', {}), 'overall-content');
       this.board = new Board($('scene-container'), URL); // Setup player boards
       this.setupPreference();
-
 
       var target = document.getElementById('loader_mask');
       var observer = new MutationObserver(function (mutations) {
@@ -92,7 +87,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.setupNotifications();
     },
 
-
     setupPreference: function () {
       var _this = this;
       var preferenceSelect = $('preference_control_100');
@@ -101,7 +95,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         _this.board.toggleCoordsHelpers(value == 1);
       };
 
-      dojo.connect(preferenceSelect, 'onchange', updatePreference);;
+      dojo.connect(preferenceSelect, 'onchange', updatePreference);
       updatePreference();
     },
 
@@ -131,7 +125,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       }
     },
 
-    onScroll: function () {
+    adaptStatusBar: function adaptStatusBar() {
+      // Make power detail fixed match page title
+      this.inherited(adaptStatusBar, arguments);
       var isFixed = dojo.hasClass("page-title", "fixed-page-title");
       dojo.toggleClass("grid-detail", "fixed", isFixed);
     },
