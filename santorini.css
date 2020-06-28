@@ -54,7 +54,7 @@ html {
   width: 100vw;
   height: 100vh;
   z-index: 2;
-  transition: opacity 1s;
+  transition: opacity 1s ease;
   background-repeat: no-repeat;
   background-color: rgba(255,255,255,0.5);
   opacity: 0.7;
@@ -71,7 +71,7 @@ html {
   background-image:url('img/cloud-left.png');
   background-size:cover;
   background-position:right;
-  transition:left 2s;
+  transition: left 2s ease;
 }
 
 #right-cloud {
@@ -83,7 +83,7 @@ html {
   z-index:2;
   background-image:url('img/cloud-right.png');
   background-size:cover;
-  transition:right 2s;
+  transition: right 2s ease;
 }
 
 
@@ -126,7 +126,7 @@ html {
 #play-area-scaler #power-choose-container {
   z-index:2;
   opacity:0;
-  transition:opacity 3s;
+  transition: opacity 2s ease;
 }
 
 
@@ -375,9 +375,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 
 #power-ram {
-  position:absolute;
-  top:50px;
-  right:2px;
+  position: absolute;
+  top: 50px;
+  right: 2px;
+  margin: 0;
 }
 
 #power-ram::after {
@@ -515,7 +516,13 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     background-size: 125%;
     background-position: 50% 20%;
     border-radius: 8px;
-    margin: 6px;
+    margin: 10px;
+}
+
+@media (max-width: 1200px) {
+  .power-card.small {
+    margin: 4px;
+  }
 }
 
 .power-card.small.wait {

@@ -63,6 +63,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       observer.observe(target, { attributes: true, attributeFilter: ['style'] });
 
       // Setup powers
+      // Add sort order by translated name
+      Object.values(gamedatas.powers)
+        .sort((power1, power2) => _(power1.name).localeCompare(_(power2.name)))
+        .forEach((power, index) => power.sort = index);
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
         player.powers.forEach(function (powerId) {
@@ -85,6 +89,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       // Setup game notifications
       this.setupNotifications();
+    },
+
+    comparePowersByName: function (power1, power2) {
+      return power1.sort - power2.sort;
+    },
+
+    comparePowerIdsByName: function (id1, id2) {
+      return gameui.gamedatas.powers[id1].sort - gameui.gamedatas.powers[id2].sort;
     },
 
     setupPreference: function () {
@@ -411,7 +423,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var _this = this;
       this.focusContainer('powers-offer');
 
-      // Display selected powers
+      // Display selected powers, sorted by name
+      args.offer.sort(this.comparePowerIdsByName);
       args.offer.forEach(function (powerId) {
         var div = dojo.place(_this.createPowerSmall(powerId), 'cards-offer');
         div.classList.add('selected');
@@ -422,7 +435,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       this._nMissingPowers = args.count - args.offer.length;
 
-      // Display remeaining powers
+      // Display remaining powers, sorted by name
+      args.deck.sort(this.comparePowerIdsByName);
       args.deck.forEach(function (powerId) {
         var div = dojo.place(_this.createPowerSmall(powerId), 'cards-deck');
         dojo.connect(div, 'onclick', function (e) {
@@ -564,9 +578,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Create a dummy in the deck
       var dummy = this.createPowerSmall(0);
       // Find the right position
+      var power = this.getPower(n.args.powerId);
       var nextPower = null;
       dojo.query('#cards-deck .power-card').some(function (div) {
-        if (div.getAttribute('data-power') > n.args.powerId) {
+        if (div.getAttribute('data-sort') > power.sort) {
           nextPower = div;
           return true;
         }
@@ -1178,6 +1193,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Gets a power object ready to use in UI templates
       var power = this.gamedatas.powers[powerId] || {
         id: 0,
+        sort: 0,
         counter: 0,
         name: '',
         title: '',
