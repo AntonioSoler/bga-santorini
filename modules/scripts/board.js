@@ -202,10 +202,6 @@ Board.prototype.enterScene = function () {
  *  - marks
  */
 Board.prototype.initBoard = function () {
-	this._logo = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.TextureLoader().load(this._url + "img/santorini-logo.png") }));
-	this._logo.scale.set(20, 10, 20);
-	this._scene.add(this._logo);
-
 	var sea = this._meshManager.createMesh('sea');
 	sea.rotation.set(0, Math.PI, 0);
 	sea.position.set(0, -2.8, 0);
@@ -299,11 +295,6 @@ Board.prototype.toggleCoordsHelpers = function (b) {
  * Render the scene
  */
 Board.prototype.render = function () {
-	// Update logo pos
-	var norme = Math.sqrt(this._camera.position.x * this._camera.position.x + this._camera.position.z * this._camera.position.z);
-	if (norme != 0) {
-		this._logo.position.set(-this._camera.position.x * 100 / norme, 4, -this._camera.position.z * 100 / norme);
-	}
 	this._renderer.render(this._scene, this._camera);
 };
 
