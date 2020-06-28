@@ -65,8 +65,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       // Setup powers
       // Add sort order by translated name
       Object.values(gamedatas.powers)
-        .sort((power1, power2) => _(power1.name).localeCompare(_(power2.name)))
-        .forEach((power, index) => power.sort = index);
+        .sort(function (power1, power2) {
+          return _(power1.name).localeCompare(_(power2.name))
+        }).forEach(function (power, index) {
+          power.sort = index;
+        });
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
         player.powers.forEach(function (powerId) {
