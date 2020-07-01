@@ -125,9 +125,44 @@ class santorini extends Table
    */
   public function stPowersSetup()
   {
-    // Create 2 workers for the first player of each team
     $players = $this->playerManager->getPlayers();
     $nPlayers = count($players);
+
+    // Notify player colors/teams
+    if ($nPlayers == 4) {
+      self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} share control of the ${color} workers'), [
+        'i18n' => ['color'],
+        'player_name' => $players[0]->getName(),
+        'player_name2' => $players[2]->getName(),
+        'color' => clienttranslate('blue'),
+      ]);
+      self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} share control of the ${color} workers'), [
+        'i18n' => ['color'],
+        'player_name' => $players[1]->getName(),
+        'player_name2' => $players[3]->getName(),
+        'color' => clienttranslate('white'),
+      ]);
+    } else {
+      self::notifyAllPlayers('message', clienttranslate('${player_name} controls of the ${color} workers'), [
+        'i18n' => ['color'],
+        'player_name' => $players[0]->getName(),
+        'color' => clienttranslate('blue'),
+      ]);
+      self::notifyAllPlayers('message', clienttranslate('${player_name} controls of the ${color} workers'), [
+        'i18n' => ['color'],
+        'player_name' => $players[1]->getName(),
+        'color' => clienttranslate('white'),
+      ]);
+      if ($nPlayers == 3) {
+        self::notifyAllPlayers('message', clienttranslate('${player_name} controls of the ${color} workers'), [
+          'i18n' => ['color'],
+          'player_name' => $players[2]->getName(),
+          'color' => clienttranslate('purple'),
+        ]);
+      }
+    }
+
+    // Create 2 workers for the first player of each team
     foreach ($players as $player) {
       if ($nPlayers == 3 || $player->getNo() <= 2) {
         $player->addWorker('f');
@@ -528,6 +563,8 @@ class santorini extends Table
     // Apply powers
     $this->powerManager->checkWinning($arg);
     if (array_key_exists('winStats', $arg)) {
+      // These stats cannot be reverted
+      // e.g., if Hera stops a win and the opponent cancels the turn, keep the stats
       $this->log->incrementStats($arg['winStats']);
     }
     if ($arg['win']) {
