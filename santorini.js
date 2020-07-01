@@ -63,12 +63,22 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       observer.observe(target, { attributes: true, attributeFilter: ['style'] });
 
       // Setup powers
-      // Add sort order by translated name
       Object.values(gamedatas.powers)
         .sort(function (power1, power2) {
           return _(power1.name).localeCompare(_(power2.name))
         }).forEach(function (power, index) {
+          // For JS code: Keep English name, add sort order
           power.sort = index;
+          power.nameEnglish = power.name;
+
+          // For HTML template: Translate text, add counter
+          power.name = _(power.name);
+          power.title = _(power.title);
+          power.text = '<p>' + power.text.map(function (text) {
+            return _(text).replace(/\[/g, '<b>').replace(/\]/g, '</b>');
+          }).join('</p><p>') + '</p>';
+          power.type = power.hero ? 'hero' : '';
+          power.counter = power.counter || 0;
         });
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
@@ -209,15 +219,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         powerDialog.show();
       }
 
-      if (powerId == this.powersIds.MORPHEUS || powerId == this.powersIds.CHAOS) {
-        var data = {
-          playerId: playerId,
-          powerId: powerId,
-          n: power.counter,
-        };
-        dojo.place(this.format_block('jstpl_powerCounter', data), 'mini-card-' + playerId + '-' + powerId);
-      }
-
       // During first page load, no animation is needed
       if (reason == 'init') {
         return;
@@ -264,9 +265,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     notif_updatePowerUI: function (n) {
       debug('Notif: updating power UI', n.args);
       this.gamedatas.powers[n.args.powerId].counter = n.args.counter;
-      var div = $('power-counter-' + n.args.playerId + "-" + n.args.powerId);
-      if (div) {
-        div.innerHTML = n.args.counter;
+      var q = dojo.query('#mini-card-' + n.args.playerId + "-" + n.args.powerId + ' .power-counter');
+      if (q.length > 0) {
+        q[0].textContent = n.args.counter;
       }
     },
 
@@ -642,7 +643,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           dojo.connect(div, 'onclick', function (ev) {
             _this.onClickChooseFirstPlayer(powerId);
           });
-          _this.addActionButton('buttonFirstPlayer' + powerId, power.name, function () {
+          _this.addActionButton('buttonFirstPlayer' + powerId, _(power.name), function () {
             _this.onClickChooseFirstPlayer(powerId)
           }, null, false, 'blue');
         }
@@ -677,8 +678,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         var div = dojo.place(_this.createPowerDetail(powerCard.id), 'power-choose-container');
         if (powerCard.location_arg == 1) {
           var mark = document.createElement("div");
-          mark.className = "power-counter";
-          mark.innerHTML = '1';
+          mark.className = 'power-counter';
+          mark.textContent = '1';
           div.append(mark);
         }
         div.id = "power-choose-" + power.id;
@@ -688,7 +689,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           dojo.connect(div, 'onclick', function (e) {
             return _this.onClickChoosePower(power.id);
           });
-          _this.addActionButton('buttonChoosePower' + power.id, power.name, function () {
+          _this.addActionButton('buttonChoosePower' + power.id, _(power.name), function () {
             _this.onClickChoosePower(power.id)
           }, null, false, 'blue');
         }
@@ -758,7 +759,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     ////////////////////////////////////
 
     addGoldenFleece: function (powerId) {
-      var power = this.getPower(powerId);
       var powerDetail = this.createPowerDetail(powerId);
       var div = dojo.place(this.createPowerSmall(powerId), 'play-area');
       div.id = 'power-ram';
@@ -834,77 +834,20 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     ///////////    Use Power    /////////////
     /////////////////////////////////////////
     /////////////////////////////////////////
-    powersIds: {
-      APOLLO: 1,
-      ARTEMIS: 2,
-      ATHENA: 3,
-      ATLAS: 4,
-      DEMETER: 5,
-      HEPHAESTUS: 6,
-      HERMES: 7,
-      MINOTAUR: 8,
-      PAN: 9,
-      PROMETHEUS: 10,
-      APHRODITE: 11,
-      ARES: 12,
-      BIA: 13,
-      CHAOS: 14,
-      CHARON: 15,
-      CHRONUS: 16,
-      CIRCE: 17,
-      DIONYSUS: 18,
-      EROS: 19,
-      HERA: 20,
-      HESTIA: 21,
-      HYPNUS: 22,
-      LIMUS: 23,
-      MEDUSA: 24,
-      MORPHEUS: 25,
-      PERSEPHONE: 26,
-      POSEIDON: 27,
-      SELENE: 28,
-      TRITON: 29,
-      ZEUS: 30,
-      AEOLUS: 31,
-      CHARYBDIS: 32,
-      CLIO: 33,
-      EUROPA: 34,
-      GAEA: 35,
-      GRAEAE: 36,
-      HADES: 37,
-      HARPIES: 38,
-      HECATE: 39,
-      MOERAE: 40,
-      NEMESIS: 41,
-      SIREN: 42,
-      TARTARUS: 43,
-      TERPSICHORE: 44,
-      URANIA: 45,
-      ACHILLES: 46,
-      ADONIS: 47,
-      ATALANTA: 48,
-      BELLEROPHON: 49,
-      HERACLES: 50,
-      JASON: 51,
-      MEDEA: 52,
-      ODYSSEUS: 53,
-      POLYPHEMUS: 54,
-      THESEUS: 55,
-    },
 
 		/*
      * onEnteringStatePlayerUsePower: the active player can use their (non-basic) power
      */
     onEnteringStatePlayerUsePower: function (args) {
       this._powerId = args.power;
-
-      for (var power in this.powersIds) {
-        if (this.powersIds[power] == args.power) {
-          this['usePower' + power.charAt(0) + power.slice(1).toLowerCase()](args);
-        }
+      var power = this.getPower(args.power);
+      var usePowerFn = this['usePower' + power.nameEnglish];
+      if (typeof usePowerFn != 'function') {
+        gameui.showMessage('Missing function: usePower' + power.nameEnglish, 'error');
+        return;
       }
+      usePowerFn.call(this, args);
     },
-
 
     usePowerCharon: function (args) {
       this._action = 'playerMove';
@@ -916,6 +859,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.makeWorkersSelectable(args.workers);
     },
 
+    usePowerAdonis: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
 
     /////////////////////////////////////////
     /////////////////////////////////////////
@@ -951,7 +898,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
 
       // If no worker can work => restart or resign
       if (this._selectableWorkers.length == 0) {
-        this.gamedatas.gamestate.descriptionmyturn = this._action == "playerMove" ? _("You cannot move a worker") : _("You cannot build");
+        this.gamedatas.gamestate.descriptionmyturn = this._action == "playerMove" ? _("You cannot move") : _("You cannot build");
         this.updatePageTitle();
         this.addActionButton('buttonResign', _('Resign'), this.onClickResign.bind(this), null, false, 'gray');
       } else if (this._selectableWorkers.length == 1) {
@@ -1198,18 +1145,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         id: 0,
         sort: 0,
         counter: 0,
+        nameEnglish: '',
         name: '',
         title: '',
-        text: [],
+        text: '',
+        type: '',
       };
-      power.type = power.hero ? 'hero' : '';
-
-      // TODO map for translation
-      power.textList = power.text.map(function (t) {
-        t = _(t);
-        t = t.replace(/\[/g, '<b>').replace(/\]/g, '</b>');
-        return t;
-      }).join('</p><p>');
       return power;
     },
 

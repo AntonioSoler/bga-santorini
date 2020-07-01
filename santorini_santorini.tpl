@@ -42,6 +42,7 @@ var jstpl_miniCard = `<div class="mini-card power-\${id} \${type}" data-power="\
 	<div class="power-name">\${name}</div>
 	<div class="power-avatar"></div>
 	<div class="power-pictogram"></div>
+	<div class="power-counter">\${counter}</div>
 </div>`;
 
 var jstpl_powerDetail = `<div class="power-detail">
@@ -50,13 +51,10 @@ var jstpl_powerDetail = `<div class="power-detail">
 		<div class="power-title">\${title}</div>
 		<div class="power-pictogram"></div>
 	</div>
-	<div class="power-ext \${type}">
-		<p>\${textList}</p>
-	</div>
+	<div class="power-ext \${type}">\${text}</div>
 </div>`;
 
 
-var jstpl_powerCounter = '<div id="power-counter-\${playerId}-\${powerId}" class="power-counter">\${n}</div>';
 var jstpl_token = '<div id="token-\${token}" class="token token-\${token}"></div>';
 var jstpl_tokenPrompt = `<table class="token-prompt">
 	<tr>

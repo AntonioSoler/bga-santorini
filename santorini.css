@@ -569,6 +569,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-counter {
+  display: none;
   position: absolute;
   width: 25px;
   height: 25px;
@@ -583,18 +584,21 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 /* Chaos: on top of the deck */
 .mini-card.power-14 .power-counter {
+  display: block;
   top: 75px;
   left: 130px;
 }
 
 /* Morpheus: on top of the equal sign */
 .mini-card.power-25 .power-counter {
+  display: block;
   top: 40px;
   left: 174px;
 }
 
 /* First player marker */
 #power-choose-container .power-detail .power-counter {
+  display: block;
   top: 7px;
   right: 7px;
 }
