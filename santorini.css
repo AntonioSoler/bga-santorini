@@ -13,10 +13,7 @@
  *
  */
 
-@import url('../../../css/csslayer.css');
 @import url('https://fonts.googleapis.com/css2?family=Amita:wght@700&family=Caveat+Brush&family=Lato:wght@400;900&display=swap');
-@import url('santorini.powers.css');
-@import url('santorini.tokens.css');
 
 html {
   background-image:none !important;
