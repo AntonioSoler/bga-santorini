@@ -18,7 +18,7 @@
 	*/
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
-var isDebug = window.location.host == 'studio.boardgamearena.com';
+var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
 var isMobile = function () {
   var body = document.getElementById("ebd-body");
@@ -27,6 +27,16 @@ var isMobile = function () {
 
 
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
+
+  // Dojo ShrinkSafe does not support named function expressions
+  // If you need to use this.inherited(), define the function here (not inside "return")
+  function santorini_adaptStatusBar() {
+    // Handle "position: fixed" for power detail (match page title)
+    this.inherited(santorini_adaptStatusBar, arguments);
+    var isFixed = dojo.hasClass("page-title", "fixed-page-title");
+    dojo.toggleClass("grid-detail", "fixed", isFixed);
+  }
+
   return declare("bgagame.santorini", ebg.core.gamegui, {
     /*
      * Constructor
@@ -150,13 +160,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       }
     },
 
-    adaptStatusBar: function adaptStatusBar() {
-      // Make power detail fixed match page title
-      this.inherited(adaptStatusBar, arguments);
-      var isFixed = dojo.hasClass("page-title", "fixed-page-title");
-      dojo.toggleClass("grid-detail", "fixed", isFixed);
-    },
-
+    adaptStatusBar: santorini_adaptStatusBar,
 
 		/*
 		 * notif_cancel:
