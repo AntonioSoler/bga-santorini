@@ -9,7 +9,8 @@ class Castor extends SantoriniPower
     $this->name  = clienttranslate('Castor & Pollux');
     $this->title = clienttranslate('Divine & Mortal Twins');
     $this->text  = [
-      clienttranslate("[Alternative Turn:] Move with all of your Workers. Do not build. Alternative Turn: Do not move. Build with all of your Workers.")
+      clienttranslate("[Alternative Turn:] Move with all of your Workers. Do not build."),
+      clienttranslate("[Alternative Turn:] Do not move. Build with all of your Workers.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

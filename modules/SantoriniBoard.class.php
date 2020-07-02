@@ -238,7 +238,7 @@ class SantoriniBoard extends APP_GameClass
   /*
    * isNeighbour : check distance between two spaces to move/build
    */
-  public function isNeighbour($a, $b, $action, $powerIds = [])
+  public function isNeighbour($a, $b, $action = null, $powerIds = [])
   {
     $ok = true;
 
@@ -270,7 +270,7 @@ class SantoriniBoard extends APP_GameClass
    *  - mixed $piece : contains all the informations (type, location, player_id) about the piece we use to move/build
    *  - string $action : specifies what kind of action we want to do with this piece (move/build)
    */
-  public function getNeighbouringSpaces($piece, $action, $powerIds = [])
+  public function getNeighbouringSpaces($piece, $action = null, $powerIds = [])
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
     return array_values(array_filter($this->getAccessibleSpaces($action), function ($space) use ($piece, $action, $powerIds) {

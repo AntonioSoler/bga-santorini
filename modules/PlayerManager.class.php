@@ -80,7 +80,7 @@ class PlayerManager extends APP_GameClass
    */
   public function getTeammatesIds($pId = -1)
   {
-    if ($pId == -1) {
+    if ($pId == -1 || $pId == null) {
       $pId = $this->game->getActivePlayerId();
     }
 
@@ -128,9 +128,9 @@ class PlayerManager extends APP_GameClass
   */
   public function eliminate($pId)
   {
-    foreach($this->game->board->getPlacedWorkers($pId) as $worker){
+    foreach ($this->game->board->getPlacedWorkers($pId) as $worker) {
       self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
-      $this->game->notifyAllPlayers('pieceRemoved', '', [ 'piece' => $worker ]);
+      $this->game->notifyAllPlayers('pieceRemoved', '', ['piece' => $worker]);
     }
     $this->game->eliminatePlayer($pId);
   }

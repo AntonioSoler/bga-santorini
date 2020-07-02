@@ -283,6 +283,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       data.lock = true;
       callback = callback || function (res) { };
       this.stopActionTimer();
+      debug('Taking action: ' + action, data);
       this.ajaxcall("/santorini/santorini/" + action + ".html", data, this, callback);
     },
 

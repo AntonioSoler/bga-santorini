@@ -9,7 +9,7 @@ class Selene extends SantoriniPower
     $this->name  = clienttranslate('Selene');
     $this->title = clienttranslate('Goddess of the Moon');
     $this->text  = [
-      clienttranslate("[Instead of Your Build:] Your female Worker may build a dome at any level regardless of which Worker moved.")
+      clienttranslate("[Alternative Build:] Your female Worker may build a dome at any level regardless of which Worker moved.")
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

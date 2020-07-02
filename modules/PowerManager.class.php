@@ -141,6 +141,17 @@ class PowerManager extends APP_GameClass
     [PERSEPHONE, CHARON],  // CF PERSEPHONE
     [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE
     [TARTARUS, TERPSICHORE],
+    // Incomplete Adonis implementation
+    [ADONIS, ARTEMIS], // multiple moves
+    [ADONIS, HERMES], // multiple moves
+    [ADONIS, TRITON], // multiple moves
+    [ADONIS, CHARYBDIS], // complex moves
+    [ADONIS, SIREN], // alternative turn
+    [ADONIS, TERPSICHORE], // both workers must move
+    [ADONIS, ATALANTA], // multiple moves
+    [ADONIS, JASON], // alternative turn
+    [ADONIS, CASTOR], // alternative turn
+    [ADONIS, ERIS], // alternative turn
   ];
 
 
