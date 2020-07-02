@@ -101,7 +101,6 @@ $game_options = [
       QUICK => [
         'name' => totranslate('Quick Setup'),
         'tmdisplay' => totranslate('Quick Setup'),
-        'description' => totranslate('BGA randomly builds an offer'),
       ],
       TOURNAMENT => [
         'name' => totranslate('Tournament Setup'),
