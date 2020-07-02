@@ -118,7 +118,7 @@ $game_options = [
       [
         'type' => 'otheroption',
         'id' => OPTION_POWERS,
-        'value' => [SIMPLE, GODS, HEROES, GOLDEN_FLEECE],
+        'value' => [SIMPLE, GODS, GOLDEN_FLEECE], // TODO : HEROES
       ],
     ],
   ],
