@@ -25,7 +25,7 @@ class Bellerophon extends SantoriniHeroPower
     $move = $this->game->log->getLastMove($this->playerId);
     if ($move['to']['z'] - $move['from']['z'] == 2) {
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->log->addAction('heroPower', $stats);
+      $this->game->log->addAction('usedPower', $stats);
     }
   }
 }

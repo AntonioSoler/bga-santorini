@@ -51,7 +51,7 @@ class Heracles extends SantoriniHeroPower
   {
     if ($this->didSpecialBuild()) {
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->log->addAction('heroPower', $stats);
+      $this->game->log->addAction('usedPower', $stats);
     }
     parent::preEndPlayerTurn();
   }

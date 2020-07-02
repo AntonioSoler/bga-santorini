@@ -136,9 +136,13 @@ class Adonis extends SantoriniHeroPower
     }
   }
 
+  // Adonis discard must happen after opponent's turn
+  public function preEndPlayerTurn()
+  {
+  }
+
   public function preEndOpponentTurn()
   {
-    // Discard must happen after Adonis power affects the opponent
     if ($this->getPowerData() != null) {
       $this->game->powerManager->removePower($this, 'hero');
     }

@@ -43,7 +43,7 @@ class Atalanta extends SantoriniHeroPower
   {
     if (count($this->game->log->getLastMoves($this->playerId)) > 1) {
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->log->addAction('heroPower', $stats);
+      $this->game->log->addAction('usedPower', $stats);
     }
     parent::preEndPlayerTurn();
   }

@@ -64,7 +64,7 @@ class Achilles extends SantoriniHeroPower
   {
     if (count($this->game->log->getLastBuilds($this->playerId)) > 1) {
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->log->addAction('heroPower', $stats);
+      $this->game->log->addAction('usedPower', $stats);
     }
     parent::preEndPlayerTurn();
   }
