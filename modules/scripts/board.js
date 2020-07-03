@@ -344,7 +344,9 @@ Board.prototype.diff = function (pieces) {
 		} else {
 			// Remove it
 			this._scene.remove(mesh);
-			this._board[piece.x][piece.y][piece.z].piece = null;
+			if (this._board[piece.x][piece.y][piece.z].piece.pieceId == id) {
+				this._board[piece.x][piece.y][piece.z].piece = null;
+			}
 			delete this._ids[id];
 		}
 	});

@@ -984,7 +984,7 @@ class santorini extends Table
   {
     // Kill worker
     self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
-    $stats = [[$self::getActivePlayerId(), 'usePower']];
+    $stats = [[$this->getActivePlayerId(), 'usePower']];
     $this->log->addRemoval($worker, $stats);
 
     // Notify
