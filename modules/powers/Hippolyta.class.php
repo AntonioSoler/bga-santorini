@@ -9,7 +9,7 @@ class Hippolyta extends SantoriniPower
     $this->name  = clienttranslate('Hippolyta');
     $this->title = clienttranslate('Queen of the Amazons');
     $this->text  = [
-      clienttranslate("[Setup:] Place a male and female Worker of your color. All Times: All Workers except your female Worker may only move diagonally.")
+      clienttranslate("[Any Time:] All Workers except your female Worker may only move diagonally."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

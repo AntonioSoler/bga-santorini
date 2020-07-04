@@ -9,7 +9,7 @@ class Hephaestus extends SantoriniPower
     $this->name  = clienttranslate('Hephaestus');
     $this->title = clienttranslate('God of Blacksmiths');
     $this->text  = [
-      clienttranslate("[Your Build:] Your Worker may build one additional block (not dome) on top of your first block.")
+      clienttranslate("[Your Build:] Your Worker may build one additional block (not dome) on top of your first block."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

@@ -9,7 +9,7 @@ class Athena extends SantoriniPower
     $this->name  = clienttranslate('Athena');
     $this->title = clienttranslate('Goddess of Wisdom');
     $this->text  = [
-      clienttranslate("[Opponent's Turn:] If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn.")
+      clienttranslate("[Opponent's Turn:] If one of your Workers moved up on your last turn, opponent Workers cannot move up this turn."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;

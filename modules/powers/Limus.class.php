@@ -10,7 +10,7 @@ class Limus extends SantoriniPower
     $this->title = clienttranslate('Goddess of Famine');
     $this->text  = [
       clienttranslate("[Opponent's Turn:] Opponent Workers cannot build on spaces neighboring your Workers, unless building a dome."),
-      clienttranslate("[REVISED POWER]")
+      clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

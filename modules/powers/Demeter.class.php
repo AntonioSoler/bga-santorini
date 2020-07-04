@@ -9,7 +9,7 @@ class Demeter extends SantoriniPower
     $this->name  = clienttranslate('Demeter');
     $this->title = clienttranslate('Goddess of the Harvest');
     $this->text  = [
-      clienttranslate("[Your Build:] Your Worker may build one additional time, but not on the same space.")
+      clienttranslate("[Your Build:] Your Worker may build one additional time, but not on the same space."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

@@ -9,7 +9,7 @@ class Hera extends SantoriniPower
     $this->name  = clienttranslate('Hera');
     $this->title = clienttranslate('Goddess of Marriage');
     $this->text  = [
-      clienttranslate("[Opponent's Turn:] An opponent cannot win by moving into a perimeter space.")
+      clienttranslate("[Opponent's Turn:] An opponent cannot win by moving into a perimeter space."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

@@ -9,7 +9,7 @@ class Odysseus extends SantoriniHeroPower
     $this->name  = clienttranslate('Odysseus');
     $this->title = clienttranslate('Cunning Leader');
     $this->text  = [
-      clienttranslate("[Start of Your Turn:] [Once], force to unoccupied corner spaces any number of opponent Workers that neighbor your Workers.")
+      clienttranslate("[Start of Your Turn:] [Once], force to unoccupied corner spaces any number of opponent Workers that neighbor your Workers."),
     ];
     $this->playerCount = [2];
     $this->golden  = false;

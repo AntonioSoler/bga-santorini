@@ -9,7 +9,7 @@ class Minotaur extends SantoriniPower
     $this->name  = clienttranslate('Minotaur');
     $this->title = clienttranslate('Bull-headed Monster');
     $this->text  = [
-      clienttranslate("[Your Move:] Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level.")
+      clienttranslate("[Your Move:] Your Worker may move into an opponent Worker's space, if their Worker can be forced one space straight backwards to an unoccupied space at any level."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

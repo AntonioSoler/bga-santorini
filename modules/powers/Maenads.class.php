@@ -9,7 +9,7 @@ class Maenads extends SantoriniPower
     $this->name  = clienttranslate('Maenads');
     $this->title = clienttranslate('Raving Ones');
     $this->text  = [
-      clienttranslate("[End of Your Turn:] If your Workers neighbour an opponent’s Worker on directly opposite sides, that opponent loses the game.")
+      clienttranslate("[End of Your Turn:] If your Workers neighbor an opponent's Worker on opposite sides, that opponent loses the game."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;

@@ -9,7 +9,7 @@ class Hermes extends SantoriniPower
     $this->name  = clienttranslate('Hermes');
     $this->title = clienttranslate('God of Travel');
     $this->text  = [
-      clienttranslate("[Your Turn:] If your Workers do not move up or down, they may each move any number of times (even zero), and then either builds.")
+      clienttranslate("[Your Turn:] If your Workers do not move up or down, they may each move any number of times (even zero), and then either builds."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

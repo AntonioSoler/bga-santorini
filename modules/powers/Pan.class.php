@@ -9,7 +9,7 @@ class Pan extends SantoriniPower
     $this->name  = clienttranslate('Pan');
     $this->title = clienttranslate('God of the Wild');
     $this->text  = [
-      clienttranslate("[Win Condition:] You also win if your Worker moves down two or more levels.")
+      clienttranslate("[Win Condition:] You also win if your Worker moves down two or more levels."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;

@@ -9,7 +9,7 @@ class Bellerophon extends SantoriniHeroPower
     $this->name  = clienttranslate('Bellerophon');
     $this->title = clienttranslate('Tamer of Pegasus');
     $this->text  = [
-      clienttranslate("[Your Move:] [Once], your Worker moves up two levels.")
+      clienttranslate("[Your Move:] [Once], your Worker moves up two levels."),
     ];
     $this->playerCount = [2];
     $this->golden  = false;
