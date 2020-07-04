@@ -92,30 +92,19 @@ html {
 
 
 
-@media (max-width: 2300px) {
-  #left-side {
-    position:relative;
-    z-index:3;
-  }
+#left-side {
+  position:relative;
+  z-index:3;
 }
-@media (min-width: 2300px) {
-  #page-title {
-    position: relative;
-    z-index: 2;
-  }
-
-  #page-content, .whiteblock.debug_section, #pagesection_howtoplay {
-    position:relative;
-    z-index:4;
-  }
-
-
-}
-
 
 #right-side {
   position: relative;
   z-index: 4;
+}
+
+#overall-footer {
+  position:relative;
+  z-index:3;
 }
 
 
