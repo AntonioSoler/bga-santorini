@@ -21,10 +21,12 @@ class Minotaur extends SantoriniPower
   /* * */
   public function argPlayerMove(&$arg)
   {
+    $workers = $this->game->board->getPlacedWorkers($this->playerId);
     $allWorkers = $this->game->board->getPlacedWorkers();
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
 
-    foreach ($arg["workers"] as &$worker) {
+    foreach ($workers as &$worker) {
+      $worker['works'] = [];
       foreach ($allWorkers as $worker2) {
         if ($worker['player_id'] == $worker2['player_id']) {
           continue;
@@ -42,6 +44,8 @@ class Minotaur extends SantoriniPower
         }
       }
     }
+
+    Utils::mergeWorkers($arg, $workers);
   }
 
   public function playerMove($worker, $work)
