@@ -481,6 +481,12 @@ class santorini extends Table
    */
   public function stNextPlayer($next = true)
   {
+    $players = $this->playerManager->getRemeaningPlayersIds();
+    if(count($players) == 1){
+      $this->announceWin($players[0]['id'], true);
+      return;
+    }
+
     $pId = $next ? $this->activeNextPlayer() : $this->getActivePlayerId();
     if ($this->playerManager->getPlayer($pId)->isEliminated()) {
       $pId = $this->activeNextPlayer();
@@ -632,7 +638,12 @@ class santorini extends Table
       $this->announceWin($pId, false);
     } else {
       // 3 players => eliminate the player
-      $this->gamestate->nextState("eliminate");
+      $players = $this->playerManager->getRemeaningPlayersIds();
+      if(count($players) > 1){
+        $this->gamestate->nextState("eliminate");
+      } else {
+        $this->announceWin($players[0]['id'], true);
+      }
     }
   }
 

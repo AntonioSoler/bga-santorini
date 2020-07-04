@@ -51,6 +51,15 @@ class PlayerManager extends APP_GameClass
     return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM player"));
   }
 
+
+  /*
+   * getPlayingPlayers: return non-eliminated players
+   */
+  public function getRemeaningPlayersIds()
+  {
+    return self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_zombie` = 0");
+  }
+
   /*
    * getTeams: return the team IDs that have any active players
    */

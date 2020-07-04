@@ -310,6 +310,7 @@ $machinestates = array(
     'action' => 'stEliminatePlayer',
     'transitions' => [
       'play' => ST_START_OF_TURN,
+      'endgame' => ST_GAME_END,
     ],
   ],
 
