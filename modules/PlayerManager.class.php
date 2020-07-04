@@ -78,13 +78,13 @@ class PlayerManager extends APP_GameClass
   /*
    * getTeammatesIds: return all teammates ids (useful to use within WHERE clause)
    */
-  public function getTeammatesIds($pId = -1)
+  public function getTeammatesIds($pId = -1, $excludeSelf = false)
   {
     if ($pId == -1 || $pId == null) {
       $pId = $this->game->getActivePlayerId();
     }
 
-    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` = ( SELECT `player_team` FROM player WHERE player_id = '$pId')");
+    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` = (SELECT `player_team` FROM player WHERE player_id = '$pId')" . ($excludeSelf ? " AND player_id != '$pId'" : ''));
     return array_map(function ($player) {
       return $player['id'];
     }, $players);
@@ -93,7 +93,7 @@ class PlayerManager extends APP_GameClass
   /*
    * getTeammates: return all players in the same team as $pId player
    */
-  public function getTeammates($pId)
+  public function getTeammates($pId, $excludeSelf = false)
   {
     return $this->getPlayers($this->getTeammatesIds($pId));
   }

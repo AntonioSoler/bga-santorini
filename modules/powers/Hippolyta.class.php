@@ -14,7 +14,41 @@ class Hippolyta extends SantoriniPower
     $this->playerCount = [2, 3, 4];
     $this->golden  = true;
     $this->orderAid = 47;
+
+    $this->implemented = true;
   }
 
   /* * */
+
+  public function argPlayerMove(&$arg)
+  {
+    $femaleWorkers = $this->game->board->getPlacedActiveWorkers('f');
+    Utils::filterWorksUnlessMine($arg, $femaleWorkers, array($this->game->board, 'isDiagonal'));
+  }
+
+  public function argTeammateMove(&$arg)
+  {
+    $this->argPlayerMove($arg);
+  }
+
+  public function argOpponentMove(&$arg)
+  {
+    Utils::filterWorks($arg, array($this->game->board, 'isDiagonal'));
+  }
+
+  public function endPlayerTurn()
+  {
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->log->addAction('stats', $stats);
+  }
+
+  public function endTeammateTurn()
+  {
+    $this->endPlayerTurn();
+  }
+
+  public function endOpponentTurn()
+  {
+    $this->endPlayerTurn();
+  }
 }

@@ -239,6 +239,13 @@ class SantoriniBoard extends APP_GameClass
     return ($space['x'] == 0 || $space['x'] == 4) && ($space['y'] == 0 || $space['y'] == 4);
   }
 
+  public function isDiagonal($a, $b)
+  {
+    $diffX = abs($a['x'] - $b['x']);
+    $diffY = abs($a['y'] - $b['y']);
+    return $diffX != 0 && $diffX == $diffY;
+  }
+
 
   /*
    * isNeighbour : check distance between two spaces to move/build

@@ -572,15 +572,27 @@ class PowerManager extends APP_GameClass
     // First apply current user power(s)
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
+    $method = array_shift($methods);
     foreach ($player->getPowers() as $power) {
-      call_user_func_array([$power, $methods[0]], $arg);
+      call_user_func_array([$power, $method], $arg);
     }
 
-    // Then apply oponnents power(s) if needed
+    // Then apply teammate power(s) if needed
     if (count($methods) > 1) {
+      $method = array_shift($methods);
+      foreach ($this->game->playerManager->getTeammates($playerId, true) as $teammate) {
+        foreach ($teammate->getPowers() as $power) {
+          call_user_func_array([$power, $method], $arg);
+        }
+      }
+    }
+
+    // Then apply opponent power(s) if needed
+    if (!empty($methods)) {
+      $method = array_shift($methods);
       foreach ($this->game->playerManager->getOpponents($playerId) as $opponent) {
         foreach ($opponent->getPowers() as $power) {
-          call_user_func_array([$power, $methods[1]], $arg);
+          call_user_func_array([$power, $method], $arg);
         }
       }
     }
@@ -606,7 +618,7 @@ class PowerManager extends APP_GameClass
    */
   public function argPlaceWorker(&$arg)
   {
-    $this->applyPower(["argPlayerPlaceWorker", "argOpponentPlaceWorker"], [&$arg]);
+    $this->argPlayerWork($arg, 'PlaceWorker');
   }
 
 
@@ -669,7 +681,7 @@ class PowerManager extends APP_GameClass
    */
   public function argPlayerWork(&$arg, $action)
   {
-    $this->applyPower(["argPlayer" . $action, "argOpponent" . $action], [&$arg]);
+    $this->applyPower(["argPlayer$action", "argTeammate$action", "argOpponent$action"], [&$arg]);
   }
 
   /*
@@ -747,7 +759,7 @@ class PowerManager extends APP_GameClass
    */
   public function afterWork($worker, $work, $action)
   {
-    $this->applyPower(["afterPlayer" . $action, "afterOpponent" . $action], [$worker, $work]);
+    $this->applyPower(["afterPlayer$action", "afterTeammate$action", "afterOpponent$action"], [$worker, $work]);
   }
 
   /*
@@ -841,7 +853,7 @@ class PowerManager extends APP_GameClass
     if ($this->isGoldenFleece()) {
       $this->checkGoldenFleece();
     }
-    $this->applyPower(["startPlayerTurn", "startOpponentTurn"], []);
+    $this->applyPower(["startPlayerTurn", "startTeammateTurn", "startOpponentTurn"], []);
   }
 
   /*
@@ -850,7 +862,7 @@ class PowerManager extends APP_GameClass
    */
   public function preEndOfTurn()
   {
-    $this->applyPower(["preEndPlayerTurn", "preEndOpponentTurn"], []);
+    $this->applyPower(["preEndPlayerTurn", "preEndTeammateTurn", "preEndOpponentTurn"], []);
   }
 
   /*
@@ -859,7 +871,7 @@ class PowerManager extends APP_GameClass
    */
   public function endOfTurn()
   {
-    $this->applyPower(["endPlayerTurn", "endOpponentTurn"], []);
+    $this->applyPower(["endPlayerTurn", "endTeammateTurn", "endOpponentTurn"], []);
   }
 
 

@@ -129,6 +129,10 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  public function argTeammatePlaceWorker(&$arg)
+  {
+  }
+
   public function argOpponentPlaceWorker(&$arg)
   {
   }
@@ -139,6 +143,10 @@ abstract class SantoriniPower extends APP_GameClass
   }
 
   public function startPlayerTurn()
+  {
+  }
+
+  public function startTeammateTurn()
   {
   }
 
@@ -164,6 +172,10 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  public function argTeammateMove(&$arg)
+  {
+  }
+
   public function argOpponentMove(&$arg)
   {
   }
@@ -177,11 +189,19 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  public function afterTeammateMove($worker, $work)
+  {
+  }
+
   public function afterOpponentMove($worker, $work)
   {
   }
 
   public function argPlayerBuild(&$arg)
+  {
+  }
+
+  public function argTeammateBuild(&$arg)
   {
   }
 
@@ -193,7 +213,12 @@ abstract class SantoriniPower extends APP_GameClass
   {
     return false;
   }
+
   public function afterPlayerBuild($worker, $work)
+  {
+  }
+
+  public function afterTeammateBuild($worker, $work)
   {
   }
 
@@ -220,11 +245,19 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  public function preEndTeammateTurn()
+  {
+  }
+
   public function preEndOpponentTurn()
   {
   }
 
   public function endPlayerTurn()
+  {
+  }
+
+  public function endTeammateTurn()
   {
   }
 
