@@ -125,6 +125,9 @@ Board.prototype.onLoad = function () {
 	this._cameraAngle = { theta: 0 };
 	var anim = Tween.get(this._cameraAngle, { loop: -1 }).to({ theta: 2 * Math.PI }, 35000, Ease.linear)
 		.addEventListener('change', () => {
+			if (this._enterScene)
+				return;
+
 			this._camera.position.x = Math.cos(this._cameraAngle.theta) * startPos.x;
 			this._camera.position.y = startPos.y;
 			this._camera.position.z = Math.sin(this._cameraAngle.theta) * startPos.x;
