@@ -980,11 +980,11 @@ class santorini extends Table
    * playerKill: kill a piece (only called with specific power eg Medusa, Bia)
    *  - obj $worker : the worker we want to kill
    */
-  public function playerKill($worker, $powerName)
+  public function playerKill($worker, $powerName, $incStats = true)
   {
     // Kill worker
     self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
-    $stats = [[$this->getActivePlayerId(), 'usePower']];
+    $stats = $incStats ? [[$this->getActivePlayerId(), 'usePower']] : [];
     $this->log->addRemoval($worker, $stats);
 
     // Notify

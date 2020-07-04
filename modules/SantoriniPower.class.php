@@ -54,6 +54,10 @@ abstract class SantoriniPower extends APP_GameClass
   {
     return $this->id <= 10;
   }
+  public function isHero()
+  {
+    return $this instanceof SantoriniHeroPower;
+  }
 
   public function getUiData()
   {
@@ -62,19 +66,18 @@ abstract class SantoriniPower extends APP_GameClass
       'name'      => $this->name,
       'title'     => $this->title,
       'text'      => $this->text,
-      'hero'      => get_parent_class($this) == 'SantoriniHeroPower',
+      'hero'      => $this->isHero(),
     ];
   }
 
   public function isSupported($nPlayers, $optionPowers)
   {
-    $isHero = $this instanceof SantoriniHeroPower;
     return $this->implemented
       && in_array($nPlayers, $this->getPlayerCount())
       && (($optionPowers == GODS_AND_HEROES)
         || ($optionPowers == SIMPLE && $this->isSimple())
-        || ($optionPowers == GODS && !$isHero)
-        || ($optionPowers == HEROES && $isHero)
+        || ($optionPowers == GODS && !$this->isHero())
+        || ($optionPowers == HEROES && $this->isHero())
         || ($optionPowers == GOLDEN_FLEECE && $this->isGoldenFleece()));
   }
 

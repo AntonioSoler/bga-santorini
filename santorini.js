@@ -884,6 +884,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.makeWorkersSelectable(args.workers);
     },
 
+    usePowerTheseus: function (args) {
+      this._action = 'playerBuild';
+      this.makeWorkersSelectable(args.workers);
+    },
+
     /////////////////////////////////////////
     /////////////////////////////////////////
     ////////    Work : move / build  ////////
