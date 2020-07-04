@@ -206,9 +206,6 @@ $machinestates = array(
     'updateGameProgression' => true,
   ],
 
-  /*
-   * TODO description
-   */
   ST_USE_POWER => [
     'name' => 'playerUsePower',
     'description' => clienttranslate('${actplayer} must use ${power_name}\'s power'),
@@ -223,12 +220,12 @@ $machinestates = array(
       'cancel' => ST_START_OF_TURN,
       'move' => ST_MOVE,
       'build' => ST_BUILD,
+      'power' => ST_USE_POWER,
       'endturn' => ST_PRE_END_OF_TURN,
       'endgame' => ST_GAME_END,
       'eliminate' => ST_ELIMINATE_PLAYER,
     ],
   ],
-
 
   ST_MOVE => [
     'name' => 'playerMove',
