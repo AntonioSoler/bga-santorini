@@ -33,8 +33,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
   function santorini_adaptStatusBar() {
     // Handle "position: fixed" for power detail (match page title)
     this.inherited(santorini_adaptStatusBar, arguments);
-    var isFixed = dojo.hasClass("page-title", "fixed-page-title");
-    dojo.toggleClass("grid-detail", "fixed", isFixed);
+    if (this.gamedatas.gamestate.name == 'buildOffer') {
+      var isFixed = dojo.hasClass("page-title", "fixed-page-title");
+      dojo.toggleClass("grid-detail", "fixed", isFixed);
+    }
   }
 
   return declare("bgagame.santorini", ebg.core.gamegui, {
@@ -335,12 +337,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     onLeavingState: function (stateName) {
       debug('Leaving state: ' + stateName);
-
-      // Don't remove the power cards
-      if (stateName == 'powersPlayerChoose') {
-        return;
+      if (stateName == 'buildOffer') {
+        dojo.empty('power-offer-container');
       }
-
       this.clearPossible();
     },
 
@@ -433,6 +432,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.focusContainer('powers-offer');
 
       // Display selected powers, sorted by name
+      dojo.empty('cards-offer');
       args.offer.sort(this.comparePowerIdsByName);
       args.offer.forEach(function (powerId) {
         var div = dojo.place(_this.createPowerSmall(powerId), 'cards-offer');
@@ -445,6 +445,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this._nMissingPowers = args.count - args.offer.length;
 
       // Display remaining powers, sorted by name
+      dojo.empty('cards-deck');
       args.deck.sort(this.comparePowerIdsByName);
       args.deck.forEach(function (powerId) {
         var div = dojo.place(_this.createPowerSmall(powerId), 'cards-deck');
@@ -638,6 +639,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onEnteringStateChooseFirstPlayer: function (args) {
       var _this = this;
       this.focusContainer('powers-choose');
+      dojo.empty('power-choose-container');
       args.powers.forEach(function (powerId) {
         var power = _this.getPower(powerId);
         var div = dojo.place(_this.createPowerDetail(powerId), 'power-choose-container');
@@ -677,7 +679,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var _this = this;
       this.focusContainer('powers-choose');
 
-      // Display remeaining powers
+      // Display remaining powers
+      dojo.empty('power-choose-container');
       args.offer.forEach(function (powerCard) {
         var power = _this.getPower(powerCard.id);
         var div = dojo.place(_this.createPowerDetail(powerCard.id), 'power-choose-container');
@@ -1229,11 +1232,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     clearPossible: function clearPossible() {
       this.removeActionButtons();
       this.onUpdateActionButtons(this.gamedatas.gamestate.name, this.gamedatas.gamestate.args, true);
-
-      dojo.empty('grid-powers');
-      dojo.query('#power-detail').removeClass().addClass('power-card power-0');
-      dojo.empty('power-choose-container');
-
       this._selectedWorker = null;
       this.board.clearClickable();
       this.board.clearHighlights();
