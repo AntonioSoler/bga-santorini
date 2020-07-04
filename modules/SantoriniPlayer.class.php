@@ -84,17 +84,6 @@ class SantoriniPlayer extends APP_GameClass
      * Powers
      */
 
-    public function getPower($index = 0)
-    {
-        return array_key_exists($index, $this->powers) ? $this->powers[$index] : null;
-    }
-
-    public function getPowerId($index = 0)
-    {
-        $power = $this->getPower($index);
-        return $power != null ? $power->getId() : null;
-    }
-
     public function getPowers()
     {
         return $this->powers;
@@ -127,5 +116,6 @@ class SantoriniPlayer extends APP_GameClass
         $player_id = $this->id;
         $type_arg = $type . $this->team;
         self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$player_id', 'worker', '$type_arg', '$location')");
+        return self::DbGetLastId();
     }
 }

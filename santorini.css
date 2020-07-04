@@ -593,6 +593,13 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   left: 174px;
 }
 
+/* Jason: near the plus sign */
+.mini-card.power-51 .power-counter {
+  display: block;
+  top: 35px;
+  left: 180px;
+}
+
 /* First player marker */
 #power-choose-container .power-detail .power-counter {
   display: block;

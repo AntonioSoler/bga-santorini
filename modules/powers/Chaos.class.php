@@ -23,7 +23,7 @@ class Chaos extends SantoriniPower
   public function getUIData()
   {
     $data = parent::getUIData();
-    $data['counter'] = $this->computeDeck();
+    $data['counter'] = ($this->playerId != null) ? $this->computeDeck() : 10;
     return $data;
   }
 
@@ -31,16 +31,6 @@ class Chaos extends SantoriniPower
   {
     return intval($this->game->powerManager->cards->countCardInLocation('deck'));
   }
-
-  public function updateUI()
-  {
-    $this->game->notifyAllPlayers('updatePowerUI', '', [
-      'playerId' => $this->playerId,
-      'powerId' => $this->getId(),
-      'counter' => $this->computeDeck()
-    ]);
-  }
-
 
   public function pickNewPower()
   {

@@ -874,6 +874,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this.makeWorkersSelectable(args.workers);
     },
 
+    usePowerJason: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
+
     /////////////////////////////////////////
     /////////////////////////////////////////
     ////////    Work : move / build  ////////
@@ -927,13 +932,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onClickSelectWorker: function (worker) {
       this.clearPossible();
 
-      // Select the worker, highlight it and let the use change selection (if any other choices)
+      // Select the worker
       this._selectedWorker = worker;
-      this.board.highlightPiece(worker);
+      if (worker.location == 'board') {
+        // Highlight the worker if it's on the board
+        // For Jason, Gaea, etc. the worker may not yet exist
+        this.board.highlightPiece(worker);
+      }
+      // Let the user change selection (if any other choices)
       if (this._selectableWorkers.length > 1) {
         this.addActionButton('buttonReset', _('Cancel'), 'onClickCancelSelect', null, false, 'gray');
       }
-      // TODO : automatically choose if only one space ?
 
       this.board.makeClickable(worker.works, this.onClickSpace.bind(this), this._action);
     },

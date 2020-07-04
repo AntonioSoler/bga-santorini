@@ -161,10 +161,13 @@ class PowerManager extends APP_GameClass
   {
     $this->game = $game;
 
-    // Initialize power deck
-    $this->cards = self::getNew('module.common.deck');
-    $this->cards->init('card');
-    $this->cards->autoreshuffle = true;
+    // stats.inc.php creates PowerManager without a game object
+    if ($game != null) {
+      // Initialize power deck
+      $this->cards = self::getNew('module.common.deck');
+      $this->cards->init('card');
+      $this->cards->autoreshuffle = true;
+    }
   }
 
   /*
@@ -183,8 +186,16 @@ class PowerManager extends APP_GameClass
    */
   public function getPowers()
   {
-    return array_map(function ($powerId) {
-      return $this->getPower($powerId);
+    $playerMap = [];
+    if ($this->cards != null) {
+      $cards = $this->cards->getCardsInLocation('hand');
+      foreach ($cards as $card) {
+        $playerMap[$card['type']] = intval($card['location_arg']);
+      }
+    }
+    return array_map(function ($powerId) use ($playerMap) {
+      $playerId = array_key_exists(strval($powerId), $playerMap) ? $playerMap[strval($powerId)] : null;
+      return $this->getPower($powerId, $playerId);
     }, array_keys(self::$classes));
   }
 
@@ -478,7 +489,10 @@ class PowerManager extends APP_GameClass
     }
     $this->notifyPower($player, $power, 'powerAdded', $reason);
     $player->addPlayerPower($power);
-    $power->setup();
+    if ($reason != 'hero') {
+      // No setup when cancelling hero power discard
+      $power->setup();
+    }
   }
 
   public function removePower($power, $reason = null)

@@ -88,6 +88,32 @@ abstract class SantoriniPower extends APP_GameClass
     return $this->game->playerManager->getPlayer($this->playerId);
   }
 
+  public function updateUI()
+  {
+    $data = $this->getUiData();
+    $this->game->notifyAllPlayers('updatePowerUI', '', [
+      'playerId' => $this->playerId,
+      'powerId' => $this->id,
+      'counter' => $data['counter'],
+    ]);
+  }
+
+  public function placeWorker($worker, $space)
+  {
+    $this->game->board->setPieceAt($worker, $space);
+    $worker['x'] = $space['x'];
+    $worker['y'] = $space['y'];
+    $worker['z'] = $space['z'];
+    $this->game->log->addPlaceWorker($worker, $this->id);
+    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places a worker (${coords})'), [
+      'i18n' => ['power_name'],
+      'piece' => $worker,
+      'power_name' => $this->getName(),
+      'player_name' => $this->getPlayer()->getName(),
+      'coords' => $this->game->board->getMsgCoords($space),
+    ]);
+  }
+
   public function setup()
   {
   }

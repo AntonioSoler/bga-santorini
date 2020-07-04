@@ -191,6 +191,18 @@ class SantoriniLog extends APP_GameClass
     $this->insert(-1, $piece['id'], 'removal', $stats);
   }
 
+  /*
+   * addPlaceWorker: add a new place worker entry to log (e.g., Jason)
+   */
+  public function addPlaceWorker($worker, $powerId, $location = 'hand')
+  {
+    $args = [
+      'power_id' => $powerId,
+      'location' => $location,
+      'to' => $this->game->board->getCoords($worker),
+    ];
+    $this->insert(-1, $worker['id'], 'placeWorker', [], $args);
+  }
 
   /*
    * addAction: add a new action to log
@@ -207,6 +219,16 @@ class SantoriniLog extends APP_GameClass
   /////////////////////////////////
   /////////////////////////////////
 
+  private function getRoundClause($pId, $offset = 0)
+  {
+    $offset = $offset ?: 0;
+    if ($offset === 'all') {
+      return "";
+    } else {
+      return "AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset";
+    }
+  }
+
   /*
  * getLastWorks: fetch last works of player of current round
  * params:
@@ -220,7 +242,7 @@ class SantoriniLog extends APP_GameClass
     $limitClause = ($limit == -1) ? '' : "LIMIT $limit";
     $actionsNames = "'" . (is_array($actions) ? implode("','", $actions) : $actions) . "'";
 
-    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC " . $limitClause);
+    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' " . $this->getRoundClause($pId) . " ORDER BY log_id DESC " . $limitClause);
 
     return array_map(function ($work) {
       $args = json_decode($work['action_arg'], true);
@@ -267,7 +289,7 @@ class SantoriniLog extends APP_GameClass
   public function getLastMoveOfWorker($workerId)
   {
     $pId = $this->game->getActivePlayerId();
-    $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'additionalTurn' OR (`action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1)) ORDER BY log_id DESC LIMIT 1");
+    $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'additionalTurn' OR (`action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' " . $this->getRoundClause($pId) . ") ORDER BY log_id DESC LIMIT 1");
     if ($move == null || $move['action'] == 'additionalTurn') {
       return null;
     }
@@ -300,10 +322,8 @@ class SantoriniLog extends APP_GameClass
   public function getLastActions($actions = ['move', 'build', 'skippedWork', 'usedPower', 'skippedPower'], $pId = null, $offset = null)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
-    $offset = $offset ?: 0;
     $actionsNames = "'" . implode("','", $actions) . "'";
-
-    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset ORDER BY log_id DESC");
+    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' " . $this->getRoundClause($pId, $offset) . " ORDER BY log_id DESC");
   }
 
   public function getLastAction($action, $pId = null, $offset = null)
@@ -337,7 +357,7 @@ class SantoriniLog extends APP_GameClass
   public function cancelTurn()
   {
     $pId = $this->game->getActivePlayerId();
-    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) ORDER BY log_id DESC");
+    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' " . $this->getRoundClause($pId) . " ORDER BY log_id DESC");
 
     $ids = [];
     $moveIds = [];
@@ -357,6 +377,11 @@ class SantoriniLog extends APP_GameClass
         // Discard hero power : put the power back
         $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
         $this->game->powerManager->addPower($power, 'hero');
+      } else if ($log['action'] == 'placeWorker') {
+        // Place worker : remove the worker, update power UI
+        self::DbQuery("UPDATE piece SET x = null, y = null, z = null, location = '" . $args['location'] . "' WHERE id = {$log['piece_id']}");
+        $power = $this->game->powerManager->getPower($args['power_id'], $pId);
+        $power->updateUI();
       }
 
       if (array_key_exists('stats', $args)) {
