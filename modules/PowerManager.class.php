@@ -140,6 +140,7 @@ class PowerManager extends APP_GameClass
     [PERSEPHONE, ARTEMIS],  // CF PERSEPHONE
     [PERSEPHONE, CHARON],  // CF PERSEPHONE
     [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE
+    [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
     [TARTARUS, TERPSICHORE],
     // Incomplete Adonis implementation
     [ADONIS, ARTEMIS], // multiple moves
@@ -152,6 +153,7 @@ class PowerManager extends APP_GameClass
     [ADONIS, JASON], // alternative turn
     [ADONIS, CASTOR], // alternative turn
     [ADONIS, ERIS], // alternative turn
+    [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
   ];
 
 
