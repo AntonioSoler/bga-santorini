@@ -25,21 +25,72 @@ var isMobile = function () {
   return body != null && body.classList.contains('mobile_version');
 };
 
+function isWebGLAvailable() {
+  var ok = false;
+  try {
+    var canvas = document.createElement('canvas');
+    ok = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+  } catch (e) {
+  }
+  debug('WebGL available:', ok);
+  return ok;
+}
+
+function isWebGL2Available() {
+  var ok = false;
+  try {
+    var canvas = document.createElement('canvas');
+    ok = !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
+  } catch (e) {
+  }
+  debug('WebGL2 available:', ok);
+  return ok;
+}
 
 define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
 
   // Dojo ShrinkSafe does not support named function expressions
   // If you need to use this.inherited(), define the function here (not inside "return")
-  function santorini_adaptStatusBar() {
-    // Handle "position: fixed" for power detail (match page title)
-    this.inherited(santorini_adaptStatusBar, arguments);
+
+  var isLoadingComplete = false;
+  function override_setLoader(value, max) {
+    // [Undocumented] Called by BGA framework when loading progress changes
+    // Call our onLoadComplete() when fully loaded
+    this.inherited(override_setLoader, arguments);
+    if (!isLoadingComplete && value >= 100) {
+      isLoadingComplete = true;
+      this.onLoadingComplete();
+    }
+  }
+
+  function override_adaptStatusBar() {
+    // [Undocumented] Called by BGA framework on scroll
+    // Handle "position: fixed" for power detail
+    this.inherited(override_adaptStatusBar, arguments);
     if (this.gamedatas.gamestate.name == 'buildOffer') {
       var isFixed = dojo.hasClass("page-title", "fixed-page-title");
       dojo.toggleClass("grid-detail", "fixed", isFixed);
     }
   }
 
+  function override_addMoveToLog(logId, moveId) {
+    // [Undocumented] Called by BGA framework on new log notification message
+    // Handle cancelled notifications
+    this.inherited(override_addMoveToLog, arguments);
+    if (this.gamedatas.cancelMoveIds && this.gamedatas.cancelMoveIds.includes(+moveId)) {
+      debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
+      dojo.addClass('log_' + logId, 'cancel');
+    }
+  }
+
   return declare("bgagame.santorini", ebg.core.gamegui, {
+    /*
+     * [Undocumented] Override BGA framework functions
+     */
+    setLoader: override_setLoader,
+    adaptStatusBar: override_adaptStatusBar,
+    addMoveToLog: override_addMoveToLog,
+
     /*
      * Constructor
      */
@@ -60,19 +111,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     setup: function (gamedatas) {
       var _this = this;
       debug('SETUP', gamedatas);
-
-      // Setup the board (3d scene using threejs)
-      dojo.place(this.format_block('jstpl_scene', {}), 'overall-content');
-      this.board = new Board($('scene-container'), URL); // Setup player boards
-      this.setupPreference();
-
-      var target = document.getElementById('loader_mask');
-      var observer = new MutationObserver(function (mutations) {
-        if (target.style.display == 'none') {
-          _this.onLoaderOff();
-        }
-      });
-      observer.observe(target, { attributes: true, attributeFilter: ['style'] });
 
       // Setup powers
       Object.values(gamedatas.powers)
@@ -99,21 +137,50 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         });
       });
 
+      // Check for WebGL
+      if (!isWebGL2Available() && !isWebGLAvailable()) {
+        dojo.style('webgl-error', 'display', 'block');
+        $('webgl-error').innerHTML = _('Your browser or graphics card does not support WebGL. Click for help.');
+        return;
+      }
+
+      // Setup the board (3d scene using threejs)
+      dojo.place(this.format_block('jstpl_scene', {}), 'overall-content');
+      this.board = new Board($('scene-container'), URL);
+      this.setupPreference();
+
       // Setup workers and buildings
       gamedatas.placedPieces.forEach(function (piece) {
         _this.board.addPiece(piece);
       });
-
-      // Setup golden fleece
       if (gamedatas.goldenFleece) {
         this.addGoldenFleece(gamedatas.goldenFleece);
       }
 
-      // Handle for cancelled notification messages
-      dojo.subscribe('addMoveToLog', this, 'santorini_addMoveToLog');
-
       // Setup game notifications
       this.setupNotifications();
+    },
+
+    onLoadingComplete: function () {
+      debug('Loading complete');
+      if (!this.board) {
+        // Automatically propose to abandon the game
+        $('ingame_menu_abandon').click();
+        return;
+      }
+
+      this.onScreenWidthChange();
+      if (this._focusedContainer == 'powers-offer') {
+        dojo.style('power-offer-container', 'opacity', '1');
+      } else if (this._focusedContainer == 'powers-choose') {
+        dojo.style('power-choose-container', 'opacity', '1');
+      }
+
+      if (this._focusedContainer == 'board') {
+        this.board.enterScene();
+      } else {
+        this.board.onLoad();
+      }
     },
 
     comparePowersByName: function (power1, power2) {
@@ -136,23 +203,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       updatePreference();
     },
 
-    onLoaderOff: function () {
-      this.onScreenWidthChange();
-      if (this._focusedContainer == 'powers-offer') {
-        dojo.style('power-offer-container', 'opacity', '1');
-      } else if (this._focusedContainer == 'powers-choose') {
-        dojo.style('power-choose-container', 'opacity', '1');
-      }
-
-      if (this._focusedContainer == 'board') {
-        this.board.enterScene();
-      } else {
-        this.board.onLoad();
-      }
-    },
-
     // TODO
     onScreenWidthChange: function () {
+      if (!this.board) { return; }
       dojo.style('page-content', 'zoom', 'normal');
       if ($('scene-container')) {
         dojo.style('santorini-overlay', 'width', document.getElementById("left-side").offsetWidth + "px");
@@ -161,8 +214,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         this.board.updateSize();
       }
     },
-
-    adaptStatusBar: santorini_adaptStatusBar,
 
 		/*
 		 * notif_cancel:
@@ -184,17 +235,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
           dojo.addClass('log_' + logId, 'cancel');
         }
-      }
-    },
-
-    /*
-     * addMoveToLog: called by BGA framework when a new notification message is logged.
-     * cancel it immediately if needed.
-     */
-    santorini_addMoveToLog: function (logId, moveId) {
-      if (this.gamedatas.cancelMoveIds && this.gamedatas.cancelMoveIds.includes(+moveId)) {
-        debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
-        dojo.addClass('log_' + logId, 'cancel');
       }
     },
 
@@ -312,6 +352,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         this.updatePageTitle();
       }
 
+      // Stop if no board
+      if (!this.board) { return; }
+
       // Stop here if it's not the current player's turn for some states
       if (["playerUsePower", "playerPlaceWorker", "playerPlaceRam", "playerMove", "playerBuild", "confirmTurn", "gameEnd"].includes(stateName)) {
         this.focusContainer('board');
@@ -337,6 +380,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
      */
     onLeavingState: function (stateName) {
       debug('Leaving state: ' + stateName);
+      if (!this.board) { return; }
       if (stateName == 'buildOffer') {
         dojo.empty('power-offer-container');
       }

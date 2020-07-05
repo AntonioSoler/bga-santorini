@@ -1,6 +1,7 @@
 {OVERALL_GAME_HEADER}
 
 <div id="play-area-scaler">
+	<a id="webgl-error" href="https://get.webgl.org/" target="_blank"></a>
 	<div id="power-offer-container">
 		<div id="grid-powers">
 			<div class="power-section">

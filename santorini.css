@@ -20,6 +20,15 @@ html {
   background-color:#76cfe9; /*#153665*/
 }
 
+#webgl-error {
+  display: none;
+  background: #d50000;
+  color: #fff;
+  text-align: center;
+  font-size: 20px;
+  padding: 30px;
+}
+
 #overall-content {
   position:relative;
 }
