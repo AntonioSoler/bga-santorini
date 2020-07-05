@@ -91,7 +91,7 @@ class SantoriniBoard extends APP_GameClass
         $ids = array_merge($ids, $this->game->playerManager->getTeammatesIds($pId));
       }
 
-      $filter = empty($ids)? "AND FALSE" : " AND player_id IN (" . implode(',', $ids) . ")";
+      $filter = empty($ids) ? "AND FALSE" : " AND player_id IN (" . implode(',', $ids) . ")";
     }
 
     return $filter;
@@ -265,7 +265,9 @@ class SantoriniBoard extends APP_GameClass
 
     // For moving, the new height can't be more than +1
     if ($action == 'move') {
-      if (in_array(BELLEROPHON, $powerIds)) {
+      if (in_array(PEGASUS, $powerIds)) {
+        $ok = $ok; // any height
+      } else if (in_array(BELLEROPHON, $powerIds)) {
         $ok =  $ok && $b['z'] <= $a['z'] + 2;
       } else {
         $ok = $ok && $b['z'] <= $a['z'] + 1;

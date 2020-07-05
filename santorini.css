@@ -804,6 +804,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-65 { background-image:url('img/cards/065.jpg'); }
 .power-66 { background-image:url('img/cards/066.jpg'); }
 .power-67 { background-image:url('img/cards/067.jpg'); }
+.power-67.power-card.small { background-position: 0% 28%; background-size: 175%; } /* Pegasus */
 
 
 .power-1 .power-avatar { background-image:url('img/avatars/001.png'); }
