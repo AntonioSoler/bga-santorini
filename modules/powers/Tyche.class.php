@@ -9,13 +9,76 @@ class Tyche extends SantoriniPower
     $this->name  = clienttranslate('Tyche');
     $this->title = clienttranslate('Goddess of Fortune');
     $this->text  = [
-      clienttranslate("[Setup:] Shuffle five Advanced God cards and one Simple God card into a face-down deck in your play area."),
-      clienttranslate("[End of Your Turn:] Turn over the top card of your deck. If it is an Advanced God card, place it under your deck. If it is the Simple God card, reshuffle it into your deck and you may take an additional turn. On that additional turn, do not turn over the top card from the deck."),
+      clienttranslate("[Setup:] Shuffle a deck of 6 cards in your play area."),
+      clienttranslate("[End of Your Turn:] Draw the top card of your deck. If it is 1 - 5, discard it. If it is 6, reshuffle your deck and you may take an additional turn. On that additional turn, do not draw the top card from your deck."),
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;
     $this->orderAid = 48;
+
+    $this->implemented = true;
   }
 
   /* * */
+
+  public function getUIData()
+  {
+    $data = parent::getUIData();
+    $data['counter'] = ($this->playerId != null) ? $this->computeDeck() : 6;
+    return $data;
+  }
+
+  public function computeDeck()
+  {
+    return intval($this->game->powerManager->cards->countCardInLocation('tycheDeck'));
+  }
+
+  public function drawCard()
+  {
+    $card = $this->game->powerManager->cards->pickCardForLocation('tycheDeck', 'tycheDiscard');
+    $additionalTurn = ($card['type'] == 1);
+    if ($additionalTurn) {
+      $this->game->powerManager->cards->moveAllCardsInLocation('tycheDiscard', 'tycheDeck');
+      $this->game->powerManager->cards->shuffle('tycheDeck');
+      $this->game->additionalTurn($this);
+    } else {
+      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} may not take an additional turn'), [
+        'i18n' => ['power_name'],
+        'power_name' => $this->getName(),
+        'player_name' => $this->getPlayer()->getName(),
+      ]);
+    }
+    $this->updateUI();
+    return $additionalTurn;
+  }
+
+  public function setup()
+  {
+    // Create the deck of 6 cards
+    $cards = [
+      ['type' => 0, 'type_arg' => 0, 'nbr' => 5], // nothing
+      ['type' => 1, 'type_arg' => 1, 'nbr' => 1], // additional turn
+    ];
+    $this->game->powerManager->cards->createCards($cards, 'tycheDeck');
+    $this->game->powerManager->cards->shuffle('tycheDeck');
+  }
+
+  public function stateEndOfTurn()
+  {
+    return (!$this->game->log->isAdditionalTurn() && $this->drawCard()) ? 'additionalTurn' : null;
+  }
+
+  public function argPlayerMove(&$arg)
+  {
+    // Usual turn => usual rule
+    if (!$this->game->log->isAdditionalTurn()) {
+      return;
+    }
+    $arg['skippable'] = true;
+  }
+
+  public function stateAfterSkip()
+  {
+    return 'endturn';
+  }
 }

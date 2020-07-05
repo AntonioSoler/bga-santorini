@@ -219,13 +219,17 @@ class SantoriniLog extends APP_GameClass
   /////////////////////////////////
   /////////////////////////////////
 
-  private function getRoundClause($pId, $offset = 0)
+  private function getRoundClause($pId, $offset = 0, $additionalTurns = false)
   {
     $offset = $offset ?: 0;
     if ($offset === 'all') {
       return "";
     } else {
-      return "AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset";
+      $clause = "AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset";
+      if (!$additionalTurns) {
+        $clause .= " AND `log_id` > (SELECT COALESCE(MAX(log_id), 0) FROM log WHERE `player_id` = $pId AND `action` = 'additionalTurn' $clause)";
+      }
+      return $clause;
     }
   }
 
@@ -235,14 +239,15 @@ class SantoriniLog extends APP_GameClass
  *    - string $action : type of work we want to fetch (move/build)
  *    - optionnal int $pId : the player we are interested in, default is active player
  *    - optional int $limit : the number of works we want to fetched (order by most recent first), default is no-limit (-1)
+ *    - optional bool $additionalTurns : whether to include works of prior additional turns during the current round (e.g., Dionysus, Tyche)
  */
-  public function getLastWorks($actions, $pId = null, $limit = -1)
+  public function getLastWorks($actions, $pId = null, $limit = -1, $additionalTurns = false)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
     $limitClause = ($limit == -1) ? '' : "LIMIT $limit";
     $actionsNames = "'" . (is_array($actions) ? implode("','", $actions) : $actions) . "'";
 
-    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' " . $this->getRoundClause($pId) . " ORDER BY log_id DESC " . $limitClause);
+    $works = self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' " . $this->getRoundClause($pId, 0, $additionalTurns) . " ORDER BY log_id DESC " . $limitClause);
 
     return array_map(function ($work) {
       $args = json_decode($work['action_arg'], true);
@@ -259,7 +264,7 @@ class SantoriniLog extends APP_GameClass
   /*
    * getLastWork: fetch the last move/build of player of current round if it exists, null otherwise
    */
-  public function getLastWork($pId = null)
+  public function getLastWork($pId = null, $additionalTurns = false)
   {
     $works = $this->getLastWorks(['move', 'build'], $pId, 1);
     return (count($works) == 1) ? $works[0] : null;
@@ -269,17 +274,17 @@ class SantoriniLog extends APP_GameClass
   /*
    * getLastMoves: fetch last moves of player of current round
    */
-  public function getLastMoves($pId = null, $limit = -1)
+  public function getLastMoves($pId = null, $limit = -1, $additionalTurns = false)
   {
-    return $this->getLastWorks('move', $pId, $limit);
+    return $this->getLastWorks('move', $pId, $limit, $additionalTurns);
   }
 
   /*
    * getLastMove: fetch the last move of player of current round if it exists, null otherwise
    */
-  public function getLastMove($pId = null)
+  public function getLastMove($pId = null, $additionalTurns = false)
   {
-    $moves = $this->getLastMoves($pId, 1);
+    $moves = $this->getLastMoves($pId, 1, $additionalTurns);
     return (count($moves) == 1) ? $moves[0] : null;
   }
 
@@ -289,8 +294,8 @@ class SantoriniLog extends APP_GameClass
   public function getLastMoveOfWorker($workerId)
   {
     $pId = $this->game->getActivePlayerId();
-    $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'additionalTurn' OR (`action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' " . $this->getRoundClause($pId) . ") ORDER BY log_id DESC LIMIT 1");
-    if ($move == null || $move['action'] == 'additionalTurn') {
+    $move = self::getObjectFromDb("SELECT * FROM log WHERE `action` = 'move' AND `piece_id` = '$workerId' AND `player_id` = '$pId' " . $this->getRoundClause($pId, 0, false) . " ORDER BY log_id DESC LIMIT 1");
+    if ($move == null) {
       return null;
     }
     return json_decode($move['action_arg'], true);
@@ -301,34 +306,34 @@ class SantoriniLog extends APP_GameClass
   /*
    * getLastBuilds: fetch last builds of player of current round
    */
-  public function getLastBuilds($pId = null, $limit = -1)
+  public function getLastBuilds($pId = null, $limit = -1, $additionalTurns = false)
   {
-    return $this->getLastWorks('build', $pId, $limit);
+    return $this->getLastWorks('build', $pId, $limit, $additionalTurns);
   }
 
   /*
    * getLastBuild: fetch the last build of player of current round if it exists, null otherwise
    */
-  public function getLastBuild($pId = null)
+  public function getLastBuild($pId = null, $additionalTurns = false)
   {
-    $builds = $this->getLastBuilds($pId, 1);
+    $builds = $this->getLastBuilds($pId, 1, $additionalTurns);
     return (count($builds) == 1) ? $builds[0] : null;
   }
 
 
   /*
-   * getLastActions : get works and actions of player (used to cancel previous action)
+   * getLastActions : get works and actions of player
    */
-  public function getLastActions($actions = ['move', 'build', 'skippedWork', 'usedPower', 'skippedPower'], $pId = null, $offset = null)
+  public function getLastActions($actions, $pId = null, $offset = null, $additionalTurns = false)
   {
     $pId = $pId ?: $this->game->getActivePlayerId();
     $actionsNames = "'" . implode("','", $actions) . "'";
-    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' " . $this->getRoundClause($pId, $offset) . " ORDER BY log_id DESC");
+    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' " . $this->getRoundClause($pId, $offset, $additionalTurns) . " ORDER BY log_id DESC");
   }
 
-  public function getLastAction($action, $pId = null, $offset = null)
+  public function getLastAction($action, $pId = null, $offset = null, $additionalTurns = false)
   {
-    $actions = $this->getLastActions([$action], $pId, $offset);
+    $actions = $this->getLastActions([$action], $pId, $offset, $additionalTurns);
     return count($actions) > 0 ? json_decode($actions[0]['action_arg'], true) : null;
   }
 
@@ -354,10 +359,23 @@ class SantoriniLog extends APP_GameClass
   //////////   Cancel   //////////
   ////////////////////////////////
   ////////////////////////////////
+
+  private function logsForCancelTurn()
+  {
+    $pId = $this->game->getActivePlayerId();
+    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' AND `action` != 'startTurn' " . $this->getRoundClause($pId, 0, false) . " ORDER BY log_id DESC");
+    return $logs;
+  }
+
+  public function canCancelTurn()
+  {
+    return !empty($this->logsForCancelTurn());
+  }
+
   public function cancelTurn()
   {
     $pId = $this->game->getActivePlayerId();
-    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' " . $this->getRoundClause($pId) . " ORDER BY log_id DESC");
+    $logs = $this->logsForCancelTurn();
 
     $ids = [];
     $moveIds = [];
@@ -390,9 +408,7 @@ class SantoriniLog extends APP_GameClass
       }
 
       $ids[] = intval($log['log_id']);
-      if ($log['action'] != 'startTurn') {
-        $moveIds[] = array_key_exists('move_id', $log) ? intval($log['move_id']) : 0; // TODO remove the array_key_exists
-      }
+      $moveIds[] = array_key_exists('move_id', $log) ? intval($log['move_id']) : 0; // TODO remove the array_key_exists
     }
 
     // Remove the logs
@@ -405,7 +421,9 @@ class SantoriniLog extends APP_GameClass
     }
 
     // Cancel the game notifications
-    self::DbQuery("UPDATE gamelog SET `cancel` = 1 WHERE `gamelog_move_id` IN (" . implode(',', $moveIds) . ")");
+    if (!empty($moveIds)) {
+      self::DbQuery("UPDATE gamelog SET `cancel` = 1 WHERE `gamelog_move_id` IN (" . implode(',', $moveIds) . ")");
+    }
     return $moveIds;
   }
 

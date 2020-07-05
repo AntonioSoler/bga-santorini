@@ -169,6 +169,10 @@ class PowerManager extends APP_GameClass
       $this->cards = self::getNew('module.common.deck');
       $this->cards->init('card');
       $this->cards->autoreshuffle = true;
+      $this->cards->autoreshuffle_custom = [
+        'deck' => 'discard',
+        'tycheDeck' => 'tycheDiscard',
+      ];
     }
   }
 

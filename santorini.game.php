@@ -482,7 +482,7 @@ class santorini extends Table
   public function stNextPlayer($next = true)
   {
     $players = $this->playerManager->getRemeaningPlayersIds();
-    if(count($players) == 1){
+    if (count($players) == 1) {
       $this->announceWin($players[0]['id'], true);
       return;
     }
@@ -639,7 +639,7 @@ class santorini extends Table
     } else {
       // 3 players => eliminate the player
       $players = $this->playerManager->getRemeaningPlayersIds();
-      if(count($players) > 1){
+      if (count($players) > 1) {
         $this->gamestate->nextState("eliminate");
       } else {
         $this->announceWin($players[0]['id'], true);
@@ -670,7 +670,7 @@ class santorini extends Table
   public function argUsePower()
   {
     $arg = [
-      'cancelable' => $this->log->getLastActions() != null
+      'cancelable' => $this->log->canCancelTurn(),
     ];
     $this->powerManager->argUsePower($arg);
     return $arg;
@@ -759,7 +759,7 @@ class santorini extends Table
   public function argPlayerWork($action, $workers = null)
   {
     $arg = [
-      'cancelable' => $this->log->getLastActions() != null,
+      'cancelable' => $this->log->canCancelTurn(),
       'skippable' => false,
       'workers' => $workers ?: $this->board->getPlacedActiveWorkers(),
     ];
@@ -873,7 +873,7 @@ class santorini extends Table
   {
     self::checkAction('cancel');
 
-    if ($this->log->getLastActions() == null) {
+    if (!$this->log->canCancelTurn()) {
       throw new BgaUserException(_("You have nothing to cancel"));
     }
 
@@ -1009,6 +1009,23 @@ class santorini extends Table
     ]);
   }
 
+
+  /*
+   * additionalTurn: grant an additional turn to the player (e.g., Dionysus, Tyche)
+   * - obj $power : the power that granted the additional turn
+   * - int $n : the additional turn number
+   */
+  public function additionalTurn($power, $n = 0)
+  {
+    $player = $power->getPlayer();
+    $stats = [[$player->getId(), 'usePower']];
+    $this->log->addAction('additionalTurn', $stats, ['power_id' => $power->getId(), 'n' => $n]);
+    $this->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} may take an additional turn'), [
+      'i18n' => ['power_name'],
+      'power_name' => $power->getName(),
+      'player_name' => $player->getName()
+    ]);
+  }
 
   ////////////////////////////////////
   ////////////   Zombie   ////////////

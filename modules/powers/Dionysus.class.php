@@ -55,10 +55,9 @@ class Dionysus extends SantoriniPower
   public function playerBuild($worker, $work)
   {
     if ($work['z'] == 3) {
-      $action = $this->game->log->getLastAction("additionalTurn");
+      $action = $this->game->log->getLastAction("additionalTurn", null, null, true);
       $n = $action == null ? 0 : ($action['n'] + 1);
-      $stats = [[$this->playerId, 'usePower']];
-      $this->game->log->addAction("towerCompleted", $stats , ['n' => $n]);
+      $this->game->log->addAction("towerCompleted", [], ['n' => $n]);
     }
     return false;
   }
@@ -66,22 +65,27 @@ class Dionysus extends SantoriniPower
 
   public function stateEndOfTurn()
   {
-    $tower = $this->game->log->getLastAction("towerCompleted");
-    $action = $this->game->log->getLastAction("additionalTurn");
+    $tower = $this->game->log->getLastAction("towerCompleted", null, null, true);
+    $action = $this->game->log->getLastAction("additionalTurn", null, null, true);
     if ($tower == null || ($action != null && $tower['n'] <= $action['n'])) {
       return null;
     }
 
-    $this->game->log->addAction("additionalTurn", [], ['n' => $action == null ? 0 : ($action['n'] + 1)]);
+    $n = $action == null ? 0 : ($action['n'] + 1);
+    $this->game->additionalTurn($this, $n);
     return 'additionalTurn';
   }
 
 
   protected function checkWinning(&$arg)
   {
-    if ($this->game->log->isAdditionalTurn()) {
+    if ($arg['win'] && $this->game->log->isAdditionalTurn()) {
       $arg['win'] = false;
       unset($arg['winStats']);
+      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: No player can win during this additional turn'), [
+        'i18n' => ['power_name'],
+        'power_name' => $this->getName(),
+      ]);
     }
   }
 

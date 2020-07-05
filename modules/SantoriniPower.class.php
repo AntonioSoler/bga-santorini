@@ -86,6 +86,11 @@ abstract class SantoriniPower extends APP_GameClass
     $this->playerId = $newPlayerId;
   }
 
+  public function getPlayerId()
+  {
+    return $this->playerId;
+  }
+
   public function getPlayer()
   {
     return $this->game->playerManager->getPlayer($this->playerId);
