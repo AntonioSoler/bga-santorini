@@ -91,7 +91,7 @@ class SantoriniBoard extends APP_GameClass
         $ids = array_merge($ids, $this->game->playerManager->getTeammatesIds($pId));
       }
 
-      $filter = empty($ids) ? "AND FALSE" : " AND player_id IN (" . implode(',', $ids) . ")";
+      $filter = empty($ids) ? "AND FALSE" : (" AND player_id IN (" . implode(',', $ids) . ")");
     }
 
     return $filter;
