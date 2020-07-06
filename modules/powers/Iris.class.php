@@ -23,11 +23,11 @@ class Iris extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
+    $allWorkers = $this->game->board->getPlacedWorkers();
     $workers = $this->game->board->getPlacedActiveWorkers();
     foreach ($workers as &$worker) {
       $worker['works'] = [];
-      foreach ($oppWorkers as $worker2) {
+      foreach ($allWorkers as $worker2) {
         // Only possible if workers are neighbors
         if (!$this->game->board->isNeighbour($worker, $worker2)) {
           continue;
