@@ -488,14 +488,15 @@ class santorini extends Table
     }
 
     $pId = $next ? $this->activeNextPlayer() : $this->getActivePlayerId();
-    if ($this->playerManager->getPlayer($pId)->isEliminated()) {
-      $pId = $this->activeNextPlayer();
-    }
-    self::giveExtraTime($pId);
     if (self::getGamestateValue("firstPlayer") == $pId) {
       $n = (int) self::getGamestateValue('currentRound') + 1;
       self::setGamestateValue("currentRound", $n);
     }
+    if ($this->playerManager->getPlayer($pId)->isEliminated()) {
+      $this->stNextPlayer();
+      return;
+    }
+    self::giveExtraTime($pId);
 
     $this->gamestate->nextState('play');
   }
