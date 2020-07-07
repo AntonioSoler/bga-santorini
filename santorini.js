@@ -112,6 +112,28 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       var _this = this;
       debug('SETUP', gamedatas);
 
+      // Check if the Board module loaded
+      // Most old browsers fail here
+      // (exception: Safari 10 passes this check but still can't play)
+      if (typeof Board == 'undefined') {
+        dojo.style('browser-error', 'display', 'block');
+        dojo.attr('browser-error', 'href', 'https://browsehappy.com/');
+        $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f644.png" alt="Face with Rolling Eyes">'
+          + '<div>' + _('Your outdated browser is not supported') + '</div>'
+          + '<div class="ua" title="User-Agent">' + navigator.userAgent + '</div>';
+        return;
+      }
+
+      // Check for WebGL
+      if (!isWebGL2Available() && !isWebGLAvailable()) {
+        dojo.style('browser-error', 'display', 'block');
+        dojo.attr('browser-error', 'href', 'https://get.webgl.org/');
+        $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f914.png" alt="Thinking Face">'
+          + '<div>' + _('Your browser or graphics card does not support WebGL') + '</div>'
+          + '<div class="ua" title="User-Agent">' + navigator.userAgent + '</div>';
+        return;
+      }
+
       // Setup powers
       Object.values(gamedatas.powers)
         .sort(function (power1, power2) {
@@ -136,13 +158,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
           _this.addPower(player.id, powerId, 'init', false);
         });
       });
-
-      // Check for WebGL
-      if (!isWebGL2Available() && !isWebGLAvailable()) {
-        dojo.style('webgl-error', 'display', 'block');
-        $('webgl-error').innerHTML = _('Your browser or graphics card does not support WebGL. Click for help.');
-        return;
-      }
 
       // Setup the board (3d scene using threejs)
       dojo.place(this.format_block('jstpl_scene', {}), 'overall-content');
