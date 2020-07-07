@@ -89,6 +89,7 @@ html {
   background-image:url('img/cloud-left.png');
   background-size:cover;
   background-position:right;
+  background-repeat:no-repeat;
   transition: left 2s ease;
 }
 
@@ -101,6 +102,7 @@ html {
   z-index:2;
   background-image:url('img/cloud-right.png');
   background-size:cover;
+  background-repeat:no-repeat;
   transition: right 2s ease;
 }
 
