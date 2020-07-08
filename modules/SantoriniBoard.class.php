@@ -239,10 +239,16 @@ class SantoriniBoard extends APP_GameClass
     return ($space['x'] == 0 || $space['x'] == 4) && ($space['y'] == 0 || $space['y'] == 4);
   }
 
+  // This supposed that the normal move is at distance at most one, might not work with some powers
   public function isDiagonal($a, $b)
   {
-    $diffX = abs($a['x'] - $b['x']);
-    $diffY = abs($a['y'] - $b['y']);
+    $dx = abs($a['x'] - $b['x']) <= 1 ? 0 : ($a['x'] < $b['x'] ? 1 : -1);
+    $dy = abs($a['y'] - $b['y']) <= 1 ? 0 : ($a['y'] < $b['y'] ? 1 : -1);
+
+    $x = $a['x'] + 5 * $dx;
+    $y = $a['y'] + 5 * $dy;
+    $diffX = abs($x - $b['x']);
+    $diffY = abs($y - $b['y']);
     return $diffX != 0 && $diffX == $diffY;
   }
 
