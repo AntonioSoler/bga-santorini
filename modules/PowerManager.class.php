@@ -686,10 +686,9 @@ class PowerManager extends APP_GameClass
    *    apply every player powers that may add new works or make the work skippable
    *    and then apply every opponent powers that may restrict the possible works
    */
-  public function argPlayerWork(&$arg, $action)
+  private function argPlayerWork(&$arg, $action)
   {
     $this->applyPower(["argPlayer$action", "argTeammate$action", "argOpponent$action"], [&$arg]);
-    Utils::cleanWorkers($arg);
   }
 
   /*
@@ -698,6 +697,7 @@ class PowerManager extends APP_GameClass
   public function argPlayerMove(&$arg)
   {
     $this->argPlayerWork($arg, 'Move');
+    Utils::cleanWorkers($arg);
   }
 
   /*
@@ -706,6 +706,7 @@ class PowerManager extends APP_GameClass
   public function argPlayerBuild(&$arg)
   {
     $this->argPlayerWork($arg, 'Build');
+    Utils::cleanWorkers($arg);
   }
 
 
