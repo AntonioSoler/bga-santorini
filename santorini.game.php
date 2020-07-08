@@ -273,11 +273,12 @@ class santorini extends Table
   public function argChooseFirstPlayer($location = 'offer')
   {
     $powers = $this->powerManager->getPowerIdsInLocation($location);
-    $firstPowerSuggestion = $this->powerManager->getFirstPlayerSuggestion($powers);
+    $suggestion = $this->powerManager->getFirstPlayerSuggestion($powers);
     $arg = [
+      'i18n' => ['power_name'],
       'powers' => $powers,
-      'power_name' => $this->powerManager->getPower($firstPowerSuggestion)->getName(),
-      'suggestion' => $firstPowerSuggestion,
+      'power_name' => $this->powerManager->getPower($suggestion)->getName(),
+      'suggestion' => $suggestion,
     ];
 
     // Apply powers (Bia must start)
@@ -666,6 +667,7 @@ class santorini extends Table
   public function argUsePower()
   {
     $arg = [
+      'i18n' => ['power_name'],
       'cancelable' => $this->log->canCancelTurn(),
     ];
     $this->powerManager->argUsePower($arg);

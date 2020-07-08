@@ -51,7 +51,7 @@
 //    !! It is not a good idea to modify this file when a game is running !!
 
 
-$machinestates = array(
+$machinestates = [
   /*
    * BGA framework initial state. Do not modify.
    */
@@ -98,7 +98,6 @@ $machinestates = array(
     'name' => 'chooseFirstPlayer',
     'description' => clienttranslate('${actplayer} must choose which power will start (balanced suggestion: ${power_name})'),
     'descriptionmyturn' => clienttranslate('${you} must choose which power will start (balanced suggestion: ${power_name})'),
-    'i18n' => array('power_name'),
     'type' => 'activeplayer',
     'args' => 'argChooseFirstPlayer',
     'action' => 'stChooseFirstPlayer',
@@ -212,7 +211,6 @@ $machinestates = array(
     'descriptionskippable' => clienttranslate('${actplayer} may use ${power_name}\'s power'),
     'descriptionmyturn' => clienttranslate('${you} must use ${power_name}\'s power'),
     'descriptionmyturnskippable' => clienttranslate('${you} may use ${power_name}\'s power'),
-    'i18n' => array('power_name'),
     'type' => 'activeplayer',
     'args' => 'argUsePower',
     'possibleactions' => ['use', 'skip', 'cancel'],
@@ -336,4 +334,4 @@ $machinestates = array(
     'args' => 'argGameEnd'
   ]
 
-);
+];
