@@ -20,10 +20,6 @@
 //@ sourceURL=santorini.js
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
-var isMobile = function () {
-  var body = document.getElementById("ebd-body");
-  return body != null && body.classList.contains('mobile_version');
-};
 
 function isWebGLAvailable() {
   var ok = false;
@@ -179,8 +175,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     onLoadingComplete: function () {
       debug('Loading complete');
       if (!this.board) {
-        // Automatically propose to abandon the game
-        $('ingame_menu_abandon').click();
+        if (!this.isReadOnly()) {
+          // Automatically propose to abandon the game
+          $('ingame_menu_abandon').click();
+        }
         return;
       }
 
@@ -196,6 +194,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       } else {
         this.board.onLoad();
       }
+    },
+
+    // Returns true for spectators, instant replay (during game), archive mode (after game end)
+    isReadOnly: function () {
+      return this.isSpectator || typeof g_replayFrom != "undefined" || g_archive_mode;
     },
 
     comparePowersByName: function (power1, power2) {
@@ -434,8 +437,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
     startActionTimer: function (buttonId) {
-      if (isDebug) {
-        debug('Ignoring startActionTimer(' + buttonId + ') because isDebug=true');
+      var isReadOnly = this.isReadOnly();
+      if (isDebug || isReadOnly || !this.bRealtime) {
+        debug('Ignoring startActionTimer(' + buttonId + ')', 'debug=' + isDebug, 'readOnly=' + isReadOnly, 'realtime=' + this.bRealtime);
         return;
       }
 
@@ -1322,6 +1326,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
         ['updatePowerUI', 10], // Happens with Morpheus, Chaos
+        ['sqlDebug', 10], // used in studio only
       ];
 
       var _this = this;
@@ -1330,6 +1335,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         dojo.subscribe(notif[0], _this, "notif_" + notif[0]);
         _this.notifqueue.setSynchronous(notif[0], notif[1]);
       });
-    }
+    },
+
+    notif_sqlDebug: function (n) {
+      debug(n.args.sql);
+      prompt(n.log, n.args.sql);
+    },
   });
 });

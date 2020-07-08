@@ -37,12 +37,6 @@ $gameinfos = array(
         totranslate("Santorini is a highly accessible pure-strategy game where you play as a youthful Greek God or Goddess competing to best aid the island's citizens in building a beautiful village in the middle of the Aegean sea.")
     ),
 
-    // Shopping link
-    'custom_buy_button' => array(
-        'url' => 'https://shop.spinmaster.com/santorini/product/p21321',
-        'label' => 'SpinMaster'
-    ),
-
     // Players configuration that can be played (ex: 2 to 4 players)
     'players' => array(2, 3, 4),
 
