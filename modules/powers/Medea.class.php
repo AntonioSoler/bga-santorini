@@ -43,7 +43,6 @@ class Medea extends SantoriniHeroPower
         }
       }
     }
-    Utils::cleanWorkers($arg);
   }
 
   public function usePower($action)

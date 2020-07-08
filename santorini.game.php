@@ -210,7 +210,6 @@ class santorini extends Table
    */
   public function addOffer($powerId)
   {
-    self::checkAction('addOffer');
     if (in_array($powerId, $this->powerManager->computeBannedIds())) {
       throw new BgaUserException(_("This power is not compatible with some already selected powers"));
     }
@@ -224,7 +223,6 @@ class santorini extends Table
    */
   public function removeOffer($powerId)
   {
-    self::checkAction('removeOffer');
     $this->powerManager->removeOffer($powerId);
   }
 
@@ -234,7 +232,6 @@ class santorini extends Table
    */
   public function confirmOffer()
   {
-    self::checkAction('confirmOffer');
     $n = $this->argBuildOffer()['count'];
     $powers = $this->powerManager->getPowersInLocation('offer');
     if (count($powers) != $n) {
@@ -442,8 +439,6 @@ class santorini extends Table
    */
   public function placeWorker($workerId, $x, $y, $z)
   {
-    self::checkAction('placeWorker');
-
     $stateArgs = $this->gamestate->state()['args'];
     if ($stateArgs['worker']['id'] != $workerId) {
       throw new BgaUserException(_('You cannot place this piece'));
@@ -702,8 +697,6 @@ class santorini extends Table
    */
   public function usePowerWork($powerId, $wId, $x, $y, $z, $actionArg)
   {
-    self::checkAction('use');
-
     // Check the power and the work
     $args = $this->gamestate->state()['args'];
     if ($args['power'] != $powerId) {
@@ -730,8 +723,6 @@ class santorini extends Table
    */
   public function skipPower()
   {
-    self::checkAction('skip');
-
     $args = $this->gamestate->state()['args'];
     if (!$args['skippable']) {
       throw new BgaUserException(_("You can't skip this action"));
@@ -816,7 +807,6 @@ class santorini extends Table
     if ($this->stCheckEndOfGame()) {
       return;
     }
-
     $state = $this->gamestate->state();
     // TODO: apply power before work ?
 
@@ -824,10 +814,7 @@ class santorini extends Table
     if (count($state['args']['workers']) == 0) {
       if ($state['args']['skippable']) {
         $this->skipWork(false);
-        return;
-      }
-
-      if (!$state['args']['cancelable']) {
+      } else if (!$state['args']['cancelable']) {
         $this->announceLose();
       }
     }
@@ -840,7 +827,6 @@ class santorini extends Table
    */
   public function resign()
   {
-    self::checkAction('resign');
     $this->announceLose();
   }
 
@@ -851,8 +837,6 @@ class santorini extends Table
    */
   public function skipWork($log = true)
   {
-    self::checkAction('skip');
-
     $args = $this->gamestate->state()['args'];
     if (!$args['skippable']) {
       throw new BgaUserException(_("You can't skip this action"));
@@ -872,8 +856,6 @@ class santorini extends Table
    */
   public function cancelPreviousWorks()
   {
-    self::checkAction('cancel');
-
     if (!$this->log->canCancelTurn()) {
       throw new BgaUserException(_("You have nothing to cancel"));
     }
@@ -1067,5 +1049,44 @@ class santorini extends Table
       self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
     }
     */
+  }
+
+  /*
+   * sqlDebug: in studio, call this from the chat window to get the SQL to update a bug report loaded from produciton
+   */
+  public function sqlDebug($p1, $p2, $p3 = null, $p4 = null)
+  {
+    $studioPlayer = self::getCurrentPlayerId();
+    $prodPlayers = [];
+    if (!empty($p1)) {
+      $prodPlayers[] = intval($p1);
+    }
+    if (!empty($p2)) {
+      $prodPlayers[] = intval($p2);
+    }
+    if (!empty($p3)) {
+      $prodPlayers[] = intval($p3);
+    }
+    if (!empty($p4)) {
+      $prodPlayers[] = intval($p4);
+    }
+
+    $msg = [];
+    $sql = [];
+    foreach ($prodPlayers as $prodPlayer) {
+      $msg[] = "$prodPlayer -> $studioPlayer";
+      $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$prodPlayer;";
+      $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$prodPlayer;";
+      $sql[] = "UPDATE stats SET stats_player_id=$studioPlayer WHERE stats_player_id=$prodPlayer;";
+      $sql[] = "UPDATE card SET card_location_arg=$studioPlayer WHERE card_location_arg=$prodPlayer;";
+      $sql[] = "UPDATE piece SET player_id=$studioPlayer WHERE player_id=$prodPlayer;";
+      $sql[] = "UPDATE log SET player_id=$studioPlayer WHERE player_id=$prodPlayer;";
+      $sql[] = "UPDATE log SET action_arg=REPLACE(action_arg, $prodPlayer, $studioPlayer);";
+      $sql[] = "";
+      $studioPlayer++;
+    }
+    self::notifyAllPlayers('sqlDebug', implode(', ', $msg), [
+      'sql' => implode("\n", $sql),
+    ]);
   }
 }

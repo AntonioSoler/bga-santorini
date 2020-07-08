@@ -47,7 +47,6 @@ class Odysseus extends SantoriniHeroPower
         }
       }
     }
-    Utils::cleanWorkers($arg);
   }
 
   public function usePower($action)

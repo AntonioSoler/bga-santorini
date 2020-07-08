@@ -40,6 +40,7 @@ class action_santorini extends APP_GameAction
   public function addOffer()
   {
     self::setAjaxMode();
+    $this->game->checkAction('addOffer');
     $powerId = (int) self::getArg('powerId', AT_int, true);
     $this->game->addOffer($powerId);
     self::ajaxResponse();
@@ -48,6 +49,7 @@ class action_santorini extends APP_GameAction
   public function removeOffer()
   {
     self::setAjaxMode();
+    $this->game->checkAction('removeOffer');
     $powerId = (int) self::getArg('powerId', AT_int, true);
     $this->game->removeOffer($powerId);
     self::ajaxResponse();
@@ -56,6 +58,7 @@ class action_santorini extends APP_GameAction
   public function confirmOffer()
   {
     self::setAjaxMode();
+    $this->game->checkAction('confirmOffer');
     $this->game->confirmOffer();
     self::ajaxResponse();
   }
@@ -84,6 +87,7 @@ class action_santorini extends APP_GameAction
   public function skipPower()
   {
     self::setAjaxMode();
+    $this->game->checkAction('skip');
     $this->game->skipPower();
     self::ajaxResponse();
   }
@@ -91,6 +95,7 @@ class action_santorini extends APP_GameAction
   public function usePowerWork()
   {
     self::setAjaxMode();
+    $this->game->checkAction('use');
     $powerId = (int) self::getArg('powerId', AT_posint, true);
     $workerId = (int) self::getArg('workerId', AT_posint, true);
     $x = (int) self::getArg('x', AT_int, true);
@@ -109,6 +114,7 @@ class action_santorini extends APP_GameAction
   public function placeWorker()
   {
     self::setAjaxMode();
+    $this->game->checkAction('placeWorker');
     $workerId = (int) self::getArg('workerId', AT_int, true);
     $x = (int) self::getArg('x', AT_int, true);
     $y = (int) self::getArg('y', AT_int, true);
@@ -140,6 +146,7 @@ class action_santorini extends APP_GameAction
   public function skipWork()
   {
     self::setAjaxMode();
+    $this->game->checkAction('skip');
     $this->game->skipWork();
     self::ajaxResponse();
   }
@@ -148,6 +155,7 @@ class action_santorini extends APP_GameAction
   public function resign()
   {
     self::setAjaxMode();
+    $this->game->checkAction('resign');
     $this->game->resign();
     self::ajaxResponse();
   }
@@ -158,6 +166,7 @@ class action_santorini extends APP_GameAction
   public function cancelPreviousWorks()
   {
     self::setAjaxMode();
+    $this->game->checkAction('cancel');
     $this->game->cancelPreviousWorks();
     self::ajaxResponse();
   }
@@ -166,6 +175,7 @@ class action_santorini extends APP_GameAction
   public function confirmTurn()
   {
     self::setAjaxMode();
+    $this->game->checkAction('confirm');
     $this->game->confirmTurn();
     self::ajaxResponse();
   }

@@ -640,6 +640,7 @@ class PowerManager extends APP_GameClass
   public function argUsePower(&$arg)
   {
     $this->applyPower(["argUsePower"], [&$arg]);
+    Utils::cleanWorkers($arg);
   }
 
   /*
@@ -688,6 +689,7 @@ class PowerManager extends APP_GameClass
   public function argPlayerWork(&$arg, $action)
   {
     $this->applyPower(["argPlayer$action", "argTeammate$action", "argOpponent$action"], [&$arg]);
+    Utils::cleanWorkers($arg);
   }
 
   /*

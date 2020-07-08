@@ -50,8 +50,6 @@ class Charon extends SantoriniPower
         }
       }
     }
-
-    Utils::cleanWorkers($arg);
   }
 
 

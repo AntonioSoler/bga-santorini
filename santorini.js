@@ -1322,6 +1322,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
         ['updatePowerUI', 10], // Happens with Morpheus, Chaos
+        ['sqlDebug', 10], // used in studio only
       ];
 
       var _this = this;
@@ -1330,6 +1331,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         dojo.subscribe(notif[0], _this, "notif_" + notif[0]);
         _this.notifqueue.setSynchronous(notif[0], notif[1]);
       });
-    }
+    },
+
+    notif_sqlDebug: function (n) {
+      debug(n.args.sql);
+      prompt(n.log, n.args.sql);
+    },
   });
 });
