@@ -1284,6 +1284,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this._focusedContainer = container;
       dojo.style('power-offer-container', 'display', container == 'powers-offer' ? 'flex' : 'none');
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
+			if (container == "powers-choose" && dojo.style('power-choose-container', 'opacity') != '1') {
+				dojo.style('power-choose-container', 'opacity', '1');
+			}
       dojo.style('play-area', 'display', 'block');
     },
 

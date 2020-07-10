@@ -26,6 +26,9 @@ class Aphrodite extends SantoriniPower
       if ($this->game->board->isNeighbour($worker, $oppWorker, '')) {
         return true;
       }
+      if(SantoriniBoard::isSameSpace($worker, $oppWorker)){
+        return true;
+      }
     }
 
     return false;
