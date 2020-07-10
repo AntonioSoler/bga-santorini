@@ -1147,8 +1147,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       if (!this.checkAction('resign')) {
         return;
       }
-      this.takeAction("resign");
-      this.clearPossible();
+      this.confirmationDialog(__("lang_mainsite", "You are about to concede this game. Are you sure?"), dojo.hitch(this, function () {
+        this.takeAction("resign");
+        this.clearPossible();
+      }));
     },
 
 
@@ -1284,9 +1286,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       this._focusedContainer = container;
       dojo.style('power-offer-container', 'display', container == 'powers-offer' ? 'flex' : 'none');
       dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
-			if (container == "powers-choose" && dojo.style('power-choose-container', 'opacity') != '1') {
-				dojo.style('power-choose-container', 'opacity', '1');
-			}
+      if (container == "powers-choose" && dojo.style('power-choose-container', 'opacity') != '1') {
+        dojo.style('power-choose-container', 'opacity', '1');
+      }
       dojo.style('play-area', 'display', 'block');
     },
 
