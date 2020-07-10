@@ -19,6 +19,10 @@ class Hippolyta extends SantoriniPower
   }
 
   /* * */
+  public function argPlayerPlaceWorker(&$arg)
+  {
+    $arg['displayType'] = true;
+  }
 
   public function argPlayerMove(&$arg)
   {
