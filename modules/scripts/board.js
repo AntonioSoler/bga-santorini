@@ -123,7 +123,7 @@ Board.prototype.initScene = function () {
 
 Board.prototype.onLoad = function () {
 	this._cameraAngle = { theta: 0 };
-	var anim = Tween.get(this._cameraAngle, { loop: -1 }).to({ theta: 2 * Math.PI }, 35000, Ease.linear)
+	var anim = Tween.get(this._cameraAngle, { loop: -1 }).to({ theta: 2 * Math.PI }, 60000, Ease.linear)
 		.addEventListener('change', () => {
 			if (this._enterScene)
 				return;
@@ -170,7 +170,6 @@ Board.prototype.enterScene = function () {
 	if ($('left-cloud')) {
 		$('left-cloud').style.left = "-10vw";
 		$('right-cloud').style.right = "-10vw";
-		$('santorini-overlay').style.opacity = "0";
 
 		Tween.get(this._camera.position).to(enterPos, 2000).addEventListener('change', () => {
 			this._camera.lookAt(new THREE.Vector3(0, 0, 0));

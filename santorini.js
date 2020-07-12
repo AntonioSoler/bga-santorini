@@ -48,13 +48,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
   // Dojo ShrinkSafe does not support named function expressions
   // If you need to use this.inherited(), define the function here (not inside "return")
 
-  var isLoadingComplete = false;
   function override_setLoader(value, max) {
     // [Undocumented] Called by BGA framework when loading progress changes
     // Call our onLoadComplete() when fully loaded
     this.inherited(override_setLoader, arguments);
-    if (!isLoadingComplete && value >= 100) {
-      isLoadingComplete = true;
+    if (!this.isLoadingComplete && value >= 100) {
+      this.isLoadingComplete = true;
       this.onLoadingComplete();
     }
   }
@@ -183,22 +182,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       }
 
       this.onScreenWidthChange();
-      if (this._focusedContainer == 'powers-offer') {
-        dojo.style('power-offer-container', 'opacity', '1');
-      } else if (this._focusedContainer == 'powers-choose') {
-        dojo.style('power-choose-container', 'opacity', '1');
-      }
-
-      if (this._focusedContainer == 'board') {
-        this.board.enterScene();
-      } else {
+      this.focusContainer();
+      if (this._focusedContainer != 'scene-container') {
         this.board.onLoad();
       }
     },
 
     // Returns true for spectators, instant replay (during game), archive mode (after game end)
     isReadOnly: function () {
-      return this.isSpectator || typeof g_replayFrom != "undefined" || g_archive_mode;
+      return this.isSpectator || typeof g_replayFrom != 'undefined' || g_archive_mode;
     },
 
     comparePowersByName: function (power1, power2) {
@@ -226,7 +218,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       if (!this.board) { return; }
       dojo.style('page-content', 'zoom', 'normal');
       if ($('scene-container')) {
-        dojo.style('santorini-overlay', 'width', document.getElementById("left-side").offsetWidth + "px");
         dojo.style('3d-scene', 'marginTop', ($('page-content').getBoundingClientRect()['top'] - $('overall-content').getBoundingClientRect()['top']) + "px");
         dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene') ? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
         this.board.updateSize();
@@ -372,10 +363,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       // Stop if no board
       if (!this.board) { return; }
+      this.focusContainer();
 
       // Stop here if it's not the current player's turn for some states
       if (["playerUsePower", "playerPlaceWorker", "playerPlaceRam", "playerMove", "playerBuild", "confirmTurn", "gameEnd"].includes(stateName)) {
-        this.focusContainer('board');
         if (!this.isCurrentPlayerActive()) {
           return;
         }
@@ -493,7 +484,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     onEnteringStateBuildOffer: function (args) {
       var _this = this;
-      this.focusContainer('powers-offer');
 
       // Display selected powers, sorted by name
       dojo.empty('cards-offer');
@@ -702,7 +692,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     /////////////////////////////
     onEnteringStateChooseFirstPlayer: function (args) {
       var _this = this;
-      this.focusContainer('powers-choose');
       dojo.empty('power-choose-container');
       args.powers.forEach(function (powerId) {
         var power = _this.getPower(powerId);
@@ -741,7 +730,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     onEnteringStatePowersPlayerChoose: function (args) {
       var _this = this;
-      this.focusContainer('powers-choose');
 
       // Display remaining powers
       dojo.empty('power-choose-container');
@@ -1271,26 +1259,36 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      * focusContainer:
      * 	show and hide containers depending on state
      */
-    focusContainer: function focusContainer(container) {
-      if (this._focusedContainer != null && this._focusedContainer == container) {
+    focusContainer: function focusContainer() {
+      var stateName = this.gamedatas.gamestate.name;
+      var container = 'scene-container';
+      switch (stateName) {
+        case 'gameSetup':
+        case 'powerSetup':
+        case 'buildOffer':
+          container = 'power-offer-container';
+          break;
+        case 'chooseFirstPlayer':
+        case 'powersNextPlayerChoose':
+        case 'powersPlayerChoose':
+          container = 'power-choose-container';
+          break;
+      }
+
+      // Stop if the container is already focused
+      if (container == this._focusedContainer || (container == 'scene-container' && !this.isLoadingComplete)) {
         return;
       }
 
-      if (this._focusedContainer != null) {
-        if (container == "board") {
-          this.board.enterScene();
-        } else if (container == "powers-choose") {
-          dojo.style('power-choose-container', 'opacity', '1');
-        }
+      debug('Focus container', 'state=' + stateName, 'container=' + container);
+      dojo.style('power-offer-container', 'display', 'none');
+      dojo.style('power-choose-container', 'display', 'none');
+      if (container == 'scene-container') {
+        this.board.enterScene();
+      } else {
+        dojo.style(container, 'display', 'flex');
       }
-
       this._focusedContainer = container;
-      dojo.style('power-offer-container', 'display', container == 'powers-offer' ? 'flex' : 'none');
-      dojo.style('power-choose-container', 'display', container == 'powers-choose' ? 'flex' : 'none');
-      if (container == "powers-choose" && dojo.style('power-choose-container', 'opacity') != '1') {
-        dojo.style('power-choose-container', 'opacity', '1');
-      }
-      dojo.style('play-area', 'display', 'block');
     },
 
 

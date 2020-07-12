@@ -64,20 +64,6 @@ html {
   z-index:1;
 }
 
-
-#santorini-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 2;
-  transition: opacity 1s ease;
-  background-repeat: no-repeat;
-  background-color: rgba(255,255,255,0.5);
-  opacity: 0.7;
-}
-
 /*clouds PNG Designed By 588ku from <a href="https://pngtree.com/">Pngtree.com</a>*/
 #left-cloud {
   position:absolute;
@@ -134,8 +120,6 @@ html {
 #play-area-scaler #power-offer-container,
 #play-area-scaler #power-choose-container {
   z-index:2;
-  opacity:0;
-  transition: opacity 2s ease;
 }
 
 
@@ -364,7 +348,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-evenly;
-    margin-top: 50px;
+    margin-top: 20px;
 }
 
 .power-info-background {

@@ -27,7 +27,6 @@ const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location
 document.write('<script src="' + URL + '/modules/scripts/board.js" type="module"><\/script>');
 
 var jstpl_scene = `<div id="scene-container">
-	<div id="santorini-overlay"></div>
 	<div id="left-cloud"></div>
 	<div id="right-cloud"></div>
 </div>`;
