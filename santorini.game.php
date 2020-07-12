@@ -1053,42 +1053,61 @@ class santorini extends Table
     */
   }
 
+
+  /////////////////////////////////////////
+  /////////////////////////////////////////
+  ////////  production bug report  ////////
+  /////////////////////////////////////////
+  /////////////////////////////////////////
+
   /*
-   * sqlDebug: in studio, call this from the chat window to get the SQL to update a bug report loaded from produciton
+   * loadBug: in studio, type loadBug(20762) into the table chat to load a bug report from production
+   * client side JavaScript will fetch each URL below in sequence, then refresh the page
    */
-  public function sqlDebug($p1, $p2, $p3 = null, $p4 = null)
+  public function loadBug($reportId)
+  {
+    $db = explode('_', self::getUniqueValueFromDB("SELECT SUBSTRING_INDEX(DATABASE(), '_', -2)"));
+    $game = $db[0];
+    $tableId = $db[1];
+    self::notifyAllPlayers('loadBug', "Trying to load <a href='https://boardgamearena.com/bug?id=$reportId' target='_blank'>bug report $reportId</a>", [
+      'urls' => [
+        "https://studio.boardgamearena.com/admin/studio/getSavedGameStateFromProduction.html?game=$game&report_id=$reportId&table_id=$tableId",
+        "https://studio.boardgamearena.com/table/table/loadSaveState.html?table=$tableId&state=1",
+        "https://studio.boardgamearena.com/1/$game/$game/loadBugSQL.html?table=$tableId&report_id=$reportId",
+        "https://studio.boardgamearena.com/admin/studio/clearGameserverPhpCache.html?game=$game",
+      ]
+    ]);
+  }
+
+  /*
+   * loadBugSQL: in studio, this is one of the URLs triggered by loadBug() above
+   */
+  public function loadBugSQL($reportId)
   {
     $studioPlayer = self::getCurrentPlayerId();
-    $prodPlayers = [];
-    if (!empty($p1)) {
-      $prodPlayers[] = intval($p1);
-    }
-    if (!empty($p2)) {
-      $prodPlayers[] = intval($p2);
-    }
-    if (!empty($p3)) {
-      $prodPlayers[] = intval($p3);
-    }
-    if (!empty($p4)) {
-      $prodPlayers[] = intval($p4);
-    }
+    $players = $this->playerManager->getPlayers();
 
-    $msg = [];
-    $sql = [];
-    foreach ($prodPlayers as $prodPlayer) {
-      $msg[] = "$prodPlayer -> $studioPlayer";
-      $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$prodPlayer;";
-      $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$prodPlayer;";
-      $sql[] = "UPDATE stats SET stats_player_id=$studioPlayer WHERE stats_player_id=$prodPlayer;";
-      $sql[] = "UPDATE card SET card_location_arg=$studioPlayer WHERE card_location_arg=$prodPlayer;";
-      $sql[] = "UPDATE piece SET player_id=$studioPlayer WHERE player_id=$prodPlayer;";
-      $sql[] = "UPDATE log SET player_id=$studioPlayer WHERE player_id=$prodPlayer;";
-      $sql[] = "UPDATE log SET action_arg=REPLACE(action_arg, $prodPlayer, $studioPlayer);";
-      $sql[] = "";
+    $sql = [
+      "UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_BGA_GAME_END
+    ];
+    foreach ($players as $player) {
+      $pId = $player->getId();
+      $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$pId";
+      $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$pId";
+      $sql[] = "UPDATE stats SET stats_player_id=$studioPlayer WHERE stats_player_id=$pId";
+      $sql[] = "UPDATE card SET card_location_arg=$studioPlayer WHERE card_location_arg=$pId";
+      $sql[] = "UPDATE piece SET player_id=$studioPlayer WHERE player_id=$pId";
+      $sql[] = "UPDATE log SET player_id=$studioPlayer WHERE player_id=$pId";
+      $sql[] = "UPDATE log SET action_arg=REPLACE(action_arg, $pId, $studioPlayer)";
       $studioPlayer++;
     }
-    self::notifyAllPlayers('sqlDebug', implode(', ', $msg), [
-      'sql' => implode("\n", $sql),
-    ]);
+    $msg = "<b>Loaded <a href='https://boardgamearena.com/bug?id=$reportId' target='_blank'>bug report $reportId</a></b><hr><ul><li>" . implode(';</li><li>', $sql) . ';</li></ul>';
+    self::warn($msg);
+    self::notifyAllPlayers('message', $msg, []);
+
+    foreach ($sql as $q) {
+      self::DbQuery($q);
+    }
+    self::reloadPlayersBasicInfos();
   }
 }

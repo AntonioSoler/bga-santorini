@@ -33,6 +33,7 @@ class PlayerManager extends APP_GameClass
     if (is_array($playerIds)) {
       $sql .= " WHERE player_id IN ('" . implode("','", $playerIds) . "')";
     }
+    $sql .= " ORDER BY no";
     $rows = self::getObjectListFromDb($sql);
 
     $players = [];

@@ -43,7 +43,7 @@ function isWebGL2Available() {
   return ok;
 }
 
-define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/stock", "ebg/scrollmap"], function (dojo, declare) {
+define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], function (dojo, declare) {
 
   // Dojo ShrinkSafe does not support named function expressions
   // If you need to use this.inherited(), define the function here (not inside "return")
@@ -437,14 +437,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
     },
 
     startActionTimer: function (buttonId) {
+      var button = $(buttonId);
       var isReadOnly = this.isReadOnly();
-      if (isDebug || isReadOnly || !this.bRealtime) {
+      if (button == null || isDebug || isReadOnly || !this.bRealtime) {
         debug('Ignoring startActionTimer(' + buttonId + ')', 'debug=' + isDebug, 'readOnly=' + isReadOnly, 'realtime=' + this.bRealtime);
         return;
       }
 
       var _this = this;
-      this.actionTimerLabel = $(buttonId).innerHTML;
+      this.actionTimerLabel = button.innerHTML;
       this.actionTimerSeconds = 15;
       this.actionTimerFunction = function () {
         var button = $(buttonId);
@@ -1331,7 +1332,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
         ['updatePowerUI', 10], // Happens with Morpheus, Chaos
-        ['sqlDebug', 10], // used in studio only
+        ['loadBug', 10], // used in studio only
       ];
 
       var _this = this;
@@ -1342,9 +1343,26 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter", "ebg/st
       });
     },
 
-    notif_sqlDebug: function (n) {
-      debug(n.args.sql);
-      prompt(n.log, n.args.sql);
+    notif_loadBug: function (n) {
+      function fetchNextUrl() {
+        var url = n.args.urls.shift();
+        debug('Fetching URL', url);
+        dojo.xhrGet({
+          url: url,
+          load: function (success) {
+            debug('Success for URL', url, success);
+            if (n.args.urls.length > 0) {
+              fetchNextUrl();
+            } else {
+              debug('Done, reloading page');
+              window.location.reload();
+            }
+          }
+        });
+      }
+
+      debug('Notif: load bug', n.args);
+      fetchNextUrl();
     },
   });
 });
