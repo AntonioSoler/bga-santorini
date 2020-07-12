@@ -65,13 +65,13 @@ class Tyche extends SantoriniPower
 
   public function stateEndOfTurn()
   {
-    return (!$this->game->log->isAdditionalTurn() && $this->drawCard()) ? 'additionalTurn' : null;
+    return (!$this->game->log->isAdditionalTurn(TYCHE) && $this->drawCard()) ? 'additionalTurn' : null;
   }
 
   public function argPlayerMove(&$arg)
   {
     // Usual turn => usual rule
-    if (!$this->game->log->isAdditionalTurn()) {
+    if (!$this->game->log->isAdditionalTurn(TYCHE)) {
       return;
     }
     $arg['skippable'] = true;

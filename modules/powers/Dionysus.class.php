@@ -23,7 +23,7 @@ class Dionysus extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     // Usual turn => usual rule
-    if (!$this->game->log->isAdditionalTurn()) {
+    if (!$this->game->log->isAdditionalTurn(DIONYSUS)) {
       return;
     }
 
@@ -40,7 +40,7 @@ class Dionysus extends SantoriniPower
   public function argPlayerBuild(&$arg)
   {
     // Usual turn => usual rule
-    if (!$this->game->log->isAdditionalTurn()) {
+    if (!$this->game->log->isAdditionalTurn(DIONYSUS)) {
       return;
     }
 
@@ -79,7 +79,7 @@ class Dionysus extends SantoriniPower
 
   protected function checkWinning(&$arg)
   {
-    if ($arg['win'] && $this->game->log->isAdditionalTurn()) {
+    if ($arg['win'] && $this->game->log->isAdditionalTurn(DIONYSUS)) {
       $arg['win'] = false;
       unset($arg['winStats']);
       $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: No player can win during this additional turn'), [
