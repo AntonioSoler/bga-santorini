@@ -53,13 +53,15 @@ class Apollo extends SantoriniPower
     $this->game->log->addForce($worker2, $worker, $stats);
 
     // Notify
-    $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${power_name}: ${player_name} forces a swap with ${player_name2}'), [
+    $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${power_name}: ${player_name} (${coords}) swaps positions with ${player_name2} (${coords2})'), [
       'i18n' => ['power_name'],
       'piece1' => $worker,
       'piece2' => $worker2,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
       'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
+      'coords' => $this->game->board->getMsgCoords($worker),
+      'coords2' => $this->game->board->getMsgCoords($worker2),
     ]);
 
     return true;
