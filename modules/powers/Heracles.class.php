@@ -24,7 +24,8 @@ class Heracles extends SantoriniHeroPower
   private function didSpecialBuild()
   {
     $builds = $this->game->log->getLastBuilds();
-    return count($builds) != 1 || $builds[0]['to']['arg'] != $builds[0]['to']['z'];
+    $move = $this->game->log->getLastMove();
+    return count($builds) != 1 || $builds[0]['to']['arg'] != $builds[0]['to']['z'] || $builds[0]['pieceId'] != $move[0]['pieceId'];
   }
 
   public function argPlayerBuild(&$arg)
