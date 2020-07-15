@@ -146,6 +146,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
           }).join('</p><p>') + '</p>';
           power.type = power.hero ? 'hero' : '';
           power.counter = power.counter || 0;
+          power.playerCount = power.playerCount.join(', ');
+          power.tooltipGolden = power.golden ? _('Golden Fleece') : '';
+          power.tooltipPlayerCount = _('Supported player count');
         });
       gamedatas.fplayers.forEach(function (player) {
         dojo.place(_this.format_block('jstpl_powerContainer', player), 'player_board_' + player.id);
@@ -323,6 +326,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       var q = dojo.query('#mini-card-' + n.args.playerId + "-" + n.args.powerId + ' .power-counter');
       if (q.length > 0) {
         q[0].textContent = n.args.counter;
+        // Restart the CSS animation
+        q[0].style.animation = 'none';
+        q[0].offsetWidth; // force repaint
+        q[0].style.animation = '';
       }
     },
 
@@ -738,8 +745,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         var div = dojo.place(_this.createPowerDetail(powerCard.id), 'power-choose-container');
         if (powerCard.location_arg == 1) {
           var mark = document.createElement("div");
-          mark.className = 'power-counter';
+          mark.className = 'power-counter infinite';
           mark.textContent = '1';
+          mark.title = dojo.string.substitute(_('${power_name} will start this game'), { power_name: power.name });
           div.append(mark);
         }
         div.id = "power-choose-" + power.id;
@@ -1231,6 +1239,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         id: 0,
         sort: 0,
         counter: 0,
+        golden: false,
+        playerCount: '',
+        tooltipGolden: '',
+        tooltipPlayerCount: '',
         nameEnglish: '',
         name: '',
         title: '',

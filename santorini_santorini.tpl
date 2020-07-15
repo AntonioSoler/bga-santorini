@@ -47,6 +47,8 @@ var jstpl_miniCard = `<div class="mini-card power-\${id} \${type}" data-power="\
 
 var jstpl_powerDetail = `<div class="power-detail">
 	<div class="power-card power-\${id} \${type}">
+		<div class="power-playerCount" title="\${tooltipPlayerCount}">\${playerCount}</div>
+		<div class="power-golden-\${golden}" title="\${tooltipGolden}"></div>
 		<div class="power-name">\${name}</div>
 		<div class="power-title">\${title}</div>
 		<div class="power-pictogram"></div>

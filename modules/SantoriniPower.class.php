@@ -62,11 +62,13 @@ abstract class SantoriniPower extends APP_GameClass
   public function getUiData()
   {
     return [
-      'id'        => $this->id,
-      'name'      => $this->name,
-      'title'     => $this->title,
-      'text'      => $this->text,
-      'hero'      => $this->isHero(),
+      'id'          => $this->id,
+      'name'        => $this->name,
+      'title'       => $this->title,
+      'text'        => $this->text,
+      'hero'        => $this->isHero(),
+      'golden'      => $this->golden,
+      'playerCount' => $this->playerCount,
     ];
   }
 

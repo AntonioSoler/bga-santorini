@@ -16,8 +16,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Amita:wght@700&family=Caveat+Brush&family=Lato:wght@400;900&display=swap');
 
 html {
-  background-image:none !important;
-  background-color:#76cfe9; /*#153665*/
+  background-image: none !important;
+  background-color: #76cfe9;
+  /*#153665*/
 }
 
 #browser-error {
@@ -42,68 +43,62 @@ html {
 }
 
 #overall-content {
-  position:relative;
+  position: relative;
 }
-
 
 #scene-container {
   outline: none;
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:1;
-  width:100%;
-  height:100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100vh;
 }
 
 #scene-container canvas {
-  position:absolute;
+  position: absolute;
   outline: none;
-  top:0;
-  left:0;
-  z-index:1;
+  top: 0;
+  left: 0;
+  z-index: 1;
 }
 
 /*clouds PNG Designed By 588ku from <a href="https://pngtree.com/">Pngtree.com</a>*/
 #left-cloud {
-  position:absolute;
-  top:0;
-  left:0;
-  width:28vw;
-  height:100vh;
-  z-index:2;
-  background-image:url('img/cloud-left.png');
-  background-size:cover;
-  background-position:right;
-  background-repeat:no-repeat;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 28vw;
+  height: 100vh;
+  z-index: 2;
+  background-image: url('img/cloud-left.png');
+  background-size: cover;
+  background-position: right;
+  background-repeat: no-repeat;
   transition: left 2s ease;
 }
 
 #right-cloud {
-  position:absolute;
-  top:0;
-  right:0;
-  width:40vw;
-  height:100vh;
-  z-index:2;
-  background-image:url('img/cloud-right.png');
-  background-size:cover;
-  background-repeat:no-repeat;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 40vw;
+  height: 100vh;
+  z-index: 2;
+  background-image: url('img/cloud-right.png');
+  background-size: cover;
+  background-repeat: no-repeat;
   transition: right 2s ease;
 }
 
-
-
 #left-side-wrapper {
-  position:relative;
+  position: relative;
 }
 
-
-
-
 #left-side {
-  position:relative;
-  z-index:3;
+  position: relative;
+  z-index: 3;
 }
 
 #right-side {
@@ -112,28 +107,25 @@ html {
 }
 
 #overall-footer {
-  position:relative;
-  z-index:3;
+  position: relative;
+  z-index: 3;
 }
 
-
-#play-area-scaler #power-offer-container,
-#play-area-scaler #power-choose-container {
-  z-index:2;
+#play-area-scaler #power-offer-container, #play-area-scaler #power-choose-container {
+  z-index: 2;
 }
-
 
 div#popin_chooseArg {
-    background-image: url('img/dialog.png');
-    background-size: contain;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    width: 30vw;
-    height: 21.8vw;
-    min-height:218px;
+  background-image: url('img/dialog.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+  width: 30vw;
+  height: 21.8vw;
+  min-height: 218px;
 }
 
 div#popin_chooseArg h2 {
@@ -145,12 +137,12 @@ div#popin_chooseArg h2 {
 }
 
 div#popin_chooseArg_contents {
-    width: 77%;
-    margin: 15% auto;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+  width: 77%;
+  margin: 15% auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 div#popin_chooseArg_contents div.arg-prompt {
@@ -164,19 +156,19 @@ div#popin_chooseArg_contents div.arg-prompt {
 }
 
 div#popin_chooseArg_contents div.arg-prompt.arg-0 {
-    background-image: url('img/lvl0.svg');
+  background-image: url('img/lvl0.svg');
 }
 
 div#popin_chooseArg_contents div.arg-prompt.arg-1 {
-    background-image: url('img/lvl1.svg');
+  background-image: url('img/lvl1.svg');
 }
 
 div#popin_chooseArg_contents div.arg-prompt.arg-2 {
-    background-image: url('img/lvl2.svg');
+  background-image: url('img/lvl2.svg');
 }
 
 div#popin_chooseArg_contents div.arg-prompt.arg-3 {
-    background-image: url('img/lvl3.svg');
+  background-image: url('img/lvl3.svg');
 }
 
 #popin_chooseArg_close {
@@ -187,55 +179,55 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 /* Player boards */
 
 .power-container {
-    text-align: center;
+  text-align: center;
 }
 
 .power-container .mini-card {
-    position: relative;
-    margin-left: -3px;
-    width: 240px;
-    height: 120px;
-    background-image: url(img/mini-card.png);
-    background-repeat: no-repeat;
-    background-size: contain;
-    overflow: hidden;
-    border-radius: 8px;
+  position: relative;
+  margin-left: -3px;
+  width: 240px;
+  height: 120px;
+  background-image: url(img/mini-card.png);
+  background-repeat: no-repeat;
+  background-size: contain;
+  overflow: hidden;
+  border-radius: 8px;
 }
 
 .power-container .mini-card .power-name {
-    font-size: 17px;
-    padding-top: 1px;
+  font-size: 17px;
+  padding-top: 1px;
 }
 
 .power-container .mini-card .power-avatar {
-    position: absolute;
-    width: 65px;
-    height: 67px;
-    top: 26px;
-    left: -9px;
-    border-radius: 100%;
-    background-size: cover;
-    background-position: top;
-    background-repeat: no-repeat;
+  position: absolute;
+  width: 65px;
+  height: 67px;
+  top: 26px;
+  left: -9px;
+  border-radius: 100%;
+  background-size: cover;
+  background-position: top;
+  background-repeat: no-repeat;
 }
 
 .power-container .mini-card .power-pictogram {
-    position: absolute;
-    width: 150px;
-    height: 72px;
-    left: 63px;
-    top: 31px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center;
+  position: absolute;
+  width: 150px;
+  height: 72px;
+  left: 63px;
+  top: 31px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .power-detail {
-  z-index:6;
+  z-index: 6;
 }
 
 .power-detail.power-dummy div {
-  display:none;
+  display: none;
 }
 
 .power-name {
@@ -245,127 +237,126 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .hero .power-name {
-    color: #6a1b9a;
+  color: #6a1b9a;
 }
 
 .hero .power-name::before {
-    content: "";
-    display: inline-block;
-    background-image: url('img/gladiator.svg');
-    background-size: contain;
-    background-repeat: no-repeat;
-    background-position: center center;
-    vertical-align: -3px;
-    width: 1em;
-    height: 1em;
-    padding-right: .3em;
+  content: '';
+  display: inline-block;
+  background-image: url('img/gladiator.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
+  vertical-align: -3px;
+  width: 1em;
+  height: 1em;
+  padding-right: .3em;
 }
 
 .power-title {
-    position: absolute;
-    top: 25px;
-    width: 100%;
-    height: 55px;
-    font: 700 14px/42px 'Amita', sans-serif;
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    color: #fff;
-    text-shadow: 1px 1px 3px black;
-    background-image: url('img/title.png');
-    background-repeat: no-repeat;
-    background-position: center center;
+  position: absolute;
+  top: 25px;
+  width: 100%;
+  height: 55px;
+  font: 700 14px/42px 'Amita', sans-serif;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #fff;
+  text-shadow: 1px 1px 3px black;
+  background-image: url('img/title.png');
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 
 .hero .power-title {
-    background-image: url('img/title-hero.png');
+  background-image: url('img/title-hero.png');
 }
 
-#power-offer-container .power-detail,
-#power-choose-container .power-detail {
-    position: relative;
-    margin: 0 10px 10px 10px;
+#power-offer-container .power-detail, #power-choose-container .power-detail {
+  position: relative;
+  margin: 0 10px 10px 10px;
 }
-
 
 #power-choose-container .power-detail {
   transition: transform 250ms ease;
 }
+
 #power-choose-container .power-detail.clickable {
   cursor: pointer;
 }
+
 #power-choose-container .power-detail.clickable:hover {
   transform: scale(1.05);
 }
 
 #power-offer-container {
-    display: flex;
+  display: flex;
 }
 
 #grid-powers {
-    flex: 1 1 auto;
-    margin: 0 0 0 10px;
+  flex: 1 1 auto;
+  margin: 0 0 0 10px;
 }
 
 .power-section {
-    background: rgba(255, 255, 255, .6);
-    border-radius: 10px;
+  background: rgba(255, 255, 255, .6);
+  border-radius: 10px;
 }
 
 .power-section p {
-    font-weight: bold;
-    padding: 5px;
-    margin: 0;
+  font-weight: bold;
+  padding: 5px;
+  margin: 0;
 }
 
 .card-container {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-evenly;
-    align-content: flex-start;
-    min-height: 166px;
-    margin-bottom: 15px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  align-content: flex-start;
+  min-height: 166px;
+  margin-bottom: 15px;
 }
 
 .card-container:empty::before {
-    content: "∅";
-    font-size: 100px;
-    line-height: 166px;
-    opacity: .2;
+  content: "∅";
+  font-size: 100px;
+  line-height: 166px;
+  opacity: .2;
 }
 
 #grid-detail {
-    flex: 0 0 270px;
+  flex: 0 0 270px;
 }
 
 #grid-detail.fixed .power-detail {
-    position: fixed;
-    top: 49px;
+  position: fixed;
+  top: 49px;
 }
 
 #power-choose-container {
-    display: flex;
-    flex-flow: row wrap;
-    justify-content: space-evenly;
-    margin-top: 20px;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-evenly;
+  margin-top: 20px;
 }
 
 .power-info-background {
-  width:100%;
-  height:100%;
-  background-color:#f0e3d4;
-  position:relative;
-  padding-bottom:1px;
+  width: 100%;
+  height: 100%;
+  background-color: #f0e3d4;
+  position: relative;
+  padding-bottom: 1px;
 }
 
 #play-area {
-    display: flex;
-    pointer-events: visible;
-    outline:none;
-    position:relative;
+  display: flex;
+  pointer-events: visible;
+  outline: none;
+  position: relative;
 }
-
 
 #power-ram {
   position: absolute;
@@ -377,7 +368,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 #power-ram::after {
   content: '';
   display: block;
-  background-image: url('img/ram.png');
+  background-image: url('img/ram.svg');
   width: 100%;
   height: 28%;
   position: absolute;
@@ -388,128 +379,152 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 #prompt-container {
-    background: #f0f0f0;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
-    padding: 5px;
-    margin-bottom: 5px;
+  background: #f0f0f0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .3);
+  padding: 5px;
+  margin-bottom: 5px;
 }
 
 .token-prompt {
-    margin: 0 auto;
-    border-style: hidden;
-    border-collapse: collapse;
+  margin: 0 auto;
+  border-style: hidden;
+  border-collapse: collapse;
 }
 
 .token-prompt td {
-    border: 1px dotted #ccc;
+  border: 1px dotted #ccc;
 }
 
 .token-choose-rotation {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 #token-container {
-    float: left;
-    border-radius: 10px;
-    background: rgba(255, 255, 255, .33);
-    margin: 10px;
+  float: left;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .33);
+  margin: 10px;
 }
 
 #prompt-container:empty, #token-container:empty {
-    display: none;
+  display: none;
 }
-
 
 .power-card {
-    margin: 0 auto;
-    width: 250px;
-    height: 418px;
-    position: relative;
-    background-repeat: no-repeat;
-    background-size: 215px;
-    background-position: center 30px;
-    border-top-left-radius: 15px;
-    border-top-right-radius: 15px;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
+  margin: 0 auto;
+  width: 250px;
+  height: 418px;
+  position: relative;
+  background-repeat: no-repeat;
+  background-size: 215px;
+  background-position: center 30px;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
 }
+
 .power-card.power-0 {
-    visibility: hidden;
+  visibility: hidden;
 }
 
 .power-card::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-    background-image: url('img/card.png');
-    background-repeat: no-repeat;
-    background-size: 100%;
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background-image: url('img/card.png');
+  background-repeat: no-repeat;
+  background-size: 100%;
 }
 
 .power-card .power-name {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    line-height: 34px;
-    text-shadow: 1px 1px 2px white;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
+  position: absolute;
+  top: 0;
+  left: 45px;
+  right: 45px;
+  text-align: center;
+  line-height: 34px;
+  text-shadow: 1px 1px 2px white;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .power-card .power-pictogram {
-    position: absolute;
-    bottom: 4px;
-    left: 45px;
-    width: 160px;
-    height: 80px;
-    background-position: center center;
-    background-repeat: no-repeat;
-    background-size: contain;
+  position: absolute;
+  bottom: 4px;
+  left: 45px;
+  width: 160px;
+  height: 80px;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.power-card .power-playerCount {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  width: 45px;
+  font: 12px 'Lato', sans-serif;
+  text-align: center;
+  color: #8a8275;
+}
+
+.power-card .power-golden-true {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 4px;
+  right: 0;
+  width: 45px;
+  height: 14px;
+  opacity: .66;
+  background-image: url('img/ram.svg');
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center center;
 }
 
 /* Extended cards showing full text */
 
 .power-ext {
-    box-sizing: border-box;
-    width: 250px;
-    margin: 0 auto 10px;
-    background-image: url('img/card-ext.png');
-    background-repeat: repeat-y;
-    background-size: 100%;
-    padding: 0 26px 10px;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
-    font: 13px 'Lato', sans-serif;
+  box-sizing: border-box;
+  width: 250px;
+  margin: 0 auto 10px;
+  background-image: url('img/card-ext.png');
+  background-repeat: repeat-y;
+  background-size: 100%;
+  padding: 0 26px 10px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
+  font: 13px 'Lato', sans-serif;
 }
 
 .power-ext p {
-    margin: 0;
-    padding-top: 10px;
+  margin: 0;
+  padding-top: 10px;
 }
 
 .power-ext b {
-    font-weight: 900;
+  font-weight: 900;
 }
 
 /* Fair division setup uses small cards */
 
 .power-card.small {
-    cursor: pointer;
-    width: 103px;
-    height: 150px;
-    background-size: 125%;
-    background-position: 50% 20%;
-    border-radius: 8px;
-    margin: 10px;
+  cursor: pointer;
+  width: 103px;
+  height: 150px;
+  background-size: 125%;
+  background-position: 50% 20%;
+  border-radius: 8px;
+  margin: 10px;
 }
 
 @media (max-width: 1200px) {
@@ -519,21 +534,21 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-card.small.wait {
-    cursor: wait;
+  cursor: wait;
 }
 
 .power-card.small::before {
-    background-image: url('img/card-small.png');
-    border-radius: 8px;
-    transition: background-image 250ms ease;
-}
-.power-card.small:hover::before {
-    background-image: url('img/card-small-hovered.png');
+  background-image: url('img/card-small.png');
+  border-radius: 8px;
+  transition: background-image 250ms ease;
 }
 
+.power-card.small:hover::before {
+  background-image: url('img/card-small-hovered.png');
+}
 
 .power-card.small.displayed::before {
-    background-image: url('img/card-small-displayed.png');
+  background-image: url('img/card-small-displayed.png');
 }
 
 .power-card.small.banned {
@@ -557,8 +572,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 }
 
 .power-card.small .power-name {
-    font-size: 15px;
-    line-height: 18px;
+  left: 0;
+  right: 0;
+  font-size: 15px;
+  line-height: 18px;
 }
 
 .power-counter {
@@ -573,6 +590,20 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   font-size: 15px;
   font-weight: bold;
   text-align: center;
+  animation: pulse 3s; 
+}
+
+.power-counter.infinite {
+  animation-iteration-count: infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 2px #ffc400;
+  }
+  50% {
+    box-shadow: 0 0 0 10px transparent;
+  }
 }
 
 /* Chaos: on top of the deck */
@@ -606,8 +637,8 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 /* First player marker */
 #power-choose-container .power-detail .power-counter {
   display: block;
-  top: 7px;
-  right: 7px;
+  top: -6px;
+  right: 9px;
 }
 
 /* Cancelled notification messages */
@@ -625,41 +656,47 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 ******* Tokens *******
 *********************/
 .token {
-    margin: 10px;
-    width: 70px;
-    height: 70px;
-    background: center / contain no-repeat;
-    transition: transform 1s cubic-bezier(.4, 1.8, .7, 1.1);
+  margin: 10px;
+  width: 70px;
+  height: 70px;
+  background: center / contain no-repeat;
+  transition: transform 1s cubic-bezier(.4, 1.8, .7, 1.1);
 }
 
 .token-wind {
-    background-image: url(img/token-wind.png);
+  background-image: url(img/token-wind.png);
 }
 
 .token-arrow {
-    background-image: url(img/token-arrow.png);
+  background-image: url(img/token-arrow.png);
 }
 
 .token.rotate-2 {
-    transform: rotate(45deg);
+  transform: rotate(45deg);
 }
+
 .token.rotate-3 {
-    transform: rotate(90deg);
+  transform: rotate(90deg);
 }
+
 .token.rotate-4 {
-    transform: rotate(135deg);
+  transform: rotate(135deg);
 }
+
 .token.rotate-5 {
-    transform: rotate(180deg);
+  transform: rotate(180deg);
 }
+
 .token.rotate-6 {
-    transform: rotate(225deg);
+  transform: rotate(225deg);
 }
+
 .token.rotate-7 {
-    transform: rotate(270deg);
+  transform: rotate(270deg);
 }
+
 .token.rotate-8 {
-    transform: rotate(315deg);
+  transform: rotate(315deg);
 }
 
 
