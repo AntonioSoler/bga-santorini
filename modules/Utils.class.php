@@ -129,22 +129,24 @@ abstract class Utils extends APP_GameClass
   /* TODO */
   public static function checkWork($arg, $wId, $x, $y, $z, $actionArg)
   {
-    $workers = array_values(array_filter($arg['workers'], function ($w) use ($wId) {
+    $workers = $arg['workers'];
+    Utils::filter($workers, function ($w) use ($wId) {
       return $w['id'] == $wId;
-    }));
+    });
     if (count($workers) != 1) {
       throw new BgaUserException(_("This worker can't be used"));
     }
 
-    $works = array_values(array_filter($workers[0]['works'], function ($w) use ($x, $y, $z, $actionArg) {
+    $works = $workers[0]['works'];
+    Utils::filter($works, function ($w) use ($x, $y, $z, $actionArg) {
       return $w['x'] == $x && $w['y'] == $y && $w['z'] == $z
         && (is_null($actionArg) || in_array($actionArg, $w['arg']));
-    }));
+    });
     if (count($works) != 1) {
       throw new BgaUserException(_("You cannot reach this space with this worker"));
     }
 
-    return ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => $actionArg];
+    return $works[0];
   }
 
 

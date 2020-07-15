@@ -279,6 +279,35 @@ class SantoriniBoard extends APP_GameClass
     return $ok;
   }
 
+
+  /*
+   * getDirection : get the corresponding direction of a move/build
+   */
+  public function getDirection($a, $b, $action = null, $powerIds = [])
+  {
+    if (in_array(URANIA, $powerIds) && !$this->game->board->isNeighbour($a, $b)){
+      $dx = abs($a['x'] - $b['x']) <= 1 ? 0 : ($a['x'] < $b['x'] ? 1 : -1);
+      $dy = abs($a['y'] - $b['y']) <= 1 ? 0 : ($a['y'] < $b['y'] ? 1 : -1);
+      $a['x'] = $worker['x'] + 5 * $dx;
+      $a['y'] = $worker['y'] + 5 * $dy;
+    }
+
+    $found = false;
+    foreach(DIRECTIONS as $d => $delta){
+      if($a['x'] + $delta['x'] == $b['x'] && $a['y'] + $delta['y'] == $b['y']){
+        if($found){
+          throw new BgaVisibleSystemException(_("Two directions were found for a move/build"));
+        }
+        $found = $d;
+      }
+    }
+    if($found === false){
+      throw new BgaVisibleSystemException(_("No direction was found for a move/build"));
+    }
+
+    return $found;
+  }
+
   /*
    * getNeighbouringSpaces:
    *   return the list of all accessible neighbouring spaces for either moving a worker or building
@@ -289,9 +318,14 @@ class SantoriniBoard extends APP_GameClass
   public function getNeighbouringSpaces($piece, $action = null, $powerIds = [])
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
-    return array_values(array_filter($this->getAccessibleSpaces($action), function ($space) use ($piece, $action, $powerIds) {
+    $spaces = $this->getAccessibleSpaces($action);
+    Utils::filter($spaces, function ($space) use ($piece, $action, $powerIds) {
       return $this->isNeighbour($piece, $space, $action, $powerIds);
-    }));
+    });
+    array_walk($spaces, function (&$space) use ($piece, $action, $powerIds){
+      $space['direction'] = $this->getDirection($piece, $space, $action, $powerIds);
+    });
+    return $spaces;
   }
 
 

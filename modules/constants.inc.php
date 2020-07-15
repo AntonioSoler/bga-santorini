@@ -143,14 +143,25 @@ define('STAT_BUILD_TOWER', 32);
 /*
  * Variable constants
  */
-define('ROTATE_N', 1);
-define('ROTATE_NE', 2);
-define('ROTATE_E', 3);
-define('ROTATE_SE', 4);
-define('ROTATE_S', 5);
-define('ROTATE_SW', 6);
-define('ROTATE_W', 7);
-define('ROTATE_NN', 8);
+define('N', 1);
+define('NE', 2);
+define('E', 3);
+define('SE', 4);
+define('S', 5);
+define('SW', 6);
+define('W', 7);
+define('NW', 8);
+
+define('DIRECTIONS', [
+  N  => ['x' => 1,  'y' => 0],
+  NE => ['x' => 1,  'y' => 1],
+  E  => ['x' => 0,  'y' => 1],
+  SE => ['x' => -1, 'y' => 1],
+  S  => ['x' => -1, 'y' => 0],
+  SW => ['x' => -1, 'y' => -1],
+  W  => ['x' => 0,  'y' => -1],
+  NW => ['x' => 1,  'y' => -1],
+]);
 
 /*
  * Global game variables
