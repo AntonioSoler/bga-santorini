@@ -89,6 +89,28 @@ const Meshes = [
 		n:'ram',
 		s:0.42,
 	},
+
+
+	{
+		n:'tokenWhirpool',
+		g:'token',
+		s:0.7,
+	},
+	{
+		n:'tokenTalus',
+		g:'token',
+		s:0.7,
+	},
+	{
+		n:'tokenWind',
+		g:'token8',
+		s:0.4,
+	},
+	{
+		n:'tokenArrow',
+		g:'token8',
+		s:0.4,
+	},
 ];
 
 

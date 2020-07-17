@@ -82,7 +82,7 @@ window.board = new Board(container, "http://192.168.1.29/" );
 board.enterScene();
 
 var piece1 = {
-	x:0,y:1,z:0, type:'ram',
+	x:0,y:1,z:0, type:'token',
 };
 var piece2 = {
 	x:1,y:3,z:0, name:'m0worker',
@@ -91,11 +91,11 @@ var piece2 = {
 //board.addPiece(piece1);
 //board.highlightPiece(piece1);
 //setTimeout(() => board.clearHighlights(), 2000);
-board.addPiece(piece2);
+//board.addPiece(piece2);
 board.addPiece(piece1);
 board.showCoordsHelpers();
 
-
+/*
 var click = (pos) => {
 	board.clearClickable();
 
