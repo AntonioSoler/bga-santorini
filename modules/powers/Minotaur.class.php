@@ -40,7 +40,7 @@ class Minotaur extends SantoriniPower
         // Must be a free space behind
         $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
         if (!is_null($space)) {
-          $worker['works'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
+          Utils::addWork($worker, $worker2);
         }
       }
     }

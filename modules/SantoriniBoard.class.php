@@ -242,17 +242,14 @@ class SantoriniBoard extends APP_GameClass
   // This supposed that the normal move is at distance at most one, might not work with some powers
   public function isDiagonal($a, $b)
   {
-    // TODO : not perfect, but work for all current powers (will fail with some power that move like a knight in chess)
-    $diffX = abs($a['x'] - $b['x']);
-    $diffY = abs($a['y'] - $b['y']);
-    return $diffX != 0 && $diffY != 0;
+    return in_array($a['direction'], [NE, SE, SW, NW]);
   }
 
 
   /*
    * isNeighbour : check distance between two spaces to move/build
    */
-  public function isNeighbour($a, $b, $action = null, $powerIds = [])
+  public static function isNeighbour($a, $b, $action = null, $powerIds = [])
   {
     $ok = true;
 
@@ -283,13 +280,13 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getDirection : get the corresponding direction of a move/build
    */
-  public function getDirection($a, $b, $action = null, $powerIds = [])
+  public static function getDirection($a, $b, $action = null, $powerIds = [])
   {
-    if (in_array(URANIA, $powerIds) && !$this->game->board->isNeighbour($a, $b)){
+    if (in_array(URANIA, $powerIds) && !self::isNeighbour($a, $b)){
       $dx = abs($a['x'] - $b['x']) <= 1 ? 0 : ($a['x'] < $b['x'] ? 1 : -1);
       $dy = abs($a['y'] - $b['y']) <= 1 ? 0 : ($a['y'] < $b['y'] ? 1 : -1);
-      $a['x'] = $worker['x'] + 5 * $dx;
-      $a['y'] = $worker['y'] + 5 * $dy;
+      $a['x'] = $a['x'] + 5 * $dx;
+      $a['y'] = $a['y'] + 5 * $dy;
     }
 
     $found = false;
@@ -349,7 +346,11 @@ class SantoriniBoard extends APP_GameClass
       return $space['x'] == $x && $space['y'] == $y;
     }));
 
-    return (count($spaces) == 1) ? $spaces[0] : null;
+    if(count($spaces) == 1){
+      $spaces[0]['direction'] = $this->getDirection($worker, $worker2);
+      return $spaces[0];
+    }
+    return null;
   }
 
 

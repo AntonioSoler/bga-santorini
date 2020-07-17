@@ -29,7 +29,7 @@ class Apollo extends SantoriniPower
       $worker['works'] = [];
       foreach ($oppWorkers as $worker2) {
         if ($this->game->board->isNeighbour($worker, $worker2, 'move')) {
-          $worker['works'][] = ['x' => $worker2['x'], 'y' => $worker2['y'], 'z' => $worker2['z']];
+          Utils::addWork($worker, $worker2);
         }
       }
     }

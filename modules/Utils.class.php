@@ -7,6 +7,12 @@ abstract class Utils extends APP_GameClass
     $data = array_values(array_filter($data, $filter));
   }
 
+  public static function search($data, $filter)
+  {
+    Utils::filter($data, $filter);
+    return (count($data) >= 1)? $data[0] : null;
+  }
+
 
   /* TODO */
   public static function filterWorkers(&$arg, $filter)
@@ -93,6 +99,17 @@ abstract class Utils extends APP_GameClass
     });
   }
 
+  public static function addWork(&$worker, $space, $action = null)
+  {
+    $worker['works'][] = [
+      'x' => $space['x'],
+      'y' => $space['y'],
+      'z' => $space['z'],
+      // 'arg' => null,
+      'direction' => SantoriniBoard::getDirection($worker, $space, $action),
+    ];
+  }
+
   public static function mergeWorkers(&$arg, $workers)
   {
     foreach ($workers as $worker) {
@@ -129,24 +146,23 @@ abstract class Utils extends APP_GameClass
   /* TODO */
   public static function checkWork($arg, $wId, $x, $y, $z, $actionArg)
   {
-    $workers = $arg['workers'];
-    Utils::filter($workers, function ($w) use ($wId) {
+    $worker = Utils::search($arg['workers'], function ($w) use ($wId) {
       return $w['id'] == $wId;
     });
-    if (count($workers) != 1) {
+    if (is_null($worker)) {
       throw new BgaUserException(_("This worker can't be used"));
     }
 
-    $works = $workers[0]['works'];
-    Utils::filter($works, function ($w) use ($x, $y, $z, $actionArg) {
+    $work = Utils::search($worker['works'], function ($w) use ($x, $y, $z, $actionArg) {
       return $w['x'] == $x && $w['y'] == $y && $w['z'] == $z
         && (is_null($actionArg) || in_array($actionArg, $w['arg']));
     });
-    if (count($works) != 1) {
+    if (is_null($work)) {
       throw new BgaUserException(_("You cannot reach this space with this worker"));
     }
 
-    return $works[0];
+    $work['arg'] = $actionArg;
+    return $work;
   }
 
 
