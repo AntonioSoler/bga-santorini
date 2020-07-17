@@ -354,6 +354,26 @@ class SantoriniBoard extends APP_GameClass
   }
 
 
+  /*
+   * getNextSpace: Return the space after a space given a direction
+   */
+  public function getNextSpace($space, $accessibleSpaces)
+  {
+    $x = $space['x'] + DIRECTIONS[$space['direction']]['x'];
+    $y = $space['y'] + DIRECTIONS[$space['direction']]['y'];
+    $spaces = array_values(array_filter($accessibleSpaces, function ($space) use ($x, $y) {
+      return $space['x'] == $x && $space['y'] == $y;
+    }));
+
+    if(count($spaces) == 1){
+      $spaces[0]['direction'] = $space['direction'];
+      return $spaces[0];
+    }
+    return null;
+  }
+
+
+
   /*##########################
   ######### Setters ##########
   ##########################*/
