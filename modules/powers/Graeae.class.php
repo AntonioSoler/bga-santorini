@@ -16,7 +16,24 @@ class Graeae extends SantoriniPower
     $this->playerCount = [2, 3];
     $this->golden  = false;
     $this->orderAid = 26;
+
+    $this->implemented = true;
   }
 
   /* * */
+  public function setup()
+  {
+    // TODO : this can be called several time when stealing a power ?
+    $this->getPlayer()->addWorker('f');
+  }
+
+  public function argPlayerBuild(&$arg)
+  {
+    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
+    $move = $this->game->log->getLastMove();
+    Utils::filterWorkersById($arg, $move['pieceId'], false);
+    foreach ($arg['workers'] as &$worker) {
+      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
+    }
+  }
 }
