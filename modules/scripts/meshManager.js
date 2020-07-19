@@ -94,12 +94,12 @@ const Meshes = [
 	{
 		n:'tokenWhirpool',
 		g:'token',
-		s:0.7,
+		s:0.8,
 	},
 	{
 		n:'tokenTalus',
 		g:'token',
-		s:0.7,
+		s:0.8,
 	},
 	{
 		n:'tokenWind',

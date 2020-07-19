@@ -136,7 +136,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         }).forEach(function (power, index) {
           // For JS code: Keep English name, add sort order
           power.sort = index;
-          power.nameEnglish = power.name;
+          power.nameEnglish = power.name.split(" ")[0];
 
           // For HTML template: Translate text, add counter
           power.name = _(power.name);
@@ -948,6 +948,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     usePowerTheseus: function (args) {
+      this._action = 'playerBuild';
+      this.makeWorkersSelectable(args.workers);
+    },
+
+		usePowerEuropa: function (args) {
       this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
     },

@@ -16,7 +16,62 @@ class Europa extends SantoriniPower
     $this->playerCount = [2, 3, 4];
     $this->golden  = false;
     $this->orderAid = 9;
+
+    $this->implemented = true;
   }
 
   /* * */
+  public function getToken()
+  {
+    $action = $this->game->log->getLastAction('addToken', $this->playerId, 'all');
+    return $this->game->board->getPiece($action['id']);
+  }
+
+  public function getUIData()
+  {
+    $data = parent::getUIData();
+    $data['counter'] = ($this->playerId != null && $this->getToken()['location'] == 'board') ? 0 : 1;
+    return $data;
+  }
+
+  public function setup()
+  {
+    $wId = $this->getPlayer()->addToken('tokenTalus', N);
+    $this->game->log->addAction('addToken', [], ['id' => $wId]);
+    $this->updateUI();
+  }
+
+  public function stateAfterBuild()
+  {
+    return 'power';
+  }
+
+  public function argUsePower(&$arg)
+  {
+    $arg = $this->game->argPlayerBuild();
+    $arg['power'] = $this->id;
+    $arg['power_name'] = $this->name;
+    $arg['skippable'] = true;
+  }
+
+  public function usePower($action)
+  {
+    $token = $this->getToken();
+    $space = $action[1];
+    if($token['location'] == 'hand'){
+      $this->placeToken($token, $space);
+    } else {
+      $this->replaceToken($token, $space);
+    }
+  }
+
+  public function stateAfterSkipPower()
+  {
+    return 'endturn';
+  }
+
+  public function stateAfterUsePower()
+  {
+    return 'endturn';
+  }
 }

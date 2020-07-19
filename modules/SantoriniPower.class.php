@@ -124,6 +124,49 @@ abstract class SantoriniPower extends APP_GameClass
     ]);
   }
 
+
+  public function placeToken($token, $space)
+  {
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->board->setPieceAt($token, $space);
+    $token['x'] = $space['x'];
+    $token['y'] = $space['y'];
+    $token['z'] = $space['z'];
+    $this->game->log->addPlaceToken($token, $this->id, $stats);
+
+    // Notify
+    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places its token (${coords})'), [
+      'i18n' => ['power_name', 'level_name'],
+      'piece' => $token,
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'level_name' => $this->game->levelNames[intval($space['z'])],
+      'coords' => $this->game->board->getMsgCoords($token, $space),
+    ]);
+
+    $this->updateUI();
+  }
+
+  public function replaceToken($token, $space)
+  {
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->board->setPieceAt($token, $space);
+    $this->game->log->addForce($token, $space, $stats);
+
+    // Notify
+    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} relocates its token (${coords})'), [
+      'i18n' => ['power_name', 'level_name'],
+      'piece' => $token,
+      'space' => $space,
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'level_name' => $this->game->levelNames[intval($space['z'])],
+      'coords' => $this->game->board->getMsgCoords($token, $space),
+    ]);
+  }
+
+
+
   public function setup()
   {
   }

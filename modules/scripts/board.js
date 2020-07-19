@@ -26,8 +26,8 @@ const hoveringColor = 0x000000;
 const highlightColor = 0x0012AA;
 
 const lvlHeights = [0, 1.24, 2.44, 3.25];
-const xCenters = [4.2, 2.12, -0.04, -2.12, -4.2];
-const zCenters = [4.15, 2.13, 0, -2.12, -4.2];
+const xCenters = {"-1": 6.1, 0:4.2, 1:2.12, 2:-0.04, 3:-2.12, 4:-4.2, "5":-5.2};
+const zCenters = {"-1": 6.1, 0:4.15, 1:2.13, 2:0, 3:-2.12, 4:-4.2, "5":-5.2};
 const startPos = new THREE.Vector3(40, 24, 0);
 const enterPos = new THREE.Vector3(20, 24, 0);
 
@@ -43,9 +43,9 @@ var Board = function (container, url) {
 	});
 
 	this._board = new Array();
-	for (var i = 0; i < 5; i++) {
+	for (var i = -1; i <= 5; i++) {
 		this._board[i] = new Array();
-		for (var j = 0; j < 5; j++) {
+		for (var j = -1; j <= 5; j++) {
 			this._board[i][j] = new Array();
 			for (var k = 0; k < 4; k++) {
 				this._board[i][j][k] = {
@@ -385,7 +385,8 @@ Board.prototype.addPiece = function (piece, animation) {
 	mesh.pieceId = piece.id;
 	mesh.position.copy(animation == "fall" ? sky : center);
 	mesh.material.opacity = (animation == "fall" || animation == "none") ? 1 : 0;
-	mesh.rotation.set(0, (Math.floor(Math.random() * 4) - 1) * Math.PI / 2, 0);
+	var theta = piece.direction? (-(piece.direction + 2.55) * Math.PI/4): ((Math.floor(Math.random() * 4) - 1) * Math.PI / 2);
+	mesh.rotation.set(0, theta, 0);
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;
 	this.addMeshToBoard(mesh, piece);

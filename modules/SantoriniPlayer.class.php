@@ -118,4 +118,12 @@ class SantoriniPlayer extends APP_GameClass
         self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$player_id', 'worker', '$type_arg', '$location')");
         return self::DbGetLastId();
     }
+
+
+    public function addToken($type, $type_arg = null, $location = 'hand')
+    {
+        $player_id = $this->id;
+        self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$player_id', '$type', '$type_arg', '$location')");
+        return self::DbGetLastId();
+    }
 }

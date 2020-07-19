@@ -45,6 +45,16 @@ class SantoriniBoard extends APP_GameClass
     return $msg;
   }
 
+  public static function addInfo($piece)
+  {
+    $piece['name'] = $piece['type'];
+    if($piece['type'] == 'worker'){
+      $piece['name'] = $piece['type_arg'].$piece['type'];
+    } elseif(substr($piece['type'], 0, 5) == 'token'){
+      $piece['direction'] = $piece['type_arg'];
+    }
+    return $piece;
+  }
 
   /*
    * getPiece: return all info about a piece
@@ -52,7 +62,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPiece($id)
   {
-    return self::getNonEmptyObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE id = '$id'");
+    return self::addInfo(self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$id'"));
   }
 
   /*
@@ -61,7 +71,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPieceAt($space)
   {
-    return self::getObjectFromDB("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}");
+    return self::addInfo(self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}"));
   }
 
 
@@ -70,7 +80,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedPieces()
   {
-    return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'board'");
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board'"));
   }
 
 
@@ -103,7 +113,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getAvailableWorkers($pId = -1)
   {
-    return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId)));
   }
 
   /*
@@ -111,7 +121,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getRam()
   {
-    return self::getObjectFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE type = 'ram'");
+    return self::addInfo(self::getObjectFromDb("SELECT * FROM piece WHERE type = 'ram'"));
   }
 
 
@@ -121,7 +131,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedWorkers($pId = -1)
   {
-    return self::getObjectListFromDb("SELECT *, CONCAT(type_arg, type) AS name FROM piece WHERE location = 'board' AND type = 'worker' " . $this->playerFilter($pId));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' " . $this->playerFilter($pId)));
   }
 
 
@@ -192,7 +202,7 @@ class SantoriniBoard extends APP_GameClass
         // Find next free space above ground
         for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
           $p = $board[$x][$y][$z];
-          $blocked = ($p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3');
+          $blocked = ($p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3' || $p['type'] == 'tokenTalus');
         }
 
         if ($blocked || $z > 3) {

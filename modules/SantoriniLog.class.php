@@ -54,7 +54,7 @@ class SantoriniLog extends APP_GameClass
    *     example: [ ['table', 'move'], [23647584, 'move'], ... ]
    *       - playerId: the player ID for a player state, or 'table' for a table stat
    *       - name: the state name, such as 'move' or 'usePower'
-   *       - value (optional): amount to add, defaults to 1 
+   *       - value (optional): amount to add, defaults to 1
    *   - boolean $subtract: true if the values should be decremented
    */
   public function incrementStats($stats, $subtract = false)
@@ -203,6 +203,20 @@ class SantoriniLog extends APP_GameClass
     ];
     $this->insert(-1, $worker['id'], 'placeWorker', [], $args);
   }
+
+  /*
+   * addPlaceToken: add a new place token entry to log (e.g., Europa)
+   */
+  public function addPlaceToken($token, $powerId, $stats, $location = 'hand')
+  {
+    $args = [
+      'power_id' => $powerId,
+      'location' => $location,
+      'to' => $this->game->board->getCoords($token),
+    ];
+    $this->insert(-1, $token['id'], 'placeToken', $stats, $args);
+  }
+
 
   /*
    * addAction: add a new action to log
@@ -398,7 +412,7 @@ class SantoriniLog extends APP_GameClass
         // Discard hero power : put the power back
         $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
         $this->game->powerManager->addPower($power, 'hero');
-      } else if ($log['action'] == 'placeWorker') {
+      } else if ($log['action'] == 'placeWorker' || $log['action'] == 'placeToken') {
         // Place worker : remove the worker, update power UI
         self::DbQuery("UPDATE piece SET x = null, y = null, z = null, location = '" . $args['location'] . "' WHERE id = {$log['piece_id']}");
         $power = $this->game->powerManager->getPower($args['power_id'], $pId);
