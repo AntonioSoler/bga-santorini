@@ -47,6 +47,10 @@ class SantoriniBoard extends APP_GameClass
 
   public static function addInfo($piece)
   {
+    if(is_null($piece)){
+      return $piece;
+    }
+
     $piece['name'] = $piece['type'];
     if($piece['type'] == 'worker'){
       $piece['name'] = $piece['type_arg'].$piece['type'];

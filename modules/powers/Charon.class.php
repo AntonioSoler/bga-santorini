@@ -21,8 +21,7 @@ class Charon extends SantoriniPower
   /* * */
   public function stateStartOfTurn()
   {
-    $arg = [];
-    $this->argUsePower($arg);
+    $arg = $this->game->argUsePower();
     return (count($arg['workers']) > 0) ? 'power' : null;
   }
 
