@@ -21,10 +21,10 @@ class Graeae extends SantoriniPower
   }
 
   /* * */
+
   public function setup()
   {
-    // TODO : this can be called several time when stealing a power ?
-    $this->getPlayer()->addWorker('f');
+    $this->getPlayer()->addWorker('m');
   }
 
   public function argPlayerBuild(&$arg)
