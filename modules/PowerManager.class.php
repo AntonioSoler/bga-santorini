@@ -86,6 +86,9 @@ class PowerManager extends APP_GameClass
     [ATLAS, GAEA],
     [APHRODITE, NEMESIS],
     [APHRODITE, URANIA],
+    [APHRODITE, BIA], // https://boardgamearena.com/bug?id=21093
+    [APHRODITE, MEDUSA], // https://boardgamearena.com/bug?id=21093
+    [APHRODITE, THESEUS], // https://boardgamearena.com/bug?id=21093
     [ASTERIA, HADES],
     [BIA, NEMESIS],
     [BIA, TARTARUS],
