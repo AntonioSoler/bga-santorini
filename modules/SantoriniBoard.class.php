@@ -47,14 +47,14 @@ class SantoriniBoard extends APP_GameClass
 
   public static function addInfo($piece)
   {
-    if(is_null($piece)){
+    if (is_null($piece)) {
       return $piece;
     }
 
     $piece['name'] = $piece['type'];
-    if($piece['type'] == 'worker'){
-      $piece['name'] = $piece['type_arg'].$piece['type'];
-    } elseif(substr($piece['type'], 0, 5) == 'token'){
+    if ($piece['type'] == 'worker') {
+      $piece['name'] = $piece['type_arg'] . $piece['type'];
+    } elseif (substr($piece['type'], 0, 5) == 'token') {
       $piece['direction'] = $piece['type_arg'];
     }
     return $piece;
@@ -296,7 +296,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public static function getDirection($a, $b, $action = null, $powerIds = [])
   {
-    if (in_array(URANIA, $powerIds) && !self::isNeighbour($a, $b)){
+    if (in_array(URANIA, $powerIds) && !self::isNeighbour($a, $b)) {
       $dx = abs($a['x'] - $b['x']) <= 1 ? 0 : ($a['x'] < $b['x'] ? 1 : -1);
       $dy = abs($a['y'] - $b['y']) <= 1 ? 0 : ($a['y'] < $b['y'] ? 1 : -1);
       $a['x'] = $a['x'] + 5 * $dx;
@@ -304,15 +304,15 @@ class SantoriniBoard extends APP_GameClass
     }
 
     $found = false;
-    foreach(DIRECTIONS as $d => $delta){
-      if($a['x'] + $delta['x'] == $b['x'] && $a['y'] + $delta['y'] == $b['y']){
-        if($found){
+    foreach (DIRECTIONS as $d => $delta) {
+      if ($a['x'] + $delta['x'] == $b['x'] && $a['y'] + $delta['y'] == $b['y']) {
+        if ($found) {
           throw new BgaVisibleSystemException(_("Two directions were found for a move/build"));
         }
         $found = $d;
       }
     }
-    if($found === false){
+    if ($found === false) {
       throw new BgaVisibleSystemException(_("No direction was found for a move/build"));
     }
 
@@ -333,12 +333,28 @@ class SantoriniBoard extends APP_GameClass
     Utils::filter($spaces, function ($space) use ($piece, $action, $powerIds) {
       return $this->isNeighbour($piece, $space, $action, $powerIds);
     });
-    array_walk($spaces, function (&$space) use ($piece, $action, $powerIds){
+    array_walk($spaces, function (&$space) use ($piece, $action, $powerIds) {
       $space['direction'] = $this->getDirection($piece, $space, $action, $powerIds);
     });
     return $spaces;
   }
 
+
+  /*
+   * getPieceCount: Return the number of blocks and domes on the board
+   */
+  public function getPieceCount()
+  {
+    return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM piece WHERE location = 'board' AND type LIKE 'lvl%'"));
+  }
+
+  /*
+   * getWorkerCount: Return the number of workers on the board
+   */
+  public function getWorkerCount()
+  {
+    return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM piece WHERE location = 'board' AND type = 'worker'"));
+  }
 
   /*
    * getCompleteTowerCount: Return the number of Complete Towers (domes on level 3)
@@ -360,7 +376,7 @@ class SantoriniBoard extends APP_GameClass
       return $space['x'] == $x && $space['y'] == $y;
     }));
 
-    if(count($spaces) == 1){
+    if (count($spaces) == 1) {
       $spaces[0]['direction'] = $this->getDirection($worker, $worker2);
       return $spaces[0];
     }
@@ -379,7 +395,7 @@ class SantoriniBoard extends APP_GameClass
       return $space['x'] == $x && $space['y'] == $y;
     }));
 
-    if(count($spaces) == 1){
+    if (count($spaces) == 1) {
       $spaces[0]['direction'] = $space['direction'];
       return $spaces[0];
     }

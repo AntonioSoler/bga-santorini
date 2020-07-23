@@ -108,8 +108,13 @@ class santorini extends Table
    */
   public function getGameProgression()
   {
-    $pieces = count($this->board->getPlacedPieces());
-    return (($pieces < 10) || ($pieces > 50))? $pieces : 50;
+    // Each worker and each block = 1%
+    // First 11 blocks = extra 5.9%
+    // The average game is about 11 blocks (about 80%)
+    // BGA allows "concede" after 50%, so after 7 blocks (52% - 56%)
+    $workers = $this->board->getWorkerCount();
+    $blocks = $this->board->getPieceCount();
+    return min($workers + $blocks + (min($blocks, 11) * 5.9), 99);
   }
 
 
