@@ -314,6 +314,7 @@ class santorini extends Table
   {
     $this->powerManager->setFirstPlayerOffer($powerId);
     self::notifyAllPlayers('message', clienttranslate('${power_name} will start this game'), [
+      'i18n' => ['power_name'],
       'power_name' => $this->powerManager->getPower($powerId)->getName(),
     ]);
     $this->gamestate->nextState('done');
