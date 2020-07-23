@@ -47,7 +47,7 @@ class Harpies extends SantoriniPower
         'piece' => $space,
         'space' => $newSpace,
         'power_name' => $this->getName(),
-        'player_name' => $this->game->getActivePlayerName(),
+        'player_name' => $this->getPlayer()->getName(),
         'player_name2' => $this->game->playerManager->getPlayer($worker['player_id'])->getName(),
         'level_name' => $this->game->levelNames[intval($newSpace['z'])],
         'coords' => $this->game->board->getMsgCoords($space, $newSpace),
