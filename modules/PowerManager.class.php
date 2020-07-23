@@ -289,6 +289,11 @@ class PowerManager extends APP_GameClass
 
     // Additional filtering for QUICK and TOURNAMENT
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
+    if ($optionPowers == GODS_AND_HEROES && $optionSetup == QUICK) {
+      // Fix invalid gameoptions at runtime
+      // https://boardgamearena.com/bug?id=21524
+      $optionSetup = TOURNAMENT;
+    }
     if (($optionSetup == QUICK || $optionSetup == TOURNAMENT)) {
       $count = $optionSetup == QUICK ? ($optionPowers == GOLDEN_FLEECE ? 1 : $nPlayers) : ($nPlayers + 1) * 2;
       if (count($powerIds) < $count) {
