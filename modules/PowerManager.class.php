@@ -286,7 +286,7 @@ class PowerManager extends APP_GameClass
 
     // Additional filtering for QUICK and TOURNAMENT
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
-    if (($optionSetup == QUICK || $optionSetup == TOURNAMENT) && $optionPowers != GODS_AND_HEROES) {
+    if (($optionSetup == QUICK || $optionSetup == TOURNAMENT)) {
       $count = $optionSetup == QUICK ? ($optionPowers == GOLDEN_FLEECE ? 1 : $nPlayers) : ($nPlayers + 1) * 2;
       if (count($powerIds) < $count) {
         throw new BgaVisibleSystemException("preparePowers: Not enough powers available (expected: $count, actual: " . count($powerIds) . ")");
@@ -309,7 +309,7 @@ class PowerManager extends APP_GameClass
       // QUICK: Go to place worker
       $this->prepareGoldenFleece($powerIds[0]);
       return 'placeWorker';
-    } else if ($optionSetup == QUICK && $optionPowers != GODS_AND_HEROES) {
+    } else if ($optionSetup == QUICK) {
       // QUICK: Skip building offer
       $this->cards->moveCards($powerIds, 'offer');
       return 'chooseFirstPlayer';

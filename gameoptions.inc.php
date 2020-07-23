@@ -77,6 +77,12 @@ $game_options = [
           'value' => 2,
           'message' => totranslate('Hero Powers requires exactly 2 players'),
         ],
+        [
+          'type' => 'otheroptionisnot',
+          'id' => OPTION_SETUP,
+          'value' => QUICK,
+          'message' => totranslate('All Gods and Hero Powers cannot be used with Quick Setup'),
+        ],
       ],
       GOLDEN_FLEECE => [
         [
@@ -115,9 +121,9 @@ $game_options = [
     ],
     'displaycondition' => [
       [
-        'type' => 'otheroption',
+        'type' => 'otheroptionisnot',
         'id' => OPTION_POWERS,
-        'value' => [SIMPLE, GODS, HEROES, GOLDEN_FLEECE],
+        'value' => NONE,
       ],
     ],
   ],
