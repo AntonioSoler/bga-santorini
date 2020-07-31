@@ -29,7 +29,7 @@ class Triton extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
-    $arg["mayMoveAgain"] = "perimeter";
+    $arg['mayMoveAgain'] = TRITON;
     // No move before => usual rule
     $moves = $this->game->log->getLastMoves();
     if (count($moves) == 0) {

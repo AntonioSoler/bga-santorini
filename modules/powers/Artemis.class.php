@@ -25,7 +25,7 @@ class Artemis extends SantoriniPower
     $move = $this->game->log->getLastMove();
     // No move before => usual rule
     if ($move == null) {
-      $arg['mayMoveAgain'] = true;
+      $arg['mayMoveAgain'] = ARTEMIS;
       return;
     }
 

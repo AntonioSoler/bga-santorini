@@ -26,7 +26,7 @@ class Aphrodite extends SantoriniPower
       if ($this->game->board->isNeighbour($worker, $oppWorker, '')) {
         return true;
       }
-      if(SantoriniBoard::isSameSpace($worker, $oppWorker)){
+      if (SantoriniBoard::isSameSpace($worker, $oppWorker)) {
         return true;
       }
     }
@@ -94,10 +94,15 @@ class Aphrodite extends SantoriniPower
           'player_name2' => $this->getPlayer()->getName(),
         ]);
       }
-    } else if ($arg['mayMoveAgain'] === 'perimeter') {
+    } else if ($arg['mayMoveAgain'] === TRITON) {
       // Last move if not on perimeter => must be neighboring
       Utils::filterWorks($arg, function ($space, $worker) {
         return $this->canFinishHere($worker, $space) || $this->game->board->isPerimeter($space);
+      });
+    } else if ($arg['mayMoveAgain'] === HERMES) {
+      // Last move if different level => must be neighboring
+      Utils::filterWorks($arg, function ($space, $worker) {
+        return $this->canFinishHere($worker, $space) || $space['z'] == $worker['z'];
       });
     }
   }
