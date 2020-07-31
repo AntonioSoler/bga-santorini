@@ -21,25 +21,29 @@
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
 
+function isBrowserSupported() {
+  // Block legacy browsers that can't load the board (anything pre-2016)
+  var ok = typeof Board != 'undefined';
+  // Also block Safari 10 for now (theoretically *should* work, but doesn't)
+  if ((navigator.userAgent.indexOf('Safari/602.') > -1 || navigator.userAgent.indexOf('Safari/603.') > -1)
+    && navigator.userAgent.indexOf('Chrome') == -1
+    && navigator.userAgent.indexOf('Chromium') == -1
+  ) {
+    ok = false;
+  }
+  debug('Browser supported:', ok);
+  return ok;
+}
+
 function isWebGLAvailable() {
   var ok = false;
   try {
     var canvas = document.createElement('canvas');
-    ok = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')));
+    ok = !!(window.WebGLRenderingContext && (canvas.getContext('webgl') || canvas.getContext('experimental-webgl')))
+      || !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
   } catch (e) {
   }
   debug('WebGL available:', ok);
-  return ok;
-}
-
-function isWebGL2Available() {
-  var ok = false;
-  try {
-    var canvas = document.createElement('canvas');
-    ok = !!(window.WebGL2RenderingContext && canvas.getContext('webgl2'));
-  } catch (e) {
-  }
-  debug('WebGL2 available:', ok);
   return ok;
 }
 
@@ -107,10 +111,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       var _this = this;
       debug('SETUP', gamedatas);
 
-      // Check if the Board module loaded
-      // Most old browsers fail here
-      // (exception: Safari 10 passes this check but still can't play)
-      if (typeof Board == 'undefined') {
+      // Check for supported browser
+      if (!isBrowserSupported()) {
         dojo.style('browser-error', 'display', 'block');
         dojo.attr('browser-error', 'href', 'https://browsehappy.com/');
         $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f644.png" alt="Face with Rolling Eyes">'
@@ -120,7 +122,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       }
 
       // Check for WebGL
-      if (!isWebGL2Available() && !isWebGLAvailable()) {
+      if (!isWebGLAvailable()) {
         dojo.style('browser-error', 'display', 'block');
         dojo.attr('browser-error', 'href', 'https://get.webgl.org/');
         $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f914.png" alt="Thinking Face">'
