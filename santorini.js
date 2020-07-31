@@ -497,7 +497,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       args.offer.sort(this.comparePowerIdsByName);
       args.offer.forEach(function (powerId) {
         var div = dojo.place(_this.createPowerSmall(powerId), 'cards-offer');
-        div.classList.add('selected');
+        dojo.addClass(div, 'selected');
         dojo.connect(div, 'onclick', function (e) {
           return _this.onClickPowerSmall(powerId);
         });
@@ -537,8 +537,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       if (this._displayedPower) {
         var powerDiv = $('power-small-' + this._displayedPower),
-          isBanned = powerDiv.classList.contains('banned'),
-          isSelected = powerDiv.classList.contains('selected'),
+          isBanned = dojo.hasClass(powerDiv, 'banned'),
+          isSelected = dojo.hasClass(powerDiv, 'selected'),
           power = this.getPower(this._displayedPower);
 
         if (isSelected) {
@@ -575,16 +575,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onClickPowerSmall: function (powerId) {
       var powerDiv = $('power-small-' + powerId),
         isActive = this.isCurrentPlayerActive(),
-        isBanned = powerDiv.classList.contains('banned'),
-        isDisplayed = powerDiv.classList.contains('displayed'),
-        isSelected = powerDiv.classList.contains('selected'),
-        isWait = powerDiv.classList.contains('wait'); // Everyone may view details on first click
+        isBanned = dojo.hasClass(powerDiv, 'banned'),
+        isDisplayed = dojo.hasClass(powerDiv, 'displayed'),
+        isSelected = dojo.hasClass(powerDiv, 'selected'),
+        isWait = dojo.hasClass(powerDiv, 'wait');
+      // Everyone may view details on first click
       this._displayedPower = powerId;
 
       if (!isDisplayed) {
         // Mark only this card as displayed
         dojo.query('.power-card.small.displayed').removeClass('displayed');
-        powerDiv.classList.add('displayed');
+        dojo.addClass(powerDiv, 'displayed');
         dojo.place(this.createPowerDetail(powerId), 'grid-detail', 'only');
       } else if (!isWait && isActive) {
         // Otherwise, active player may select/unselect the power
@@ -601,12 +602,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     addOffer: function () {
-      $('power-small-' + this._displayedPower).classList.add('wait');
+      dojo.addClass('power-small-' + this._displayedPower, 'wait');
       this.takeAction("addOffer", { powerId: this._displayedPower });
     },
 
     removeOffer: function () {
-      $('power-small-' + this._displayedPower).classList.add('wait');
+      dojo.addClass('power-small-' + this._displayedPower, 'wait');
       this.takeAction("removeOffer", { powerId: this._displayedPower });
     },
 
@@ -628,9 +629,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.slide(powerDivId, dummy.id).then(function () {
         // Replace the dummy with the real card
         var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
-        powerDiv.style = '';
-        powerDiv.classList.add('selected');
-        powerDiv.classList.remove('wait');
+        dojo.style(powerDiv, { top: null, left: null });
+        dojo.addClass(powerDiv, 'selected');
+        dojo.removeClass(powerDiv, 'wait');
         _this._nMissingPowers--;
 
         _this.updateBannedPowers(n.args.banned);
@@ -671,9 +672,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.slide(powerDivId, dummy.id).then(function () {
         // Replace the dummy with the real card
         var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
-        powerDiv.style = '';
-        powerDiv.classList.remove('selected');
-        powerDiv.classList.remove('wait');
+        dojo.style(powerDiv, { top: null, left: null });
+        dojo.removeClass(powerDiv, 'selected wait');
         _this._nMissingPowers++;
 
         _this.updateBannedPowers(n.args.banned);
@@ -952,7 +952,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.makeWorkersSelectable(args.workers);
     },
 
-		usePowerEuropa: function (args) {
+    usePowerEuropa: function (args) {
       this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
     },

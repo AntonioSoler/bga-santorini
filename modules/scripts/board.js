@@ -3,7 +3,9 @@ import { OrbitControls } from './OrbitControls.min.js';
 import { MeshManager } from './meshManager.js';
 import { Tween, Ease } from './tweenjs.min.js';
 
-var isMobile = () => document.getElementById("ebd-body") && document.getElementById("ebd-body").classList.contains('mobile_version');
+function isMobile() {
+	return dojo.hasClass('ebd-body', 'mobile_version');
+}
 
 //window['$'] = function(id){ return document.getElementById(id); };
 const canvasHeight = () => (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, $('scene-container').getBoundingClientRect()['height']) - ($('3d-scene') ? dojo.style('3d-scene', 'marginTop') : 100));
@@ -26,8 +28,8 @@ const hoveringColor = 0x000000;
 const highlightColor = 0x0012AA;
 
 const lvlHeights = [0, 1.24, 2.44, 3.25];
-const xCenters = {"-1": 6.1, 0:4.2, 1:2.12, 2:-0.04, 3:-2.12, 4:-4.2, "5":-5.2};
-const zCenters = {"-1": 6.1, 0:4.15, 1:2.13, 2:0, 3:-2.12, 4:-4.2, "5":-5.2};
+const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5": -5.2 };
+const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -5.2 };
 const startPos = new THREE.Vector3(40, 24, 0);
 const enterPos = new THREE.Vector3(20, 24, 0);
 
@@ -107,16 +109,16 @@ Board.prototype.initScene = function () {
 	this._mouse = { x: 0, y: 0 };
 	this._mouseDown = false;
 
-	document.getElementById('play-area').addEventListener('mousemove', (event) => {
+	var playArea = document.getElementById('play-area');
+	playArea.addEventListener('mousemove', (event) => {
 		event.preventDefault();
 		this._mouse = this.getRealMouseCoords(event.clientX, event.clientY);
 		if (!this._mouseDown && this._clickable.length > 0) {
 			this.raycasting(true);
 		}
 	}, false);
-
-	document.getElementById('play-area').addEventListener('mousedown', (event) => this._mouseDown = true);
-	document.getElementById('play-area').addEventListener('mouseup', (event) => this._mouseDown = false);
+	playArea.addEventListener('mousedown', (event) => this._mouseDown = true);
+	playArea.addEventListener('mouseup', (event) => this._mouseDown = false);
 
 	this._enterScene = false;
 };
@@ -188,8 +190,8 @@ Board.prototype.enterScene = function () {
 		RIGHT: THREE.MOUSE.ROTATE
 	}
 	controls.addEventListener('change', this.render.bind(this));
-	controls.addEventListener("click", (ev) => {
-		this._mouse = this.getRealMouseCoords(ev.posX, ev.posY);
+	controls.addEventListener('click', (event) => {
+		this._mouse = this.getRealMouseCoords(event.posX, event.posY);
 		this.raycasting(false);
 	})
 };
@@ -385,7 +387,7 @@ Board.prototype.addPiece = function (piece, animation) {
 	mesh.pieceId = piece.id;
 	mesh.position.copy(animation == "fall" ? sky : center);
 	mesh.material.opacity = (animation == "fall" || animation == "none") ? 1 : 0;
-	var theta = piece.direction? (-(piece.direction + 2.55) * Math.PI/4): ((Math.floor(Math.random() * 4) - 1) * Math.PI / 2);
+	var theta = piece.direction ? (-(piece.direction + 2.55) * Math.PI / 4) : ((Math.floor(Math.random() * 4) - 1) * Math.PI / 2);
 	mesh.rotation.set(0, theta, 0);
 	this._scene.add(mesh);
 	this._ids[piece.id] = mesh;

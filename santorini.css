@@ -314,7 +314,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .card-container {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-evenly;
+  justify-content: space-around;
   align-content: flex-start;
   min-height: 166px;
   margin-bottom: 15px;
@@ -339,7 +339,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 #power-choose-container {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-evenly;
+  justify-content: space-around;
   margin-top: 20px;
 }
 
