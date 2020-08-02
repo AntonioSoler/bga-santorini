@@ -234,25 +234,35 @@ class PowerManager extends APP_GameClass
   /*
    * getPowersInLocation: return all the powers in a given location
    */
-  public function getPowersInLocation($location)
+  public function getPowersInLocation($location, $locationArg = null)
   {
-    $cards = $this->cards->getCardsInLocation($location);
-    return array_values(array_map(function ($card) {
-      return $this->getPower($card['type']);
-    }, $cards));
+    return array_values(array_map(function ($powerId) {
+      return $this->getPower($powerId);
+    }, $this->getPowerIdsInLocation($location, $locationArg)));
   }
 
   /*
    * getPowerIdsInLocation: return all the power IDs in a given location
    */
-  public function getPowerIdsInLocation($location)
+  public function getPowerIdsInLocation($location, $locationArg = null)
   {
-    $cards = $this->cards->getCardsInLocation($location);
+    $cards = $this->cards->getCardsInLocation($location, $locationArg);
     return array_values(array_map(function ($card) {
       return intval($card['type']);
     }, $cards));
   }
 
+  /*
+   * getOpponentPowerIds: return all the power IDs for opponent players
+   */
+  public function getOpponentPowerIds($pId = -1)
+  {
+    $powerIds = [];
+    foreach ($this->game->playerManager->getOpponentsIds() as $opponentId) {
+      $powerIds = array_merge($powerIds, $this->getPowerIdsInLocation('hand', $opponentId));
+    }
+    return $powerIds;
+  }
 
   /*
    * createCards:
@@ -488,7 +498,7 @@ class PowerManager extends APP_GameClass
     }
     if ($reason == 'setup') {
       // Check the card for first player indicator
-      $card = $this->game->powerManager->cards->getCard($power->getId());
+      $card = $this->cards->getCard($power->getId());
       if ($card['location_arg'] == 1) {
         $this->game->setGameStateValue('firstPlayer', $player->getId());
       }
@@ -499,7 +509,7 @@ class PowerManager extends APP_GameClass
     }
     if ($reason == 'setup' || $reason == 'hero') {
       // Draw the card
-      $this->game->powerManager->cards->moveCard($power->getId(), 'hand', $player->getId());
+      $this->cards->moveCard($power->getId(), 'hand', $player->getId());
     }
     $this->notifyPower($player, $power, 'powerAdded', $reason);
     $player->addPlayerPower($power);
@@ -531,7 +541,7 @@ class PowerManager extends APP_GameClass
     if ($oldPlayer == null) {
       throw new BgaVisibleSystemException("movePower: Missing old player (powerId: {$power->getId()})");
     }
-    $this->game->powerManager->cards->moveCard($power->getId(), 'hand', $newPlayer->getId());
+    $this->cards->moveCard($power->getId(), 'hand', $newPlayer->getId());
     $this->notifyPower($newPlayer, $power, 'powerMoved', $reason);
     $oldPlayer->removePlayerPower($power);
     $newPlayer->addPlayerPower($power);

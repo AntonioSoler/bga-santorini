@@ -15,9 +15,9 @@ class SantoriniPlayer extends APP_GameClass
         $this->zombie = $row['zombie'] == 1;
 
         // Load powers
-        $cards = $this->game->powerManager->cards->getCardsInLocation('hand', $this->id);
-        foreach ($cards as $powerId => $card) {
-            $this->powers[] = $this->game->powerManager->getPower($card['type'], $this->id);
+        $powerIds = $this->game->powerManager->getPowerIdsInLocation('hand', $this->id);
+        foreach ($powerIds as $powerId) {
+            $this->powers[] = $this->game->powerManager->getPower($powerId, $this->id);
         }
     }
 
