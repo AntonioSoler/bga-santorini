@@ -83,13 +83,13 @@ class PowerManager extends APP_GameClass
    * TODO
    */
   public static $bannedMatchups = [
-    [ATLAS, GAEA],
-    [APHRODITE, NEMESIS],
-    [APHRODITE, URANIA],
     [APHRODITE, BIA], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, MEDUSA], // https://boardgamearena.com/bug?id=21093
+    [APHRODITE, NEMESIS],
     [APHRODITE, THESEUS], // https://boardgamearena.com/bug?id=21093
+    [APHRODITE, URANIA],
     [ASTERIA, HADES],
+    [ATLAS, GAEA],
     [BIA, NEMESIS],
     [BIA, TARTARUS],
     [CHARON, HECATE],
@@ -98,24 +98,12 @@ class PowerManager extends APP_GameClass
     [CIRCE, GAEA],
     [CIRCE, GRAEAE],
     [CIRCE, HECATE],
-    [CIRCE, JASON],
     [CIRCE, MOERAE],
     [CIRCE, NYX],
     [CIRCE, PROTEUS],
     [CIRCE, TARTARUS],
-    // Additionally, ban Circe and any hero
-    [CIRCE, ACHILLES],
-    [CIRCE, ADONIS],
-    [CIRCE, ATALANTA],
-    [CIRCE, BELLEROPHON],
-    [CIRCE, HERACLES],
-    [CIRCE, MEDEA],
-    [CIRCE, ODYSSEUS],
-    [CIRCE, POLYPHEMUS],
-    [CIRCE, THESEUS],
     [CLIO, NEMESIS],
     [ERIS, HECATE],
-    [ERIS, PERSEPHONE],
     [ERIS, TARTARUS],
     [GAEA, NEMESIS],
     [GAEA, SELENE],
@@ -127,8 +115,8 @@ class PowerManager extends APP_GameClass
     [HECATE, DIONYSUS],
     [HECATE, MEDEA],
     [HECATE, MOERAE],
-    [HECATE, SCYLLA],
     [HECATE, NYX],
+    [HECATE, SCYLLA],
     [HECATE, TARTARUS],
     [HECATE, THESEUS],
     [HYPNUS, TERPSICHORE],
@@ -139,24 +127,49 @@ class PowerManager extends APP_GameClass
     [NEMESIS, TERPSICHORE],
     [NEMESIS, THESEUS],
     [SELENE, GAEA],
-    [PERSEPHONE, TRITON], // CF PERSEPHONE
-    [PERSEPHONE, ARTEMIS],  // CF PERSEPHONE
-    [PERSEPHONE, CHARON],  // CF PERSEPHONE
-    [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE
-    [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
     [TARTARUS, TERPSICHORE],
+
+    // Circe ban all heroes
+    [CIRCE, ACHILLES],
+    [CIRCE, ADONIS],
+    [CIRCE, ATALANTA],
+    [CIRCE, BELLEROPHON],
+    [CIRCE, HERACLES],
+    [CIRCE, JASON],
+    [CIRCE, MEDEA],
+    [CIRCE, ODYSSEUS],
+    [CIRCE, POLYPHEMUS],
+    [CIRCE, THESEUS],
+
+    // Incomplete Persephone implementation
+    [PERSEPHONE, ARTEMIS],  // multiple moves
+    [PERSEPHONE, ATALANTA], // multiple moves
+    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350
+    [PERSEPHONE, CHARON],  // CF PERSEPHONE
+    [PERSEPHONE, CHARYBDIS], // complex moves
+    [PERSEPHONE, ERIS], // rulebook & alternative turn
+    [PERSEPHONE, HERMES], // multiple moves
+    [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
+    [PERSEPHONE, JASON], // alternative turn
+    [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE
+    [PERSEPHONE, SIREN], // alternative turn
+    [PERSEPHONE, TERPSICHORE], // both workers must move
+    [PERSEPHONE, TRITON], // multiple moves
+
     // Incomplete Adonis implementation
     [ADONIS, ARTEMIS], // multiple moves
-    [ADONIS, HERMES], // multiple moves
-    [ADONIS, TRITON], // multiple moves
+    [ADONIS, ATALANTA], // multiple moves
+    [ADONIS, CASTOR], // alternative turn
+    [ADONIS, CHARON],  // pre-chosen worker
     [ADONIS, CHARYBDIS], // complex moves
+    [ADONIS, ERIS], // alternative turn
+    [ADONIS, HERMES], // multiple moves
+    [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
+    [ADONIS, JASON], // alternative turn
+    [ADONIS, PROMETHEUS],  // movement restriction
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
-    [ADONIS, ATALANTA], // multiple moves
-    [ADONIS, JASON], // alternative turn
-    [ADONIS, CASTOR], // alternative turn
-    [ADONIS, ERIS], // alternative turn
-    [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
+    [ADONIS, TRITON], // multiple moves
   ];
 
 
