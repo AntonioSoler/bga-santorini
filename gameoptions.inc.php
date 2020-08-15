@@ -121,6 +121,28 @@ $game_options = [
       ],
     ],
   ],
+
+  OPTION_TEAMS => [
+    'name' => totranslate('Teams'),
+    'values' => [
+      TEAMS_RANDOM => [
+        'name' => totranslate('Random'),
+        'description' => totranslate('Only applies with 4 players'),
+      ],
+      TEAMS_1_AND_2 => [
+        'name' => totranslate('By table order (1st/2nd versus 3rd/4th)'),
+        'description' => totranslate('Only applies with 4 players'),
+      ],
+      TEAMS_1_AND_3 => [
+        'name' => totranslate('By table order (1st/3rd versus 2nd/4th)'),
+        'description' => totranslate('Only applies with 4 players'),
+      ],
+      TEAMS_1_AND_4 => [
+        'name' => totranslate('By table order (1st/4th versus 2nd/3rd)'),
+        'description' => totranslate('Only applies with 4 players'),
+      ],
+    ],
+  ],
 ];
 
 

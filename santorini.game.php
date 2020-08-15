@@ -33,6 +33,7 @@ class santorini extends Table
     self::initGameStateLabels([
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
+      'optionTeams' => OPTION_TEAMS,
       'currentRound' => CURRENT_ROUND,
       'firstPlayer' => FIRST_PLAYER,
     ]);
@@ -58,19 +59,65 @@ class santorini extends Table
    */
   protected function setupNewGame($players, $options = array())
   {
-    // Create players and assign teams
-    self::DbQuery('DELETE FROM player');
+    // Get player order
+    $orderPlayer = []; // [ 0 => playerId =>, 1 => playerId, ... ]
+    $orderTable = []; // [ 0 => playerId, 1 => playerId, ... ]
+    $i = 0;
+    foreach ($players as $pId => $player) {
+      $orderPlayer[] = $pId;
+      $orderTable[$player['player_table_order']] = $pId;
+    }
+
+    if (count($players) == 4) {
+      // player_table_order is non-consecutive
+      // Rekey $orderTable with 0, 1, 2, 3
+      ksort($orderTable);
+      $orderTable = array_values($orderTable);
+
+      // Determine the teammate of each player
+      $teammateOf = []; // [ playerId => playerId, ... ]
+      $optionTeams = intval($this->getGameStateValue('optionTeams'));
+      if ($optionTeams == TEAMS_RANDOM) {
+        $optionTeams = rand(TEAMS_1_AND_2, TEAMS_1_AND_4);
+      }
+      if ($optionTeams == TEAMS_1_AND_2) {
+        $teammateOf[$orderTable[0]] = $orderTable[1];
+        $teammateOf[$orderTable[1]] = $orderTable[0];
+        $teammateOf[$orderTable[2]] = $orderTable[3];
+        $teammateOf[$orderTable[3]] = $orderTable[2];
+      } else if ($optionTeams == TEAMS_1_AND_3) {
+        $teammateOf[$orderTable[0]] = $orderTable[2];
+        $teammateOf[$orderTable[1]] = $orderTable[3];
+        $teammateOf[$orderTable[2]] = $orderTable[0];
+        $teammateOf[$orderTable[3]] = $orderTable[1];
+      } else if ($optionTeams == TEAMS_1_AND_4) {
+        $teammateOf[$orderTable[0]] = $orderTable[3];
+        $teammateOf[$orderTable[1]] = $orderTable[2];
+        $teammateOf[$orderTable[2]] = $orderTable[1];
+        $teammateOf[$orderTable[3]] = $orderTable[0];
+      }
+
+      // Preserve BGA player order, only swapping as needed to maintain teams
+      if ($orderPlayer[1] == $teammateOf[$orderPlayer[0]]) {
+        $orderPlayer = [$orderPlayer[0], $orderPlayer[2], $teammateOf[$orderPlayer[0]], $teammateOf[$orderPlayer[2]]];
+      } else {
+        $orderPlayer = [$orderPlayer[0], $orderPlayer[1], $teammateOf[$orderPlayer[0]], $teammateOf[$orderPlayer[1]]];
+      }
+    }
+
+    // Create players
     $gameInfos = self::getGameinfos();
-    $sql = 'INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar, player_team) VALUES ';
     $values = [];
     $i = 0;
     $nTeams = count($players) == 3 ? 3 : 2;
-    foreach ($players as $pId => $player) {
+    foreach ($orderPlayer as $pId) {
+      $player = $players[$pId];
       $team = $i++ % $nTeams;
       $color = $gameInfos['player_colors'][$team];
-      $values[] = "('" . $pId . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "', '$team')";
+      $values[] = "($pId, '$color', '{$player['player_canal']}', '" . addslashes($player['player_name']) . "', '" . addslashes($player['player_avatar']) . "', $team)";
     }
-    self::DbQuery($sql . implode($values, ','));
+    self::DbQuery('DELETE FROM player');
+    self::DbQuery('INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar, player_team) VALUES ' . implode(',',  $values));
     self::reloadPlayersBasicInfos();
 
     // Init stats

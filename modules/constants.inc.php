@@ -124,6 +124,12 @@ define('QUICK', 0);
 define('TOURNAMENT', 1);
 define('CUSTOM', 2);
 
+define('OPTION_TEAMS', 103);
+define('TEAMS_RANDOM', 1);
+define('TEAMS_1_AND_2', 2);
+define('TEAMS_1_AND_3', 3);
+define('TEAMS_1_AND_4', 4);
+
 define('HELPERS', 100);
 define('ENABLED', 1);
 define('DISABLED', 2);
