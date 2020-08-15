@@ -24,6 +24,7 @@ class Odysseus extends SantoriniHeroPower
   {
     $arg = [];
     $this->argUsePower($arg);
+    Utils::cleanWorkers($arg);
     return (count($arg['workers']) > 0) ? 'power' : null;
   }
 

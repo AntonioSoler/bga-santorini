@@ -993,7 +993,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       // If no worker can work => restart or resign
       if (this._selectableWorkers.length == 0) {
-        this.gamedatas.gamestate.descriptionmyturn = this._action == "playerMove" ? _("You cannot move") : _("You cannot build");
+        this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptioncannot;
         this.updatePageTitle();
         this.addActionButton('buttonResign', _('Resign'), this.onClickResign.bind(this), null, false, 'gray');
       } else if (this._selectableWorkers.length == 1) {
