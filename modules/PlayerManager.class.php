@@ -94,7 +94,7 @@ class PlayerManager extends APP_GameClass
       $pId = $this->game->getActivePlayerId();
     }
 
-    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_team` = (SELECT `player_team` FROM player WHERE player_id = '$pId')" . ($excludeSelf ? " AND player_id != '$pId'" : ''));
+    $players = self::getObjectListFromDb("SELECT player_id id FROM player WHERE player_eliminated = 0 AND player_team = (SELECT player_team FROM player WHERE player_id = $pId)" . ($excludeSelf ? " AND player_id != $pId" : ''));
     return array_map(function ($player) {
       return $player['id'];
     }, $players);
@@ -105,7 +105,7 @@ class PlayerManager extends APP_GameClass
    */
   public function getTeammates($pId, $excludeSelf = false)
   {
-    return $this->getPlayers($this->getTeammatesIds($pId));
+    return $this->getPlayers($this->getTeammatesIds($pId, $excludeSelf));
   }
 
 

@@ -278,6 +278,14 @@ class PowerManager extends APP_GameClass
   }
 
   /*
+   * hasPower: return true if the power ID is currently in the player's hand
+   */
+  public function hasPower($powerId, $playerId)
+  {
+    return in_array($powerId, $this->getPowerIdsInLocation('hand', $playerId));
+  }
+
+  /*
    * createCards:
    *   during game setup, create power card
    */
@@ -611,6 +619,11 @@ class PowerManager extends APP_GameClass
     $player = $this->game->playerManager->getPlayer($playerId);
     $method = array_shift($methods);
     foreach ($player->getPowers() as $power) {
+      // Circe: Removed powers are still in this loop
+      // For example, prevent startPlayerTurn() after Circe returns Morpheus
+      if (!$this->hasPower($power->getId(), $playerId)) {
+        continue;
+      }
       call_user_func_array([$power, $method], $arg);
     }
 

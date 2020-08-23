@@ -325,7 +325,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     notif_updatePowerUI: function (n) {
       debug('Notif: updating power UI', n.args);
       this.gamedatas.powers[n.args.powerId].counter = n.args.counter;
-      var q = dojo.query('#mini-card-' + n.args.playerId + "-" + n.args.powerId + ' .power-counter');
+      var q = dojo.query('.mini-card.power-' + n.args.powerId + ' .power-counter');
       if (q.length > 0) {
         q[0].textContent = n.args.counter;
         // Restart the CSS animation
