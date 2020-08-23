@@ -38,3 +38,13 @@ $this->levelNames = [
   2 => clienttranslate('level 2'),
   3 => clienttranslate('level 3'),
 ];
+
+$this->pieceNames = [
+  'lvl0' => clienttranslate('a block'),
+  'lvl1' => clienttranslate('a block'),
+  'lvl2' => clienttranslate('a block'),
+  'lvl3' => clienttranslate('a dome'),
+  'worker' => clienttranslate('a worker'),
+  'ram' => clienttranslate('the Ram figure'),
+  'tokenTalus' => clienttranslate('the Talus Token'),
+];

@@ -21,44 +21,44 @@ class Europa extends SantoriniPower
   }
 
   /* * */
+
   public function getToken()
   {
-    $action = $this->game->log->getLastAction('addToken', $this->playerId, 'all');
-    return $this->game->board->getPiece($action['id']);
-  }
-
-  public function getUIData()
-  {
-    $data = parent::getUIData();
-    $data['counter'] = ($this->playerId != null && $this->getToken()['location'] == 'board') ? 0 : 1;
-    return $data;
+    return $this->game->board->getPiecesByType('tokenTalus')[0];
   }
 
   public function setup()
   {
-    $wId = $this->getPlayer()->addToken('tokenTalus', N);
-    $this->game->log->addAction('addToken', [], ['id' => $wId]);
-    $this->updateUI();
+    $this->getPlayer()->addToken('tokenTalus');
   }
 
   public function stateAfterBuild()
   {
-    return 'power';
+    $arg = [];
+    $this->argUsePower($arg);
+    Utils::cleanWorkers($arg);
+    return (count($arg['workers']) > 0) ? 'power' : null;
   }
 
   public function argUsePower(&$arg)
   {
-    $arg = $this->game->argPlayerBuild();
     $arg['power'] = $this->id;
     $arg['power_name'] = $this->name;
     $arg['skippable'] = true;
+
+    $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
+    $move = $this->game->log->getLastMove();
+    Utils::filterWorkersById($arg, $move['pieceId']);
+    foreach ($arg['workers'] as &$worker) {
+      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
+    }
   }
 
   public function usePower($action)
   {
     $token = $this->getToken();
     $space = $action[1];
-    if($token['location'] == 'hand'){
+    if ($token['location'] == 'hand') {
       $this->placeToken($token, $space);
     } else {
       $this->replaceToken($token, $space);

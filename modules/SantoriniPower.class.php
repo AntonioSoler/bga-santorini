@@ -115,9 +115,12 @@ abstract class SantoriniPower extends APP_GameClass
     $worker['y'] = $space['y'];
     $worker['z'] = $space['z'];
     $this->game->log->addPlaceWorker($worker, $this->id);
-    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places a worker (${coords})'), [
-      'i18n' => ['power_name'],
+
+    // Notify
+    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places ${piece_name} (${coords})'), [
+      'i18n' => ['power_name', 'piece_name'],
       'piece' => $worker,
+      'piece_name' => $this->game->pieceNames[$worker['type']],
       'power_name' => $this->getName(),
       'player_name' => $this->getPlayer()->getName(),
       'coords' => $this->game->board->getMsgCoords($space),
@@ -135,16 +138,14 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addPlaceToken($token, $this->id, $stats);
 
     // Notify
-    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places its token (${coords})'), [
-      'i18n' => ['power_name', 'level_name'],
+    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places ${piece_name} (${coords})'), [
+      'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
+      'piece_name' => $this->game->pieceNames[$token['type']],
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
-      'level_name' => $this->game->levelNames[intval($space['z'])],
       'coords' => $this->game->board->getMsgCoords($token, $space),
     ]);
-
-    $this->updateUI();
   }
 
   public function replaceToken($token, $space)
@@ -154,13 +155,13 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addForce($token, $space, $stats);
 
     // Notify
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} relocates its token (${coords})'), [
-      'i18n' => ['power_name', 'level_name'],
+    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} moves ${piece_name} (${coords})'), [
+      'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
+      'piece_name' => $this->game->tokenNames[$token['type']],
       'space' => $space,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
-      'level_name' => $this->game->levelNames[intval($space['z'])],
       'coords' => $this->game->board->getMsgCoords($token, $space),
     ]);
   }

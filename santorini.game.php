@@ -509,10 +509,10 @@ class santorini extends Table
 
     // Notify
     $piece = $this->board->getPiece($workerId);
-    $msg = $piece['type'] == 'ram' ? clienttranslate('${player_name} places the Ram figure (${coords})') : clienttranslate('${player_name} places a worker (${coords})');
-    self::notifyAllPlayers('workerPlaced', $msg, [
-      'i18n' => [],
+    self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places ${piece_name} (${coords})'), [
+      'i18n' => ['piece_name'],
       'piece' => $piece,
+      'piece_name' => $this->pieceNames[$piece['type']],
       'player_name' => self::getActivePlayerName(),
       'coords' => $this->board->getMsgCoords($space),
     ]);
@@ -1015,11 +1015,11 @@ class santorini extends Table
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
-    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds a ${piece_name} on ${level_name} (${coords})'), [
+    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds ${piece_name} on ${level_name} (${coords})'), [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
       'piece' => $piece,
-      'piece_name' => ($space['arg'] == 3) ? clienttranslate('dome') : clienttranslate('block'),
+      'piece_name' => $this->pieceNames[$type],
       'level_name' => $this->levelNames[intval($space['z'])],
       'coords' => $this->board->getMsgCoords($space),
     ]);

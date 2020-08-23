@@ -78,6 +78,17 @@ class SantoriniBoard extends APP_GameClass
     return self::addInfo(self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}"));
   }
 
+  /*
+   * getPiecesByType: return all info about pieces of the given type
+   */
+  public function getPiecesByType($type, $type_arg = null)
+  {
+    $sql = "SELECT * FROM piece WHERE type = '$type'";
+    if ($type_arg) {
+      $sql .= " AND type_arg = '$type_arg'";
+    }
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
+  }
 
   /*
    * getPlacedPieces: return all pieces on the board
@@ -125,7 +136,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getRam()
   {
-    return self::addInfo(self::getObjectFromDb("SELECT * FROM piece WHERE type = 'ram'"));
+    return $this->getPiecesByType('ram')[0];
   }
 
 
@@ -307,13 +318,13 @@ class SantoriniBoard extends APP_GameClass
     foreach (DIRECTIONS as $d => $delta) {
       if ($a['x'] + $delta['x'] == $b['x'] && $a['y'] + $delta['y'] == $b['y']) {
         if ($found) {
-          throw new BgaVisibleSystemException(_("Two directions were found for a move/build"));
+          throw new BgaVisibleSystemException("getDirection: Two directions found");
         }
         $found = $d;
       }
     }
     if ($found === false) {
-      throw new BgaVisibleSystemException(_("No direction was found for a move/build"));
+      throw new BgaVisibleSystemException("getDirection: No direction found");
     }
 
     return $found;
