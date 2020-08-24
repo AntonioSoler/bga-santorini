@@ -623,12 +623,28 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       var _this = this;
       debug('Notif: addOffer', n.args);
 
-      // Create a dummy in the offer that will be replaced by the actual power
-      var dummy = dojo.place(this.createPowerSmall(0), 'cards-offer');
-      dummy.id = 'addOffer-dummy';
+      // Create a dummy in the offer
+      var dummy = this.createPowerSmall(0);
+      // Find the right position
+      var power = this.getPower(n.args.powerId);
+      var nextPower = null;
+      dojo.query('#cards-offer .power-card').some(function (div) {
+        if (div.getAttribute('data-sort') > power.sort) {
+          nextPower = div;
+          return true;
+        }
+      });
+
+      // Insert it
+      if (nextPower != null) {
+        dummy = dojo.place(dummy, nextPower, 'before');
+      } else {
+        dummy = dojo.place(dummy, 'cards-offer', 'last');
+      }
 
       // Slide the real card to the position of the dummy
       var powerDivId = 'power-small-' + n.args.powerId;
+      dummy.id = 'addOffer-dummy';
       this.slide(powerDivId, dummy.id).then(function () {
         // Replace the dummy with the real card
         var powerDiv = dojo.place(powerDivId, dummy.id, 'replace');
@@ -703,6 +719,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onEnteringStateChooseFirstPlayer: function (args) {
       var _this = this;
       dojo.empty('power-choose-container');
+      args.powers.sort(this.comparePowerIdsByName);
       args.powers.forEach(function (powerId) {
         var power = _this.getPower(powerId);
         var div = dojo.place(_this.createPowerDetail(powerId), 'power-choose-container');
@@ -715,7 +732,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
           });
           _this.addActionButton('buttonFirstPlayer' + powerId, _(power.name), function () {
             _this.onClickChooseFirstPlayer(powerId)
-          }, null, false, 'blue');
+          }, null, false, powerId == args.suggestion ? 'blue' : 'gray');
         }
       });
     },
