@@ -37,6 +37,12 @@ class Hypnus extends SantoriniPower
     // Sort them by height and see if first one is strictly higher
     usort($workers, 'self::cmpZ');
     if (self::cmpZ($workers[0], $workers[1]) != 0) {
+      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) cannot move'), [
+        'i18n' => ['power_name'],
+        'power_name' => $this->getName(),
+        'player_name' => $this->game->getActivePlayerName(), // opponent
+        'coords' => $this->game->board->getMsgCoords($workers[0]),
+      ]);
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('blockedWorker', $stats, ['wId' => $workers[0]['id']]);
     }
