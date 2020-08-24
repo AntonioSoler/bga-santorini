@@ -418,12 +418,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         return;
       }
 
-      if ((stateName == "playerMove" || stateName == "playerBuild" || stateName == "playerUsePower")) {
-        if (args.skippable) {
-          this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
-        }
+      if (stateName == "playerMove" || stateName == "playerBuild" || stateName == "playerUsePower") {
+        this.addActionButton('buttonResign', _('Resign'), 'onClickResign', null, false, 'red');
         if (args.cancelable) {
           this.addActionButton('buttonCancel', _('Restart turn'), 'onClickCancel', null, false, 'gray');
+        }
+        if (args.skippable) {
+          this.addActionButton('buttonSkip', _('Skip'), 'onClickSkip', null, false, 'gray');
         }
       }
 
@@ -995,7 +996,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       if (this._selectableWorkers.length == 0) {
         this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.descriptioncannot;
         this.updatePageTitle();
-        this.addActionButton('buttonResign', _('Resign'), this.onClickResign.bind(this), null, false, 'gray');
       } else if (this._selectableWorkers.length == 1) {
         // If only one worker can work, automatically select it
         this.onClickSelectWorker(this._selectableWorkers[0]);

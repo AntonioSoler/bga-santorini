@@ -377,16 +377,16 @@ class SantoriniLog extends APP_GameClass
   ////////////////////////////////
   ////////////////////////////////
 
-  private function logsForCancelTurn()
+  private function logsForCancelTurn($ignore = ['startTurn'])
   {
     $pId = $this->game->getActivePlayerId();
-    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE `player_id` = '$pId' AND `action` != 'startTurn' " . $this->getRoundClause($pId, 0, false) . " ORDER BY log_id DESC");
+    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE player_id = $pId AND action NOT IN ('" . implode("', '", $ignore) . "') " . $this->getRoundClause($pId, 0, false) . " ORDER BY log_id DESC");
     return $logs;
   }
 
   public function canCancelTurn()
   {
-    return !empty($this->logsForCancelTurn());
+    return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
   }
 
   public function cancelTurn()

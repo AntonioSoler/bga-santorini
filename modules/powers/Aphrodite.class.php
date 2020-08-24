@@ -42,6 +42,13 @@ class Aphrodite extends SantoriniPower
     foreach ($oppWorkers as $worker) {
       if ($this->isNeighbouring($worker)) {
         $forcedWorkers[] = $worker['id'];
+        $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
+          'i18n' => ['power_name'],
+          'power_name' => $this->getName(),
+          'player_name' => $this->game->getActivePlayerName(), // opponent
+          'player_name2' => $this->getPlayer()->getName(), // Aphrodite
+          'coords' => $this->game->board->getMsgCoords($worker),
+        ]);
       }
     }
 
@@ -60,59 +67,64 @@ class Aphrodite extends SantoriniPower
     return $action['workers'];
   }
 
-  public function canFinishHere($worker, $space)
+  public function canFinishHere($worker, $space, $forcedWorkers)
   {
-    $forcedWorkers = $this->getForcedWorkers();
-    return $forcedWorkers == null || !in_array($worker['id'], $forcedWorkers) || $this->isNeighbouring($space);
+    return !in_array($worker['id'], $forcedWorkers) || $this->isNeighbouring($space);
+  }
+
+  /*
+   * canKeepMoving:
+   *   called for non-neighboring spaces, returns true if this space allows the player to keep moving (look ahead 1)
+   */
+  public function canKeepMoving($worker, $space, $mayMoveAgain)
+  {
+    if ($mayMoveAgain === false) {
+      return false;
+    } else if ($mayMoveAgain == HERMES && $space['z'] != $worker['z']) {
+      // Hermes must stay on the same level to move again
+      return false;
+    } else if ($mayMoveAgain == TRITON && !$this->game->board->isPerimeter($space)) {
+      // Triton must stay on the perimiter to move again
+      return false;
+    }
+
+    // Intermediate moves cannot win the game
+    if ($space['z'] == 3) {
+      if ($this->game->board->isPerimeter($space) && in_array(HERA, $this->game->powerManager->getOpponentPowerIds())) {
+        // Hera: Can't win on the permiter, so perimiter level 3 is valid
+        return true;
+      }
+      if ($this->game->log->isAdditionalTurn(DIONYSUS)) {
+        // Dionysus: Can't win during additional turn, so any level 3 is valid
+        return true;
+      }
+      // Other level 3 space would win, invalid
+      return false;
+    }
+
+    // All other cases are valid intermediate moves
+    return true;
   }
 
   public function argOpponentMove(&$arg)
   {
-    if ($this->getForcedWorkers() == null) {
+    $forcedWorkers = $this->getForcedWorkers();
+    if ($forcedWorkers == null) {
       return;
     }
 
     // Allow skip only if condition is satisfied
     if ($arg['skippable']) {
       foreach ($arg['workers'] as $worker) {
-        $arg['skippable'] = $arg['skippable'] && $this->canFinishHere($worker, $worker);
+        $arg['skippable'] = $arg['skippable'] && $this->canFinishHere($worker, $worker, $forcedWorkers);
       }
     }
 
-    // Last move => must be neighboring
-    if ($arg['mayMoveAgain'] === false) {
-      Utils::filterWorks($arg, function ($space, $worker) {
-        return $this->canFinishHere($worker, $space);
-      });
-
-      if (empty($arg['workers'])) {
-        $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: Your last move must be to a space neighboring ${player_name2}'), [
-          'i18n' => ['power_name'],
-          'power_name' => $this->getName(),
-          'player_name2' => $this->getPlayer()->getName(),
-        ]);
-      }
-    } else {
-      if ($arg['mayMoveAgain'] === TRITON) {
-        // Last move if not on perimeter => must be neighboring
-        Utils::filterWorks($arg, function ($space, $worker) {
-          return $this->canFinishHere($worker, $space) || $this->game->board->isPerimeter($space);
-        });
-      } else if ($arg['mayMoveAgain'] === HERMES) {
-        // Last move if different level => must be neighboring
-        Utils::filterWorks($arg, function ($space, $worker) {
-          return $this->canFinishHere($worker, $space) || $space['z'] == $worker['z'];
-        });
-      }
-
-      // Always remove level 3 spaces, unless they don't win the game
-      if (!$this->game->log->isAdditionalTurn(DIONYSUS)) {
-        $opponentIsHera = in_array(HERA, $this->game->powerManager->getOpponentPowerIds());
-        Utils::filterWorks($arg, function ($space, $worker) use ($opponentIsHera) {
-          return $space['z'] < 3 || ($opponentIsHera && $this->game->board->isPerimeter($space));
-        });
-      }
-    }
+    // Last move must be neighboring or intermediate move must be valid
+    $mayMoveAgain = $arg['mayMoveAgain'];
+    Utils::filterWorks($arg, function ($space, $worker) use ($forcedWorkers, $mayMoveAgain) {
+      return $this->canFinishHere($worker, $space, $forcedWorkers) || $this->canKeepMoving($worker, $space, $mayMoveAgain);
+    });
   }
 
   public function endOpponentTurn()

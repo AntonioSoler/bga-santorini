@@ -883,7 +883,7 @@ class santorini extends Table
    */
   public function resign()
   {
-    $this->announceLose();
+    $this->announceLose(clienttranslate('${player_name} resigns'));
   }
 
 
@@ -1163,5 +1163,28 @@ class santorini extends Table
       self::DbQuery($q);
     }
     self::reloadPlayersBasicInfos();
+  }
+
+  // call from studio chat to expedite game start
+  public function quickBuild()
+  {
+    $worker = ['id' => -1, 'x' => 0, 'y' => 0, 'z' => 0];
+
+    $this->playerBuild($worker, ['x' => 4, 'y' => 1, 'z' => 0, 'arg' => 0]);
+
+    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 0, 'arg' => 0]);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 1, 'arg' => 1]);
+
+    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 0, 'arg' => 0]);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 1, 'arg' => 1]);
+
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 0, 'arg' => 0]);
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 1, 'arg' => 1]);
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 2, 'arg' => 2]);
+
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 0, 'arg' => 0]);
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 1, 'arg' => 1]);
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 2, 'arg' => 2]);
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 3, 'arg' => 3]);
   }
 }

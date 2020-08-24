@@ -214,7 +214,7 @@ $machinestates = [
     'descriptioncannot' => clienttranslate('${you} cannot use ${power_name}\'s power'),
     'type' => 'activeplayer',
     'args' => 'argUsePower',
-    'possibleactions' => ['use', 'skip', 'cancel'],
+    'possibleactions' => ['use', 'skip', 'cancel', 'resign'],
     'transitions' => [
       'cancel' => ST_START_OF_TURN,
       'move' => ST_MOVE,
@@ -236,7 +236,7 @@ $machinestates = [
     'type' => 'activeplayer',
     'args' => 'argPlayerMove',
     'action' => 'stBeforeWork',
-    'possibleactions' => ['playerMove', 'skip', 'cancel', 'resign', 'endgame'],
+    'possibleactions' => ['playerMove', 'skip', 'cancel', 'resign'],
     'transitions' => [
       // Zombie must call power's preEndOfTurn()
       'zombiePass' => ST_PRE_END_OF_TURN,
@@ -260,7 +260,7 @@ $machinestates = [
     'type' => 'activeplayer',
     'args' => 'argPlayerBuild',
     'action' => 'stBeforeWork',
-    'possibleactions' => ['playerBuild', 'skip', 'cancel', 'resign', 'endgame'],
+    'possibleactions' => ['playerBuild', 'skip', 'cancel', 'resign'],
     'transitions' => [
       // Zombie must call power's preEndOfTurn()
       'zombiePass' => ST_PRE_END_OF_TURN,
