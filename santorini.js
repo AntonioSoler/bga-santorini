@@ -206,6 +206,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       return gameui.gamedatas.powers[id1].sort - gameui.gamedatas.powers[id2].sort;
     },
 
+    comparePowerCardsByName: function (card1, card2) {
+      return gameui.gamedatas.powers[card1.id].sort - gameui.gamedatas.powers[card2.id].sort;
+    },
+
     setupPreference: function () {
       var _this = this;
       var preferenceSelect = $('preference_control_100');
@@ -760,28 +764,30 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       // Display remaining powers
       dojo.empty('power-choose-container');
-      args.offer.forEach(function (powerCard) {
-        var power = _this.getPower(powerCard.id);
-        var div = dojo.place(_this.createPowerDetail(powerCard.id), 'power-choose-container');
-        if (powerCard.location_arg == 1) {
-          var mark = document.createElement("div");
-          mark.className = 'power-counter infinite';
-          mark.textContent = '1';
-          mark.title = dojo.string.substitute(_('${power_name} will start this game'), { power_name: power.name });
-          div.append(mark);
-        }
-        div.id = "power-choose-" + power.id;
+      Object.values(args.offer)
+        .sort(this.comparePowerCardsByName)
+        .forEach(function (powerCard) {
+          var power = _this.getPower(powerCard.id);
+          var div = dojo.place(_this.createPowerDetail(powerCard.id), 'power-choose-container');
+          if (powerCard.location_arg == 1) {
+            var mark = document.createElement("div");
+            mark.className = 'power-counter infinite';
+            mark.textContent = '1';
+            mark.title = dojo.string.substitute(_('${power_name} will start this game'), { power_name: power.name });
+            div.append(mark);
+          }
+          div.id = "power-choose-" + power.id;
 
-        if (_this.isCurrentPlayerActive()) {
-          dojo.addClass(div, 'clickable');
-          dojo.connect(div, 'onclick', function (e) {
-            return _this.onClickChoosePower(power.id);
-          });
-          _this.addActionButton('buttonChoosePower' + power.id, _(power.name), function () {
-            _this.onClickChoosePower(power.id)
-          }, null, false, 'blue');
-        }
-      });
+          if (_this.isCurrentPlayerActive()) {
+            dojo.addClass(div, 'clickable');
+            dojo.connect(div, 'onclick', function (e) {
+              return _this.onClickChoosePower(power.id);
+            });
+            _this.addActionButton('buttonChoosePower' + power.id, _(power.name), function () {
+              _this.onClickChoosePower(power.id)
+            }, null, false, 'blue');
+          }
+        });
     },
 
     /*
