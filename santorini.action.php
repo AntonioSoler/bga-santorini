@@ -185,6 +185,6 @@ class action_santorini extends APP_GameAction
     self::setAjaxMode();
     $reportId = (int) self::getArg('report_id', AT_int, true);
     $this->game->loadBugSQL($reportId);
-    self::ajaxResponse();
+    echo '{"status":1,"data":{"valid":1,"data":null}}';
   }
 }
