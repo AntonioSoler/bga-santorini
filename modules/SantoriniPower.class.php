@@ -144,7 +144,7 @@ abstract class SantoriniPower extends APP_GameClass
       'piece_name' => $this->game->pieceNames[$token['type']],
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
-      'coords' => $this->game->board->getMsgCoords($token, $space),
+      'coords' => $this->game->board->getMsgCoords($token),
     ]);
   }
 
@@ -158,7 +158,7 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} moves ${piece_name} (${coords})'), [
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
-      'piece_name' => $this->game->tokenNames[$token['type']],
+      'piece_name' => $this->game->pieceNames[$token['type']],
       'space' => $space,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
