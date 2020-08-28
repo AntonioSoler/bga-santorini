@@ -127,13 +127,6 @@ class SantoriniLog extends APP_GameClass
     }
 
     $actionArgs = json_encode($args);
-
-    // TODO : remove
-    $test = self::getUniqueValueFromDB("SHOW COLUMNS FROM log WHERE Field = 'move_id'");
-    if (is_null($test)) {
-      self::DbQuery("ALTER TABLE `log` ADD `move_id` INT(11) NOT NULL DEFAULT 0");
-    }
-
     self::DbQuery("INSERT INTO log (`round`, `move_id`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$moveId', '$playerId', '$pieceId', '$action', '$actionArgs')");
   }
 
@@ -425,17 +418,11 @@ class SantoriniLog extends APP_GameClass
       }
 
       $ids[] = intval($log['log_id']);
-      $moveIds[] = array_key_exists('move_id', $log) ? intval($log['move_id']) : 0; // TODO remove the array_key_exists
+      $moveIds[] = intval($log['move_id']);
     }
 
     // Remove the logs
     self::DbQuery("DELETE FROM log WHERE `player_id` = '$pId' AND `log_id` IN (" . implode(',', $ids) . ")");
-
-    // TODO : remove
-    $test = self::getUniqueValueFromDB("SHOW COLUMNS FROM gamelog WHERE Field = 'cancel'");
-    if (is_null($test)) {
-      self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
-    }
 
     // Cancel the game notifications
     if (!empty($moveIds)) {
@@ -449,12 +436,6 @@ class SantoriniLog extends APP_GameClass
    */
   public function getCancelMoveIds()
   {
-    // TODO : remove
-    $test = self::getUniqueValueFromDB("SHOW COLUMNS FROM gamelog WHERE Field = 'cancel'");
-    if (is_null($test)) {
-      self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
-    }
-
     $moveIds = self::getObjectListFromDb("SELECT `gamelog_move_id` FROM gamelog WHERE `cancel` = 1 ORDER BY 1", true);
     return array_map('intval', $moveIds);
   }
