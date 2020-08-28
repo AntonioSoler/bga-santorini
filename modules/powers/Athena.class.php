@@ -42,6 +42,17 @@ class Athena extends SantoriniPower
     }
   }
 
+  public function startOpponentTurn()
+  {
+    if ($this->hasMovedUp()) {
+      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} cannot move up this turn'), [
+        'i18n' => ['power_name'],
+        'power_name' => $this->getName(),
+        'player_name' => $this->game->getActivePlayerName(), // opponent
+      ]);
+    }
+  }
+
   public function argOpponentMove(&$arg)
   {
     if (!$this->hasMovedUp()) {
