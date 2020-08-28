@@ -59,7 +59,6 @@ class SantoriniLog extends APP_GameClass
    */
   public function incrementStats($stats, $subtract = false)
   {
-    // $this->game->notifyAllPlayers('message', "incrementStats: " . json_encode($stats, JSON_PRETTY_PRINT), []);
     foreach ($stats as $stat) {
       if (!is_array($stat)) {
         throw new BgaVisibleSystemException("incrementStats: Not an array");
@@ -152,7 +151,7 @@ class SantoriniLog extends APP_GameClass
   private function addWork($piece, $to, $action, $stats = [])
   {
     $args = [
-      'from' => $this->game->board->getCoords($piece),
+      'from' => SantoriniBoard::getCoords($piece),
       'to'   => $to,
     ];
     $this->insert(-1, $piece['id'], $action, $stats, $args);
@@ -199,7 +198,7 @@ class SantoriniLog extends APP_GameClass
     $args = [
       'power_id' => $powerId,
       'location' => $location,
-      'to' => $this->game->board->getCoords($worker),
+      'to' => SantoriniBoard::getCoords($worker),
     ];
     $this->insert(-1, $worker['id'], 'placeWorker', [], $args);
   }
@@ -212,7 +211,7 @@ class SantoriniLog extends APP_GameClass
     $args = [
       'power_id' => $powerId,
       'location' => $location,
-      'to' => $this->game->board->getCoords($token),
+      'to' => SantoriniBoard::getCoords($token),
     ];
     $this->insert(-1, $token['id'], 'placeToken', $stats, $args);
   }
@@ -404,7 +403,7 @@ class SantoriniLog extends APP_GameClass
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
       } else if ($log['action'] == 'build') {
         // Build : remove the piece
-        self::DbQuery("DELETE FROM piece WHERE x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
+        self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
       } else if ($log['action'] == 'removal') {
         // Removal : put the piece back on the board
         self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$log['piece_id']}");

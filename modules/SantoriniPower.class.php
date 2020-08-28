@@ -26,37 +26,50 @@ abstract class SantoriniPower extends APP_GameClass
   {
     return $this->id;
   }
+
   public function getName()
   {
     return $this->name;
   }
+
   public function getTitle()
   {
     return $this->title;
   }
+
   public function getText()
   {
     return $this->text;
   }
+
   public function getPlayerCount()
   {
     return $this->playerCount;
   }
+
   public function getOrderAid()
   {
     return $this->orderAid;
   }
+
   public function isGoldenFleece()
   {
     return $this->golden;
   }
+
   public function isSimple()
   {
     return $this->id <= 10;
   }
+
   public function isHero()
   {
     return $this instanceof SantoriniHeroPower;
+  }
+
+  public function isImplemented()
+  {
+    return $this->implemented;
   }
 
   public function getUiData()
@@ -148,7 +161,7 @@ abstract class SantoriniPower extends APP_GameClass
     ]);
   }
 
-  public function replaceToken($token, $space)
+  public function moveToken($token, $space)
   {
     $stats = [[$this->playerId, 'usePower']];
     $this->game->board->setPieceAt($token, $space);
@@ -166,6 +179,21 @@ abstract class SantoriniPower extends APP_GameClass
     ]);
   }
 
+  public function removePiece($piece)
+  {
+    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
+    $this->game->log->addRemoval($piece);
+
+    // Notify
+    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes ${piece_name} (${coords})'), [
+      'i18n' => ['power_name', 'piece_name'],
+      'piece' => $piece,
+      'piece_name' => $this->game->pieceNames[$piece['type']],
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'coords' => $this->game->board->getMsgCoords($piece),
+    ]);
+  }
 
 
   public function setup()

@@ -46,7 +46,7 @@ class Charon extends SantoriniPower
         // Check space behind is free
         $space = $this->game->board->getSpaceBehind($worker2, $worker, $accessibleSpaces);
         if (!is_null($space)) {
-          $worker['works'][] = $this->game->board->getCoords($worker2);
+          $worker['works'][] = SantoriniBoard::getCoords($worker2, 0, true);
         }
       }
     }
@@ -61,7 +61,7 @@ class Charon extends SantoriniPower
 
     // Get info about workers and space
     $worker = $this->game->board->getPiece($wId);
-    $worker2 = $this->game->board->getPieceAt($space);
+    $worker2 = $this->game->board->getPiece($space['id']);
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
     $newSpace = $this->game->board->getSpaceBehind($worker2, $worker, $accessibleSpaces);
 

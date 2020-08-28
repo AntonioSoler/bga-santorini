@@ -26,10 +26,7 @@ class Zeus extends SantoriniPower
       if ($worker['z'] == 3) {
         continue;
       }
-
-      $space = $this->game->board->getCoords($worker);
-      $space['arg'] = [$space['z']];
-      $worker['works'][] = $space;
+      $worker['works'][] = SantoriniBoard::getCoords($worker, 1, true);
     }
   }
 
@@ -37,13 +34,13 @@ class Zeus extends SantoriniPower
   public function playerBuild($worker, $work)
   {
     // If space is free, we can do a classic build -> return false
-    $worker2 = $this->game->board->getPieceAt($work);
-    if ($worker2 == null) {
+    $worker2 = $this->game->board->getPiece($work);
+    if ($worker2 == null || $worker2['location'] != 'board') {
       return false;
     }
 
     // Move up the worker
-    $space = $this->game->board->getCoords($worker);
+    $space = SantoriniBoard::getCoords($worker);
     $space['z'] = $space['z'] + 1;
     if ($space['z'] > 3) {
       throw new BgaUserException(_("Zeus: This worker would go too high"));
@@ -62,6 +59,7 @@ class Zeus extends SantoriniPower
     $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${power_name}: ${player_name} builds a block under themself (${coords})'), [
       'i18n' => ['power_name'],
       'piece' => $piece,
+      'under' => $worker,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
       'coords' => $this->game->board->getMsgCoords($worker),

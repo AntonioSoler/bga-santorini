@@ -31,8 +31,6 @@ class Adonis extends SantoriniHeroPower
 
   public function stateAfterBuild()
   {
-    // TODO: compute "if possible" during Adonis turn instead of opponent turn?
-    // Would require bans against Gods with special moves (Apollo, Minotaur, etc.)
     return 'power';
   }
 
@@ -46,7 +44,7 @@ class Adonis extends SantoriniHeroPower
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
     foreach ($arg['workers'] as &$worker) {
       foreach ($oppWorkers as $worker2) {
-        $worker['works'][] = $this->game->board->getCoords($worker2);
+        $worker['works'][] = SantoriniBoard::getCoords($worker2, 0, true);
       }
     }
   }
@@ -55,7 +53,7 @@ class Adonis extends SantoriniHeroPower
   {
     // Get info about the two workers
     $adonisWorker = $this->game->board->getPiece($action[0]);
-    $oppWorker = $this->game->board->getPieceAt($action[1]);
+    $oppWorker = $this->game->board->getPiece($action[1]['id']);
 
     $this->game->log->addAction('usePowerAdonis', [], [
       'adonisWorkerId' => $adonisWorker['id'],

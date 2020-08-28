@@ -23,8 +23,12 @@ class Iris extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
-    $allWorkers = $this->game->board->getPlacedWorkers();
     $workers = $this->game->board->getPlacedActiveWorkers();
+    $allWorkers = $workers;
+    // Must use getPlacedOpponentWorkers() so Iris cannot target Clio's invisible workers
+    foreach ($this->game->board->getPlacedOpponentWorkers() as $oppWorker) {
+      $allWorkers[] = $oppWorker;
+    }
     foreach ($workers as &$worker) {
       $worker['works'] = [];
       foreach ($allWorkers as $worker2) {

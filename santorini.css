@@ -620,6 +620,13 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   left: 174px;
 }
 
+/* Clio: bottom of avatar */
+.mini-card.power-33 .power-counter {
+  display: block;
+  top: 75px;
+  left: 35px;
+}
+
 /* Jason: near the plus sign */
 .mini-card.power-51 .power-counter {
   display: block;

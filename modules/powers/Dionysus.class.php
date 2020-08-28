@@ -19,7 +19,7 @@ class Dionysus extends SantoriniPower
   }
 
   /* * */
-  // TODO: filter only Opponent workers in Athena Aphrodite Hypnus Limus Hades
+
   public function argPlayerMove(&$arg)
   {
     // Usual turn => usual rule

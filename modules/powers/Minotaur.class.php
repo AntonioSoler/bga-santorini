@@ -19,19 +19,17 @@ class Minotaur extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerMove(&$arg)
   {
-    $workers = $this->game->board->getPlacedWorkers($this->playerId);
-    $allWorkers = $this->game->board->getPlacedWorkers();
+    $workers = $this->game->board->getPlacedActiveWorkers();
+    // Must use getPlacedOpponentWorkers() so Minotaur cannot target Clio's invisible workers
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
 
     foreach ($workers as &$worker) {
       $worker['works'] = [];
-      foreach ($allWorkers as $worker2) {
-        if ($worker['player_id'] == $worker2['player_id']) {
-          continue;
-        }
-
+      foreach ($oppWorkers as $worker2) {
         // Must be accessible
         if (!$this->game->board->isNeighbour($worker, $worker2, 'move')) {
           continue;
@@ -51,8 +49,8 @@ class Minotaur extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = $this->game->board->getPieceAt($work);
-    if ($worker2 != null) {
+    $worker2 = $this->game->board->getPiece($work);
+    if ($worker2 != null && $worker2['location'] == 'board') {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
       $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
       if (is_null($space)) {

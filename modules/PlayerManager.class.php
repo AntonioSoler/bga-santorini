@@ -78,7 +78,6 @@ class PlayerManager extends APP_GameClass
   {
     $ui = [];
     foreach ($this->getPlayers() as $player) {
-      // TODO associative array? $ui[$player->getId()]
       $ui[] = $player->getUiData();
     }
     return $ui;
