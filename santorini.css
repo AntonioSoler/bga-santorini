@@ -18,7 +18,6 @@
 html {
   background-image: none !important;
   background-color: #76cfe9;
-  /*#153665*/
 }
 
 #browser-error {
@@ -42,77 +41,98 @@ html {
   padding: 10px;
 }
 
-#overall-content {
-  position: relative;
-}
-
 #scene-container {
   outline: none;
+  height: 95vh;
+}
+
+/* On mobile, need extra space for scrolling, to prevent getting "stuck" on the 3D scene */
+.mobile_version #scene-container {
+  height: 85vh;
+}
+
+/* Fixed position is only used when scene is in the background (during power selection) */
+#scene-container.fixed {
   position: fixed;
-  top: 0;
   left: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100vh;
+  right: 240px;
+}
+
+.mobile_version #scene-container.fixed {
+  right: 0;
+}
+
+.logs_on_additional_column #scene-container.fixed {
+  right: 500px;
 }
 
 #scene-container canvas {
-  position: absolute;
   outline: none;
-  top: 0;
-  left: 0;
-  z-index: 1;
 }
 
 /*clouds PNG Designed By 588ku from <a href="https://pngtree.com/">Pngtree.com</a>*/
 #left-cloud {
-  position: absolute;
+  pointer-events: none;
+  position: fixed;
   top: 0;
-  left: 0;
+  left: -10vw;
   width: 28vw;
-  height: 100vh;
+  height: 105vh;
   z-index: 2;
   background-image: url('img/cloud-left.png');
   background-size: cover;
   background-position: right;
   background-repeat: no-repeat;
-  transition: left 2s ease;
+  transition: all 2s ease;
+}
+#left-cloud.zoomed {
+  left: 0;
+  height: 100vh;
 }
 
 #right-cloud {
-  position: absolute;
+  pointer-events: none;
+  position: fixed;
   top: 0;
-  right: 0;
+  right: -5vw;
   width: 40vw;
-  height: 100vh;
+  height: 105vh;
   z-index: 2;
   background-image: url('img/cloud-right.png');
   background-size: cover;
+  background-position: left;
   background-repeat: no-repeat;
-  transition: right 2s ease;
+  transition: all 2s ease;
+}
+.logs_on_additional_column #right-cloud {
+  width: 50vw;
+}
+#right-cloud.zoomed {
+  right: 0;
+  height: 100vh;
 }
 
-#left-side-wrapper {
-  position: relative;
-}
-
-#left-side {
-  position: relative;
+#page-title {
   z-index: 3;
 }
 
-#right-side {
-  position: relative;
-  z-index: 4;
-}
-
+#browser-error,
+#table-decision,
+#power-offer-container,
+#power-choose-container,
+#right-side,
+.debug_section,
+.pageheader,
+#pagesection_howtoplay,
+#pagesection_competition,
+p#agesection_tournament,
+#pagesection_strategytips,
+#pagesection_options,
+#pagesection_credits,
+#pagesection_music,
 #overall-footer {
   position: relative;
   z-index: 3;
-}
-
-#play-area-scaler #power-offer-container, #play-area-scaler #power-choose-container {
-  z-index: 2;
 }
 
 div#popin_chooseArg {
@@ -331,11 +351,6 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   flex: 0 0 270px;
 }
 
-#grid-detail.fixed .power-detail {
-  position: fixed;
-  top: 49px;
-}
-
 #power-choose-container {
   display: flex;
   flex-flow: row wrap;
@@ -351,11 +366,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   padding-bottom: 1px;
 }
 
+#play-area-scaler {
+  min-height: 85vh;
+}
+
 #play-area {
-  display: flex;
-  pointer-events: visible;
   outline: none;
-  position: relative;
 }
 
 #power-ram {

@@ -67,8 +67,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     // Handle "position: fixed" for power detail
     this.inherited(override_adaptStatusBar, arguments);
     if (this.gamedatas.gamestate.name == 'buildOffer') {
-      var isFixed = dojo.hasClass("page-title", "fixed-page-title");
-      dojo.toggleClass("grid-detail", "fixed", isFixed);
+      var nodes = dojo.query('#grid-detail .power-detail');
+      if (nodes.length > 0) {
+        var style = { position: '', top: '' };
+        if (dojo.hasClass("page-title", "fixed-page-title")) {
+          var height = $('page-title').getBoundingClientRect().height + 6;
+          style = { position: 'fixed', top: height + 'px' };
+        }
+        dojo.style(nodes[0], style);
+      }
     }
   }
 
@@ -160,7 +167,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       });
 
       // Setup the board (3d scene using threejs)
-      dojo.place(this.format_block('jstpl_scene', {}), 'overall-content');
       this.board = new Board($('scene-container'), URL);
       this.setupPreference();
 
@@ -226,11 +232,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onScreenWidthChange: function () {
       if (!this.board) { return; }
       dojo.style('page-content', 'zoom', 'normal');
-      if ($('scene-container')) {
-        dojo.style('3d-scene', 'marginTop', ($('page-content').getBoundingClientRect()['top'] - $('overall-content').getBoundingClientRect()['top']) + "px");
-        dojo.style('play-area', 'min-height', (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0) - ($('3d-scene') ? dojo.style('3d-scene', 'marginTop') : 100)) + "px");
-        this.board.updateSize();
-      }
+      this.board.updateSize();
     },
 
 		/*
@@ -1326,8 +1328,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       dojo.style('power-offer-container', 'display', 'none');
       dojo.style('power-choose-container', 'display', 'none');
       if (container == 'scene-container') {
+        dojo.removeClass('scene-container', 'fixed');
+        this.board.updateSize();
         this.board.enterScene();
       } else {
+        dojo.addClass('scene-container', 'fixed');
+        this.board.updateSize();
         dojo.style(container, 'display', 'flex');
       }
       this._focusedContainer = container;

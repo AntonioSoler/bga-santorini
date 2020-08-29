@@ -2,6 +2,11 @@
 
 <div id="play-area-scaler">
 	<a id="browser-error" href="#" target="_blank"></a>
+	<div id="play-area">
+		<div id="prompt-container"></div>
+		<div id="token-container"></div>
+		<div id="scene-container"></div>
+	</div>
 	<div id="power-offer-container">
 		<div id="grid-powers">
 			<div class="power-section">
@@ -16,21 +21,13 @@
 		<div id="grid-detail"></div>
 	</div>
 	<div id="power-choose-container"></div>
-	<div id="play-area">
-		<div id="prompt-container"></div>
-		<div id="token-container"></div>
-	</div>
+	<div id="left-cloud" class="zoomed"></div>
+	<div id="right-cloud" class="zoomed"></div>
 </div>
 
 <script type="text/javascript">
 const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
 document.write('<script src="' + URL + '/modules/scripts/board.js" type="module"><\/script>');
-
-var jstpl_scene = `<div id="scene-container">
-	<div id="left-cloud"></div>
-	<div id="right-cloud"></div>
-</div>`;
-
 
 var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${id} \${type} small" data-power="\${id}" data-sort="\${sort}">
 	<div class="power-name">\${name}</div>

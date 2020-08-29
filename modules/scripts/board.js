@@ -7,14 +7,9 @@ function isMobile() {
 	return dojo.hasClass('ebd-body', 'mobile_version');
 }
 
-//window['$'] = function(id){ return document.getElementById(id); };
-const canvasHeight = () => (Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0, $('scene-container').getBoundingClientRect()['height']) - ($('3d-scene') ? dojo.style('3d-scene', 'marginTop') : 100));
-const canvasWidth = () => document.getElementById("left-side").getBoundingClientRect()['width'];
-
 // Zoom limits
 var ZOOM_MIN = 15;
-var ZOOM_MAX = 40;
-var ZOOM_MAX_MOBILE = 50;
+var ZOOM_MAX = 55;
 
 // Fall animation
 const fallAnimation = {
@@ -89,7 +84,8 @@ Board.prototype.initScene = function () {
 	//	this._scene.background.convertLinearToGamma( 2 );
 
 	// Camera
-	this._camera = new THREE.PerspectiveCamera(30, canvasWidth() / canvasHeight(), 1, isMobile() ? 250 : 150);
+	var containerSize = this._container.getBoundingClientRect();
+	this._camera = new THREE.PerspectiveCamera(30, containerSize.width / containerSize.height, 1, isMobile() ? 250 : 150);
 	this._camera.position.copy(startPos);
 	this._camera.lookAt(new THREE.Vector3(0, 0, 0));
 
@@ -140,9 +136,10 @@ Board.prototype.onLoad = function () {
 
 
 Board.prototype.updateSize = function () {
-	this._camera.aspect = canvasWidth() / canvasHeight();
+	var containerSize = this._container.getBoundingClientRect();
+	this._camera.aspect = containerSize.width / containerSize.height;
 	this._camera.updateProjectionMatrix();
-	this._renderer.setSize(canvasWidth(), canvasHeight());
+	this._renderer.setSize(containerSize.width, containerSize.height);
 	this.render();
 };
 
@@ -169,22 +166,20 @@ Board.prototype.enterScene = function () {
 		Tween.removeTweens(this._cameraAngle);
 	}
 
-	if ($('left-cloud')) {
-		$('left-cloud').style.left = "-10vw";
-		$('right-cloud').style.right = "-10vw";
+	dojo.removeClass('left-cloud', 'zoomed');
+	dojo.removeClass('right-cloud', 'zoomed');
 
-		Tween.get(this._camera.position).to(enterPos, 2000).addEventListener('change', () => {
-			this._camera.lookAt(new THREE.Vector3(0, 0, 0));
-			this.render();
-		});
-	}
+	Tween.get(this._camera.position).to(enterPos, 2000).addEventListener('change', () => {
+		this._camera.lookAt(new THREE.Vector3(0, 0, 0));
+		this.render();
+	});
 
 	// Controls
 	var controls = new OrbitControls(this._camera, document.getElementById('play-area'));
 	controls.enablePan = false;
 	controls.maxPolarAngle = Math.PI * 0.45;
 	controls.minDistance = ZOOM_MIN;
-	controls.maxDistance = isMobile() ? ZOOM_MAX_MOBILE : ZOOM_MAX;
+	controls.maxDistance = ZOOM_MAX;
 	controls.mouseButtons = {
 		LEFT: THREE.MOUSE.ROTATE,
 		RIGHT: THREE.MOUSE.ROTATE
