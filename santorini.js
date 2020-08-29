@@ -1073,6 +1073,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.makeWorkersSelectable(args.workers);
     },
 
+    usePowerGaea: function (args) {
+      this._action = 'playerBuild';
+      this.makeWorkersSelectable(args.workers);
+    },
+
     /////////////////////////////////////////
     /////////////////////////////////////////
     ////////    Work : move / build  ////////

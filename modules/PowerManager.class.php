@@ -284,8 +284,9 @@ class PowerManager extends APP_GameClass
   /*
    * hasPower: return true if the power ID is currently in the player's hand
    */
-  public function hasPower($powerId, $playerId)
+  public function hasPower($powerId, $playerId = -1)
   {
+    $playerId = $playerId == -1 ? $this->game->getActivePlayerId() : $playerId;
     return in_array($powerId, $this->getPowerIdsInLocation('hand', $playerId));
   }
 
@@ -851,6 +852,19 @@ class PowerManager extends APP_GameClass
   public function getNewState($method)
   {
     $playerId = $this->game->getActivePlayerId();
+
+    // Gaea: check stateAfterOpponentBuild first
+    if ($method == 'stateAfterBuild') {
+      foreach ($this->game->playerManager->getOpponents($playerId) as $opponent) {
+        foreach ($opponent->getPowers() as $power) {
+          $r = $power->stateAfterOpponentBuild();
+          if ($r != null) {
+            return $r;
+          }
+        }
+      }
+    }
+
     $player = $this->game->playerManager->getPlayer($playerId);
     $powers = $player->getPowers();
     $r = array_values(array_filter(array_map(function ($power) use ($method) {
@@ -876,8 +890,7 @@ class PowerManager extends APP_GameClass
    */
   public function stateAfterWork($action)
   {
-    $name = "stateAfter" . $action;
-    return $this->getNewState($name);
+    return $this->getNewState("stateAfter$action");
   }
 
   /*

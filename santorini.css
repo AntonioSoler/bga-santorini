@@ -660,8 +660,10 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   left: 174px;
 }
 
-/* Clio: bottom of avatar */
-.mini-card.power-33 .power-counter {
+/* Bottom of avatar */
+.mini-card.power-33 .power-counter, /* Clio */
+.mini-card.power-35 .power-counter  /* Gaea */
+{
   display: block;
   top: 75px;
   left: 35px;

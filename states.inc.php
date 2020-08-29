@@ -200,6 +200,7 @@ $machinestates = [
       'build' => ST_BUILD,
       'endgame' => ST_GAME_END,
       'power' => ST_USE_POWER,
+      'switch' => ST_SWITCH_PLAYER,
       'eliminate' => ST_ELIMINATE_PLAYER,
     ],
     'updateGameProgression' => true,
@@ -220,6 +221,7 @@ $machinestates = [
       'move' => ST_MOVE,
       'build' => ST_BUILD,
       'power' => ST_USE_POWER,
+      'switch' => ST_SWITCH_PLAYER,
       'endturn' => ST_PRE_END_OF_TURN,
       'endgame' => ST_GAME_END,
       'eliminate' => ST_ELIMINATE_PLAYER,
@@ -272,6 +274,7 @@ $machinestates = [
       'move'       => ST_MOVE,
       'build'      => ST_BUILD,
       'power'      => ST_USE_POWER,
+      'switch'     => ST_SWITCH_PLAYER,
       'eliminate'  => ST_ELIMINATE_PLAYER,
     ],
   ],
@@ -315,6 +318,25 @@ $machinestates = [
     ],
   ],
 
+  ST_SWITCH_PLAYER => [
+    'name' => 'switchPlayer',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stSwitchPlayer',
+    'transitions' => [
+      // Zombie must call power's preEndOfTurn()
+      'zombiePass' => ST_PRE_END_OF_TURN,
+      'endturn'    => ST_PRE_END_OF_TURN,
+      'endgame'    => ST_GAME_END,
+      //'done'     => ST_BUILD or ST_PRE_END_OF_TURN, (depends on context)
+      //'skip'     => ST_BUILD or ST_PRE_END_OF_TURN, (depends on context)
+      'cancel'     => ST_START_OF_TURN,
+      'move'       => ST_MOVE,
+      'build'      => ST_BUILD,
+      'power'      => ST_USE_POWER,
+      'eliminate'  => ST_ELIMINATE_PLAYER,
+    ],
+  ],
 
   ST_GAME_END => [
     'name' => 'gameEndStats',

@@ -104,6 +104,7 @@ define('ST_END_OF_TURN', 17);
 define('ST_USE_POWER', 15);
 
 define('ST_ELIMINATE_PLAYER', 20);
+define('ST_SWITCH_PLAYER', 30);
 
 define('ST_GAME_END', 98);
 define('ST_BGA_GAME_END', 99);
@@ -179,3 +180,5 @@ define('DIRECTIONS', [
  */
 define('CURRENT_ROUND', 20);
 define('FIRST_PLAYER', 21);
+define('SWITCH_PLAYER', 30);
+define('SWITCH_STATE', 31);

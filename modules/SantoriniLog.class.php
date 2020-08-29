@@ -213,9 +213,9 @@ class SantoriniLog extends APP_GameClass
   /*
    * addAction: add a new action to log
    */
-  public function addAction($action, $stats = [], $args = [])
+  public function addAction($action, $stats = [], $args = [], $playerId = -1)
   {
-    $this->insert(-1, 0, $action, $stats, $args);
+    $this->insert($playerId, 0, $action, $stats, $args);
   }
 
 
@@ -225,17 +225,22 @@ class SantoriniLog extends APP_GameClass
   /////////////////////////////////
   /////////////////////////////////
 
+  /* getRoundClause
+   * offset can be a number of rounds, or 'all' for everything, or the name of an action to get everyhing after the most recent occurance of that action (by any player)
+   */
   private function getRoundClause($pId, $offset = 0, $additionalTurns = false)
   {
     $offset = $offset ?: 0;
-    if ($offset === 'all') {
-      return "";
-    } else {
+    if (is_numeric($offset)) {
       $clause = "AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset";
       if (!$additionalTurns) {
         $clause .= " AND `log_id` > (SELECT COALESCE(MAX(log_id), 0) FROM log WHERE `player_id` = $pId AND `action` = 'additionalTurn' $clause)";
       }
       return $clause;
+    } else if ($offset === 'all') {
+      return "";
+    } else {
+      return " AND `log_id` > (SELECT COALESCE(MAX(log_id), 0) FROM log WHERE `action` = '$offset')";
     }
   }
 
@@ -378,6 +383,10 @@ class SantoriniLog extends APP_GameClass
 
   public function canCancelTurn()
   {
+    // Gaea: Block restart turn during power (could be during an opponent's turn)
+    if ($this->game->powerManager->hasPower(GAEA) &&  $this->game->gamestate->state()['name'] == 'playerUsePower') {
+      return false;
+    }
     return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
   }
 
