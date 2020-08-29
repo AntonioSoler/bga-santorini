@@ -47,7 +47,7 @@ class Heracles extends SantoriniHeroPower
 
   public function stateAfterBuild()
   {
-    return $this->didSpecialBuild() ? 'buildAgain' : null;
+    return $this->didSpecialBuild() ? 'build' : null;
   }
 
   public function preEndPlayerTurn()

@@ -45,6 +45,6 @@ class Artemis extends SantoriniPower
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('stats', $stats);
     }
-    return $count == 1 ? 'moveAgain' : null;
+    return $count == 1 ? 'move' : null;
   }
 }

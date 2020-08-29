@@ -52,6 +52,6 @@ class Asteria extends SantoriniPower
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('stats', $stats);
     }
-    return $count == 1 && $this->hasMovedDown() ? 'buildAgain' : null;
+    return $count == 1 && $this->hasMovedDown() ? 'build' : null;
   }
 }

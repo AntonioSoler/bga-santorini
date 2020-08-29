@@ -43,7 +43,7 @@ class Castor extends SantoriniPower
     if ($moves == 0 || $workers == 1) {
       return null;
     } else if ($moves < $workers) {
-      return 'moveAgain';
+      return 'move';
     } else {
       return 'endturn';
     }
@@ -77,7 +77,7 @@ class Castor extends SantoriniPower
 
     $builds = count($this->game->log->getLastBuilds());
     $workers = count($this->game->board->getPlacedActiveWorkers());
-    return $builds < $workers ? 'buildAgain' : null;
+    return $builds < $workers ? 'build' : null;
   }
 
   public function endPlayerTurn()

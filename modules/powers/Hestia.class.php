@@ -47,6 +47,6 @@ class Hestia extends SantoriniPower
     }
 
     $arg = $this->game->argPlayerBuild();
-    return !empty($arg['workers']) ? 'buildAgain' : null;
+    return !empty($arg['workers']) ? 'build' : null;
   }
 }
