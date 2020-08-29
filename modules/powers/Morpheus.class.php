@@ -64,7 +64,7 @@ class Morpheus extends SantoriniPower
 
   public function stateAfterBuild()
   {
-    return $this->computeStock() > 0 ? 'buildAgain' : null;
+    return $this->computeStock() > 0 ? 'build' : null;
   }
 
   public function endPlayerTurn()

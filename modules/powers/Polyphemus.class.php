@@ -39,7 +39,7 @@ class Polyphemus extends SantoriniHeroPower
   public function stateAfterBuild()
   {
     $count = count($this->game->log->getLastBuilds($this->playerId));
-    return $count < 3 ? 'buildAgain' : null;
+    return $count < 3 ? 'build' : null;
   }
 
   public function preEndPlayerTurn()

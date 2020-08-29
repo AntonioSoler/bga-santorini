@@ -36,7 +36,7 @@ class Atalanta extends SantoriniHeroPower
 
   public function stateAfterMove()
   {
-    return 'moveAgain';
+    return 'move';
   }
 
   public function preEndPlayerTurn()

@@ -53,7 +53,7 @@ class Poseidon extends SantoriniPower
     Utils::filterWorkers($workers, function ($worker) use ($move) {
       return ($worker['id'] != $move['pieceId']) && $worker['z'] == 0;
     });
-    return empty($workers) ? null : 'buildAgain';
+    return empty($workers) ? null : 'build';
   }
 
   public function endPlayerTurn()

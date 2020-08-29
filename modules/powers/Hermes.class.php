@@ -49,7 +49,7 @@ class Hermes extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return $this->hasMovedUpOrDown() ? null : 'moveAgain';
+    return $this->hasMovedUpOrDown() ? null : 'move';
   }
 
 

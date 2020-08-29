@@ -42,7 +42,7 @@ class Triton extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return $this->hasMovedOnPerimeter() ?  'moveAgain' : null;
+    return $this->hasMovedOnPerimeter() ?  'move' : null;
   }
 
   public function endPlayerTurn()

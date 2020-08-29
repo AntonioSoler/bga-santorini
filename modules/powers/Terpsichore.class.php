@@ -37,7 +37,7 @@ class Terpsichore extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return count($this->game->log->getLastMoves()) < count($this->game->board->getPlacedActiveWorkers()) ? 'moveAgain' : null;
+    return count($this->game->log->getLastMoves()) < count($this->game->board->getPlacedActiveWorkers()) ? 'move' : null;
   }
 
 
@@ -54,7 +54,7 @@ class Terpsichore extends SantoriniPower
 
   public function stateAfterBuild()
   {
-    return count($this->game->log->getLastBuilds()) < count($this->game->board->getPlacedActiveWorkers()) ? 'buildAgain' : null;
+    return count($this->game->log->getLastBuilds()) < count($this->game->board->getPlacedActiveWorkers()) ? 'build' : null;
   }
 
   public function endPlayerTurn()
