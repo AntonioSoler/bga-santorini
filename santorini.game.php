@@ -36,6 +36,8 @@ class santorini extends Table
       'optionTeams' => OPTION_TEAMS,
       'currentRound' => CURRENT_ROUND,
       'firstPlayer' => FIRST_PLAYER,
+      'switchPlayer' => SWITCH_PLAYER,
+      'switchState' => SWITCH_STATE,
     ]);
 
     // Initialize logger, board, power manager and player manager
@@ -130,6 +132,8 @@ class santorini extends Table
     $pId = $this->activeNextPlayer();
     self::setGameStateInitialValue('firstPlayer', $pId);
     self::setGameStateInitialValue('currentRound', 0);
+    self::setGameStateInitialValue('switchPlayer', 0);
+    self::setGameStateInitialValue('switchState', 0);
   }
 
   /*
@@ -707,6 +711,37 @@ class santorini extends Table
     $this->activeNextPlayer();
     $this->playerManager->eliminate($pId);
     $this->stNextPlayer(false);
+  }
+
+  /*
+   * stSwitchPlayer: this function is called when we need to change players during the turn (e.g., Gaea)
+   */
+  public function stSwitchPlayer()
+  {
+    $switchPlayer = $this->getGameStateValue('switchPlayer');
+    $switchState = $this->getGameStateValue('switchState');
+    $this->setGameStateValue('switchPlayer', 0);
+    $this->setGameStateValue('switchState', 0);
+
+    $this->gamestate->changeActivePlayer($switchPlayer);
+    $next = null;
+    if ($switchState == ST_USE_POWER) {
+      // Gaea is stealing control to place a worker
+      $next = 'power';
+    } else if ($switchState == ST_BUILD) {
+      // Gaea is returning control after opponent build
+      $next = $this->powerManager->stateAfterPlayerBuild() ?: 'done';
+      // Translate ambiguous state names for "build" context
+      if ($next == 'done' || $next == 'skip') {
+        $next = 'endturn';
+      }
+    }
+    self::debug("stSwitchPlayer: switchPlayer=$switchPlayer, switchState=$switchState, next=$next");
+    $this->notifyAllPlayers('message', "stSwitchPlayer: switchPlayer=$switchPlayer, switchState=$switchState, next=$next", []);
+    if ($next == null) {
+      throw new BgaVisibleSystemException("stSwitchPlayer: Missing next state (player: $switchPlayer)");
+    }
+    $this->gamestate->nextState($next);
   }
 
   /////////////////////////////////////////

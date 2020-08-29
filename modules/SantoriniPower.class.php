@@ -282,6 +282,12 @@ abstract class SantoriniPower extends APP_GameClass
     return null;
   }
 
+  // only Gaea
+  public function stateAfterOpponentBuild()
+  {
+    return null;
+  }
+
   public function stateAfterBuild()
   {
     return null;

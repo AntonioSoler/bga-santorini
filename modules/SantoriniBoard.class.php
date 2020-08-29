@@ -81,12 +81,16 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPiecesByType: return all info about pieces of the given type
    */
-  public function getPiecesByType($type, $type_arg = null)
+  public function getPiecesByType($type, $type_arg = null, $location = null)
   {
     $sql = "SELECT * FROM piece WHERE type = '$type'";
     if ($type_arg) {
       $sql .= " AND type_arg = '$type_arg'";
     }
+    if ($location) {
+      $sql .= " AND location = '$location'";
+    }
+    $sql .= " ORDER BY id";
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
