@@ -131,8 +131,13 @@ define('TEAMS_1_AND_3', 3);
 define('TEAMS_1_AND_4', 4);
 
 define('HELPERS', 100);
-define('ENABLED', 1);
-define('DISABLED', 2);
+define('HELPERS_ENABLED', 1);
+define('HELPERS_DISABLED', 2);
+
+define('CONFIRM', 101);
+define('CONFIRM_TIMER', 1);
+define('CONFIRM_ENABLED', 2);
+define('CONFIRM_DISABLED', 3);
 
 /*
  * Game statistics constants

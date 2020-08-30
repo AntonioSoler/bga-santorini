@@ -18,6 +18,15 @@
 	*/
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
+
+const HELPERS = 100;
+const HELPERS_ENABLED = 1;
+const HELPERS_DISABLED = 1;
+const CONFIRM = 101;
+const CONFIRM_TIMER = 1;
+const CONFIRM_ENABLED = 2;
+const CONFIRM_DISABLED = 3;
+
 var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () { };
 
@@ -94,6 +103,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     }
   }
 
+  var queuedFunction = null;
+  function override_unlockInterface(uid) {
+    // [Undocumented] Called by BGA framework after interface is unlocked following ajax call
+    // Handle auto-confirm
+    this.inherited(override_unlockInterface, arguments);
+    if (queuedFunction != null) {
+      var fn = queuedFunction;
+      queuedFunction = null; // clear first to avoid infinite loop
+      fn();
+    }
+  }
+
   return declare("bgagame.santorini", ebg.core.gamegui, {
     /*
      * [Undocumented] Override BGA framework functions
@@ -101,6 +122,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     setLoader: override_setLoader,
     adaptStatusBar: override_adaptStatusBar,
     onPlaceLogOnChannel: override_onPlaceLogOnChannel,
+    unlockInterface: override_unlockInterface,
 
     /*
      * Constructor
@@ -226,14 +248,22 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
     setupPreference: function () {
       var _this = this;
-      var preferenceSelect = $('preference_control_100');
-      var updatePreference = function () {
-        var value = preferenceSelect.options[preferenceSelect.selectedIndex].value;
-        _this.board.toggleCoordsHelpers(value == 1);
+      var updatePreference = function (e) {
+        var match = e.target.id.match(/^preference_[cf]ontrol_(\d+)$/)
+        if (!match) {
+          return;
+        }
+        var pref = +match[1];
+        var prefValue = +e.target.value;
+        debug('Update preference', pref + ' = ' + prefValue);
+        _this.prefs[pref].value = prefValue;
+        if (pref == HELPERS) {
+          _this.board.toggleCoordsHelpers(prefValue == HELPERS_ENABLED);
+        }
       };
 
-      dojo.connect(preferenceSelect, 'onchange', updatePreference);
-      updatePreference();
+      dojo.query('.preference_control').connect('onchange', updatePreference);
+      updatePreference({ target: $('preference_control_' + HELPERS) });
     },
 
     onScreenWidthChange: function () {
@@ -471,8 +501,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     startActionTimer: function (buttonId) {
       var button = $(buttonId);
       var isReadOnly = this.isReadOnly();
-      if (button == null || isDebug || isReadOnly || !this.bRealtime) {
-        debug('Ignoring startActionTimer(' + buttonId + ')', 'debug=' + isDebug, 'readOnly=' + isReadOnly, 'realtime=' + this.bRealtime);
+      var prefValue = (this.prefs[CONFIRM] || {}).value;
+      if (button == null || isReadOnly || prefValue == CONFIRM_ENABLED) {
+        debug('Ignoring startActionTimer(' + buttonId + ')', 'readOnly=' + isReadOnly, 'prefValue=' + prefValue);
+        return;
+      }
+
+      if (prefValue == CONFIRM_DISABLED) {
+        var fn = function () { button.click(); };
+        if (this.isInterfaceLocked()) {
+          queuedFunction = fn;
+        } else {
+          fn();
+        }
         return;
       }
 
@@ -590,9 +631,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       }
     },
 
-		/*
-		 * updateBannedPowers: display only "selectable" powers
-		 */
+    /*
+     * updateBannedPowers: display only "selectable" powers
+     */
     updateBannedPowers: function (bannedIds) {
       dojo.query(".power-card.small").removeClass("banned");
       bannedIds.forEach(function (powerId) {
@@ -956,7 +997,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     /////////////////////////////////////////
     /////////////////////////////////////////
 
-		/*
+    /*
      * onEnteringStatePlayerUsePower: the active player can use their (non-basic) power
      */
     onEnteringStatePlayerUsePower: function (args) {
@@ -1034,7 +1075,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.onEnteringStatePlayerWork(args);
     },
 
-		/*
+    /*
      * makeWorkersSelectable:
      */
     makeWorkersSelectable: function (workers) {

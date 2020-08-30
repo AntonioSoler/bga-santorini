@@ -152,8 +152,18 @@ $game_preferences = [
     'name' => totranslate('Display board coordinates/height'),
     'needReload' => false,
     'values' => [
-      ENABLED => ['name' => totranslate('Enabled')],
-      DISABLED => ['name' => totranslate('Disabled')],
+      HELPERS_ENABLED   => ['name' => totranslate('Enabled')],
+      HELPERS_DISABLED  => ['name' => totranslate('Disabled')],
     ]
-  ]
+  ],
+
+  CONFIRM => [
+    'name' => totranslate('Turn confirmation'),
+    'needReload' => false,
+    'values' => [
+      CONFIRM_TIMER     => ['name' => totranslate('Enabled with timer')],
+      CONFIRM_ENABLED   => ['name' => totranslate('Enabled')],
+      CONFIRM_DISABLED  => ['name' => totranslate('Disabled')],
+    ]
+  ],
 ];
