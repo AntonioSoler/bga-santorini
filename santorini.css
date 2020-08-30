@@ -82,13 +82,13 @@ html {
   top: 0;
   left: -10vw;
   width: 28vw;
-  height: 105vh;
+  height: 104vh;
   z-index: 2;
   background-image: url('img/cloud-left.png');
   background-size: cover;
   background-position: right;
   background-repeat: no-repeat;
-  transition: all 2s ease;
+  transition: all 2s ease-out;
 }
 #left-cloud.zoomed {
   left: 0;
@@ -101,13 +101,13 @@ html {
   top: 0;
   right: -5vw;
   width: 40vw;
-  height: 105vh;
+  height: 104vh;
   z-index: 2;
   background-image: url('img/cloud-right.png');
   background-size: cover;
   background-position: left;
   background-repeat: no-repeat;
-  transition: all 2s ease;
+  transition: all 2s ease-out;
 }
 .logs_on_additional_column #right-cloud {
   width: 50vw;

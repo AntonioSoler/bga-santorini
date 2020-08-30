@@ -30,8 +30,8 @@ const lvlHeights = [0, 1.24, 2.44, 3.18];
 const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5": -5.2 };
 const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -5.2 };
 const startPos = new THREE.Vector3(40, 24, 0);
-const enterPos = new THREE.Vector3(20, 24, 0);
-
+const enterPos = new THREE.Vector3(20, 28, 0);
+const lookAt = new THREE.Vector3(0, -2, 0);
 
 var Board = function (container, url) {
 	console.info("Creating board");
@@ -77,7 +77,7 @@ Board.prototype.initScene = function () {
 	var containerSize = this._container.getBoundingClientRect();
 	this._camera = new THREE.PerspectiveCamera(30, containerSize.width / containerSize.height, 1, isMobile() ? 250 : 150);
 	this._camera.position.copy(startPos);
-	this._camera.lookAt(new THREE.Vector3(0, 0, 0));
+	this._camera.lookAt(lookAt);
 
 	// Lights
 	this._scene.add(new THREE.HemisphereLight(0xFFFFFF, 0xFFFFFF, 1));
@@ -113,13 +113,14 @@ Board.prototype.onLoad = function () {
 	this._cameraAngle = { theta: 0 };
 	var anim = Tween.get(this._cameraAngle, { loop: -1 }).to({ theta: 2 * Math.PI }, 60000, Ease.linear)
 		.addEventListener('change', () => {
-			if (this._enterScene)
+			if (this._enterScene) {
 				return;
+			}
 
 			this._camera.position.x = Math.cos(this._cameraAngle.theta) * startPos.x;
 			this._camera.position.y = startPos.y;
 			this._camera.position.z = Math.sin(this._cameraAngle.theta) * startPos.x;
-			this._camera.lookAt(new THREE.Vector3(0, 0, 0));
+			this._camera.lookAt(lookAt);
 			this.render();
 		});
 };
@@ -162,7 +163,7 @@ Board.prototype.getRealMouseCoords = function (px, py) {
 	return {
 		x: (px - rect.left) / rect.width * 2 - 1,
 		y: -(py - rect.top) / rect.height * 2 + 1
-	}
+	};
 };
 
 
@@ -182,13 +183,14 @@ Board.prototype.enterScene = function () {
 	dojo.removeClass('left-cloud', 'zoomed');
 	dojo.removeClass('right-cloud', 'zoomed');
 
-	Tween.get(this._camera.position).to(enterPos, 2000).addEventListener('change', () => {
-		this._camera.lookAt(new THREE.Vector3(0, 0, 0));
+	Tween.get(this._camera.position).to(enterPos, 2000, Ease.quadOut).addEventListener('change', () => {
+		this._camera.lookAt(lookAt);
 		this.render();
 	});
 
 	// Controls
 	var controls = new OrbitControls(this._camera, document.getElementById('play-area'));
+	controls.target.copy(lookAt);
 	controls.enablePan = false;
 	controls.maxPolarAngle = Math.PI * 0.45;
 	controls.minDistance = ZOOM_MIN;
@@ -201,7 +203,7 @@ Board.prototype.enterScene = function () {
 	controls.addEventListener('click', (event) => {
 		this._mouse = this.getRealMouseCoords(event.posX, event.posY);
 		this.raycasting(false);
-	})
+	});
 };
 
 
@@ -627,7 +629,7 @@ Board.prototype.makeClickable = function (objects, callback, action) {
 		marker.name = "marker";
 		marker.position.set(0, isMobile() ? 0.15 : 0.05, 0);
 		transparent.add(marker);
-	})
+	});
 
 	this.render();
 };
