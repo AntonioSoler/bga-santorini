@@ -264,6 +264,23 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       dojo.query('.preference_control').connect('onchange', updatePreference);
       updatePreference({ target: $('preference_control_' + HELPERS) });
+
+      // Add reset camera button
+      var resetCameraBlock = this.format_block('jstpl_resetCamera', {
+        camera: _('Camera'),
+        reset: __('lang_mainsite', 'Reset to default'),
+      });
+      var q = dojo.query('#ingame_menu_content .preference_choice');
+      if (q.length > 0) {
+        dojo.place(resetCameraBlock, q[q.length - 1], 'after');
+      }
+      q = dojo.query('#pagesection_options .preference_choice');
+      if (q.length > 0) {
+        dojo.place(resetCameraBlock, q[q.length - 1], 'after');
+      }
+      dojo.query('.buttonResetCamera').connect('onclick', function () {
+        _this.board.resetCameraPosition();
+      });
     },
 
     onScreenWidthChange: function () {

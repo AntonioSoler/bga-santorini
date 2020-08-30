@@ -29,6 +29,13 @@
 const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
 document.write('<script src="' + URL + '/modules/scripts/board.js" type="module"><\/script>');
 
+var jstpl_resetCamera = `<div class="preference_choice">
+	<div class="row-data row-data-large">
+		<div class="row-label">\${camera}</div>
+		<div class="row-value"><a href="#" class="bgabutton bgabutton_blue buttonResetCamera" onclick="return false;">\${reset}</a></div>
+	</div>
+</div>`;
+
 var jstpl_powerSmall = `<div id="power-small-\${id}" class="power-card power-\${id} \${type} small" data-power="\${id}" data-sort="\${sort}">
 	<div class="power-name">\${name}</div>
 </div>`;

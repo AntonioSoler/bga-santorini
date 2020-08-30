@@ -11,6 +11,15 @@ function isTouch() {
 	return dojo.hasClass('ebd-body', 'touch-device');
 }
 
+const debounce = (fn, time) => {
+	let timeout;
+	return function () {
+		const functionCall = () => fn.apply(this, arguments);
+		clearTimeout(timeout);
+		timeout = setTimeout(functionCall, time);
+	}
+};
+
 // Zoom limits
 var ZOOM_MIN = 15;
 var ZOOM_MAX = 55;
@@ -40,7 +49,7 @@ var Board = function (container, url) {
 	this._meshManager = new MeshManager(url);
 	this._meshManager.load().then(() => {
 		this.render();
-		console.info("Meshes loaded, rendered scene should look good")
+		console.info("Meshes loaded, rendered scene should look good");
 	});
 
 	this._ids = [];
@@ -183,7 +192,9 @@ Board.prototype.enterScene = function () {
 	dojo.removeClass('left-cloud', 'zoomed');
 	dojo.removeClass('right-cloud', 'zoomed');
 
-	Tween.get(this._camera.position).to(enterPos, 2000, Ease.quadOut).addEventListener('change', () => {
+	// Start at the previous position, if any
+	var pos = this.loadCameraPosition() || enterPos;
+	Tween.get(this._camera.position).to(pos, 2000, Ease.quadOut).addEventListener('change', () => {
 		this._camera.lookAt(lookAt);
 		this.render();
 	});
@@ -192,6 +203,7 @@ Board.prototype.enterScene = function () {
 	var controls = new OrbitControls(this._camera, document.getElementById('play-area'));
 	controls.target.copy(lookAt);
 	controls.enablePan = false;
+	controls.minPolarAngle = Math.PI * 0.01;
 	controls.maxPolarAngle = Math.PI * 0.45;
 	controls.minDistance = ZOOM_MIN;
 	controls.maxDistance = ZOOM_MAX;
@@ -199,7 +211,10 @@ Board.prototype.enterScene = function () {
 		LEFT: THREE.MOUSE.ROTATE,
 		RIGHT: THREE.MOUSE.ROTATE
 	}
-	controls.addEventListener('change', this.render.bind(this));
+	controls.addEventListener('change', () => {
+		this.render();
+		this.saveCameraPosition();
+	});
 	controls.addEventListener('click', (event) => {
 		this._mouse = this.getRealMouseCoords(event.posX, event.posY);
 		this.raycasting(false);
@@ -672,6 +687,44 @@ Board.prototype.getCenter = function (space, zOffset = 0) {
 	return new THREE.Vector3(x, z, y);
 };
 
+Board.prototype.saveCameraPosition = debounce(function () {
+	try {
+		var x = this._camera.position.x.toFixed(2);
+		var y = this._camera.position.y.toFixed(2);
+		var z = this._camera.position.z.toFixed(2);
+		localStorage.setItem('santorini.camera.x', x);
+		localStorage.setItem('santorini.camera.y', y);
+		localStorage.setItem('santorini.camera.z', z);
+		console.info('Saved camera position', x, y, z);
+	} catch (e) {
+	}
+}, 500);
+
+Board.prototype.loadCameraPosition = function () {
+	var position = null;
+	try {
+		var x = localStorage.getItem('santorini.camera.x');
+		var y = localStorage.getItem('santorini.camera.y');
+		var z = localStorage.getItem('santorini.camera.z');
+		console.info('Loaded camera position', x, y, z);
+		if (x != null && y != null && z != null) {
+			position = new THREE.Vector3(x, y, z);
+		}
+	} catch (e) {
+	}
+	return position;
+};
+
+Board.prototype.resetCameraPosition = function () {
+	if (!this._enterScene) {
+		return;
+	}
+	console.info('Reset camera position', enterPos.x, enterPos.y, enterPos.z);
+	Tween.get(this._camera.position).to(enterPos, 2000, Ease.quadOut).addEventListener('change', () => {
+		this._camera.lookAt(lookAt);
+		this.render();
+	});
+}
 
 window.Board = Board;
 export { Board };

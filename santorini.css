@@ -25,6 +25,11 @@ html {
   background: rgba(248, 248, 248, 0.85);
 }
 
+.bgabutton.buttonResetCamera {
+  margin: 0;
+  padding: 1px 12px;
+}
+
 #browser-error {
   display: none;
   background: #d50000;
