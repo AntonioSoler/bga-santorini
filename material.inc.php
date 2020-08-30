@@ -47,4 +47,5 @@ $this->pieceNames = [
   'worker' => clienttranslate('a worker'),
   'ram' => clienttranslate('the Ram figure'),
   'tokenTalus' => clienttranslate('the Talus Token'),
+  'tokenCoin' => clienttranslate('a Coin Token'),
 ];

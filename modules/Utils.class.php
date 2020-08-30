@@ -10,11 +10,9 @@ abstract class Utils extends APP_GameClass
   public static function search($data, $filter)
   {
     Utils::filter($data, $filter);
-    return (count($data) >= 1)? $data[0] : null;
+    return (count($data) >= 1) ? $data[0] : null;
   }
 
-
-  /* TODO */
   public static function filterWorkers(&$arg, $filter)
   {
     if ($arg == null) {
@@ -28,7 +26,6 @@ abstract class Utils extends APP_GameClass
     }
   }
 
-
   public static function filterWorkersById(&$arg, $wId, $same = true)
   {
     self::filterWorkers($arg, function (&$worker) use ($wId, $same) {
@@ -37,7 +34,6 @@ abstract class Utils extends APP_GameClass
         : (($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId));
     });
   }
-
 
   public static function cleanWorkers(&$arg)
   {
@@ -62,8 +58,6 @@ abstract class Utils extends APP_GameClass
   }
 
 
-
-  /* TODO */
   /*
     // Don't work when you change the array in $filter !!
         $worker['works'] = array_values(array_filter($worker['works'], function(&$space) use ($worker, $filter) {
@@ -75,7 +69,7 @@ abstract class Utils extends APP_GameClass
     foreach ($arg["workers"] as &$worker) {
       $works = [];
 
-      if (isset($worker['works'])) { // TODO should be useless...
+      if (isset($worker['works'])) {
         foreach ($worker['works'] as &$space) {
           if ($filter($space, $worker)) {
             $works[] = $space;
@@ -88,7 +82,6 @@ abstract class Utils extends APP_GameClass
     self::cleanWorkers($arg);
   }
 
-
   public static function filterWorksUnlessMine(&$arg, $workers, $filter)
   {
     $workersIds = array_map(function ($worker) {
@@ -99,15 +92,11 @@ abstract class Utils extends APP_GameClass
     });
   }
 
-  public static function addWork(&$worker, $space, $action = null)
+  public static function addWork(&$worker, $space)
   {
-    $worker['works'][] = [
-      'x' => $space['x'],
-      'y' => $space['y'],
-      'z' => $space['z'],
-      // 'arg' => null,
-      'direction' => SantoriniBoard::getDirection($worker, $space, $action),
-    ];
+    $coords = SantoriniBoard::getCoords($space, 0, true);
+    $coords['direction'] = SantoriniBoard::getDirection($worker, $space);
+    $worker['works'][] = $coords;
   }
 
   public static function mergeWorkers(&$arg, $workers)
@@ -142,8 +131,6 @@ abstract class Utils extends APP_GameClass
     return $sworker;
   }
 
-
-  /* TODO */
   public static function checkWork($arg, $wId, $x, $y, $z, $actionArg)
   {
     $worker = Utils::search($arg['workers'], function ($w) use ($wId) {
@@ -165,7 +152,6 @@ abstract class Utils extends APP_GameClass
     return $work;
   }
 
-
   public static function getMoveIds($works)
   {
     return array_map(function ($work) {
@@ -178,5 +164,15 @@ abstract class Utils extends APP_GameClass
     return array_map(function ($power) {
       return intval($power->getId());
     }, $powers);
+  }
+
+  /* convertIntValues: change the values for x,y,z and other numeric keys to int (instead of string) */
+  public static function convertIntValues(&$array)
+  {
+    array_walk($array, function (&$value, $key) {
+      if (in_array($key, ['id', 'x', 'y', 'z', 'arg', 'direction'])) {
+        $value = (int) $value;
+      }
+    });
   }
 }

@@ -102,6 +102,9 @@ class action_santorini extends APP_GameAction
     $y = (int) self::getArg('y', AT_int, true);
     $z = (int) self::getArg('z', AT_posint, true);
     $arg = self::getArg('arg', AT_int, false, null);
+    if ($arg != null) {
+      $arg = (int) $arg;
+    }
     $this->game->usePowerWork($powerId, $workerId, $x, $y, $z, $arg);
     self::ajaxResponse();
   }
@@ -136,6 +139,9 @@ class action_santorini extends APP_GameAction
     $y = (int) self::getArg('y', AT_int, true);
     $z = (int) self::getArg('z', AT_posint, true);
     $arg = self::getArg('arg', AT_int, false, null);
+    if ($arg != null) {
+      $arg = (int) $arg;
+    }
     $this->game->work($workerId, $x, $y, $z, $arg);
     self::ajaxResponse();
   }

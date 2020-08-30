@@ -50,20 +50,11 @@ class Ares extends SantoriniPower
     $space = $action[1];
     $space['z']--;
 
-    // Remove piece
-    $piece = $this->game->board->getPieceAt($space);
-    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
-    $this->game->log->addRemoval($piece);
-    // TODO : remove token
-
-    // Notify
-    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block (${coords})'), [
-      'i18n' => ['power_name'],
-      'piece' => $piece,
-      'power_name' => $this->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-      'coords' => $this->game->board->getMsgCoords($piece),
-    ]);
+    // Remove the piece(s) at this space x,y,z
+    $pieces = $this->game->board->getPiecesAt($space);
+    foreach ($pieces as $piece) {
+      $this->removePiece($piece);
+    }
   }
 
   public function stateAfterUsePower()

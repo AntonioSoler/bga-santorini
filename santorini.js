@@ -236,7 +236,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       updatePreference();
     },
 
-    // TODO
     onScreenWidthChange: function () {
       if (!this.board) { return; }
       dojo.style('page-content', 'zoom', 'normal');
@@ -1246,7 +1245,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     notif_blockBuiltUnder: function (n) {
       debug('Notif: block built under', n.args);
-      this.board.addPieceUnder(n.args.piece);
+      this.board.addPieceUnder(n.args.piece, n.args.under);
     },
 
 
@@ -1264,9 +1263,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     ////////    Utility methods    ////////
     ///////////////////////////////////////
 
-    /*
-     * // TODO:
-     */
     slide: function slide(sourceId, targetId) {
       var _this = this;
       return new Promise(function (resolve, reject) {
@@ -1276,10 +1272,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       });
     },
 
-
-    /*
-     * // TODO:
-     */
     slideTemporary: function slideTemporary(phantom, sourceId, targetId, duration) {
       var _this = this;
       duration = duration || 1000;
@@ -1288,8 +1280,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         setTimeout(resolve, duration);
       });
     },
-
-
 
     getPower: function getPower(powerId) {
       // Gets a power object ready to use in UI templates

@@ -25,7 +25,7 @@ class Bia extends SantoriniPower
   public function argChooseFirstPlayer(&$arg)
   {
     $pId = $this->getId();
-    Utils::filter($arg['powers'], function($power) use ($pId){
+    Utils::filter($arg['powers'], function ($power) use ($pId) {
       return $power == $pId;
     });
 
@@ -38,7 +38,7 @@ class Bia extends SantoriniPower
 
   public function argPlayerPlaceWorker(&$arg)
   {
-    Utils::filter($arg['accessibleSpaces'], function($space){
+    Utils::filter($arg['accessibleSpaces'], function ($space) {
       return $this->game->board->isPerimeter($space);
     });
   }
@@ -49,12 +49,13 @@ class Bia extends SantoriniPower
     $x = 2 * $work['x'] - $worker['x'];
     $y = 2 * $work['y'] - $worker['y'];
 
-    // If there is no opponent in the next space -> return null
-    $worker2 = self::getObjectFromDB("SELECT * FROM piece WHERE x = {$x} AND y = {$y} AND type = 'worker' AND location = 'board'");
-    if ($worker2 == null || $worker2['player_id'] == $worker['player_id']) {
-      return;
+    // Must use getPlacedOpponentWorkers() so Bia cannot target Clio's invisible workers
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
+    foreach ($oppWorkers as &$oppWorker) {
+      if ($oppWorker['x'] == $x and $oppWorker['y'] == $y) {
+        $this->game->playerKill($oppWorker, $this->getName());
+        break;
+      }
     }
-
-    $this->game->playerKill($worker2, $this->getName());
   }
 }

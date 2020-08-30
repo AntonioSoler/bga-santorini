@@ -228,7 +228,9 @@ class PowerManager extends APP_GameClass
   {
     $ui = [];
     foreach ($this->getPowers() as $power) {
-      $ui[$power->getId()] = $power->getUiData();
+      if ($power->isImplemented()) {
+        $ui[$power->getId()] = $power->getUiData();
+      }
     }
     return $ui;
   }
@@ -296,7 +298,7 @@ class PowerManager extends APP_GameClass
     foreach (array_keys(self::$classes) as $powerId) {
       $values[] = "('$powerId', 0, 'box', 0)";
     }
-    self::DbQuery($sql . implode($values, ','));
+    self::DbQuery($sql . implode(',', $values));
   }
 
   /*

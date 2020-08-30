@@ -34,8 +34,9 @@ class Medusa extends SantoriniPower
     foreach ($arg['workers'] as &$worker) {
       $worker['works'] = [];
       foreach ($oppWorkers as $worker2) {
+        $isN = $this->game->board->isNeighbour($worker, $worker2, 'build');
         if ($this->game->board->isNeighbour($worker, $worker2, 'build') && $worker2['z'] < $worker['z']) {
-          $worker['works'][] = SantoriniBoard::getCoords($worker2, 1);
+          $worker['works'][] = SantoriniBoard::getCoords($worker2, 1, true);
         }
       }
     }
@@ -51,14 +52,11 @@ class Medusa extends SantoriniPower
 
     foreach ($arg['workers'] as $worker) {
       foreach ($worker['works'] as $work) {
-        $worker2 = $this->game->board->getPieceAt($work);
-        if ($worker2 == null) {
-          // Might happens if the only worker already killed the piece just before
-          continue;
+        $worker2 = $this->game->board->getPiece($work['id']);
+        if ($worker2 != null && $worker2['location'] == 'board') {
+          $this->game->playerKill($worker2, $this->getName());
+          $this->game->playerBuild($worker, SantoriniBoard::getCoords($worker2, 2));
         }
-
-        $this->game->playerKill($worker2, $this->getName());
-        $this->game->playerBuild($worker, SantoriniBoard::getCoords($worker2, 2));
       }
     }
   }

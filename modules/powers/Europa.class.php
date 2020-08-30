@@ -61,7 +61,7 @@ class Europa extends SantoriniPower
     if ($token['location'] == 'hand') {
       $this->placeToken($token, $space);
     } else {
-      $this->replaceToken($token, $space);
+      $this->moveToken($token, $space);
     }
   }
 

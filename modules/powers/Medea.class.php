@@ -35,12 +35,17 @@ class Medea extends SantoriniHeroPower
     $arg['power_name'] = $this->name;
     $arg['skippable'] = true;
 
-    $allWorkers = $this->game->board->getPlacedWorkers();
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
+    $allWorkers = $arg['workers'];
+    // Must use getPlacedOpponentWorkers() so Medea cannot target Clio's invisible workers
+    foreach ($this->game->board->getPlacedOpponentWorkers() as $oppWorker) {
+      $allWorkers[] = $oppWorker;
+    }
+
     foreach ($arg['workers'] as &$worker) {
       foreach ($allWorkers as $worker2) {
         if ($worker['id'] != $worker2['id'] && $worker2['z'] > 0 && $this->game->board->isNeighbour($worker, $worker2)) {
-          $worker['works'][] = $this->game->board->getCoords($worker2);
+          $worker['works'][] = SantoriniBoard::getCoords($worker2, 0, true);
         }
       }
     }
@@ -51,25 +56,12 @@ class Medea extends SantoriniHeroPower
     // Extract info from action
     $wId = $action[0];
     $space = $action[1];
-    $destroyCount = $space['z'] - 1;
-    $worker = $this->game->board->getPieceAt($space);
+    $worker = $this->game->board->getPiece($space['id']);
 
-    while ($space['z'] > 0) {
-      $space['z']--;
-
-      // Remove piece
-      $piece = $this->game->board->getPieceAt($space);
-      self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
-      $this->game->log->addRemoval($piece);
-
-      // Notify (same text as Ares to help translators)
-      $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes a block (${coords})'), [
-        'i18n' => ['power_name'],
-        'piece' => $piece,
-        'power_name' => $this->getName(),
-        'player_name' => $this->game->getActivePlayerName(),
-        'coords' => $this->game->board->getMsgCoords($piece),
-      ]);
+    // Remove the piece(s) under the worker at this x,y
+    $pieces = $this->game->board->getBlocksAt($space);
+    foreach ($pieces as $piece) {
+      $this->removePiece($piece);
     }
 
     // Force the worker to ground level

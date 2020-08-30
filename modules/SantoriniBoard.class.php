@@ -17,17 +17,21 @@ class SantoriniBoard extends APP_GameClass
    *       * 0 : don't add any field arg
    *       * 1 : arg is filled with singleton [z] (useful eg in argPlayerBuild)
    *       * 2 : arg is set to z (useful when building)
+   *   - optional $id : true to include the piece ID in the result array
    */
-  public static function getCoords($mixed, $arg = 0)
+  public static function getCoords($mixed, $arg = 0, $keepId = false)
   {
-    $data = ['x' => (int) $mixed['x'], 'y' => (int) $mixed['y'], 'z' => (int) $mixed['z']];
+    $data = ['x' =>  $mixed['x'], 'y' => $mixed['y'], 'z' => $mixed['z']];
     if ($arg == 1) {
       $data['arg'] = [$mixed['z']];
     }
     if ($arg == 2) {
       $data['arg'] = $mixed['z'];
     }
-
+    if ($keepId) {
+      $data['id'] = $mixed['id'];
+    }
+    Utils::convertIntValues($mixed);
     return $data;
   }
 
@@ -38,9 +42,9 @@ class SantoriniBoard extends APP_GameClass
   public static function getMsgCoords($worker, $space = null)
   {
     $cols = ['A', 'B', 'C', 'D', 'E'];
-    $msg = $cols[$worker['y']] . ((int) $worker['x']  + 1);
+    $msg = $cols[$worker['y']] . ($worker['x']  + 1);
     if ($space != null) {
-      $msg .= ' -> ' . $cols[$space['y']] . ((int) $space['x']  + 1);
+      $msg .= ' -> ' . $cols[$space['y']] . ($space['x']  + 1);
     }
     return $msg;
   }
@@ -57,45 +61,70 @@ class SantoriniBoard extends APP_GameClass
     } elseif (substr($piece['type'], 0, 5) == 'token') {
       $piece['direction'] = $piece['type_arg'];
     }
+    Utils::convertIntValues($piece);
     return $piece;
   }
 
   /*
    * getPiece: return all info about a piece
-   * params : int $id
+   * params : mixed $id, either int or array with ['id'] key
    */
-  public function getPiece($id)
+  public function getPiece($mixed)
   {
-    return self::addInfo(self::getNonEmptyObjectFromDB("SELECT * FROM piece WHERE id = '$id'"));
+    $id = null;
+    if (is_numeric($mixed)) {
+      $id = $mixed;
+    } else if (is_array($mixed) && array_key_exists('id', $mixed)) {
+      $id = $mixed['id'];
+    }
+    if ($id == null) {
+      return null;
+    }
+    return self::addInfo(self::getObjectFromDB("SELECT * FROM piece WHERE id = '$id'"));
   }
 
   /*
-   * getPieceAt: return all info about a piece at a location
+   * getPiecesAt: return array the pieces at this x,y,z location.
+   * tokens make it possible to have multiple pieces (e.g., Clio coin + worker)
    * params : array $space
    */
-  public function getPieceAt($space)
+  public function getPiecesAt($space)
   {
-    return self::addInfo(self::getObjectFromDB("SELECT * FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']}"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']} ORDER BY id"));
+  }
+
+  /*
+   * getBlocksAt: return array of blocks at this x,y location (for all z, order top down)
+   * params : array $space
+   */
+  public function getBlocksAt($space)
+  {
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type IN ('lvl0', 'lvl1', 'lvl2') AND x = {$space['x']} AND y = {$space['y']} ORDER BY z DESC"));
   }
 
   /*
    * getPiecesByType: return all info about pieces of the given type
    */
-  public function getPiecesByType($type, $type_arg = null)
+  public function getPiecesByType($type, $type_arg = null, $location = null)
   {
     $sql = "SELECT * FROM piece WHERE type = '$type'";
     if ($type_arg) {
       $sql .= " AND type_arg = '$type_arg'";
     }
+    if ($location) {
+      $sql .= " AND location = '$location'";
+    }
+    $sql .= " ORDER BY id";
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
   /*
    * getPlacedPieces: return all pieces on the board
+   * Order by tokens first, then by z-order ascending
    */
   public function getPlacedPieces()
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board'"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' ORDER BY (type LIKE 'token%') DESC, z, x, y"));
   }
 
 
@@ -104,7 +133,7 @@ class SantoriniBoard extends APP_GameClass
   /*
    * TODO
    */
-  public function playerFilter($pIds = -1)
+  public function playerFilter($pIds = -1, $negate = false)
   {
     $filter = "";
     if ($pIds != -1) {
@@ -116,7 +145,8 @@ class SantoriniBoard extends APP_GameClass
         $ids = array_merge($ids, $this->game->playerManager->getTeammatesIds($pId));
       }
 
-      $filter = empty($ids) ? "AND FALSE" : (" AND player_id IN (" . implode(',', $ids) . ")");
+      $filter = empty($ids) ? "FALSE" : "player_id IN (" . implode(',', $ids) . ")";
+      $filter = $negate ? " AND NOT ($filter)" : " AND $filter";
     }
 
     return $filter;
@@ -128,7 +158,8 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getAvailableWorkers($pId = -1)
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' " . $this->playerFilter($pId)));
+    $filter = $this->playerFilter($pId);
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' $filter"));
   }
 
   /*
@@ -141,14 +172,14 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
-   * getPlacedWorkers: return all placed wor!kers
+   * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
   public function getPlacedWorkers($pId = -1)
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' " . $this->playerFilter($pId)));
+    $filter = $this->playerFilter($pId);
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter"));
   }
-
 
   /*
    * getPlacedActiveWorkers: return all placed workers of active player
@@ -167,12 +198,35 @@ class SantoriniBoard extends APP_GameClass
 
   /*
    * getPlacedOpponentWorkers: return all placed workers of opponents of active player
+   * - automatically filters Clio's protected workers
+   * - passive powers like Aphrodite, Harpies, etc. that apply to Clio should not use this function
+   *  (see also: getPlacedNotMineWorkers() which does not filter Clio)
    */
   public function getPlacedOpponentWorkers($pId = null)
   {
-    return $this->game->board->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId));
+    $workers = $this->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId));
+
+    // Clio: Workers on top of a coin are invisible to opponents
+    $tokensXY = array_map(function ($token) {
+      return [intval($token['x']), intval($token['y'])];
+    }, $this->getPiecesByType('tokenCoin', null, 'board'));
+    if (!empty($tokensXY)) {
+      Utils::filterWorkers($workers, function ($worker) use ($tokensXY) {
+        return !in_array([intval($worker['x']), intval($worker['y'])], $tokensXY);
+      });
+    }
+
+    return $workers;
   }
 
+  /*
+   * getPlacedWorkers: return all placed workers except those of the active player
+   */
+  public function getPlacedNotMineWorkers()
+  {
+    $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds(), true);
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter"));
+  }
 
 
   /*
@@ -205,7 +259,7 @@ class SantoriniBoard extends APP_GameClass
    * getAccessibleSpaces:
    *   return the list of all accessible spaces for either placing a worker, moving or building
    */
-  public function getAccessibleSpaces($action = null)
+  public function getAccessibleSpaces($action = null, $powerIds = [])
   {
     $board = $this->getBoard();
 
@@ -217,7 +271,10 @@ class SantoriniBoard extends APP_GameClass
         // Find next free space above ground
         for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
           $p = $board[$x][$y][$z];
-          $blocked = ($p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3' || $p['type'] == 'tokenTalus');
+          if ($p['type'] == 'tokenCoin' && in_array(CLIO, $powerIds)) {
+            break;
+          }
+          $blocked = $p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3' || $p['type'] == 'tokenTalus' || $p['type'] == 'tokenCoin';
         }
 
         if ($blocked || $z > 3) {
@@ -305,7 +362,7 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getDirection : get the corresponding direction of a move/build
    */
-  public static function getDirection($a, $b, $action = null, $powerIds = [])
+  public static function getDirection($a, $b, $powerIds = [])
   {
     if (in_array(URANIA, $powerIds) && !self::isNeighbour($a, $b)) {
       $dx = abs($a['x'] - $b['x']) <= 1 ? 0 : ($a['x'] < $b['x'] ? 1 : -1);
@@ -340,12 +397,12 @@ class SantoriniBoard extends APP_GameClass
   public function getNeighbouringSpaces($piece, $action = null, $powerIds = [])
   {
     // Starting from all accessible spaces, and filtering out those too far or too high (for moving only)
-    $spaces = $this->getAccessibleSpaces($action);
+    $spaces = $this->getAccessibleSpaces($action, $powerIds);
     Utils::filter($spaces, function ($space) use ($piece, $action, $powerIds) {
       return $this->isNeighbour($piece, $space, $action, $powerIds);
     });
-    array_walk($spaces, function (&$space) use ($piece, $action, $powerIds) {
-      $space['direction'] = $this->getDirection($piece, $space, $action, $powerIds);
+    array_walk($spaces, function (&$space) use ($piece, $powerIds) {
+      $space['direction'] = $this->getDirection($piece, $space, $powerIds);
     });
     return $spaces;
   }

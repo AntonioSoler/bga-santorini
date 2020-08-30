@@ -19,27 +19,31 @@ class Harpies extends SantoriniPower
   }
 
   /* * */
+
   public function afterOpponentMove($worker, $work)
   {
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
-    Utils::filterWorkersById($oppWorkers, $worker['id']);
-    if (count($oppWorkers) == 0)
-      return; // this was not an opponent worker
+    // Don't use getPlacedOpponentWorkers() because the power applies to Clio
+    $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
+    Utils::filterWorkersById($myWorkers, $worker['id']);
+    if (!empty($myWorkers)) {
+      return; // opponent is moving Harpies worker (Dionysus)
+    }
 
     // currently, no power affects this series of forces as Tartarus is only a 2-player god
+    $opponent = $this->game->playerManager->getPlayer();
     $space = $work;
-    while (true){
+    while (true) {
       // Must be a free space behind
-      $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
+      $accessibleSpaces = $this->game->board->getAccessibleSpaces('move', $opponent->getPowerIds());
       $newSpace = $this->game->board->getNextSpace($space, $accessibleSpaces);
-      if (is_null($newSpace) || $newSpace['z'] > $space['z'])
+      if (is_null($newSpace) || $newSpace['z'] > $space['z']) {
         return;
+      }
 
       $stats = [[$this->playerId, 'usePower']];
       $space['id'] = $worker['id'];
       $this->game->log->addForce($space, $newSpace, $stats);
       $this->game->board->setPieceAt($space, $newSpace);
-
 
       // Notify (same text as Charon to help translators)
       $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name} (${coords})'), [
@@ -48,7 +52,7 @@ class Harpies extends SantoriniPower
         'space' => $newSpace,
         'power_name' => $this->getName(),
         'player_name' => $this->getPlayer()->getName(),
-        'player_name2' => $this->game->playerManager->getPlayer($worker['player_id'])->getName(),
+        'player_name2' => $opponent->getName(),
         'level_name' => $this->game->levelNames[intval($newSpace['z'])],
         'coords' => $this->game->board->getMsgCoords($space, $newSpace),
       ]);

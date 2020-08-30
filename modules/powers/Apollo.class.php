@@ -40,8 +40,8 @@ class Apollo extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is free, we can do a classic move -> return false
-    $worker2 = $this->game->board->getPieceAt($work);
-    if ($worker2 == null) {
+    $worker2 = $this->game->board->getPiece($work);
+    if ($worker2 == null || $worker2['location'] != 'board') {
       return false;
     }
 

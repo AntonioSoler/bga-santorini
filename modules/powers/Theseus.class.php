@@ -39,7 +39,7 @@ class Theseus extends SantoriniHeroPower
     foreach ($arg['workers'] as &$worker) {
       foreach ($oppWorkers as $worker2) {
         if ($worker['z'] == $worker2['z'] - 2 && $this->game->board->isNeighbour($worker, $worker2)) {
-          $worker['works'][] = $this->game->board->getCoords($worker2);
+          $worker['works'][] = SantoriniBoard::getCoords($worker2, 0, true);
         }
       }
     }
@@ -48,7 +48,7 @@ class Theseus extends SantoriniHeroPower
   public function usePower($action)
   {
     $space = $action[1];
-    $worker = $this->game->board->getPieceAt($space);
+    $worker = $this->game->board->getPiece($space['id']);
     $this->game->playerKill($worker, $this->getName(), false);
   }
 

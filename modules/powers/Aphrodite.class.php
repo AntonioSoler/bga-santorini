@@ -20,27 +20,25 @@ class Aphrodite extends SantoriniPower
 
   /* * */
 
-  public function isNeighbouring($oppWorker)
+  public function isNeighbouring($myWorkers, $oppWorker)
   {
-    $workers = $this->game->board->getPlacedWorkers($this->playerId);
-    foreach ($workers as $worker) {
-      if ($this->game->board->isNeighbour($worker, $oppWorker, '')) {
-        return true;
-      }
-      if (SantoriniBoard::isSameSpace($worker, $oppWorker)) {
+    foreach ($myWorkers as $worker) {
+      if (SantoriniBoard::isSameSpace($worker, $oppWorker) || $this->game->board->isNeighbour($worker, $oppWorker)) {
         return true;
       }
     }
-
     return false;
   }
 
   public function startOpponentTurn()
   {
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
+    // Don't use getPlacedOpponentWorkers() because the power should affect Clio
+    // Need filterWorksUnlessMine for Dionysus additional turn
+    $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
+    $oppWorkers = $this->game->board->getPlacedNotMineWorkers();
     $forcedWorkers = [];
     foreach ($oppWorkers as $worker) {
-      if ($this->isNeighbouring($worker)) {
+      if ($this->isNeighbouring($myWorkers, $worker)) {
         $forcedWorkers[] = $worker['id'];
         $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
           'i18n' => ['power_name'],
@@ -67,9 +65,9 @@ class Aphrodite extends SantoriniPower
     return $action['workers'];
   }
 
-  public function canFinishHere($worker, $space, $forcedWorkers)
+  public function canFinishHere($worker, $space, $forcedWorkers, $myWorkers)
   {
-    return !in_array($worker['id'], $forcedWorkers) || $this->isNeighbouring($space);
+    return !in_array($worker['id'], $forcedWorkers) || $this->isNeighbouring($myWorkers, $space);
   }
 
   /*
@@ -114,16 +112,17 @@ class Aphrodite extends SantoriniPower
     }
 
     // Allow skip only if condition is satisfied
+    $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
     if ($arg['skippable']) {
       foreach ($arg['workers'] as $worker) {
-        $arg['skippable'] = $arg['skippable'] && $this->canFinishHere($worker, $worker, $forcedWorkers);
+        $arg['skippable'] = $arg['skippable'] && $this->canFinishHere($worker, $worker, $forcedWorkers, $myWorkers);
       }
     }
 
     // Last move must be neighboring or intermediate move must be valid
     $mayMoveAgain = $arg['mayMoveAgain'];
-    Utils::filterWorks($arg, function ($space, $worker) use ($forcedWorkers, $mayMoveAgain) {
-      return $this->canFinishHere($worker, $space, $forcedWorkers) || $this->canKeepMoving($worker, $space, $mayMoveAgain);
+    Utils::filterWorks($arg, function ($space, $worker) use ($forcedWorkers, $myWorkers, $mayMoveAgain) {
+      return $this->canFinishHere($worker, $space, $forcedWorkers, $myWorkers) || $this->canKeepMoving($worker, $space, $mayMoveAgain);
     });
   }
 
@@ -134,9 +133,10 @@ class Aphrodite extends SantoriniPower
       return;
     }
 
+    $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
     foreach ($this->getForcedWorkers() as $workerId) {
       $move = $this->game->log->getLastMoveOfWorker($workerId);
-      if ($move != null && !$this->isNeighbouring($move['to'])) {
+      if ($move != null && !$this->isNeighbouring($myWorkers, $move['to'])) {
         $this->game->announceLose(clienttranslate('${power_name}: ${player_name} cannot move to a space neighboring ${player_name2} and is eliminated!'), [
           'i18n' => ['power_name'],
           'power_name' => $this->getName(),

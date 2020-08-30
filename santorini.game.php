@@ -1187,4 +1187,12 @@ class santorini extends Table
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 2, 'arg' => 2]);
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 3, 'arg' => 3]);
   }
+
+  // call from studio chat to copy another studio game's board
+  public function copyBoard($tableId)
+  {
+    self::DbQuery("DELETE FROM piece");
+    self::DbQuery("INSERT INTO piece SELECT * FROM ebd_santorini_$tableId.piece");
+    self::DbQuery("UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_PLACE_WORKER);
+  }
 }
