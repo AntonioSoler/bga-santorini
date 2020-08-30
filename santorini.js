@@ -79,13 +79,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     }
   }
 
-  function override_addMoveToLog(logId, moveId) {
-    // [Undocumented] Called by BGA framework on new log notification message
-    // Handle cancelled notifications
-    this.inherited(override_addMoveToLog, arguments);
-    if (this.gamedatas.cancelMoveIds && this.gamedatas.cancelMoveIds.includes(+moveId)) {
-      debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
-      dojo.addClass('log_' + logId, 'cancel');
+  var dockedlog_to_move_id = {};
+  function override_onPlaceLogOnChannel(msg) {
+    // [Undocumented] Called by BGA framework on any notification message
+    // Handle cancelling log messages for restart turn
+    var currentLogId = this.next_log_id;
+    this.inherited(override_onPlaceLogOnChannel, arguments);
+    if (msg.move_id && this.next_log_id != currentLogId) {
+      var moveId = +msg.move_id;
+      dockedlog_to_move_id[currentLogId] = moveId;
+      if (this.gamedatas.cancelMoveIds != null && this.gamedatas.cancelMoveIds.includes(moveId)) {
+        this.cancelLogs([moveId]);
+      }
     }
   }
 
@@ -95,7 +100,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     setLoader: override_setLoader,
     adaptStatusBar: override_adaptStatusBar,
-    addMoveToLog: override_addMoveToLog,
+    onPlaceLogOnChannel: override_onPlaceLogOnChannel,
 
     /*
      * Constructor
@@ -184,6 +189,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
     onLoadingComplete: function () {
       debug('Loading complete');
+      // Handle previously cancelled moves
+      this.cancelLogs(this.gamedatas.cancelMoveIds);
+
       if (!this.board) {
         if (!this.isReadOnly()) {
           // Automatically propose to abandon the game
@@ -242,19 +250,37 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     notif_cancel: function (n) {
       debug('Notif: cancel turn', n.args);
       this.board.diff(n.args.placedPieces);
-      this.cancelNotifications(n.args.moveIds);
+      this.cancelLogs(n.args.moveIds);
     },
 
-    /*
-     * cancelNotifications: cancel past notification log messages the given move IDs
+    /* 
+     * cancelLogs:
+     *   strikes all log messages related to the given array of move IDs
      */
-    cancelNotifications: function (moveIds) {
-      for (var logId in this.log_to_move_id) {
-        var moveId = +this.log_to_move_id[logId];
-        if (moveIds.includes(moveId)) {
-          debug('Cancel notification message for move ID ' + moveId + ', log ID ' + logId);
-          dojo.addClass('log_' + logId, 'cancel');
+    cancelLogs: function (moveIds) {
+      if (Array.isArray(moveIds)) {
+        debug('Cancel log messages for move IDs', moveIds);
+        var elements = [];
+        // Desktop logs
+        for (var logId in this.log_to_move_id) {
+          var moveId = +this.log_to_move_id[logId];
+          if (moveIds.includes(moveId)) {
+            elements.push($('log_' + logId));
+          }
         }
+        // Mobile logs
+        for (var logId in dockedlog_to_move_id) {
+          var moveId = +dockedlog_to_move_id[logId];
+          if (moveIds.includes(moveId)) {
+            elements.push($('dockedlog_' + logId));
+          }
+        }
+        // Add strikethrough
+        elements.forEach(function (e) {
+          if (e != null) {
+            dojo.addClass(e, 'cancel');
+          }
+        });
       }
     },
 

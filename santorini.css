@@ -664,8 +664,14 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   text-decoration: line-through;
 }
 
+/* Desktop logs */
 .log.cancel .roundedbox {
-  background-color: rgba(255, 205, 210, 0.6);
+  background-color: rgba(239, 154, 154, 0.6);
+}
+
+/* Mobile logs */
+.log.cancel.roundedbox {
+  background-color: #ef9a9a;
 }
 
 /*********************
