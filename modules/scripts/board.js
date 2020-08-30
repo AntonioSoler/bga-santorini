@@ -7,6 +7,10 @@ function isMobile() {
 	return dojo.hasClass('ebd-body', 'mobile_version');
 }
 
+function isTouch() {
+	return dojo.hasClass('ebd-body', 'touch-device');
+}
+
 // Zoom limits
 var ZOOM_MIN = 15;
 var ZOOM_MAX = 55;
@@ -122,6 +126,29 @@ Board.prototype.onLoad = function () {
 
 
 Board.prototype.updateSize = function () {
+	// First resize the container
+	var viewportHeight;
+	var containerTop;
+	if (isTouch()) {
+		// Phone/tablet: Height should match viewport when scrolled past BGA header (minus page-title only)
+		// (note: phone in landscape orientation is not isMobile())
+		// Calculate viewport height without address bar ("100vh" in CSS, but no JavaScript equivilant?)
+		var vhElement = document.createElement('div');
+		vhElement.style.cssText = 'position: fixed; top: 0; height: 100vh; pointer-events: none;';
+		document.documentElement.insertBefore(vhElement, document.documentElement.firstChild);
+		viewportHeight = vhElement.offsetHeight;
+		document.documentElement.removeChild(vhElement);
+		var pageTitle = $('page-title').getBoundingClientRect();
+		containerTop = pageTitle.height + 5;
+	} else {
+		// Desktop: Height should match unscrolled viewport from 0,0 (minus BGA header and page-title)
+		viewportHeight = document.getElementsByTagName('html')[0].clientHeight;
+		var containerSize = this._container.getBoundingClientRect();
+		containerTop = window.pageYOffset + containerSize.top;
+	}
+	dojo.style(this._container, 'height', (viewportHeight - containerTop) + 'px');
+
+	// Then resize the scene
 	var containerSize = this._container.getBoundingClientRect();
 	this._camera.aspect = containerSize.width / containerSize.height;
 	this._camera.updateProjectionMatrix();

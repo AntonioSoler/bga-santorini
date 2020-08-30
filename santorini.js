@@ -237,8 +237,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     onScreenWidthChange: function () {
-      if (!this.board) { return; }
       dojo.style('page-content', 'zoom', 'normal');
+      if (!this.board) { return; }
       this.board.updateSize();
     },
 
