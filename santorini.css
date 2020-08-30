@@ -20,6 +20,11 @@ html {
   background-color: #76cfe9;
 }
 
+/* Make clouds visible through BGA main UI elements */
+#topbar, #page-title, .current_player_is_active #page-title, .log .roundedbox {
+  background: rgba(248, 248, 248, 0.85);
+}
+
 #browser-error {
   display: none;
   background: #d50000;
