@@ -35,19 +35,32 @@ class Aphrodite extends SantoriniPower
     // Don't use getPlacedOpponentWorkers() because the power should affect Clio
     // Need filterWorksUnlessMine for Dionysus additional turn
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
-    $oppWorkers = $this->game->board->getPlacedNotMineWorkers();
+    $oppWorkers = $this->game->board->getPlacedNotMineWorkers($this->playerId);
     $forcedWorkers = [];
+    $forcedPlayers = [];
     foreach ($oppWorkers as $worker) {
       if ($this->isNeighbouring($myWorkers, $worker)) {
         $forcedWorkers[] = $worker['id'];
-        $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
-          'i18n' => ['power_name'],
-          'power_name' => $this->getName(),
-          'player_name' => $this->game->getActivePlayerName(), // opponent
-          'player_name2' => $this->getPlayer()->getName(), // Aphrodite
-          'coords' => $this->game->board->getMsgCoords($worker),
-        ]);
+        $playerId = $worker['player_id'];
+        if (!array_key_exists($playerId, $forcedPlayers)) {
+          $forcedPlayers[$playerId] = [];
+        }
+        $forcedPlayers[$playerId][] = $worker;
       }
+    }
+
+    foreach ($forcedPlayers as $playerId => $workers) {
+      $coords = implode(', ', array_map(function ($worker) {
+        return $this->game->board->getMsgCoords($worker);
+      }, $workers));
+      $opponent = $this->game->playerManager->getPlayer($playerId);
+      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
+        'i18n' => ['power_name'],
+        'power_name' => $this->getName(),
+        'player_name' => $opponent->getName(), // opponent
+        'player_name2' => $this->getPlayer()->getName(), // Aphrodite
+        'coords' => $coords,
+      ]);
     }
 
     if (!empty($forcedWorkers)) {

@@ -159,7 +159,7 @@ class SantoriniBoard extends APP_GameClass
   public function getAvailableWorkers($pId = -1)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' $filter"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
@@ -178,7 +178,7 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedWorkers($pId = -1)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
@@ -222,10 +222,10 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPlacedWorkers: return all placed workers except those of the active player
    */
-  public function getPlacedNotMineWorkers()
+  public function getPlacedNotMineWorkers($pId = null)
   {
-    $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds(), true);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter"));
+    $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds($pId), true);
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
   }
 
 
