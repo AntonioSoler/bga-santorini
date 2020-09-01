@@ -48,7 +48,7 @@ $gameinfos = array(
     // 'not_recommend_player_number' => array( 2, 3 ),      // <= example: this is not recommended to play this game with 2 or 3 players
 
     // Estimated game duration, in minutes (used only for the launch, afterward the real duration is computed)
-    'estimated_duration' => 30,
+    'estimated_duration' => 10,
 
     // Time in second add to a player when "giveExtraTime" is called (speed profile = fast)
     'fast_additional_time' => 30,
@@ -68,7 +68,7 @@ $gameinfos = array(
     'tie_breaker_description' => '',
 
     // Game is "beta". A game MUST set is_beta=1 when published on BGA for the first time, and must remains like this until all bugs are fixed.
-    'is_beta' => 1,
+    'is_beta' => 0,
 
     // Is this game cooperative (all players wins together or loose together)
     'is_coop' => 0,
@@ -87,7 +87,7 @@ $gameinfos = array(
     'strategy' => 5,
 
     // Diplomacy of the game, from 0 (no interaction in this game) to 5 (totally based on interaction and discussion between players)
-    'diplomacy' => 1,
+    'diplomacy' => 3,
 
     // Colors attributed to players
     'player_colors' => array("0000ff", "ffffff", "982fff"),
@@ -121,7 +121,7 @@ $gameinfos = array(
     //  http://en.doc.boardgamearena.com/Game_meta-information:_gameinfos.inc.php
     //  IMPORTANT: this list should be ORDERED, with the most important tag first.
     //  IMPORTANT: it is mandatory that the FIRST tag is 1, 2, 3 and 4 (= game category)
-    'tags' => array(1, 11, 106),
+    'tags' => array(1, 10, 102, 106, 209),
 
 
     //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)
