@@ -40,7 +40,7 @@ const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5":
 const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -5.2 };
 const startPos = new THREE.Vector3(40, 24, 0);
 const enterPos = new THREE.Vector3(20, 28, 0);
-const lookAt = new THREE.Vector3(0, -2, 0);
+const lookAt = new THREE.Vector3(0, -1.5, 0);
 
 var Board = function (container, url) {
 	console.info("Creating board");
@@ -141,6 +141,7 @@ Board.prototype.updateSize = function () {
 	var containerTop;
 	if (isTouch()) {
 		// Phone/tablet: Height should match viewport when scrolled past BGA header (minus page-title only)
+		// Phone: Also give some extra space to prevent getting "stuck" on the 3d scene
 		// (note: phone in landscape orientation is not isMobile())
 		// Calculate viewport height without address bar ("100vh" in CSS, but no JavaScript equivilant?)
 		var vhElement = document.createElement('div');
@@ -149,7 +150,7 @@ Board.prototype.updateSize = function () {
 		viewportHeight = vhElement.offsetHeight;
 		document.documentElement.removeChild(vhElement);
 		var pageTitle = $('page-title').getBoundingClientRect();
-		containerTop = pageTitle.height + 5;
+		containerTop = pageTitle.height * (isMobile() ? 2 : 1) + 5;
 	} else {
 		// Desktop: Height should match unscrolled viewport from 0,0 (minus BGA header and page-title)
 		viewportHeight = document.getElementsByTagName('html')[0].clientHeight;
@@ -160,6 +161,7 @@ Board.prototype.updateSize = function () {
 
 	// Then resize the scene
 	var containerSize = this._container.getBoundingClientRect();
+	console.info('Resizing board', containerSize.width, containerSize.height, viewportHeight);
 	this._camera.aspect = containerSize.width / containerSize.height;
 	this._camera.updateProjectionMatrix();
 	this._renderer.setSize(containerSize.width, containerSize.height);
@@ -194,6 +196,7 @@ Board.prototype.enterScene = function () {
 
 	// Start at the previous position, if any
 	var pos = this.loadCameraPosition() || enterPos;
+	console.info('Enter scene camera position', pos.x, pos.y, pos.z);
 	Tween.get(this._camera.position).to(pos, 2000, Ease.quadOut).addEventListener('change', () => {
 		this._camera.lookAt(lookAt);
 		this.render();
@@ -689,30 +692,42 @@ Board.prototype.getCenter = function (space, zOffset = 0) {
 
 Board.prototype.saveCameraPosition = debounce(function () {
 	try {
-		var x = this._camera.position.x.toFixed(2);
-		var y = this._camera.position.y.toFixed(2);
-		var z = this._camera.position.z.toFixed(2);
-		localStorage.setItem('santorini.camera.x', x);
-		localStorage.setItem('santorini.camera.y', y);
-		localStorage.setItem('santorini.camera.z', z);
-		console.info('Saved camera position', x, y, z);
-	} catch (e) {
-	}
+		var x = this._camera.position.x;
+		var y = this._camera.position.y;
+		var z = this._camera.position.z;
+		if (x == null || y == null || z == null || Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) {
+			console.warn('Not saving invalid camera position', x, y, z);
+			return;
+		}
+		var xS = x.toFixed(3);
+		var yS = y.toFixed(3);
+		var zS = z.toFixed(3);
+		localStorage.setItem('santorini.camera.x', xS);
+		localStorage.setItem('santorini.camera.y', yS);
+		localStorage.setItem('santorini.camera.z', zS);
+		console.info('Saved camera position', xS, yS, zS);
+	} catch (ignore) { }
 }, 500);
 
 Board.prototype.loadCameraPosition = function () {
-	var position = null;
 	try {
-		var x = localStorage.getItem('santorini.camera.x');
-		var y = localStorage.getItem('santorini.camera.y');
-		var z = localStorage.getItem('santorini.camera.z');
-		console.info('Loaded camera position', x, y, z);
-		if (x != null && y != null && z != null) {
-			position = new THREE.Vector3(x, y, z);
+		var xS = localStorage.getItem('santorini.camera.x');
+		var yS = localStorage.getItem('santorini.camera.y');
+		var zS = localStorage.getItem('santorini.camera.z');
+		if (!xS || !yS || !zS) {
+			console.warn('Not loading empty camera position', xS, yS, zS);
+			return;
 		}
-	} catch (e) {
-	}
-	return position;
+		var x = Number(xS);
+		var y = Number(yS);
+		var z = Number(zS);
+		if (Number.isNaN(x) || Number.isNaN(y) || Number.isNaN(z)) {
+			console.warn('Not loading invalid camera position', x, y, z);
+			return;
+		}
+		console.info('Loaded camera position', x, y, z);
+		return new THREE.Vector3(x, y, z);
+	} catch (ignore) { }
 };
 
 Board.prototype.resetCameraPosition = function () {
@@ -720,10 +735,14 @@ Board.prototype.resetCameraPosition = function () {
 		return;
 	}
 	console.info('Reset camera position', enterPos.x, enterPos.y, enterPos.z);
-	Tween.get(this._camera.position).to(enterPos, 2000, Ease.quadOut).addEventListener('change', () => {
-		this._camera.lookAt(lookAt);
-		this.render();
-	});
+	this._camera.position.copy(enterPos);
+	this._camera.lookAt(lookAt);
+	this.render();
+	try {
+		localStorage.removeItem('santorini.camera.x');
+		localStorage.removeItem('santorini.camera.y');
+		localStorage.removeItem('santorini.camera.z');
+	} catch (ignore) { }
 }
 
 window.Board = Board;

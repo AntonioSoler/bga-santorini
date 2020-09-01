@@ -25,6 +25,20 @@ html {
   background: rgba(248, 248, 248, 0.85);
 }
 
+#page-title {
+  z-index: 3;
+}
+
+/* Taller page-title on mobile allows easier scrolling */
+.mobile_version #page-title {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+#page-title .action-button {
+  margin-left: 20px;
+}
+
 .bgabutton.buttonResetCamera {
   margin: 0;
   padding: 1px 12px;

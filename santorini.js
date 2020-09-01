@@ -279,12 +279,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         dojo.place(resetCameraBlock, q[q.length - 1], 'after');
       }
       dojo.query('.buttonResetCamera').connect('onclick', function () {
+        $('page-title').scrollIntoView({ block: "start", inline: "start" });
+        $('scene-container').scrollIntoView({ block: "end", inline: "start" });
+        _this.board.updateSize();
         _this.board.resetCameraPosition();
       });
     },
 
     onScreenWidthChange: function () {
-      dojo.style('page-content', 'zoom', 'normal');
+      dojo.style('page-content', 'zoom', '');
+      dojo.style('page-title', 'zoom', '');
+      dojo.style('right-side-first-part', 'zoom', '');
       if (!this.board) { return; }
       this.board.updateSize();
     },
