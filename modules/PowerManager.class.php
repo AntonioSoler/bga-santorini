@@ -144,6 +144,7 @@ class PowerManager extends APP_GameClass
     // Incomplete Persephone implementation
     [PERSEPHONE, ARTEMIS],  // multiple moves
     [PERSEPHONE, ATALANTA], // multiple moves
+    [PERSEPHONE, BELLEROPHON], // cannot require use of hero power
     [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350
     [PERSEPHONE, CHARON],  // CF PERSEPHONE
     [PERSEPHONE, CHARYBDIS], // complex moves
@@ -159,6 +160,7 @@ class PowerManager extends APP_GameClass
     // Incomplete Adonis implementation
     [ADONIS, ARTEMIS], // multiple moves
     [ADONIS, ATALANTA], // multiple moves
+    [ADONIS, BELLEROPHON], // cannot require use of hero power
     [ADONIS, CASTOR], // alternative turn
     [ADONIS, CHARON],  // pre-chosen worker
     [ADONIS, CHARYBDIS], // complex moves
