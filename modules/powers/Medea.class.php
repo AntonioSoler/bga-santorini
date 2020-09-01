@@ -65,6 +65,7 @@ class Medea extends SantoriniHeroPower
     }
 
     // Force the worker to ground level
+    $space['z'] = 0;
     $this->game->board->setPieceAt($worker, $space);
     $this->game->log->addForce($worker, $space);
 
