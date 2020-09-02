@@ -30,7 +30,6 @@ CREATE TABLE IF NOT EXISTS `card` (
 
 CREATE TABLE IF NOT EXISTS `log` (
   `log_id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `round` int(11) NOT NULL,
   `move_id` int(11) NOT NULL,
   `player_id` int(11) NOT NULL,
   `piece_id` int(11),
