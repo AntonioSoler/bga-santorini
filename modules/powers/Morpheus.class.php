@@ -30,9 +30,8 @@ class Morpheus extends SantoriniPower
 
   public function computeStock()
   {
-    $rounds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'morpheusStart'");
-    $builds = self::getObjectFromDb("SELECT COUNT(*) as n FROM log WHERE `action` = 'morpheusBuild'");
-    return $rounds['n'] - $builds['n'];
+    $stock = self::getObjectFromDb("SELECT (SELECT COUNT(*) FROM log WHERE action = 'morpheusStart') - (SELECT COUNT(*) FROM log WHERE action = 'morpheusBuild') AS stock FROM DUAL");
+    return intval($stock);
   }
 
   public function startPlayerTurn()

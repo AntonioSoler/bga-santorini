@@ -34,7 +34,6 @@ class santorini extends Table
       'optionPowers' => OPTION_POWERS,
       'optionSetup' => OPTION_SETUP,
       'optionTeams' => OPTION_TEAMS,
-      'currentRound' => CURRENT_ROUND,
       'firstPlayer' => FIRST_PLAYER,
       'switchPlayer' => SWITCH_PLAYER,
       'switchState' => SWITCH_STATE,
@@ -131,7 +130,6 @@ class santorini extends Table
     // Active first player to play
     $pId = $this->activeNextPlayer();
     self::setGameStateInitialValue('firstPlayer', $pId);
-    self::setGameStateInitialValue('currentRound', 0);
     self::setGameStateInitialValue('switchPlayer', 0);
     self::setGameStateInitialValue('switchState', 0);
   }
@@ -542,10 +540,6 @@ class santorini extends Table
     }
 
     $pId = $next ? $this->activeNextPlayer() : $this->getActivePlayerId();
-    if (self::getGamestateValue("firstPlayer") == $pId) {
-      $n = (int) self::getGamestateValue('currentRound') + 1;
-      self::setGamestateValue("currentRound", $n);
-    }
     if ($this->playerManager->getPlayer($pId)->isEliminated()) {
       $this->stNextPlayer();
       return;
@@ -736,8 +730,6 @@ class santorini extends Table
         $next = 'endturn';
       }
     }
-    self::debug("stSwitchPlayer: switchPlayer=$switchPlayer, switchState=$switchState, next=$next");
-    $this->notifyAllPlayers('message', "stSwitchPlayer: switchPlayer=$switchPlayer, switchState=$switchState, next=$next", []);
     if ($next == null) {
       throw new BgaVisibleSystemException("stSwitchPlayer: Missing next state (player: $switchPlayer)");
     }
@@ -1134,12 +1126,9 @@ class santorini extends Table
    */
   public function upgradeTableDb($from_version)
   {
-    /*
-    if ($from_version < 2006150952) {
-      self::DbQuery("ALTER TABLE `log` ADD `move_id` INT(11) NOT NULL DEFAULT 0");
-      self::DbQuery("ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0");
+    if ($from_version <= 2009010714) {
+      self::DbQuery("ALTER TABLE log DROP round");
     }
-    */
   }
 
 
@@ -1203,7 +1192,7 @@ class santorini extends Table
   // call from studio chat to expedite game start
   public function quickBuild()
   {
-    $worker = ['id' => -1, 'x' => 0, 'y' => 0, 'z' => 0];
+    $worker = ['id' => 0, 'x' => 0, 'y' => 0, 'z' => 0];
 
     $this->playerBuild($worker, ['x' => 4, 'y' => 1, 'z' => 0, 'arg' => 0]);
 
@@ -1220,7 +1209,6 @@ class santorini extends Table
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 0, 'arg' => 0]);
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 1, 'arg' => 1]);
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 2, 'arg' => 2]);
-    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 3, 'arg' => 3]);
   }
 
   // call from studio chat to copy another studio game's board

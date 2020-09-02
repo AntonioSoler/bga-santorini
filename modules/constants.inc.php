@@ -178,7 +178,6 @@ define('DIRECTIONS', [
 /*
  * Global game variables
  */
-define('CURRENT_ROUND', 20);
 define('FIRST_PLAYER', 21);
 define('SWITCH_PLAYER', 30);
 define('SWITCH_STATE', 31);

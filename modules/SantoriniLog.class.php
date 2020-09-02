@@ -104,8 +104,7 @@ class SantoriniLog extends APP_GameClass
   public function insert($playerId, $pieceId, $action, $stats = [], $args = [])
   {
     $playerId = $playerId == -1 ? $this->game->getActivePlayerId() : $playerId;
-    $round = $this->game->getGameStateValue("currentRound");
-    $moveId = self::getUniqueValueFromDB("SELECT `global_value` FROM `global` WHERE `global_id` = 3");
+    $moveId = self::getUniqueValueFromDB("SELECT global_value FROM global WHERE global_id = 3");
 
     if ($action == 'move') {
       $stats[] = ['table', 'move'];
@@ -126,7 +125,7 @@ class SantoriniLog extends APP_GameClass
     }
 
     $actionArgs = json_encode($args);
-    self::DbQuery("INSERT INTO log (`round`, `move_id`, `player_id`, `piece_id`, `action`, `action_arg`) VALUES ('$round', '$moveId', '$playerId', '$pieceId', '$action', '$actionArgs')");
+    self::DbQuery("INSERT INTO log (move_id, player_id, piece_id, action, action_arg) VALUES ($moveId, $playerId, $pieceId, '$action', '$actionArgs')");
   }
 
 
@@ -226,21 +225,28 @@ class SantoriniLog extends APP_GameClass
   /////////////////////////////////
 
   /* getRoundClause
-   * offset can be a number of rounds, or 'all' for everything, or the name of an action to get everyhing after the most recent occurance of that action (by any player)
+   * mixed $offset can be:
+   *  - 'all', to get all rows for the entire game
+   *  - a number, to get rows since this player's startTurn
+   *  - an action name, to get rows since anyone's instance of this action
    */
   private function getRoundClause($pId, $offset = 0, $additionalTurns = false)
   {
     $offset = $offset ?: 0;
-    if (is_numeric($offset)) {
-      $clause = "AND `round` = (SELECT round FROM log WHERE `player_id` = $pId AND `action` = 'startTurn' ORDER BY log_id DESC LIMIT 1) - $offset";
-      if (!$additionalTurns) {
-        $clause .= " AND `log_id` > (SELECT COALESCE(MAX(log_id), 0) FROM log WHERE `player_id` = $pId AND `action` = 'additionalTurn' $clause)";
-      }
-      return $clause;
-    } else if ($offset === 'all') {
+    if ($offset === 'all') {
       return "";
+    }
+
+    if (is_numeric($offset)) {
+      // Offset > 0 used by Circe
+      $actions = ['startTurn'];
+      if (!$additionalTurns) {
+        $actions[] = 'additionalTurn';
+      }
+      return " AND log_id > (SELECT log_id FROM log WHERE player_id = $pId AND action IN ('" . implode("', '", $actions) . "') ORDER BY log_id DESC LIMIT 1 OFFSET $offset)";
     } else {
-      return " AND `log_id` > (SELECT COALESCE(MAX(log_id), 0) FROM log WHERE `action` = '$offset')";
+      // Offset as action name used by Gaea
+      return " AND log_id > (SELECT log_id FROM log WHERE action = '$offset' ORDER BY log_id DESC LIMIT 1)";
     }
   }
 
@@ -377,7 +383,7 @@ class SantoriniLog extends APP_GameClass
   private function logsForCancelTurn($ignore = ['startTurn'])
   {
     $pId = $this->game->getActivePlayerId();
-    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE player_id = $pId AND action NOT IN ('" . implode("', '", $ignore) . "') " . $this->getRoundClause($pId, 0, false) . " ORDER BY log_id DESC");
+    $logs = self::getObjectListFromDb("SELECT * FROM log WHERE action NOT IN ('" . implode("', '", $ignore) . "') " . $this->getRoundClause($pId, 0, false) . " ORDER BY log_id DESC");
     return $logs;
   }
 
