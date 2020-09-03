@@ -682,6 +682,7 @@ class santorini extends Table
     // Still call preEndOfTurn to calculate player statistics
     $this->powerManager->preEndOfTurn();
     $pId = self::getActivePlayerId();
+    $this->makeLoose($pId);
   }
 
 
