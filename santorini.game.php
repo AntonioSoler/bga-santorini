@@ -682,6 +682,11 @@ class santorini extends Table
     // Still call preEndOfTurn to calculate player statistics
     $this->powerManager->preEndOfTurn();
     $pId = self::getActivePlayerId();
+  }
+
+
+  public function makeLoose($pId)
+  {
     if ($this->playerManager->getPlayerCount() != 3) {
       // 1v1 or 2v2 => end of the game
       $this->announceWin($pId, false);
@@ -689,7 +694,11 @@ class santorini extends Table
       // 3 players => eliminate the player
       $players = $this->playerManager->getRemeaningPlayersIds();
       if (count($players) > 1) {
-        $this->gamestate->nextState("eliminate");
+        if(self::getActivePlayerId() == $pId){
+          $this->gamestate->nextState("eliminate");
+        } else {
+          $this->playerManager->eliminate($pId);
+        }
       } else {
         $this->announceWin($players[0]['id'], true);
       }
