@@ -304,7 +304,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.cancelLogs(n.args.moveIds);
     },
 
-    /* 
+    /*
      * cancelLogs:
      *   strikes all log messages related to the given array of move IDs
      */
@@ -1077,6 +1077,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
     },
+
+		usePowerScylla: function (args) {
+			this._action = 'playerMove';
+			this.makeWorkersSelectable(args.workers);
+		},
+
 
     /////////////////////////////////////////
     /////////////////////////////////////////

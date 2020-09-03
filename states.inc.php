@@ -248,6 +248,7 @@ $machinestates = [
       'skip'       => ST_BUILD,
       'cancel'     => ST_START_OF_TURN,
       'move'       => ST_MOVE,
+      'power' => ST_USE_POWER,
       'eliminate'  => ST_ELIMINATE_PLAYER,
     ],
   ],
