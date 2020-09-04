@@ -1088,6 +1088,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 			this.makeWorkersSelectable(args.workers);
 		},
 
+		usePowerProteus: function (args) {
+			this._action = 'playerMove';
+			this.makeWorkersSelectable(args.workers);
+		},
 
     /////////////////////////////////////////
     /////////////////////////////////////////

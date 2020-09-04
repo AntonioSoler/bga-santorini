@@ -16,7 +16,63 @@ class Proteus extends SantoriniPower
     $this->playerCount = [2, 3];
     $this->golden  = false;
     $this->orderAid = 30;
+
+    $this->implemented = true;
   }
 
   /* * */
+  public function setup()
+  {
+    $this->getPlayer()->addWorker('m');
+  }
+
+  public function stateAfterMove()
+  {
+    return count($this->game->board->getPlacedWorkers($this->playerId)) > 1? 'power' : null;
+  }
+
+
+  public function argUsePower(&$arg)
+  {
+    $arg['power'] = $this->id;
+    $arg['power_name'] = $this->name;
+    $arg['skippable'] = false;
+
+    $move = $this->game->log->getLastMove();
+    $workers = $this->game->board->getPlacedWorkers($this->playerId);
+    Utils::filterWorkersById($workers, $move['pieceId'], false);
+    foreach($workers as &$worker){
+      $worker['works'] = [$move['from']];
+    }
+    $arg['workers'] = $workers;
+  }
+
+
+  public function usePower($action)
+  {
+    // Extract info from action
+    $wId = $action[0];
+    $space = $action[1];
+    $worker = $this->game->board->getPiece($wId);
+
+    // Force worker
+    $this->game->board->setPieceAt($worker, $space);
+    $this->game->log->addForce($worker, $space);
+
+    // Notify
+    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces another worker to a space on ${level_name} (${coords})'), [
+      'i18n' => ['power_name', 'level_name'],
+      'piece' => $worker,
+      'space' => $space,
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'level_name' => $this->game->levelNames[intval($space['z'])],
+      'coords' => $this->game->board->getMsgCoords($worker, $space),
+    ]);
+  }
+
+  public function stateAfterUsePower()
+  {
+    return 'build';
+  }
 }
