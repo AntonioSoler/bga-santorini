@@ -610,9 +610,13 @@ class santorini extends Table
       'work' => $work,
     ];
 
-    // Basic rule: Win by moving up to level 3
+    // Basic rule: Win by moving up to level 3 one of MY workers
     if ($work != null && $work['action'] == 'move') {
-      $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
+      $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
+      Utils::filterWorkersById($workers, $work['pieceId']);
+      if(!empty($workers)){
+        $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
+      }
     }
 
     // Apply powers
