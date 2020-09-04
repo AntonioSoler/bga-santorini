@@ -179,7 +179,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
           power.title = _(power.title);
           power.text = '<p>' + power.text.map(function (text) {
             return _(text).replace(/\[/g, '<b>').replace(/\]/g, '</b>');
-          }).join('</p><p>') + '</p>';
+          }).join('</p>\n<p>') + '</p>';
           power.type = power.hero ? 'hero' : '';
           power.counter = power.counter || 0;
           power.playerCount = power.playerCount.join(', ');
@@ -196,6 +196,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       // Setup the board (3d scene using threejs)
       this.board = new Board($('scene-container'), URL);
       this.setupPreference();
+      this.setupWikiText();
 
       // Setup workers and buildings
       gamedatas.placedPieces.forEach(function (piece) {
@@ -283,6 +284,39 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         $('scene-container').scrollIntoView({ block: "end", inline: "start" });
         _this.board.updateSize();
         _this.board.resetCameraPosition();
+      });
+    },
+
+    setupWikiText: function () {
+      var query = dojo.query('.debug_section');
+      if (!isDebug || query.length == 0) {
+        return;
+      }
+
+      var _this = this;
+      var button = dojo.place('<div id="wikiTextButton" class="bgabutton bgabutton_blue">Generate wiki power list</div>', query[0]);
+      dojo.connect(button, 'onclick', function () {
+        var powers = Object.values(_this.gamedatas.powers).sort(function (power1, power2) {
+          return power1.sort - power2.sort;
+        });
+        var mapper = function (p) {
+          var revised = p.text.includes('<p><b>REVISED POWER</b></p>');
+          var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em">');
+          return '<b>' + p.name + '</b>, <i>' + p.title + '</i>'
+            + (revised ? ' &mdash; <span style="color:blue">(revised power)</span>' : '')
+            + '\n' + txt;
+        };
+        var joiner = '\n----\n';
+        var simpleGods = powers.filter(p => p.id <= 10);
+        var addGods = powers.filter(p => p.id > 10 && !p.hero);
+        var heroPowers = powers.filter(p => p.hero);
+        var txt = "\n<!--\n\n\n\n    Please do not modify anything below this point.\n    Content generated directly from the game code.\n\n\n\n-->\n"
+          + "== List of Simple Gods (" + simpleGods.length + ") ==\n" + simpleGods.map(mapper).join(joiner)
+          + "\n\n== List of Additional Gods (" + addGods.length + ") ==\n" + addGods.map(mapper).join(joiner)
+          + "\n\n== List of Hero Powers (" + heroPowers.length + ") ==\n" + heroPowers.map(mapper).join(joiner);
+        console.log(txt);
+        navigator.clipboard.writeText(txt);
+        _this.showMessage('Text copied to clipboard &mdash; <a href="https://en.doc.boardgamearena.com/index.php?title=Gamehelpsantor' + 'ini&action=edit" target="_blank">edit Gamehelpsantor' + 'ini</a>', 'info');
       });
     },
 
