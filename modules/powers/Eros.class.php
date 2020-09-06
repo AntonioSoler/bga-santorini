@@ -20,6 +20,7 @@ class Eros extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerPlaceWorker(&$arg)
   {
     // Only perimeter space
@@ -42,6 +43,10 @@ class Eros extends SantoriniPower
     });
   }
 
+  public function argTeammatePlaceWorker(&$arg)
+  {
+    $this->argPlayerPlaceWorker($arg);
+  }
 
   public function checkPlayerWinning(&$arg)
   {
