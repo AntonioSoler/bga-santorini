@@ -19,6 +19,7 @@ class Hydra extends SantoriniPower
   }
 
   /* * */
+
   public function stateAfterBuild()
   {
     return 'power';
@@ -26,8 +27,8 @@ class Hydra extends SantoriniPower
 
   public function isNeighbouring($worker, $myWorkers)
   {
-    foreach($myWorkers as $worker2){
-      if($this->game->board->isNeighbour($worker, $worker2)){
+    foreach ($myWorkers as $worker2) {
+      if ($this->game->board->isNeighbour($worker, $worker2)) {
         return true;
       }
     }
@@ -37,8 +38,8 @@ class Hydra extends SantoriniPower
   public function isIndependentSet()
   {
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
-    foreach($myWorkers as $worker){
-      if($this->isNeighbouring($worker, $myWorkers)){
+    foreach ($myWorkers as $worker) {
+      if ($this->isNeighbouring($worker, $myWorkers)) {
         return false;
       }
     }
@@ -51,43 +52,43 @@ class Hydra extends SantoriniPower
     $arg['power_name'] = $this->name;
     $arg['skippable'] = false;
 
-    if($this->isIndependentSet()){
+    if ($this->isIndependentSet()) {
       // Obtain a new worker
       $arg['type'] = 'add';
       $this->game->log->addAction('HydraPower', [], ['type' => 'add']);
-      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} obtain a new worker'), [
-        'i18n' => ['power_name'],
-        'power_name' => $this->getName(),
-        'player_name' => $this->game->getActivePlayerName(),
-      ]);
-
       $move = $this->game->log->getLastMove();
       $workers = $this->game->board->getPlacedWorkers($this->playerId);
       Utils::filterWorkersById($workers, $move['pieceId']);
       $worker = $workers[0];
 
       $spaces = $this->game->board->getNeighbouringSpaces($worker, "build");
-      $minHeight = array_reduce($spaces, function($carry, $space){ return min($carry, $space['z']); }, 4);
-      Utils::filter($spaces, function($space) use ($minHeight){ return $space['z'] == $minHeight; });
+      $minHeight = array_reduce($spaces, function ($carry, $space) {
+        return min($carry, $space['z']);
+      }, 4);
+      Utils::filter($spaces, function ($space) use ($minHeight) {
+        return $space['z'] == $minHeight;
+      });
       $worker['works'] = $spaces;
       $arg['workers'] = [$worker];
     } else {
       // Discard a worker
       $arg['type'] = 'remove';
       $this->game->log->addAction('HydraPower', [], ['type' => 'remove']);
-      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} must discard a worker'), [
-        'i18n' => ['power_name'],
-        'power_name' => $this->getName(),
-        'player_name' => $this->game->getActivePlayerName(),
-      ]);
-
-      $arg['workers'] = $this->game->board->getPlacedWorkers($this->playerId);
-      foreach($arg['workers'] as &$worker){
-        $worker['works'] = [SantoriniBoard::getCoords($worker)];
+      $empty = [
+        'id' => 0,
+        'playerId' => $this->playerId,
+        'works' => [],
+      ];
+      $workers = $this->game->board->getPlacedWorkers($this->playerId);
+      foreach ($workers as $worker) {
+        $coords =  SantoriniBoard::getCoords($worker, 0, true);
+        // Save the worker ID in the 'arg' field
+        $coords['arg'] = [$worker['id']];
+        $empty['works'][] = $coords;
       }
+      $arg['workers'] = [$empty];
     }
   }
-
 
   public function usePower($action)
   {
@@ -96,27 +97,15 @@ class Hydra extends SantoriniPower
     $space = $action[1];
 
     $action = $this->game->log->getLastAction("HydraPower");
-    if($action['type'] == "add"){
+    if ($action['type'] == "add") {
       $id = $this->getPlayer()->addWorker('m', 'hand');
       $extraWorker = $this->game->board->getPiece($id);
       $this->placeWorker($extraWorker, $space);
     } else {
-      $worker = $this->game->board->getPiece($wId);
-      self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$wId}");
-      $stats = [[$this->game->getActivePlayerId(), 'usePower']];
-      $this->game->log->addRemoval($worker, $stats);
-
-      // Notify
-      $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removed one of its worker (${coords})'), [
-        'i18n' => ['power_name'],
-        'piece' => $worker,
-        'power_name' => $this->name,
-        'player_name' => $this->game->getActivePlayerName(),
-        'coords' => $this->game->board->getMsgCoords($space),
-      ]);
+      $worker = $this->game->board->getPiece($space['arg']);
+      $this->removePiece($worker);
     }
   }
-
 
   public function stateAfterUsePower()
   {
