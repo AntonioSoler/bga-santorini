@@ -139,7 +139,7 @@ class PlayerManager extends APP_GameClass
   {
     foreach ($this->game->board->getPlacedWorkers($pId) as $worker) {
       self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
-      $this->game->notifyAllPlayers('pieceRemoved', '', ['piece' => $worker]);
+      $this->game->notifyAllPlayers('pieceRemovedInstant', '', ['piece' => $worker]);
     }
     $this->game->eliminatePlayer($pId);
   }

@@ -668,7 +668,7 @@ class santorini extends Table
   /*
    * announceLoose: this function is called when a player cannot move and build during their turn
    */
-  public function announceLose($msg = null, $args = null)
+  public function announceLose($msg = null, $args = null, $pId = null)
   {
     $msg = $msg ?: clienttranslate('${player_name} cannot move/build and is eliminated!');
     if (!is_array($args)) {
@@ -679,13 +679,9 @@ class santorini extends Table
 
     // Still call preEndOfTurn to calculate player statistics
     $this->powerManager->preEndOfTurn();
-    $pId = self::getActivePlayerId();
-    $this->makeLoose($pId);
-  }
 
-
-  public function makeLoose($pId)
-  {
+    // Announce win or elimination
+    $pId = $pId ?: self::getActivePlayerId();
     if ($this->playerManager->getPlayerCount() != 3) {
       // 1v1 or 2v2 => end of the game
       $this->announceWin($pId, false);
