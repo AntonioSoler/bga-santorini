@@ -462,7 +462,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   height: 418px;
   position: relative;
   background-repeat: no-repeat;
-  background-size: 215px;
+  background-size: 212px;
   background-position: center 30px;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
@@ -567,7 +567,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   cursor: pointer;
   width: 103px;
   height: 150px;
-  background-size: 125%;
+  background-size: 135%;
   background-position: 50% 20%;
   border-radius: 8px;
   margin: 10px;
@@ -827,11 +827,14 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-5 { background-image:url('img/cards/005.jpg'); }
 .power-6 { background-image:url('img/cards/006.jpg'); }
 .power-7 { background-image:url('img/cards/007.jpg'); }
+.power-7.power-card.small { background-position: 65% 45%; } /* Hermes */
 .power-8 { background-image:url('img/cards/008.jpg'); }
 .power-9 { background-image:url('img/cards/009.jpg'); }
+.power-9.power-card.small { background-position: 15% 30%; } /* Pan */
 .power-10 { background-image:url('img/cards/010.jpg'); }
 .power-11 { background-image:url('img/cards/011.jpg'); }
 .power-12 { background-image:url('img/cards/012.jpg'); }
+.power-12.power-card.small { background-size: 150%; background-position: 45% 0%; } /* Ares */
 .power-13 { background-image:url('img/cards/013.jpg'); }
 .power-14 { background-image:url('img/cards/014.jpg'); }
 .power-15 { background-image:url('img/cards/015.jpg'); }
@@ -856,6 +859,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-34 { background-image:url('img/cards/034.jpg'); }
 .power-35 { background-image:url('img/cards/035.jpg'); }
 .power-36 { background-image:url('img/cards/036.jpg'); }
+.power-36.power-card.small { background-size: 175% } /* Graeae */
 .power-37 { background-image:url('img/cards/037.jpg'); }
 .power-38 { background-image:url('img/cards/038.jpg'); }
 .power-39 { background-image:url('img/cards/039.jpg'); }
@@ -878,12 +882,14 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-56 { background-image:url('img/cards/056.jpg'); }
 .power-57 { background-image:url('img/cards/057.jpg'); }
 .power-58 { background-image:url('img/cards/058.jpg'); }
+.power-58.power-card.small { background-position: 0% 25%; } /* Castor & Pollux */
 .power-59 { background-image:url('img/cards/059.jpg'); }
 .power-60 { background-image:url('img/cards/060.jpg'); }
 .power-61 { background-image:url('img/cards/061.jpg'); }
 .power-62 { background-image:url('img/cards/062.jpg'); }
 .power-63 { background-image:url('img/cards/063.jpg'); }
 .power-64 { background-image:url('img/cards/064.jpg'); }
+.power-64.power-card.small { background-position: 95% 0%; background-size: 170%; } /* Hydra */
 .power-65 { background-image:url('img/cards/065.jpg'); }
 .power-66 { background-image:url('img/cards/066.jpg'); }
 .power-67 { background-image:url('img/cards/067.jpg'); }

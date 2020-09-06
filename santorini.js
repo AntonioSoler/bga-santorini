@@ -717,6 +717,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         dojo.query('.power-card.small.displayed').removeClass('displayed');
         dojo.addClass(powerDiv, 'displayed');
         dojo.place(this.createPowerDetail(powerId), 'grid-detail', 'only');
+        this.adaptStatusBar();
       } else if (!isWait && isActive) {
         // Otherwise, active player may select/unselect the power
         // Already selected => unselect it
