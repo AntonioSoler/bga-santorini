@@ -54,14 +54,14 @@ html {
   color: #fff;
   text-align: center;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 22px;
   padding: 30px;
 }
 
 #browser-error .ua {
   color: #ef9a9a;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 75%;
   margin: 6px;
 }
 
@@ -145,7 +145,9 @@ html {
 }
 
 #browser-error,
+#neutralized_game_panel,
 #table-decision,
+#zombieBack,
 #power-offer-container,
 #power-choose-container,
 #right-side,

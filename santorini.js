@@ -147,21 +147,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       // Check for supported browser
       if (!isBrowserSupported()) {
-        dojo.style('browser-error', 'display', 'block');
-        dojo.attr('browser-error', 'href', 'https://browsehappy.com/');
-        $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f644.png" alt="Face with Rolling Eyes">'
-          + '<div>' + _('Your outdated browser is not supported') + '</div>'
-          + '<div class="ua" title="User-Agent">' + navigator.userAgent + '</div>';
+        this.showFatalError('browser');
         return;
       }
 
       // Check for WebGL
       if (!isWebGLAvailable()) {
-        dojo.style('browser-error', 'display', 'block');
-        dojo.attr('browser-error', 'href', 'https://get.webgl.org/');
-        $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f914.png" alt="Thinking Face">'
-          + '<div>' + _('Your browser or graphics card does not support WebGL') + '</div>'
-          + '<div class="ua" title="User-Agent">' + navigator.userAgent + '</div>';
+        this.showFatalError('webgl');
         return;
       }
 
@@ -210,16 +202,23 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.setupNotifications();
     },
 
+    showFatalError: function (err) {
+      var href = err == 'webgl' ? 'https://get.webgl.org/' : 'https://browsehappy.com/';
+      var msg = err == 'webgl' ? _('Your browser or graphics card does not support WebGL') : _('Your outdated browser is not supported');
+      dojo.style('browser-error', 'display', 'block');
+      dojo.attr('browser-error', 'href', href);
+      $('browser-error').innerHTML = '<img src="https://noto-website-2.storage.googleapis.com/emoji/emoji_u1f627.png" alt="Anguished Face">'
+        + '<div>' + msg + '</div>'
+        + '<div class="ua" title="User-Agent">' + navigator.userAgent + '</div>'
+        + '<div id="errorAbandon" class="bgabutton bgabutton_blue" onclick="$(\'ingame_menu_abandon\').click();return false">' + _('Abandon the game (no penalty)') + '</div>';
+    },
+
     onLoadingComplete: function () {
       debug('Loading complete');
       // Handle previously cancelled moves
       this.cancelLogs(this.gamedatas.cancelMoveIds);
 
       if (!this.board) {
-        if (!this.isReadOnly()) {
-          // Automatically propose to abandon the game
-          $('ingame_menu_abandon').click();
-        }
         return;
       }
 
@@ -1112,20 +1111,20 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.makeWorkersSelectable(args.workers);
     },
 
-		usePowerScylla: function (args) {
-			this._action = 'playerMove';
-			this.makeWorkersSelectable(args.workers);
-		},
+    usePowerScylla: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
 
-		usePowerHydra: function (args) {
-			this._action = 'playerBuild';
-			this.makeWorkersSelectable(args.workers);
-		},
+    usePowerHydra: function (args) {
+      this._action = 'playerBuild';
+      this.makeWorkersSelectable(args.workers);
+    },
 
-		usePowerProteus: function (args) {
-			this._action = 'playerMove';
-			this.makeWorkersSelectable(args.workers);
-		},
+    usePowerProteus: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
 
     /////////////////////////////////////////
     /////////////////////////////////////////
