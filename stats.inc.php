@@ -84,6 +84,11 @@ $stats_type = [
 
     // Statistics existing for each player
     'player' => [
+        'restartTurn' => [
+            'id' => STAT_RESTART_TURN,
+            'name' => totranslate('Restart turn'),
+            'type' => 'int'
+        ],
         'playerPower' => [
             'id' => STAT_POWER,
             'name' => totranslate('Power'),

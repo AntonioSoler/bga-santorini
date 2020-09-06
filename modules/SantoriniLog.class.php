@@ -37,6 +37,7 @@ class SantoriniLog extends APP_GameClass
       $this->game->initStat('player', 'moveDown', 0, $pId);
       $this->game->initStat('player', 'buildBlock', 0, $pId);
       $this->game->initStat('player', 'buildDome', 0, $pId);
+      $this->game->initStat('player', 'restartTurn', 0, $pId);
     }
   }
 
@@ -442,6 +443,9 @@ class SantoriniLog extends APP_GameClass
     if (!empty($moveIds)) {
       self::DbQuery("UPDATE gamelog SET `cancel` = 1 WHERE `gamelog_move_id` IN (" . implode(',', $moveIds) . ")");
     }
+
+    // Count the number of restarts
+    $this->incrementStats([[$pId, 'restartTurn']]);
     return $moveIds;
   }
 

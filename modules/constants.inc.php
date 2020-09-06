@@ -151,6 +151,7 @@ define('STAT_MOVE_DOWN', 22);
 define('STAT_BUILD_BLOCK', 30);
 define('STAT_BUILD_DOME', 31);
 define('STAT_BUILD_TOWER', 32);
+define('STAT_RESTART_TURN', 40);
 
 /*
  * Variable constants
