@@ -19,11 +19,12 @@ class Eris extends SantoriniPower
   }
 
   /* * */
+
   public function getLastOpponentMoveWorkerId()
   {
-    $ids = "('" . implode("','", $this->game->playerManager->getOpponentsIds($this->playerId)) . "')";
-    $work = self::getObjectFromDb("SELECT l.* FROM log l LEFT OUTER JOIN piece p ON p.id = l.piece_id WHERE l.`action` = 'move' AND l.`player_id` IN ($ids) AND p.`player_id` IN ($ids) ORDER BY l.log_id DESC LIMIT 1");
-    return is_null($work)? null : $work['piece_id'];
+    $ids = implode(",", $this->game->playerManager->getOpponentsIds($this->playerId));
+    $pieceId = self::getUniqueValueFromDB("SELECT l.piece_id FROM log l JOIN piece p ON (p.id = l.piece_id AND p.player_id = l.player_id) WHERE l.action = 'move' AND l.player_id IN ($ids) ORDER BY l.log_id DESC LIMIT 1");
+    return $pieceId;
   }
 
   public function argPlayerMove(&$arg)
@@ -40,7 +41,7 @@ class Eris extends SantoriniPower
   {
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
     Utils::filterWorkersById($workers, $worker['id']);
-    if(empty($workers)){
+    if (empty($workers)) {
       $this->game->log->addAction("ErisAltTurn");
     }
   }
