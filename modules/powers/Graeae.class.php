@@ -25,6 +25,8 @@ class Graeae extends SantoriniPower
   public function setup()
   {
     $this->getPlayer()->addWorker('m');
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->log->addAction('stats', $stats);
   }
 
   public function argPlayerBuild(&$arg)
