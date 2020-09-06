@@ -41,7 +41,7 @@ class Circe extends SantoriniPower
         $myPowers = $this->getPlayer()->getPowers();
         if (count($myPowers) > 1) {
           // Return stolen powers
-          $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name}\'s workers are neighboring'), [
+          $this->game->notifyAllPlayers('message', $this->game->msg['powerNeighboring'], [
             'i18n' => ['power_name'],
             'power_name' => $this->getName(),
             'player_name' => $opponent->getName(),
@@ -61,7 +61,7 @@ class Circe extends SantoriniPower
     $opponentPowers = $opponent->getPowers();
     if (count($opponentPowers) > 0) {
       // Steal powers
-      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name}\'s workers are not neighboring'), [
+      $this->game->notifyAllPlayers('message', $this->game->msg['powerNotNeighboring'], [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),
         'player_name' => $opponent->getName(),

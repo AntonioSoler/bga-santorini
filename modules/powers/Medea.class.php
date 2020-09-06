@@ -69,8 +69,8 @@ class Medea extends SantoriniHeroPower
     $this->game->board->setPieceAt($worker, $space);
     $this->game->log->addForce($worker, $space);
 
-    // Notify (same text as Charon to help translators)
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name} (${coords})'), [
+    // Notify force
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerForce'], [
       'i18n' => ['power_name', 'level_name'],
       'piece' => $worker,
       'space' => $space,

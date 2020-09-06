@@ -1516,8 +1516,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       var _this = this;
       notifs.forEach(function (notif) {
         var functionname = "notif_" + notif[0];
-        dojo.subscribe(notif[0], _this, "notif_" + notif[0]);
+        dojo.subscribe(notif[0], _this, functionname);
         _this.notifqueue.setSynchronous(notif[0], notif[1]);
+
+        // xxxInstant notification runs same function without delay
+        dojo.subscribe(notif[0] + 'Instant', _this, functionname);
+        _this.notifqueue.setSynchronous(notif[0] + 'Instant', 10);
       });
     },
 

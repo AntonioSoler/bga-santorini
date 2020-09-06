@@ -29,8 +29,7 @@ class Bia extends SantoriniPower
       return $power == $pId;
     });
 
-    // Same text as chooseFirstPlayer()
-    $this->game->notifyAllPlayers('message', clienttranslate('${power_name} will start this game'), [
+    $this->game->notifyAllPlayers('message', $this->game->msg['firstPlayer'], [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),
     ]);

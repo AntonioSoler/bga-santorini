@@ -42,7 +42,7 @@ class Tyche extends SantoriniPower
       $this->game->powerManager->cards->shuffle('tycheDeck');
       $this->game->additionalTurn($this);
     } else {
-      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} may not take an additional turn'), [
+      $this->game->notifyAllPlayers('message', $this->game->msg['powerNoAdditionalTurn'], [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),
         'player_name' => $this->getPlayer()->getName(),

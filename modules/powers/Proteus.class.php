@@ -28,7 +28,7 @@ class Proteus extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return count($this->game->board->getPlacedWorkers($this->playerId)) > 1? 'power' : null;
+    return count($this->game->board->getPlacedWorkers($this->playerId)) > 1 ? 'power' : null;
   }
 
 
@@ -41,7 +41,7 @@ class Proteus extends SantoriniPower
     $move = $this->game->log->getLastMove();
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
     Utils::filterWorkersById($workers, $move['pieceId'], false);
-    foreach($workers as &$worker){
+    foreach ($workers as &$worker) {
       $worker['works'] = [$move['from']];
     }
     $arg['workers'] = $workers;
@@ -59,13 +59,14 @@ class Proteus extends SantoriniPower
     $this->game->board->setPieceAt($worker, $space);
     $this->game->log->addForce($worker, $space);
 
-    // Notify
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces another worker to a space on ${level_name} (${coords})'), [
+    // Notify force
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerForce'], [
       'i18n' => ['power_name', 'level_name'],
       'piece' => $worker,
       'space' => $space,
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
+      'player_name2' => $this->game->getActivePlayerName(),
       'level_name' => $this->game->levelNames[intval($space['z'])],
       'coords' => $this->game->board->getMsgCoords($worker, $space),
     ]);

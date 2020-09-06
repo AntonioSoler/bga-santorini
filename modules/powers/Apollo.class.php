@@ -39,31 +39,27 @@ class Apollo extends SantoriniPower
 
   public function playerMove($worker, $work)
   {
-    // If space is free, we can do a classic move -> return false
+    // If space is occupied, first do a force
     $worker2 = $this->game->board->getPiece($work);
-    if ($worker2 == null || $worker2['location'] != 'board') {
-      return false;
+    if ($worker2 != null && $worker2['location'] == 'board') {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->board->setPieceAt($worker2, $worker);
+      $this->game->log->addForce($worker2, $worker, $stats);
+
+      // Notify force
+      $this->game->notifyAllPlayers('workerMovedInstant', $this->game->msg['powerForce'], [
+        'i18n' => ['power_name', 'level_name'],
+        'piece' => $worker2,
+        'space' => $worker,
+        'power_name' => $this->getName(),
+        'player_name' => $this->game->getActivePlayerName(),
+        'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
+        'level_name' => $this->game->levelNames[intval($worker['z'])],
+        'coords' => $this->game->board->getMsgCoords($worker2, $worker),
+      ]);
     }
 
-    // Switch workers
-    $stats = [[$this->playerId, 'usePower']];
-    $this->game->board->setPieceAt($worker, $worker2);
-    $this->game->log->addMove($worker, $worker2);
-    $this->game->board->setPieceAt($worker2, $worker);
-    $this->game->log->addForce($worker2, $worker, $stats);
-
-    // Notify
-    $this->game->notifyAllPlayers('workerSwitched', clienttranslate('${power_name}: ${player_name} (${coords}) swaps positions with ${player_name2} (${coords2})'), [
-      'i18n' => ['power_name'],
-      'piece1' => $worker,
-      'piece2' => $worker2,
-      'power_name' => $this->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-      'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
-      'coords' => $this->game->board->getMsgCoords($worker),
-      'coords2' => $this->game->board->getMsgCoords($worker2),
-    ]);
-
-    return true;
+    // Always do a classic move
+    return false;
   }
 }

@@ -164,6 +164,10 @@ define('SW', 6);
 define('W', 7);
 define('NW', 8);
 
+define('BLUE', 0);
+define('WHITE', 1);
+define('PURPLE', 2);
+
 define('DIRECTIONS', [
   N  => ['x' => 1,  'y' => 0],
   NE => ['x' => 1,  'y' => 1],

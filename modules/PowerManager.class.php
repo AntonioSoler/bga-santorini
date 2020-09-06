@@ -591,14 +591,14 @@ class PowerManager extends APP_GameClass
     $msg = '';
     if ($action == 'powerAdded' && $reason != 'hero') {
       // No notification message when cancelling hero power discard
-      $msg = clienttranslate('${player_name} gains power ${power_name}');
+      $msg = $this->game->msg['powerGain'];
     } else if ($action == 'powerRemoved') {
-      $msg = clienttranslate('${player_name} discards power ${power_name}');
+      $msg = $this->game->msg['powerDiscard'];
     } else if ($action == 'powerMoved') {
       $oldPlayer = $power->getPlayer();
       $args['player_id2'] = $oldPlayer->getId();
       $args['player_name2'] = $oldPlayer->getName();
-      $msg = clienttranslate('${player_name} gains power ${power_name} from ${player_name2}');
+      $msg = $this->game->msg['powerGainFrom'];
     }
     $this->game->notifyAllPlayers($action, $msg, $args);
   }

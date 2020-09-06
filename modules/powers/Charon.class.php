@@ -69,8 +69,8 @@ class Charon extends SantoriniPower
     $this->game->board->setPieceAt($worker2, $newSpace);
     $this->game->log->addForce($worker2, $newSpace);
 
-    // Notify (same text as Minotaur to help translators)
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name} (${coords})'), [
+    // Notify force
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerForce'], [
       'i18n' => ['power_name', 'level_name'],
       'piece' => $worker2,
       'space' => $newSpace,

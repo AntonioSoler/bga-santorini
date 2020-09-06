@@ -64,8 +64,8 @@ class Scylla extends SantoriniPower
     $this->game->board->setPieceAt($oppWorker, $space);
     $this->game->log->addForce($oppWorker, $space);
 
-    // Notify (same text as Minotaur to help translators)
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} forces ${player_name2} to a space on ${level_name} (${coords})'), [
+    // Notify force
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerForce'], [
       'i18n' => ['power_name', 'level_name'],
       'piece' => $oppWorker,
       'space' => $space,

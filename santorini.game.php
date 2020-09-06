@@ -185,34 +185,34 @@ class santorini extends Table
 
     // Notify player colors/teams
     if ($nPlayers == 4) {
-      self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} share control of the ${color} workers'), [
+      self::notifyAllPlayers('message', $this->msg['colorTeam'], [
         'i18n' => ['color'],
         'player_name' => $players[0]->getName(),
         'player_name2' => $players[2]->getName(),
-        'color' => clienttranslate('blue'),
+        'color' => $this->colorNames[BLUE],
       ]);
-      self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} share control of the ${color} workers'), [
+      self::notifyAllPlayers('message', $this->msg['colorTeam'], [
         'i18n' => ['color'],
         'player_name' => $players[1]->getName(),
         'player_name2' => $players[3]->getName(),
-        'color' => clienttranslate('white'),
+        'color' => $this->colorNames[WHITE],
       ]);
     } else {
-      self::notifyAllPlayers('message', clienttranslate('${player_name} controls of the ${color} workers'), [
+      self::notifyAllPlayers('message', $this->msg['colorPlayer'], [
         'i18n' => ['color'],
         'player_name' => $players[0]->getName(),
-        'color' => clienttranslate('blue'),
+        'color' => $this->colorNames[BLUE],
       ]);
-      self::notifyAllPlayers('message', clienttranslate('${player_name} controls of the ${color} workers'), [
+      self::notifyAllPlayers('message', $this->msg['colorPlayer'], [
         'i18n' => ['color'],
         'player_name' => $players[1]->getName(),
-        'color' => clienttranslate('white'),
+        'color' => $this->colorNames[WHITE],
       ]);
       if ($nPlayers == 3) {
-        self::notifyAllPlayers('message', clienttranslate('${player_name} controls of the ${color} workers'), [
+        self::notifyAllPlayers('message', $this->msg['colorPlayer'], [
           'i18n' => ['color'],
           'player_name' => $players[2]->getName(),
-          'color' => clienttranslate('purple'),
+          'color' => $this->colorNames[PURPLE],
         ]);
       }
     }
@@ -295,12 +295,6 @@ class santorini extends Table
     }
 
     // Send notification message
-    $msg = clienttranslate('${player_name} offers powers ${power_name1} and ${power_name2} for selection');
-    if ($n == 3) {
-      $msg = clienttranslate('${player_name} offers powers ${power_name1}, ${power_name2}, and ${power_name3} for selection');
-    } else if ($n == 4) {
-      $msg = clienttranslate('${player_name} offers powers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection');
-    }
     $args = [
       'i18n' => [],
       'player_name' => self::getActivePlayerName()
@@ -312,7 +306,7 @@ class santorini extends Table
       $args[$argName] = $power->getName();
       $i++;
     }
-    self::notifyAllPlayers('buildOffer', $msg, $args);
+    self::notifyAllPlayers('buildOffer', $this->msg["offer$n"], $args);
 
     if ($this->powerManager->isGoldenFleece()) {
       $this->gamestate->nextState('goldenFleece');
@@ -362,7 +356,7 @@ class santorini extends Table
   public function chooseFirstPlayer($powerId)
   {
     $this->powerManager->setFirstPlayerOffer($powerId);
-    self::notifyAllPlayers('message', clienttranslate('${power_name} will start this game'), [
+    self::notifyAllPlayers('message', $this->msg['firstPlayer'], [
       'i18n' => ['power_name'],
       'power_name' => $this->powerManager->getPower($powerId)->getName(),
     ]);
@@ -511,7 +505,7 @@ class santorini extends Table
 
     // Notify
     $piece = $this->board->getPiece($workerId);
-    self::notifyAllPlayers('workerPlaced', clienttranslate('${player_name} places ${piece_name} (${coords})'), [
+    self::notifyAllPlayers('workerPlaced', $this->msg['placePiece'], [
       'i18n' => ['piece_name'],
       'piece' => $piece,
       'piece_name' => $this->pieceNames[$piece['type']],
@@ -614,7 +608,7 @@ class santorini extends Table
     if ($work != null && $work['action'] == 'move') {
       $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
       Utils::filterWorkersById($workers, $work['pieceId']);
-      if(!empty($workers)){
+      if (!empty($workers)) {
         $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
       }
     }
@@ -654,13 +648,13 @@ class santorini extends Table
     $players = $win ? $this->playerManager->getTeammates($playerId) : $this->playerManager->getOpponents($playerId);
     if (count($players) == 2) {
       // 4 players
-      self::notifyAllPlayers('message', clienttranslate('${player_name} and ${player_name2} win!'), [
+      self::notifyAllPlayers('message', $this->msg['winTeam'], [
         'player_name' => $players[0]->getName(),
         'player_name2' => $players[1]->getName(),
       ]);
     } else {
       // 2 or 3 players
-      self::notifyAllPlayers('message', clienttranslate('${player_name} wins!'), [
+      self::notifyAllPlayers('message', $this->msg['winPlayer'], [
         'player_name' => $players[0]->getName(),
       ]);
     }
@@ -699,7 +693,7 @@ class santorini extends Table
       // 3 players => eliminate the player
       $players = $this->playerManager->getRemeaningPlayersIds();
       if (count($players) > 1) {
-        if(self::getActivePlayerId() == $pId){
+        if (self::getActivePlayerId() == $pId) {
           $this->gamestate->nextState("eliminate");
         } else {
           $this->playerManager->eliminate($pId);
@@ -924,7 +918,7 @@ class santorini extends Table
    */
   public function resign()
   {
-    $this->announceLose(clienttranslate('${player_name} resigns'));
+    $this->announceLose($this->msg['resign']);
   }
 
 
@@ -959,7 +953,7 @@ class santorini extends Table
 
     // Undo the turn
     $moveIds = $this->log->cancelTurn();
-    self::notifyAllPlayers('cancel', clienttranslate('${player_name} restarts their turn'), [
+    self::notifyAllPlayers('cancel', $this->msg['restart'], [
       'placedPieces' => $this->board->getPlacedPieces(),
       'player_name' => self::getActivePlayerName(),
       'moveIds' => $moveIds,
@@ -1023,11 +1017,11 @@ class santorini extends Table
 
     // Notify
     if ($space['z'] > $worker['z']) {
-      $msg = clienttranslate('${player_name} moves up to ${level_name} (${coords})');
+      $msg = $this->msg['moveUp'];
     } else if ($space['z'] < $worker['z']) {
-      $msg = clienttranslate('${player_name} moves down to ${level_name} (${coords})');
+      $msg = $this->msg['moveDown'];
     } else {
-      $msg = clienttranslate('${player_name} moves on ${level_name} (${coords})');
+      $msg = $this->msg['moveOn'];
     }
     $pId = self::getActivePlayerId();
 
@@ -1046,7 +1040,7 @@ class santorini extends Table
    *  - obj $worker : the piece id we want to use to build
    *  - obj $space : the location and building type we want to build
    */
-  public function playerBuild($worker, $space)
+  public function playerBuild($worker, $space, $notify = 'blockBuilt')
   {
     // Build piece
     $pId = self::getActivePlayerId();
@@ -1056,7 +1050,7 @@ class santorini extends Table
 
     // Notify
     $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
-    self::notifyAllPlayers('blockBuilt', clienttranslate('${player_name} builds ${piece_name} on ${level_name} (${coords})'), [
+    self::notifyAllPlayers($notify, $this->msg['build'], [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
       'piece' => $piece,
@@ -1079,7 +1073,7 @@ class santorini extends Table
     $this->log->addRemoval($worker, $stats);
 
     // Notify
-    $this->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} kills ${player_name2} (${coords})'), [
+    $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], [
       'i18n' => ['power_name'],
       'piece' => $worker,
       'power_name' => $powerName,
@@ -1100,7 +1094,7 @@ class santorini extends Table
     $player = $power->getPlayer();
     $stats = [[$player->getId(), 'usePower']];
     $this->log->addAction('additionalTurn', $stats, ['power_id' => $power->getId(), 'n' => $n]);
-    $this->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} may take an additional turn'), [
+    $this->notifyAllPlayers('message', $this->msg['powerAdditionalTurn'], [
       'i18n' => ['power_name'],
       'power_name' => $power->getName(),
       'player_name' => $player->getName()
@@ -1208,20 +1202,20 @@ class santorini extends Table
   {
     $worker = ['id' => 0, 'x' => 0, 'y' => 0, 'z' => 0];
 
-    $this->playerBuild($worker, ['x' => 4, 'y' => 1, 'z' => 0, 'arg' => 0]);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 1, 'z' => 0, 'arg' => 0], 'blockBuiltInstant');
 
-    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 0, 'arg' => 0]);
-    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 1, 'arg' => 1]);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 0, 'arg' => 0], 'blockBuiltInstant');
+    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 1, 'arg' => 1], 'blockBuiltInstant');
 
-    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 0, 'arg' => 0]);
-    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 1, 'arg' => 1]);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 0, 'arg' => 0], 'blockBuiltInstant');
+    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 1, 'arg' => 1], 'blockBuiltInstant');
 
-    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 0, 'arg' => 0]);
-    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 1, 'arg' => 1]);
-    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 2, 'arg' => 2]);
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 0, 'arg' => 0], 'blockBuiltInstant');
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 1, 'arg' => 1], 'blockBuiltInstant');
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 2, 'arg' => 2], 'blockBuiltInstant');
 
-    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 0, 'arg' => 0]);
-    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 1, 'arg' => 1]);
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 0, 'arg' => 0], 'blockBuiltInstant');
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 1, 'arg' => 1], 'blockBuiltInstant');
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 2, 'arg' => 2]);
   }
 

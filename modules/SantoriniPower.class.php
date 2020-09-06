@@ -2,7 +2,6 @@
 
 abstract class SantoriniPower extends APP_GameClass
 {
-
   protected $game;
   protected $playerId;
 
@@ -130,7 +129,7 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addPlaceWorker($worker, $this->id);
 
     // Notify
-    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places ${piece_name} (${coords})'), [
+    $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], [
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $worker,
       'piece_name' => $this->game->pieceNames[$worker['type']],
@@ -151,7 +150,7 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addPlaceToken($token, $this->id, $stats);
 
     // Notify
-    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name} places ${piece_name} (${coords})'), [
+    $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], [
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
       'piece_name' => $this->game->pieceNames[$token['type']],
@@ -168,7 +167,7 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addForce($token, $space, $stats);
 
     // Notify
-    $this->game->notifyAllPlayers('workerMoved', clienttranslate('${power_name}: ${player_name} moves ${piece_name} (${coords})'), [
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerMovePiece'], [
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
       'piece_name' => $this->game->pieceNames[$token['type']],
@@ -185,7 +184,7 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addRemoval($piece);
 
     // Notify
-    $this->game->notifyAllPlayers('pieceRemoved', clienttranslate('${power_name}: ${player_name} removes ${piece_name} (${coords})'), [
+    $this->game->notifyAllPlayers('pieceRemoved', $this->game->msg['powerRemovePiece'], [
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $piece,
       'piece_name' => $this->game->pieceNames[$piece['type']],
