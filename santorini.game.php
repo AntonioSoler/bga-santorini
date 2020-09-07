@@ -1041,6 +1041,11 @@ class santorini extends Table
     // Build piece
     $pId = self::getActivePlayerId();
     $type = 'lvl' . $space['arg'];
+    if (!array_key_exists($type, $this->pieceNames)) {
+      // What can cause this? https://boardgamearena.com/bug?id=23675
+      throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
+    }
+    $pieceName = $this->pieceNames[$type];
     self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$space['x']}', '{$space['y']}', '{$space['z']}') ");
     $this->log->addBuild($worker, $space);
 
@@ -1050,7 +1055,7 @@ class santorini extends Table
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
       'piece' => $piece,
-      'piece_name' => $this->pieceNames[$type],
+      'piece_name' => $pieceName,
       'level_name' => $this->levelNames[intval($space['z'])],
       'coords' => $this->board->getMsgCoords($space),
     ]);
