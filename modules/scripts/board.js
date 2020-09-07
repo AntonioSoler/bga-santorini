@@ -474,21 +474,6 @@ Board.prototype.movePiece = function (piece, space, delay, animation) {
 	this.moveMesh(mesh, space, delay, animation);
 };
 
-/*
- * Switch two pieces
- * - mixed piece1
- * - mixed piece2
- */
-Board.prototype.switchPiece = function (piece1, piece2) {
-	// Update location on (abstract) board
-	var mesh1 = this._ids[piece1.id];
-	var mesh2 = this._ids[piece2.id];
-	mesh1.space = { x: piece2.x, y: piece2.y, z: piece2.z };
-	mesh2.space = { x: piece1.x, y: piece1.y, z: piece1.z };
-	this.moveMesh(mesh1, piece2);
-	this.moveMesh(mesh2, piece1);
-};
-
 
 /*
  * Remove a piece

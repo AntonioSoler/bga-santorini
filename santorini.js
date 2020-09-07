@@ -1348,15 +1348,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     /*
-     * notif_workerSwitched:
-     *   called whenever two workers are switched using Apollo
-     */
-    notif_workerSwitched: function (n) {
-      debug('Notif: worker switched', n.args);
-      this.board.switchPiece(n.args.piece1, n.args.piece2);
-    },
-
-    /*
      * notif_blockBuilt:
      *   called whenever a new block is built under a worker using Zeus
      */
@@ -1507,7 +1498,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         ['workerMoved', 1600],
         ['blockBuilt', 1000],
         ['ramPowerSet', 1000],
-        ['workerSwitched', 1600], 	// Happens with Apollo
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
         ['updatePowerUI', 10], // Happens with Morpheus, Chaos
