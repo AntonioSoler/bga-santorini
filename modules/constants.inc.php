@@ -119,6 +119,7 @@ define('HEROES', 3);
 define('GODS_AND_HEROES', 4);
 define('GOLDEN_FLEECE', 5);
 define('NONE', 6);
+define('PRESET', 7);
 
 define('OPTION_SETUP', 102);
 define('QUICK', 0);

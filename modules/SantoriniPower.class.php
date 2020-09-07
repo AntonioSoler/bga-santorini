@@ -92,7 +92,8 @@ abstract class SantoriniPower extends APP_GameClass
         || ($optionPowers == SIMPLE && $this->isSimple())
         || ($optionPowers == GODS && !$this->isHero())
         || ($optionPowers == HEROES && $this->isHero())
-        || ($optionPowers == GOLDEN_FLEECE && $this->isGoldenFleece()));
+        || ($optionPowers == GOLDEN_FLEECE && $this->isGoldenFleece())
+        || ($optionPowers == PRESET && Presets::isSupported($this->id)));
   }
 
   public function setPlayerId($newPlayerId)
