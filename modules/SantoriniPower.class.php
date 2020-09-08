@@ -2,6 +2,16 @@
 
 abstract class SantoriniPower extends APP_GameClass
 {
+  public static function compareByName($power1, $power2)
+  {
+    $name1 = strtolower($power1->name);
+    $name2 = strtolower($power2->name);
+    if ($name1 == $name2) {
+      return 0;
+    }
+    return ($name1 > $name2) ? +1 : -1;
+  }
+
   protected $game;
   protected $playerId;
 

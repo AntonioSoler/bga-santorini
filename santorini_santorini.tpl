@@ -9,11 +9,11 @@
 	</div>
 	<div id="power-offer-container">
 		<div id="grid-powers">
-			<div class="power-section">
+			<div id="section-offer" class="power-section">
 				<p id="title-offer"></p>
 				<div id="cards-offer" class="card-container"></div>
 			</div>
-			<div class="power-section">
+			<div id="section-deck" class="power-section">
 				<p id="title-deck"></p>
 				<div id="cards-deck" class="card-container"></div>
 			</div>

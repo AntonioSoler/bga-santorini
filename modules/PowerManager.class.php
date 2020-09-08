@@ -305,13 +305,14 @@ class PowerManager extends APP_GameClass
   }
 
   /*
-   * preparePowers: move supported power cards to the deck
+   * preparePowers: move supported power cards to the deck and transition to the next state
    */
   public function preparePowers()
   {
     $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
     if ($optionPowers == NONE) {
-      return 'placeWorker';
+      $this->game->gamestate->nextState('placeWorker');
+      return;
     }
 
     // Filter supported powers depending on the number of players and game option
@@ -351,17 +352,17 @@ class PowerManager extends APP_GameClass
 
     if ($optionSetup == QUICK && $optionPowers == GOLDEN_FLEECE) {
       // QUICK: Go to place worker
-      $this->prepareGoldenFleece($powerIds[0]);
-      return 'placeWorker';
+      $this->setSpecialPower('ram', $powerIds[0], true);
+      $this->game->gamestate->nextState('placeWorker');
     } else if ($optionSetup == QUICK) {
-      // QUICK: Skip building offer
+      // QUICK: Auto-confirm the offer
       $this->cards->moveCards($powerIds, 'offer');
-      return 'chooseFirstPlayer';
+      $this->game->confirmOffer(true);
     } else {
       // TOURNAMENT and CUSTOM: Build offer
       $this->cards->moveCards($powerIds, 'deck');
       $this->cards->shuffle('deck');
-      return 'offer';
+      $this->game->gamestate->nextState('offer');
     }
   }
 
@@ -443,6 +444,10 @@ class PowerManager extends APP_GameClass
   public function setFirstPlayerOffer($powerId)
   {
     $this->cards->moveCard($powerId, 'offer', '1');
+    $this->game->notifyAllPlayers('message', $this->game->msg['firstPlayer'], [
+      'i18n' => ['power_name'],
+      'power_name' => $this->getPower($powerId)->getName(),
+    ]);
   }
 
 
@@ -462,57 +467,106 @@ class PowerManager extends APP_GameClass
   ///////////////////////////////////////
   ///////////////////////////////////////
 
+  public function getSpecialPowerId($location)
+  {
+    $powerId = $this->getPowerIdsInLocation($location);
+    return empty($powerId) ? null : $powerId[0];
+  }
+
+  public function getSpecialPower($location, $playerId = null)
+  {
+    $powerId = $this->getSpecialPowerId($location);
+    return $powerId == null ? null : $this->getPower($powerId, $playerId);
+  }
+
+  public function setSpecialPower($location, $powerId, $autoConfirm = false)
+  {
+    $this->cards->moveCard($powerId, $location);
+    $power = $this->getPower($powerId);
+    $this->game->notifyAllPlayers('specialPowerSet', $this->game->msg['specialPower'], [
+      'i18n' => ['power_name', 'special_name'],
+      'player_name' => $autoConfirm ? 'Board Game Arena' : $this->game->getActivePlayerName(),
+      'power_name' => $power->getName(),
+      'powerId' => $powerId,
+      'location' => $location,
+      'special_name' => $this->game->specialNames[$location],
+    ]);
+
+    if ($location == 'ram') {
+      // Extra reminder about Golden Fleece
+      $this->game->notifyAllPlayers('message', clienttranslate('Golden Fleece: Neighbor the Ram figure at the start of any turn to have the power of ${power_name}, ${power_title}'), [
+        'i18n' => ['power_name', 'power_title'],
+        'power_name' => $power->getName(),
+        'power_title' => $power->getTitle(),
+      ]);
+    } else if ($location == 'nyxNight') {
+      // Return all 'nyxDeck' back to 'deck', needed for Chaos
+      $this->cards->moveAllCardsInLocation('nyxDeck', 'deck');
+    }
+  }
+
   public function isGoldenFleece()
   {
     return intval($this->game->getGameStateValue('optionPowers')) == GOLDEN_FLEECE;
   }
 
-  public function prepareGoldenFleece($powerId)
-  {
-    $power = $this->getPower($powerId);
-    $this->game->notifyAllPlayers('ramPowerSet', clienttranslate('Golden Fleece: Neighbor the Ram figure at the start of any turn to have the power of ${power_name}, ${power_title}'), [
-      'i18n' => ['power_name', 'power_title'],
-      'power_name' => $power->getName(),
-      'power_title' => $power->getTitle(),
-      'powerId' => $power->getId(),
-    ]);
-    $this->cards->moveCard($powerId, 'ramCard');
-    self::DbQuery("INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ('$powerId', 0, 'ram', 0), ('$powerId', 0, 'ram', 0)");
-  }
-
-  public function getGoldenFleecePowerId()
-  {
-    $ramCard = $this->cards->getCardsInLocation('ramCard');
-    return empty($ramCard) ? null : array_values($ramCard)[0]['type'];
-  }
-
-  public function getGoldenFleecePower()
-  {
-    $powerId = $this->getGoldenFleecePowerId();
-    return $this->game->powerManager->getPower($powerId);
-  }
-
   public function checkGoldenFleece()
   {
     $ram = $this->game->board->getRam();
-    $power = $this->getGoldenFleecePower();
     foreach ($this->game->playerManager->getPlayers() as $player) {
       $playerId = $player->getId();
+      $power = $this->getSpecialPower('ram', $playerId);
       $workers = $this->game->board->getPlacedWorkers($playerId);
       Utils::filterWorkers($workers, function ($worker) use ($ram) {
         return $this->game->board->isNeighbour($worker, $ram, '');
       });
 
-      $playerGoldenFleeceCards = array_values($this->cards->getCardsOfTypeInLocation($power->getId(), null, 'hand', $playerId));
-
-      // Neighbouring ram => gain power
-      if (count($workers) > 0 && count($playerGoldenFleeceCards) == 0) {
-        $this->cards->pickCard('ram', $playerId);
-        $this->notifyPower($player, $power, 'powerAdded', 'ram');
-      } else if (count($workers) == 0 && count($playerGoldenFleeceCards) > 0) {
-        $this->cards->moveCard($playerGoldenFleeceCards[0]['id'], 'ram');
-        $this->notifyPower($player, $power, 'powerRemoved', 'ram');
+      $hasPower = $this->hasPower($power->getId(), $playerId);
+      if (!$hasPower && count($workers) > 0) {
+        $this->addPower($power, 'ram');
+      } else if ($hasPower && count($workers) == 0) {
+        $this->removePower($power, 'ram');
       }
+    }
+  }
+
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  /////////  Nyx's Night Power  /////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+
+  /*
+   * prepareNyxNightPowers: move night powers to 'nyxDeck' and transition to the next state
+   */
+  public function prepareNyxNightPowers()
+  {
+    $offer = $this->getPowerIdsInLocation('offer');
+    $powers = array_filter($this->getPowers(), function ($power) use ($offer) {
+      return !in_array($power->getId(), $offer) && !in_array($power->getId(), $this->computeBannedIds($offer)) && $power->isSupported(2, GOLDEN_FLEECE);
+    });
+    $powerIds = array_values(array_map(function ($power) {
+      return $power->getId();
+    }, $powers));
+
+    $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
+    if (($optionSetup == QUICK || $optionSetup == TOURNAMENT)) {
+      $count = $optionSetup == QUICK ? 1 : 6;
+      if (count($powerIds) < $count) {
+        throw new BgaVisibleSystemException("prepareNyxNightPowers: Not enough powers available (expected: $count, actual: " . count($powerIds) . ")");
+      }
+      shuffle($powerIds);
+      array_splice($powerIds, $count);
+    }
+
+    if ($optionSetup == QUICK) {
+      // QUICK: Auto-confirm Nyx's Night Power
+      $this->setSpecialPower('nyxNight', $powerIds[0], true);
+      $this->game->gamestate->nextState('chooseFirstPlayer');
+    } else {
+      // TOURNAMENT and CUSTOM: Build offer
+      $this->cards->moveCards($powerIds, 'nyxDeck');
+      $this->game->gamestate->nextState('nyx');
     }
   }
 
@@ -520,7 +574,7 @@ class PowerManager extends APP_GameClass
   {
     $player = $power->getPlayer();
     if ($player == null) {
-      throw new BgaVisibleSystemException("addPower: Missing player (powerId: {$power->getId()})");
+      throw new BgaVisibleSystemException("addPower: Missing player (powerId: {$power->getId()}, reason: $reason)");
     }
     if ($reason == 'setup') {
       // Check the card for first player indicator
@@ -533,14 +587,18 @@ class PowerManager extends APP_GameClass
         $this->game->setStat($power->getId(), 'playerPower', $player->getId());
       }
     }
-    if ($reason == 'setup' || $reason == 'hero') {
+    if ($reason == 'setup' || $reason == 'hero' || $reason == 'nyx') {
       // Draw the card
       $this->cards->moveCard($power->getId(), 'hand', $player->getId());
+    } else if ($reason == 'ram' || $reason == 'nyxNight') {
+      // Duplicate this card into the player's hand
+      self::DbQuery("INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ('{$power->getId()}', 0, 'hand', {$player->getId()})");
     }
     $this->notifyPower($player, $power, 'powerAdded', $reason);
     $player->addPlayerPower($power);
-    if ($reason != 'hero') {
+    if ($reason != 'hero' && $reason != 'ram' && $reason != 'nyxNight' && $reason != 'nyx') {
       // No setup when cancelling hero power discard
+      // No setup for Golden Fleece or Nyx
       $power->setup();
     }
   }
@@ -549,10 +607,21 @@ class PowerManager extends APP_GameClass
   {
     $player = $power->getPlayer();
     if ($player == null) {
-      throw new BgaVisibleSystemException("removePower: Missing player (powerId: {$power->getId()})");
+      throw new BgaVisibleSystemException("removePower: Missing player (powerId: {$power->getId()}, reason: $reason)");
     }
-    $moveTo = $reason == 'chaos' ? 'discard' : 'box';
-    $this->cards->moveCard($power->getId(), $moveTo);
+    if ($reason == 'ram' || $reason == 'nyxNight') {
+      // Destroy the duplicate card
+      self::DbQuery("DELETE FROM card WHERE card_type = '{$power->getId()}' AND card_location = 'hand' AND card_location_arg = {$player->getId()}");
+    } else {
+      // Move the card to the discard location
+      $moveTo = 'box';
+      if ($reason == 'chaos') {
+        $moveTo = 'discard';
+      } else if ($reason == 'nyx') {
+        $moveTo = 'nyx';
+      }
+      $this->cards->moveCard($power->getId(), $moveTo);
+    }
     $this->notifyPower($player, $power, 'powerRemoved', $reason);
     $player->removePlayerPower($power);
   }
@@ -561,11 +630,11 @@ class PowerManager extends APP_GameClass
   public function movePower($power, $newPlayer, $reason = null)
   {
     if ($newPlayer == null) {
-      throw new BgaVisibleSystemException("movePower: Missing new player (powerId: {$power->getId()})");
+      throw new BgaVisibleSystemException("movePower: Missing new player (powerId: {$power->getId()}, reason: $reason)");
     }
     $oldPlayer = $power->getPlayer();
     if ($oldPlayer == null) {
-      throw new BgaVisibleSystemException("movePower: Missing old player (powerId: {$power->getId()})");
+      throw new BgaVisibleSystemException("movePower: Missing old player (powerId: {$power->getId()}, reason: $reason)");
     }
     $this->cards->moveCard($power->getId(), 'hand', $newPlayer->getId());
     $this->notifyPower($newPlayer, $power, 'powerMoved', $reason);
@@ -599,6 +668,9 @@ class PowerManager extends APP_GameClass
       $args['player_id2'] = $oldPlayer->getId();
       $args['player_name2'] = $oldPlayer->getName();
       $msg = $this->game->msg['powerGainFrom'];
+    }
+    if ($reason == 'nyx' || ($reason == 'chaos' && $action == 'powerRemoved')) {
+      $action = "{$action}Instant";
     }
     $this->game->notifyAllPlayers($action, $msg, $args);
   }

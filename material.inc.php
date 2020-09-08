@@ -38,6 +38,7 @@ $this->msg = [
   'offer3' => clienttranslate('${player_name} offers powers ${power_name1}, ${power_name2}, and ${power_name3} for selection'),
   'offer4' => clienttranslate('${player_name} offers powers ${power_name1}, ${power_name2}, ${power_name3}, and ${power_name4} for selection'),
   'firstPlayer' => clienttranslate('${power_name} will start this game'),
+  'specialPower' => clienttranslate('${player_name} chooses ${power_name} as ${special_name}'),
   'colorPlayer' => clienttranslate('${player_name} controls of the ${color} workers'),
   'colorTeam' => clienttranslate('${player_name} and ${player_name2} share control of the ${color} workers'),
   'placePiece' => clienttranslate('${player_name} places ${piece_name} (${coords})'),
@@ -62,6 +63,13 @@ $this->msg = [
   'powerNoAdditionalTurn' => clienttranslate('${power_name}: ${player_name} may not take an additional turn'),
   'powerNeighboring' => clienttranslate('${power_name}: ${player_name}\'s workers are neighboring'),
   'powerNotNeighboring' => clienttranslate('${power_name}: ${player_name}\'s workers are not neighboring'),
+  'powerCompleteTowers' => clienttranslate('${power_name}: ${count} Complete Towers are on the board'),
+  'powerDomeBuilt' => clienttranslate('${power_name}: At least one dome was built this turn'),
+];
+
+$this->specialNames = [
+  'ram' => clienttranslate('Golden Fleece power'),
+  'nyxNight' => clienttranslate("Nyx's Night Power"),
 ];
 
 $this->colorNames = [

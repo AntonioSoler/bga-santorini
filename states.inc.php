@@ -89,8 +89,22 @@ $machinestates = [
     'possibleactions' => ['addOffer', 'removeOffer', 'confirmOffer'],
     'transitions' => [
       'zombiePass' => ST_GAME_END,
-      'done' => ST_CHOOSE_FIRST_PLAYER,
+      'chooseFirstPlayer' => ST_CHOOSE_FIRST_PLAYER,
       'goldenFleece' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+      'nyx' => ST_CHOOSE_NYX_POWER,
+    ],
+  ],
+
+  ST_CHOOSE_NYX_POWER => [
+    'name' => 'chooseNyxNightPower',
+    'description' => clienttranslate('${actplayer} must choose ${special_name}'),
+    'descriptionmyturn' => clienttranslate('${you} must choose ${special_name}'),
+    'type' => 'activeplayer',
+    'args' => 'argChooseNyxNightPower',
+    'possibleactions' => ['chooseNyxNightPower'],
+    'transitions' => [
+      'zombiePass' => ST_GAME_END,
+      'chooseFirstPlayer' => ST_CHOOSE_FIRST_PLAYER,
     ],
   ],
 

@@ -145,7 +145,8 @@ class santorini extends Table
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
       'placedPieces' => $this->board->getPlacedPieces(),
       'powers' => $this->powerManager->getUiData(),
-      'goldenFleece' => $this->powerManager->getGoldenFleecePowerId(),
+      'goldenFleece' => $this->powerManager->getSpecialPowerId('ram'),
+      'nyxNightPower' => $this->powerManager->getSpecialPowerId('nyxNight'),
       'cancelMoveIds' => $this->log->getCancelMoveIds(),
     ];
   }
@@ -231,8 +232,8 @@ class santorini extends Table
     }
 
     // Prepare a deck with all possible powers for this game (if needed)
-    $nextState = $this->powerManager->preparePowers();
-    $this->gamestate->nextState($nextState);
+    // State transition will be handled within
+    $this->powerManager->preparePowers();
   }
 
 
@@ -285,7 +286,7 @@ class santorini extends Table
    * confirmOffer:
    *   during fair division setup, when contestant confirms the offer is complete
    */
-  public function confirmOffer()
+  public function confirmOffer($autoConfirm = false)
   {
     $n = $this->argBuildOffer()['count'];
     $powers = $this->powerManager->getPowersInLocation('offer');
@@ -293,28 +294,49 @@ class santorini extends Table
       $msg = sprintf(self::_("You must offer exactly %d powers"), $n);
       throw new BgaUserException($msg);
     }
+    usort($powers, ['SantoriniPower', 'compareByName']);
 
     // Send notification message
     $args = [
       'i18n' => [],
-      'player_name' => self::getActivePlayerName()
+      'player_name' => $autoConfirm ? 'Board Game Arena' : self::getActivePlayerName(),
     ];
     $i = 1;
+    $nyx = false;
     foreach ($powers as $power) {
       $argName = "power_name$i";
       $args['i18n'][] = $argName;
       $args[$argName] = $power->getName();
+      if ($power->getId() == NYX) {
+        $nyx = true;
+      }
       $i++;
     }
     self::notifyAllPlayers('buildOffer', $this->msg["offer$n"], $args);
 
     if ($this->powerManager->isGoldenFleece()) {
       $this->gamestate->nextState('goldenFleece');
+    } else if ($nyx) {
+      $this->powerManager->prepareNyxNightPowers();
     } else {
-      $this->gamestate->nextState('done');
+      $this->gamestate->nextState('chooseFirstPlayer');
     }
   }
 
+  public function argChooseNyxNightPower()
+  {
+    return [
+      'i18n' => ['power_name', 'special_name'],
+      'special_name' => $this->specialNames['nyxNight'],
+      'nyxDeck' => $this->powerManager->getPowerIdsInLocation('nyxDeck'),
+    ];
+  }
+
+  public function chooseNyxNightPower($powerId)
+  {
+    $this->powerManager->setSpecialPower('nyxNight', $powerId);
+    $this->gamestate->nextState('chooseFirstPlayer');
+  }
 
   /*
    * argChooseFirstPlayer: is called in the fair division setup, when the contestant choose who will start
@@ -356,10 +378,6 @@ class santorini extends Table
   public function chooseFirstPlayer($powerId)
   {
     $this->powerManager->setFirstPlayerOffer($powerId);
-    self::notifyAllPlayers('message', $this->msg['firstPlayer'], [
-      'i18n' => ['power_name'],
-      'power_name' => $this->powerManager->getPower($powerId)->getName(),
-    ]);
     $this->gamestate->nextState('done');
   }
 
@@ -399,7 +417,7 @@ class santorini extends Table
   public function choosePower($powerId)
   {
     if ($this->powerManager->isGoldenFleece()) {
-      $this->powerManager->prepareGoldenFleece($powerId);
+      $this->powerManager->setSpecialPower('ram', $powerId);
     } else {
       $player = $this->playerManager->getPlayer();
       $power = $this->powerManager->getPower($powerId, $player->getId());

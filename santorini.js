@@ -75,7 +75,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     // [Undocumented] Called by BGA framework on scroll
     // Handle "position: fixed" for power detail
     this.inherited(override_adaptStatusBar, arguments);
-    if (this.gamedatas.gamestate.name == 'buildOffer') {
+    if (this.gamedatas.gamestate.name == 'buildOffer' || this.gamedatas.gamestate.name == 'chooseNyxNightPower') {
       var nodes = dojo.query('#grid-detail .power-detail');
       if (nodes.length > 0) {
         var style = { position: '', top: '' };
@@ -196,8 +196,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       });
       if (gamedatas.goldenFleece) {
         this.addGoldenFleece(gamedatas.goldenFleece);
+      } else if (gamedatas.nyxNightPower) {
+        this.addNyxNightPower(gamedatas.nyxNightPower);
       }
-
       // Setup game notifications
       this.setupNotifications();
     },
@@ -301,9 +302,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         var mapper = function (p) {
           var revised = p.text.includes('<p><b>REVISED POWER</b></p>');
           var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em">');
-          return '<b>' + p.name + '</b>, <i>' + p.title + '</i>'
-            + (revised ? ' &mdash; <span style="color:blue">(revised power)</span>' : '')
-            + '\n' + txt;
+          return '<p><b>' + p.name + '</b>, <i>' + p.title + '</i>'
+            + (revised ? ' &mdash; <span style="color:blue">(revised power)</span>' : '') + '<br>\n'
+            + 'Players: ' + p.playerCount.join(', ')
+            + ' &mdash; Golden Fleece: ' + (p.golden ? 'Yes' : 'No')
+            + '</p>\n' + txt;
         };
         var joiner = '\n----\n';
         var simpleGods = powers.filter(p => p.id <= 10);
@@ -379,9 +382,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         circeQuery = dojo.query('.mini-card.power-' + powerId);
       }
       // Create mini card
-      var power = this.getPower(powerId);
-      var powerDetail = this.createPowerDetail(powerId);
-      var card = this.createMiniCard(playerId, powerId);
+      var night = (reason == 'nyxNight' || (reason == 'init' && powerId == this.gamedatas.nyxNightPower)) ? 'night' : '';
+      var powerDetail = this.createPowerDetail(powerId, night);
+      var card = this.createMiniCard(playerId, powerId, night);
       card.id = "mini-card-" + playerId + "-" + powerId;
       this.addTooltipHtml(card.id, powerDetail);
 
@@ -413,10 +416,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       if (dummy == null) {
         // Create a dummy mini card for the animation
-        var dummy = this.createMiniCard(playerId, powerId);
+        var dummy = this.createMiniCard(playerId, powerId, night);
         dummy.id = 'miniCard-dummy';
         dojo.style(dummy, 'position', 'absolute');
-        var animationTarget = (reason == 'ram' ? 'power-ram' : 'topbar');
+        var animationTarget = 'topbar';
+        if (reason == 'ram' || reason == 'nyxNight') {
+          animationTarget = 'power-' + reason;
+        }
         this.placeOnObject(dummy, animationTarget);
       }
 
@@ -430,7 +436,10 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
     removePower: function (playerId, powerId, reason) {
       var card = $("mini-card-" + playerId + "-" + powerId);
-      var animationTarget = (reason == 'ram' ? 'power-ram' : 'topbar');
+      var animationTarget = 'topbar';
+      if (reason == 'ram' || reason == 'nyxNight') {
+        animationTarget = 'power-' + reason;
+      }
       this.slideToObjectAndDestroy(card, animationTarget);
     },
 
@@ -515,9 +524,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onLeavingState: function (stateName) {
       debug('Leaving state: ' + stateName);
       if (!this.board) { return; }
-      if (stateName == 'buildOffer') {
-        dojo.empty('power-offer-container');
-      }
       this.clearPossible();
     },
 
@@ -654,35 +660,46 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      * buildOfferActionButtons: show confirm button if the count is correct
      */
     buildOfferActionButtons: function () {
-      var count = this.gamedatas.gamestate.args.offer.length + this.gamedatas.gamestate.args.deck.length;
-      var countOffer = dojo.query('#cards-offer .power-card').length;
-      var countDeck = count - countOffer;
-      $('title-offer').textContent = dojo.string.substitute(_('Powers On Offer (${count}):'), { count: countOffer });
-      $('title-deck').textContent = dojo.string.substitute(_('Powers Available (${count}):'), { count: countDeck });
+      var _this = this;
+      if (this.gamedatas.gamestate.name == 'buildOffer') {
+        var count = this.gamedatas.gamestate.args.offer.length + this.gamedatas.gamestate.args.deck.length;
+        var countOffer = dojo.query('#cards-offer .power-card').length;
+        var countDeck = count - countOffer;
+        $('title-offer').textContent = dojo.string.substitute(_('Powers On Offer (${count}):'), { count: countOffer });
+        $('title-deck').textContent = dojo.string.substitute(_('Powers Available (${count}):'), { count: countDeck });
+      }
 
       if (!this.isCurrentPlayerActive()) {
         return;
       }
       this.removeActionButtons();
 
-      if (this._displayedPower) {
-        var powerDiv = $('power-small-' + this._displayedPower),
-          isBanned = dojo.hasClass(powerDiv, 'banned'),
-          isSelected = dojo.hasClass(powerDiv, 'selected'),
-          power = this.getPower(this._displayedPower);
-
-        if (isSelected) {
-          var buttonText = dojo.string.substitute(_('Remove ${name}'), power);
-          this.addActionButton('buttonRemoveFromOffer', buttonText, this.removeOffer.bind(this), null, false, 'red');
-        } else if (!isBanned) {
-          var buttonText = dojo.string.substitute(_('Add ${name}'), power);
-          this.addActionButton('buttonAddToOffer', buttonText, this.addOffer.bind(this), null, false, 'blue');
+      if (this.gamedatas.gamestate.name == 'buildOffer') {
+        if (this._displayedPower) {
+          var powerDiv = $('power-small-' + this._displayedPower),
+            isBanned = dojo.hasClass(powerDiv, 'banned'),
+            isSelected = dojo.hasClass(powerDiv, 'selected'),
+            power = this.getPower(this._displayedPower);
+          if (isSelected) {
+            var buttonText = dojo.string.substitute(_('Remove ${name}'), power);
+            this.addActionButton('buttonRemoveFromOffer', buttonText, this.removeOffer.bind(this), null, false, 'red');
+          } else if (!isBanned) {
+            var buttonText = dojo.string.substitute(_('Add ${name}'), power);
+            this.addActionButton('buttonAddToOffer', buttonText, this.addOffer.bind(this), null, false, 'blue');
+          }
         }
-      }
+        // Enough powers : confirm button
+        if (this._nMissingPowers == 0) {
+          this.addActionButton('buttonConfirmOffer', _('Confirm'), 'onClickConfirmOffer', null, false, 'blue');
+        }
 
-      // Enough powers : confirm button
-      if (this._nMissingPowers == 0) {
-        this.addActionButton('buttonConfirmOffer', _('Confirm'), 'onClickConfirmOffer', null, false, 'blue');
+      } else if (this.gamedatas.gamestate.name == 'chooseNyxNightPower') {
+        if (this._displayedPower) {
+          var power = this.getPower(this._displayedPower);
+          this.addActionButton('buttonChooseNyxNightPower', _(power.name), function () {
+            _this.takeAction('chooseNyxNightPower', { powerId: this._displayedPower });
+          }, null, false, 'blue');
+        }
       }
     },
 
@@ -712,7 +729,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       // Everyone may view details on first click
       this._displayedPower = powerId;
 
-      if (!isDisplayed) {
+      if (this.gamedatas.gamestate.name == 'chooseNyxNightPower' || !isDisplayed) {
         // Mark only this card as displayed
         dojo.query('.power-card.small.displayed').removeClass('displayed');
         dojo.addClass(powerDiv, 'displayed');
@@ -841,6 +858,47 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
 
+    ///////////////////////////
+    //// Nyx's Night Power ////
+    ///////////////////////////
+
+    onEnteringStateChooseNyxNightPower: function (args) {
+      var _this = this;
+      this._displayedPower = null;
+      dojo.empty('grid-detail');
+      dojo.destroy('section-offer');
+      dojo.empty('cards-deck');
+      $('title-deck').textContent = dojo.string.substitute(_('Powers Available (${count}):'), { count: args.nyxDeck.length });
+      args.nyxDeck.sort(this.comparePowerIdsByName);
+      args.nyxDeck.forEach(function (powerId) {
+        var div = dojo.place(_this.createPowerSmall(powerId, 'night'), 'cards-deck');
+        dojo.connect(div, 'onclick', function (e) {
+          return _this.onClickPowerSmall(powerId);
+        });
+      });
+      this.buildOfferActionButtons();
+    },
+
+    addNyxNightPower: function (powerId) {
+      this.gamedatas.nyxNightPower = powerId;
+      var div = dojo.place(this.createPowerSmall(powerId, 'night'), 'play-area');
+      div.id = 'power-nyxNight';
+      if (this._focusedContainer != 'scene-container') {
+        dojo.addClass(div, 'hide');
+      }
+      var powerDetail = this.createPowerDetail(powerId, 'night');
+      this.addTooltipHtml(div.id, powerDetail);
+
+      var powerDialog = new ebg.popindialog();
+      powerDialog.create('powerDialogNyx');
+      // match material.inc.php specialNames
+      powerDialog.setTitle(_("Nyx's Night Power"));
+      powerDialog.setContent(powerDetail);
+      powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
+      dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+    },
+
+
     /////////////////////////////
     //// Choose First Player ////
     /////////////////////////////
@@ -851,6 +909,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       args.powers.forEach(function (powerId) {
         var power = _this.getPower(powerId);
         var div = dojo.place(_this.createPowerDetail(powerId), 'power-choose-container');
+        if (power.id == 66) { // Nyx: Also display the night power
+          dojo.place(_this.createPowerDetail(_this.gamedatas.nyxNightPower, 'night'), div);
+        }
         div.id = "power-choose-" + power.id;
 
         if (_this.isCurrentPlayerActive()) {
@@ -893,6 +954,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         .forEach(function (powerCard) {
           var power = _this.getPower(powerCard.id);
           var div = dojo.place(_this.createPowerDetail(powerCard.id), 'power-choose-container');
+          if (power.id == 66) { // Nyx: Also display the night power
+            dojo.place(_this.createPowerDetail(_this.gamedatas.nyxNightPower, 'night'), div);
+          }
           if (powerCard.location_arg == 1) {
             var mark = document.createElement("div");
             mark.className = 'power-counter infinite';
@@ -977,6 +1041,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     ////////////////////////////////////
 
     addGoldenFleece: function (powerId) {
+      this.gamedatas.goldenFleece = powerId;
       var powerDetail = this.createPowerDetail(powerId);
       var div = dojo.place(this.createPowerSmall(powerId), 'play-area');
       div.id = 'power-ram';
@@ -984,16 +1049,20 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       var powerDialog = new ebg.popindialog();
       powerDialog.create('powerDialogRam');
-      powerDialog.setTitle(_("Ram's power"));
+      // match material.inc.php specialNames
+      powerDialog.setTitle(_('Golden Fleece power'));
       powerDialog.setContent(powerDetail);
       powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
       dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
     },
 
-
-    notif_ramPowerSet: function (n) {
-      debug('Notif: ram power was set', n.args);
-      this.addGoldenFleece(n.args.powerId);
+    notif_specialPowerSet: function (n) {
+      debug('Notif: Special power was set', n.args);
+      if (n.args.location == 'ram') {
+        this.addGoldenFleece(n.args.powerId);
+      } else if (n.args.location == 'nyxNight') {
+        this.addNyxNightPower(n.args.powerId);
+      }
     },
 
 
@@ -1408,18 +1477,30 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       return power;
     },
 
-    createMiniCard: function (playerId, powerId) {
+    createMiniCard: function (playerId, powerId, cssClass) {
       var power = this.getPower(powerId);
+      if (cssClass) {
+        power = Object.assign({}, power); // copy
+        power.type = (power.type || '') + ' ' + cssClass;
+      }
       return dojo.place(this.format_block('jstpl_miniCard', power), 'power_container_' + playerId);
     },
 
-    createPowerSmall: function (powerId) {
+    createPowerSmall: function (powerId, cssClass) {
       var power = this.getPower(powerId);
+      if (cssClass) {
+        power = Object.assign({}, power); // copy
+        power.type = (power.type || '') + ' ' + cssClass;
+      }
       return this.format_block('jstpl_powerSmall', power);
     },
 
-    createPowerDetail: function (powerId) {
+    createPowerDetail: function (powerId, cssClass) {
       var power = this.getPower(powerId);
+      if (cssClass) {
+        power = Object.assign({}, power); // copy
+        power.type = (power.type || '') + ' ' + cssClass;
+      }
       return this.format_block('jstpl_powerDetail', power);
     },
 
@@ -1434,6 +1515,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         case 'gameSetup':
         case 'powerSetup':
         case 'buildOffer':
+        case 'chooseNyxNightPower':
           container = 'power-offer-container';
           break;
         case 'chooseFirstPlayer':
@@ -1452,7 +1534,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       dojo.style('power-offer-container', 'display', 'none');
       dojo.style('power-choose-container', 'display', 'none');
       if (container == 'scene-container') {
+        dojo.destroy('power-offer-container');
+        dojo.destroy('power-choose-container');
         dojo.removeClass('scene-container', 'fixed');
+        var powerNyx = $('power-nyxNight');
+        if (powerNyx) {
+          dojo.removeClass(powerNyx, 'hide');
+        }
         this.board.updateSize();
         this.board.enterScene();
       } else {
@@ -1497,7 +1585,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         ['workerPlaced', 1000],
         ['workerMoved', 1600],
         ['blockBuilt', 1000],
-        ['ramPowerSet', 1000],
+        ['specialPowerSet', 10],
         ['blockBuiltUnder', 2000],// Happens with Zeus
         ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
         ['updatePowerUI', 10], // Happens with Morpheus, Chaos

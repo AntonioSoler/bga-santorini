@@ -63,6 +63,15 @@ class action_santorini extends APP_GameAction
     self::ajaxResponse();
   }
 
+  public function chooseNyxNightPower()
+  {
+    $this->game->checkAction('chooseNyxNightPower');
+    self::setAjaxMode();
+    $powerId = (int) self::getArg('powerId', AT_int, true);
+    $this->game->chooseNyxNightPower($powerId);
+    self::ajaxResponse();
+  }
+
   public function chooseFirstPlayer()
   {
     $this->game->checkAction('chooseFirstPlayer');

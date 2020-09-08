@@ -14,16 +14,18 @@ class Chaos extends SantoriniPower
     ];
     $this->playerCount = [2, 3, 4];
     $this->golden  = false; // TODO the rules allow this
+    // TODO: Need to verify using Chaos as Nyx's Night Power
     $this->orderAid = 34;
 
     $this->implemented = true;
   }
 
   /* * */
+
   public function getUIData()
   {
     $data = parent::getUIData();
-    $data['counter'] = ($this->playerId != null) ? $this->computeDeck() : 10;
+    $data['counter'] = ($this->playerId != null) ? $this->computeDeck() : 0;
     return $data;
   }
 
@@ -43,7 +45,12 @@ class Chaos extends SantoriniPower
   public function setup()
   {
     // Recreate the deck with just non-banned Simple Gods
-    $banned = $this->game->powerManager->computeBannedIds('hand');
+    $powerIds = $this->game->powerManager->getPowerIdsInLocation('hand');
+    $nyxNightId = $this->game->powerManager->getSpecialPowerId('nyxNight');
+    if ($nyxNightId != null) {
+      $powerIds[] = $nyxNightId;
+    }
+    $banned = $this->game->powerManager->computeBannedIds($powerIds);
     $this->game->powerManager->cards->moveAllCardsInLocation('deck', 'box');
     for ($i = 1; $i <= 10; $i++) {
       if (in_array($i, $banned)) {
@@ -60,36 +67,38 @@ class Chaos extends SantoriniPower
     $this->pickNewPower();
   }
 
-  public function endOfTurn()
+  public function endPlayerTurn()
   {
     $works = $this->game->log->getLastBuilds();
     $dome = false;
     for ($i = 0; !$dome && $i < count($works); $i++) {
       $dome = $works[$i]['to']['arg'] == 3;
     }
-
     if (!$dome) {
       return;
     }
 
-    // Discard current Simple God power
+    $this->game->notifyAllPlayers('message', $this->game->msg['powerDomeBuilt'], [
+      'i18n' => ['power_name'],
+      'power_name' => $this->getName(),
+    ]);
+
+    // Discard current Simple God power and add new
     foreach ($this->getPlayer()->getPowers() as $power) {
       if ($power->isSimple()) {
         $this->game->powerManager->removePower($power, 'chaos');
       }
     }
-
-    // Add new
     $this->pickNewPower();
-  }
-
-  public function endPlayerTurn()
-  {
-    $this->endOfTurn();
   }
 
   public function endOpponentTurn()
   {
-    $this->endOfTurn();
+    $this->endPlayerTurn();
+  }
+
+  public function endTeammateTurn()
+  {
+    $this->endPlayerTurn();
   }
 }

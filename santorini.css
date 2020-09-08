@@ -20,6 +20,10 @@ html {
   background-color: #76cfe9;
 }
 
+.hide {
+  display: none;
+}
+
 /* Make clouds visible through BGA main UI elements */
 #topbar, #page-title, .current_player_is_active #page-title, .log .roundedbox {
   background: rgba(248, 248, 248, 0.85);
@@ -404,24 +408,30 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   outline: none;
 }
 
-#power-ram {
+#power-ram, #power-nyxNight {
   position: absolute;
-  top: 50px;
-  right: 2px;
+  z-index: 3;
+  top: 38px;
+  right: 0;
   margin: 0;
 }
 
-#power-ram::after {
+#power-ram::after, #power-nyxNight::after {
   content: '';
   display: block;
   background-image: url('img/ram.svg');
   width: 100%;
-  height: 28%;
+  height: 32px;
   position: absolute;
-  top: -50px;
+  top: -38px;
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+#power-nyxNight::after {
+  background-image: url('img/moon.svg');
+  filter: invert(1) hue-rotate(180deg);
 }
 
 #prompt-container {
@@ -550,6 +560,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   border-bottom-right-radius: 10px;
   box-shadow: 2px 2px 4px rgba(0, 0, 0, .5);
   font: 13px 'Lato', sans-serif;
+  border-top: 1px solid #44443344;
 }
 
 .power-ext p {
@@ -559,6 +570,26 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 .power-ext b {
   font-weight: 900;
+}
+
+/* Nyx's Night Power */
+
+.night.power-card {
+  box-shadow: 2px 2px 4px rgba(255, 255, 255, .5);
+}
+
+.night.power-card,
+.night.power-ext,
+.night.mini-card {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.night .power-title {
+  filter: grayscale(100%);
+}
+
+.night .power-name {
+  color: #110;
 }
 
 /* Fair division setup uses small cards */

@@ -87,6 +87,7 @@ define('PEGASUS', 67);
 define('ST_BGA_GAME_SETUP', 1);
 define('ST_POWERS_SETUP', 10);
 define('ST_BUILD_OFFER', 12);
+define('ST_CHOOSE_NYX_POWER', 66);
 define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
 define('ST_POWERS_CHOOSE', 14);
 define('ST_CHOOSE_FIRST_PLAYER', 18);
