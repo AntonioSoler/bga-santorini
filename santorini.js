@@ -304,9 +304,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
           var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em">');
           return '<p><b>' + p.name + '</b>, <i>' + p.title + '</i>'
             + (revised ? ' &mdash; <span style="color:blue">(revised power)</span>' : '') + '<br>\n'
-            + 'Players: ' + p.playerCount.join(', ')
-            + ' &mdash; Golden Fleece: ' + (p.golden ? 'Yes' : 'No')
-            + '</p>\n' + txt;
+            + '<small>Players: ' + p.playerCount
+            + (p.golden ? ' &mdash; Golden Fleece Variant' : '')
+            + '</small></p>\n' + txt;
         };
         var joiner = '\n----\n';
         var simpleGods = powers.filter(p => p.id <= 10);
