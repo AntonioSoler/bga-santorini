@@ -182,6 +182,16 @@ class SantoriniBoard extends APP_GameClass
   }
 
   /*
+   * getPlacedTokens: return all placed tokens
+   * opt params : int $pId -> if specified, return only placed tokens of corresponding player
+   */
+  public function getPlacedTokens($pId = -1)
+  {
+    $filter = $this->playerFilter($pId);
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type LIKE 'token%' $filter ORDER BY id"));
+  }
+
+  /*
    * getPlacedActiveWorkers: return all placed workers of active player
    */
   public function getPlacedActiveWorkers($type = null)

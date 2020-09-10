@@ -141,6 +141,10 @@ class PlayerManager extends APP_GameClass
       self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
       $this->game->notifyAllPlayers('pieceRemovedInstant', '', ['piece' => $worker]);
     }
+    foreach ($this->game->board->getPlacedTokens($pId) as $token) {
+      self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$token['id']}");
+      $this->game->notifyAllPlayers('pieceRemovedInstant', '', ['piece' => $token]);
+    }
     $this->game->eliminatePlayer($pId);
   }
 }
