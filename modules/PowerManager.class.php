@@ -128,6 +128,7 @@ class PowerManager extends APP_GameClass
     [NEMESIS, THESEUS],
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
+    [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],
