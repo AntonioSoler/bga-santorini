@@ -129,6 +129,8 @@ class PowerManager extends APP_GameClass
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
+    [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
+    [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],
