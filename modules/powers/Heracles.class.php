@@ -21,13 +21,14 @@ class Heracles extends SantoriniHeroPower
 
   /* * */
 
-  private function didSpecialBuild()
+  private function didSpecialBuild($builds)
   {
-    $builds = $this->game->log->getLastBuilds();
-    $move = $this->game->log->getLastMove();
-    $ok = (count($builds) != 1) || ($builds[0]['to']['arg'] != $builds[0]['to']['z']);
-    $ok = $ok || ($builds[0]['pieceId'] != $move['pieceId']);
-    return $ok;
+    $special = count($builds) != 1 || ($builds[0]['to']['arg'] != $builds[0]['to']['z']);
+    if (!$special) {
+      $move = $this->game->log->getLastMove();
+      $special = $special || ($builds[0]['pieceId'] != $move['pieceId']);
+    }
+    return $special;
   }
 
   public function argPlayerBuild(&$arg)
@@ -47,12 +48,16 @@ class Heracles extends SantoriniHeroPower
 
   public function stateAfterBuild()
   {
-    return $this->didSpecialBuild() ? 'build' : null;
+    $builds = $this->game->log->getLastBuilds();
+    $again = (count($builds) == 1 && $builds[0]['to']['arg'] == 3) // https://boardgamearena.com/bug?id=24620
+      || $this->didSpecialBuild($builds);
+    return $again ? 'build' : null;
   }
 
   public function preEndPlayerTurn()
   {
-    if ($this->didSpecialBuild()) {
+    $builds = $this->game->log->getLastBuilds();
+    if ($this->didSpecialBuild($builds)) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('usedPower', $stats);
     }
