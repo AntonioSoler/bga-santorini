@@ -299,23 +299,26 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         var powers = Object.values(_this.gamedatas.powers).sort(function (power1, power2) {
           return power1.sort - power2.sort;
         });
-        var mapper = function (p) {
-          var revised = p.text.includes('<p><b>REVISED POWER</b></p>');
-          var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em">');
-          return '<p><b>' + p.name + '</b>, <i>' + p.title + '</i>'
-            + (revised ? ' &mdash; <span style="color:blue">(revised power)</span>' : '') + '<br>\n'
-            + '<small>Players: ' + p.playerCount
-            + (p.golden ? ' &mdash; Golden Fleece Variant' : '')
-            + '</small></p>\n' + txt;
-        };
-        var joiner = '\n----\n';
-        var simpleGods = powers.filter(p => p.id <= 10);
-        var addGods = powers.filter(p => p.id > 10 && !p.hero);
-        var heroPowers = powers.filter(p => p.hero);
         var txt = "\n<!--\n\n\n\n    Please do not modify anything below this point.\n    Content generated directly from the game code.\n\n\n\n-->\n"
-          + "== List of Simple Gods (" + simpleGods.length + ") ==\n" + simpleGods.map(mapper).join(joiner)
-          + "\n\n== List of Additional Gods (" + addGods.length + ") ==\n" + addGods.map(mapper).join(joiner)
-          + "\n\n== List of Hero Powers (" + heroPowers.length + ") ==\n" + heroPowers.map(mapper).join(joiner);
+          + "== List of Powers (" + powers.length + ") ==\n"
+          + powers.map(function (p) {
+            var info = ['Players: ' + p.playerCount];
+            var color = '';
+            if (p.id <= 10) {
+              info.push('Simple God');
+            } else if (p.hero) {
+              info.push('Hero Power');
+              color = 'color:#6a1b9a';
+            }
+            if (p.golden) {
+              info.push('Golden Fleece Variant');
+            }
+            if (p.text.includes('REVISED POWER')) {
+              info.push('REVISED POWER');
+            }
+            var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em;' + color + '">');
+            return '<p style="' + color + '"><b>' + p.name + '</b>, <i>' + p.title + '</i><br>' + '<small>' + info.join(' &mdash; ') + '</small></p>\n' + txt;
+          }).join('\n----\n');
         console.log(txt);
         navigator.clipboard.writeText(txt);
         _this.showMessage('Text copied to clipboard &mdash; <a href="https://en.doc.boardgamearena.com/index.php?title=Gamehelpsantor' + 'ini&action=edit" target="_blank">edit Gamehelpsantor' + 'ini</a>', 'info');
