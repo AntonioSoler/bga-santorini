@@ -80,6 +80,29 @@ define('IRIS', 65);
 define('NYX', 66);
 define('PEGASUS', 67);
 
+// Island of Misfit Powers
+// https://boardgamegeek.com/thread/2119002/island-misfit-powers
+define('ARACHNE', 100);
+define('ARIADNE', 101);
+define('CASSANDRA', 102);
+define('CENTAURS', 103);
+define('CHELONE', 104);
+define('DAEDALUS', 105);
+define('GERAS', 106);
+define('HELIOS', 107);
+define('KHIONE', 108);
+define('LERNAEAN', 109);
+define('MANIAE', 110);
+define('MNEMOSYNE', 111);
+define('PANDORA', 112);
+define('PANDORASBOX', 113);
+define('PEITHO', 114);
+define('PERSEUS', 115);
+define('PHAETON', 116);
+define('PROCRUSTES', 117);
+define('PYGMALION', 118);
+define('SISYPHUS', 119);
+define('TITANS', 120);
 
 /*
  * State constants
