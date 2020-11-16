@@ -42,7 +42,8 @@ class Eris extends SantoriniPower
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
     Utils::filterWorkersById($workers, $worker['id']);
     if (empty($workers)) {
-      $this->game->log->addAction("ErisAltTurn");
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction("ErisAltTurn", $stats);
     }
   }
 
