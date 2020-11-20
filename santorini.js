@@ -1516,7 +1516,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       var container = 'scene-container';
       switch (stateName) {
         case 'gameSetup':
-        case 'powerSetup':
+        case 'powersSetup':
         case 'buildOffer':
         case 'chooseNyxNightPower':
           container = 'power-offer-container';
@@ -1537,8 +1537,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       dojo.style('power-offer-container', 'display', 'none');
       dojo.style('power-choose-container', 'display', 'none');
       if (container == 'scene-container') {
-        dojo.destroy('power-offer-container');
-        dojo.destroy('power-choose-container');
+        dojo.empty('power-offer-container');
+        dojo.empty('power-choose-container');
         dojo.removeClass('scene-container', 'fixed');
         var powerNyx = $('power-nyxNight');
         if (powerNyx) {
