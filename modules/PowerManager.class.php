@@ -299,10 +299,10 @@ class PowerManager extends APP_GameClass
    */
   public function createCards()
   {
-    $sql = 'INSERT INTO card (card_type, card_type_arg, card_location, card_location_arg) VALUES ';
+    $sql = 'INSERT INTO card (card_id, card_type, card_type_arg, card_location, card_location_arg) VALUES ';
     $values = [];
     foreach (array_keys(self::$classes) as $powerId) {
-      $values[] = "('$powerId', 0, 'box', 0)";
+      $values[] = "($powerId, '$powerId', 0, 'box', 0)";
     }
     self::DbQuery($sql . implode(',', $values));
   }
