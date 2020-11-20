@@ -62,12 +62,13 @@ $game_options = [
         'name' => totranslate('No Powers'),
         'tmdisplay' => totranslate('No Powers'),
       ],
+      /*
       PRESET => [
         'name' => totranslate('Preset matchup'),
         'tmdisplay' => totranslate('Preset matchup'),
         'description' => totranslate('Power matchup of the week'),
       ],
-
+      */
     ],
     'startcondition' => [
       HEROES => [
@@ -98,6 +99,7 @@ $game_options = [
           'message' => totranslate('No Powers requires exactly 2 players'),
         ],
       ],
+      /*
       PRESET => [
         [
           'type' => 'maxplayers',
@@ -105,6 +107,7 @@ $game_options = [
           'message' => totranslate('Preset matchup requires exactly 2 players'),
         ],
       ],
+      */
     ],
   ],
 
@@ -132,11 +135,13 @@ $game_options = [
         'id' => OPTION_POWERS,
         'value' => NONE,
       ],
+      /*
       [
         'type' => 'otheroptionisnot',
         'id' => OPTION_POWERS,
         'value' => PRESET,
       ],
+      */
     ],
   ],
 
