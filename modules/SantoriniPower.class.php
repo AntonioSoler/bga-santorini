@@ -124,11 +124,13 @@ abstract class SantoriniPower extends APP_GameClass
   public function updateUI()
   {
     $data = $this->getUiData();
-    $this->game->notifyAllPlayers('updatePowerUI', '', [
-      'playerId' => $this->playerId,
-      'powerId' => $this->id,
-      'counter' => $data['counter'],
-    ]);
+    if (array_key_exists('counter', $data)) {
+      $this->game->notifyAllPlayers('updatePowerUI', '', [
+        'playerId' => $this->playerId,
+        'powerId' => $this->id,
+        'counter' => $data['counter'],
+      ]);
+    }
   }
 
   public function placeWorker($worker, $space)
