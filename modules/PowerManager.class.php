@@ -87,7 +87,6 @@ class PowerManager extends APP_GameClass
     [APHRODITE, MEDUSA], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, NEMESIS],
     [APHRODITE, THESEUS], // https://boardgamearena.com/bug?id=21093
-    [APHRODITE, SCYLLA], // does not work as Scylla should be allowed to go away and drag Aphrodite
     [APHRODITE, URANIA],
     [ASTERIA, HADES],
     [ATLAS, GAEA],
