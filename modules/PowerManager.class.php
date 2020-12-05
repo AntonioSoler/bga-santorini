@@ -176,6 +176,7 @@ class PowerManager extends APP_GameClass
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
+    [ADONIS, NEMESIS] // move workers at the end
   ];
 
 
