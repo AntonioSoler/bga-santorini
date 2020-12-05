@@ -126,11 +126,12 @@ class PowerManager extends APP_GameClass
     [MOERAE, TARTARUS],
     [NEMESIS, TERPSICHORE],
     [NEMESIS, THESEUS],
+    [NYX, CHAOS], // https://boardgamearena.com/bug?id=29287
+    [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
+    [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
+    [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
-    [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
-    [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
-    [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],
