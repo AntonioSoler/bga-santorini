@@ -176,6 +176,10 @@ class PowerManager extends APP_GameClass
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
     [ADONIS, NEMESIS] // move workers at the end
+
+    // Incomplete Nemesis implementation: uses force to check if her power has been used
+    [NEMESIS, CHARYBDIS],
+    [NEMESIS, HARPIES],
   ];
 
 

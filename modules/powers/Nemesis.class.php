@@ -44,7 +44,7 @@ class Nemesis extends SantoriniPower
 
 	$actions = $this->game->log->getLastWorks(['force'], null, 2);
 
-	# choose second exchange
+	# choose second exchange: the remaining Nemesis worker and one teammate of the previous target
 	if (count($actions) > 0)
 	{		
 	    $arg['skippable'] = false;
@@ -61,7 +61,7 @@ class Nemesis extends SantoriniPower
 	    Utils::filterWorkersById($workers, $lastw, false);
 	    
 	    
-		if (count($workers) != 1)
+		if (count($workers) != 1 || count($oppWorkers) == 0)
 		    throw new BgaVisibleSystemException('Unexpected state in Nemesis.');
 	    
 	    $arg['workers'] = $workers;
@@ -72,14 +72,13 @@ class Nemesis extends SantoriniPower
 	{
 		$opponents = $this->game->playerManager->getOpponentsIds();
 
-		
-
 		// for each opponent, check if no worker neighbors Nemesis'    
 		foreach($opponents as $opp){
 		  $oppWorkers = $this->game->board->getPlacedWorkers($opp);
+
 		  $nb = count($oppWorkers);
 		  if ($nb < 2)
-		    throw new BgaVisibleSystemException('Unexpected state in Nemesis.');
+		    continue; // skip an opponent with less than 2 workers visible (e.g., Hydra)
 		  
 		  Utils::FilterWorkers($oppWorkers, function($opp) use ($workers) {
 		    return !$this->game->board->isNeighbour($workers[0], $opp) && !$this->game->board->isNeighbour($workers[1], $opp);
@@ -113,8 +112,9 @@ class Nemesis extends SantoriniPower
     $mySpace =  $this->game->board->getCoords($worker);
     $oppSpace = $this->game->board->getCoords($oppWorker);
 
-	if (count($this->game->log->getLastWorks(['force'], null, 2)) > 1 ) 
-		$stats = [[$this->playerId, 'usePower']]; # TODO wrong stat number, weird...
+       if (count($this->game->log->getLastWorks(['force'], null, 2)) > 1 )
+               $stats = [[$this->playerId, 'usePower']]; # TODO wrong stat number, weird...
+
 	else 
 		$stats = [];
 	$this->game->board->setPieceAt($worker, $oppSpace);
