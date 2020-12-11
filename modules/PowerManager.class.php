@@ -77,6 +77,7 @@ class PowerManager extends APP_GameClass
     IRIS => 'Iris',
     NYX => 'Nyx',
     PEGASUS => 'Pegasus',
+    CASSANDRA => 'Cassandra',
   ];
 
   /*

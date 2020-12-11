@@ -1199,6 +1199,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.makeWorkersSelectable(args.workers);
     },
 
+    usePowerCassandra: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
+
     /////////////////////////////////////////
     /////////////////////////////////////////
     ////////    Work : move / build  ////////

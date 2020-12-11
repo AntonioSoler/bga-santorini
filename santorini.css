@@ -849,6 +849,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-65 .power-pictogram { background-image:url('img/pictograms/065.png'); }
 .power-66 .power-pictogram { background-image:url('img/pictograms/066.png'); }
 .power-67 .power-pictogram { background-image:url('img/pictograms/067.png'); }
+.power-102 .power-pictogram { background-image:url('img/pictograms/102.png'); }
 
 
 .power-1 { background-image:url('img/cards/001.jpg'); }
@@ -925,6 +926,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-66 { background-image:url('img/cards/066.jpg'); }
 .power-67 { background-image:url('img/cards/067.jpg'); }
 .power-67.power-card.small { background-position: 0% 28%; background-size: 175%; } /* Pegasus */
+.power-102 { background-image:url('img/cards/102.jpg'); }
 
 
 .power-1 .power-avatar { background-image:url('img/avatars/001.png'); }
@@ -994,3 +996,4 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-65 .power-avatar { background-image:url('img/avatars/065.png'); }
 .power-66 .power-avatar { background-image:url('img/avatars/066.png'); }
 .power-67 .power-avatar { background-image:url('img/avatars/067.png'); }
+.power-102 .power-avatar { background-image:url('img/cards/102.jpg'); }
