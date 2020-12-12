@@ -84,6 +84,19 @@ class SantoriniLog extends APP_GameClass
       }
 
       $this->game->incStat($value, $name, $pId);
+
+      /*
+      // DEBUG: Print stat changes
+      $args = [
+        'player_name' => 'Table',
+        'name' => $name,
+        'value' => $this->game->getStat($name, $pId),
+      ];
+      if ($pId) {
+        $args['player_name'] = $this->game->playerManager->getPlayer($pId)->getName();
+      }
+      $this->game->notifyAllPlayers('message', '[Statistics] ${player_name} ${name}=${value}', $args);
+      */
     }
   }
 

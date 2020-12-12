@@ -1154,6 +1154,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.makeWorkersSelectable(args.workers);
     },
 
+    usePowerNemesis: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
+
     usePowerMedea: function (args) {
       this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);

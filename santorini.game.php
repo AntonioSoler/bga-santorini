@@ -811,7 +811,10 @@ class santorini extends Table
 
     // Use power
     $this->powerManager->usePower($powerId, [$wId, $work]);
-    $stats = [[self::getActivePlayerId(), 'usePower']];
+    $stats = [];
+    if ($powerId != NEMESIS) {
+      $stats = [[self::getActivePlayerId(), 'usePower']];
+    }
     $this->log->addAction("usedPower", $stats, [$wId, $work]);
 
     $state = $this->powerManager->stateAfterUsePower();
