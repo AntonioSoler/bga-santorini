@@ -350,14 +350,13 @@ Board.prototype.diff = function (pieces) {
 
 	this._ids.slice().map((mesh, id) => {
 		var piece = mesh.space;
+		piece.id = id; // add the piece ID
 		var space = pieces.reduce((carry, npiece) => npiece.id == id ? npiece : carry, null);
-		// Still exist => move it if needed
 		if (space != null) {
-			if (piece.x != space.x || piece.y != space.y || piece.z != space.z) {
-				this.moveMesh(mesh, space, 0, "none");
+			if (piece.x != space.x || piece.y != space.y || piece.z != space.z) { // move
+				this.movePiece(piece, space, 0, "none");
 			}
-		} else {
-			// Remove it
+		} else { // remove
 			this._scene.remove(mesh);
 			delete this._ids[id];
 		}
@@ -464,7 +463,7 @@ Board.prototype.moveMesh = function (mesh, space, delay, animation) {
 
 /*
  * Move a piece to a new position
- * - mixed pece : info about the piece
+ * - mixed piece : info about the piece
  * - mixed space : contains the location
  */
 Board.prototype.movePiece = function (piece, space, delay, animation) {

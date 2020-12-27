@@ -86,6 +86,7 @@ class PowerManager extends APP_GameClass
     [APHRODITE, BIA], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, MEDUSA], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, NEMESIS],
+    [APHRODITE, SCYLLA], // Scylla should be allowed to go away and drag Aphrodite
     [APHRODITE, THESEUS], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, URANIA],
     [ASTERIA, HADES],
@@ -126,12 +127,13 @@ class PowerManager extends APP_GameClass
     [MOERAE, TARTARUS],
     [NEMESIS, TERPSICHORE],
     [NEMESIS, THESEUS],
-    [SELENE, GAEA],
-    [TARTARUS, TERPSICHORE],
-    [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
+    [NYX, CHAOS], // https://boardgamearena.com/bug?id=29287
     [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
+    [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
     [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [HARPIES, TARTARUS], // until "forces after win" are deleted
+    [SELENE, GAEA],
+    [TARTARUS, TERPSICHORE],
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],
@@ -176,8 +178,12 @@ class PowerManager extends APP_GameClass
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
+<<<<<<< HEAD
     [ADONIS, NEMESIS], // move workers at the end
     [ADONIS, PROTEUS], // can teleport a worker
+=======
+    [ADONIS, NEMESIS] // move workers at the end
+>>>>>>> a26c89a7b69c395ea4a5946f81c4a4ed83e8eb9f
   ];
 
 
