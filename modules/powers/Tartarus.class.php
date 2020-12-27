@@ -187,10 +187,10 @@ class Tartarus extends SantoriniPower
     if ($loserID && $loose)
     {
       $loser = $this->game->playerManager->getPlayer($loserID);
-      $this->game->announceLose(clienttranslate('${power_name}: ${player_name} (${coords}) enters the Abyss.'), [
+      $this->game->announceLose(clienttranslate('${power_name}: ${player_name2} (${coords}) enters the Abyss.'), [
         'i18n' => ['power_name'],
         'power_name' => clienttranslate('Tartarus'),
-        'player_name' => $loser->getName(),
+        'player_name2' => $loser->getName(), // 2 because announce_lose rewrites player_name 
         'coords' => $this->game->board->getMsgCoords($abyss),
       ], $loserID);
     }
