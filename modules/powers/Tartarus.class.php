@@ -84,7 +84,7 @@ class Tartarus extends SantoriniPower
     $abyssToken['y'] = $space['y'];
     $abyssToken['z'] = $space['z'];
   
-   $this->game->notifyPlayer($this->playerId, 'workerPlaced', clienttranslate('${power_name}: ${player_name} places the abyss in ${coords}'), [
+   $this->game->notifyPlayer($this->playerId, 'workerPlaced', clienttranslate('${power_name}: ${player_name} places the Abyss in ${coords}'), [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
@@ -96,14 +96,11 @@ class Tartarus extends SantoriniPower
   
   public function getAbyssSpace()
   {
-    $myabyss = $this->game->log->getActions(['usePowerTartarus'], $this->playerId); // get the last abyss placed (possible in case of restart)
-    
+    $myabyss = $this->game->log->getActions(['usePowerTartarus'], $this->playerId); // get the last abyss placed (possible in case of restart) 
     if (count($myabyss) == 0)
       return null;
       
     $abyss = json_decode($myabyss[0]['action_arg'], true)['space'];
-    
-    
     return $abyss;
   }
   
@@ -168,13 +165,7 @@ class Tartarus extends SantoriniPower
     foreach (array_reverse($logs) as $log) {
       $args = json_decode($log['action_arg'], true);
 
-      if ($log['action'] == 'move' or $log['action'] == 'force') {
-        if ($this->game->board->isSameSpace($args['to'], $abyss))
-        {
-            $loserID = $this->game->board->getPiece($log['piece_id'])['player_id'];
-            break;
-        }
-      } else if ($log['action'] == 'placeWorker') {
+      if ($log['action'] == 'move' or $log['action'] == 'force' or $log['action'] == 'placeWorker') {
         if ($this->game->board->isSameSpace($args['to'], $abyss))
         {
             $loserID = $this->game->board->getPiece($log['piece_id'])['player_id'];
@@ -187,7 +178,7 @@ class Tartarus extends SantoriniPower
     if ($loserID && $loose)
     {
       $loser = $this->game->playerManager->getPlayer($loserID);
-      $this->game->announceLose(clienttranslate('${power_name}: ${player_name2} (${coords}) enters the Abyss.'), [
+      $this->game->announceLose(clienttranslate('${power_name}: ${player_name2} (${coords}) enters the Abyss and is eliminated!'), [
         'i18n' => ['power_name'],
         'power_name' => clienttranslate('Tartarus'),
         'player_name2' => $loser->getName(), // 2 because announce_lose rewrites player_name 
@@ -226,7 +217,7 @@ class Tartarus extends SantoriniPower
       $arg['win'] = true;
       $arg['pId'] = $this->game->playerManager->getOpponentsIds($loserID)[0];
       $arg['winStats'] = [[$this->playerId, 'usePower']];
-      $msg = clienttranslate('${power_name}: ${player_name} (${coords}) enters the Abyss.');
+      $msg = clienttranslate('${power_name}: ${player_name} (${coords}) enters the Abyss and is eliminated!');
       $this->game->notifyAllPlayers('message', $msg, [
         'i18n' => ['power_name'],
         'power_name' => clienttranslate('Tartarus'),
