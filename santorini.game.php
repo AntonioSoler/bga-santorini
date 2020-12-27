@@ -140,10 +140,10 @@ class santorini extends Table
    *  The method is called each time the game interface is displayed to a player, ie: when the game starts and when a player refreshes the game page (F5)
    */
   protected function getAllDatas()
-  {
+  {    
     return [
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
-      'placedPieces' => $this->board->getPlacedPieces(),
+      'placedPieces' => $this->board->getPlacedPieces($this->getCurrentPlayerId()),
       'powers' => $this->powerManager->getUiData(),
       'goldenFleece' => $this->powerManager->getSpecialPowerId('ram'),
       'nyxNightPower' => $this->powerManager->getSpecialPowerId('nyxNight'),
@@ -970,11 +970,15 @@ class santorini extends Table
 
     // Undo the turn
     $moveIds = $this->log->cancelTurn();
-    self::notifyAllPlayers('cancel', $this->msg['restart'], [
-      'placedPieces' => $this->board->getPlacedPieces(),
-      'player_name' => self::getActivePlayerName(),
-      'moveIds' => $moveIds,
-    ]);
+     $players = self::loadPlayersBasicInfos();
+     foreach( $players as $player_id => $player )
+     {
+        self::notifyPlayer($player_id, 'cancel', $this->msg['restart'], [
+          'placedPieces' => $this->board->getPlacedPieces($player_id),
+          'player_name' => self::getActivePlayerName(),
+          'moveIds' => $moveIds,
+         ]);
+     }
 
     // Apply power
     $this->gamestate->nextState('cancel');

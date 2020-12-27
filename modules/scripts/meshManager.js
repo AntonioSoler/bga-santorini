@@ -92,6 +92,11 @@ const Meshes = [
 
 	/* Tokens */
 	{
+		n: 'tokenAbyss',
+		g: 'token',
+		s: 0.8,
+	},
+	{
 		n: 'tokenWhirpool',
 		g: 'token',
 		s: 0.8,

@@ -131,6 +131,7 @@ class PowerManager extends APP_GameClass
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
     [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
+    [HARPIES, TARTARUS], // until "forces after win" are deleted
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],
@@ -175,7 +176,8 @@ class PowerManager extends APP_GameClass
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
-    [ADONIS, NEMESIS] // move workers at the end
+    [ADONIS, NEMESIS], // move workers at the end
+    [ADONIS, PROTEUS], // can teleport a worker
   ];
 
 

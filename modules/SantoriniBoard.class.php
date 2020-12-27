@@ -121,10 +121,34 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPlacedPieces: return all pieces on the board
    * Order by tokens first, then by z-order ascending
+   * parameter: send token visibles by this player
    */
-  public function getPlacedPieces()
+  public function getPlacedPieces($playerView= null)
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' ORDER BY (type LIKE 'token%') DESC, z, x, y"));
+  
+    // add the abyss for Tartarus -- not the cleanest way
+    $abyss = false;
+    $tokenabyss = null;
+    $spaceabyss = null;
+    if ($playerView != null)
+    {
+      $powers = $this->game->playerManager->getPlayer($playerView)->getPowers();
+      if (count($powers)==1 && $powers[0]->getId() == TARTARUS && $powers[0]->getAbyssSpace() != null)
+      {  
+        $abyss = true;
+        $tokenabyss = $powers[0]->getToken();
+        $spaceabyss = $powers[0]->getAbyssSpace();
+        $spaceabyss['z'] = count($this->getBlocksAt($spaceabyss));
+        $this->setPieceAt($tokenabyss, $spaceabyss);
+      }
+    }
+  
+    $return = array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' ORDER BY (type LIKE 'token%') DESC, z, x, y"));
+    
+    if ($abyss)
+      $this->setPieceAt($tokenabyss, $spaceabyss, 'hand');
+      
+    return $return;
   }
 
 
