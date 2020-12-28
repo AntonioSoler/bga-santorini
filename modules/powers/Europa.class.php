@@ -22,13 +22,17 @@ class Europa extends SantoriniPower
 
   /* * */
 
-  public function getUiData($playerId)
+  public function getUiData()
   {
-    // Talus location shown in player panel
-    $data = parent::getUiData($playerId);
+    $data = parent::getUiData();
+    // Talus not placed
+    $data['counter'] = '--';
     if ($this->playerId != null) {
       $token = $this->getToken();
-      $data['counter'] = ($token['location'] != 'hand') ? $this->game->board->getMsgCoords($token) : '--';
+      if ($token['location'] == 'board') {
+        // Talus location visible to all
+        $data['counter'] = $this->game->board->getMsgCoords($token);
+      }
     }
     return $data;
   }

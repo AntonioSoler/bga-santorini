@@ -199,10 +199,11 @@ class SantoriniLog extends APP_GameClass
   /*
    * addPlaceWorker: add a new place worker entry to log (e.g., Jason)
    */
-  public function addPlaceWorker($worker, $powerId, $location = 'hand')
+  public function addPlaceWorker($worker, $power, $location = 'hand')
   {
     $args = [
-      'power_id' => $powerId,
+      'power_id' => $power->getId(),
+      'player_id' => $power->getPlayerId(),
       'location' => $location,
       'to' => SantoriniBoard::getCoords($worker),
     ];
@@ -212,10 +213,11 @@ class SantoriniLog extends APP_GameClass
   /*
    * addPlaceToken: add a new place token entry to log (e.g., Europa)
    */
-  public function addPlaceToken($token, $powerId, $stats, $location = 'hand')
+  public function addPlaceToken($token, $power, $stats, $location = 'hand')
   {
     $args = [
-      'power_id' => $powerId,
+      'power_id' => $power->getId(),
+      'player_id' => $power->getPlayerId(),
       'location' => $location,
       'to' => SantoriniBoard::getCoords($token),
     ];
@@ -225,10 +227,11 @@ class SantoriniLog extends APP_GameClass
   /*
    * addMoveToken: add a new move token entry to log (e.g., Europa)
    */
-  public function addMoveToken($token, $space, $powerId, $stats = [])
+  public function addMoveToken($token, $space, $power, $stats = [])
   {
     $args = [
-      'power_id' => $powerId,
+      'power_id' => $power->getId(),
+      'player_id' => $power->getPlayerId(),
       'from' => SantoriniBoard::getCoords($token),
       'to'   => $space,
     ];
@@ -438,7 +441,7 @@ class SantoriniLog extends APP_GameClass
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
         if ($log['action'] == 'moveToken') {
           // Europa needs to update the counter
-          $power = $this->game->powerManager->getPower($args['power_id'], $pId);
+          $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
           $power->updateUI();
         }
       } else if ($log['action'] == 'build') {
@@ -454,7 +457,7 @@ class SantoriniLog extends APP_GameClass
       } else if ($log['action'] == 'placeWorker' || $log['action'] == 'placeToken') {
         // Place worker : remove the worker, update power UI
         self::DbQuery("UPDATE piece SET x = null, y = null, z = null, location = '" . $args['location'] . "' WHERE id = {$log['piece_id']}");
-        $power = $this->game->powerManager->getPower($args['power_id'], $pId);
+        $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
         $power->updateUI();
       }
 

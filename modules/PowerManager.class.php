@@ -239,7 +239,13 @@ class PowerManager extends APP_GameClass
     $ui = [];
     foreach ($this->getPowers() as $power) {
       if ($power->isImplemented()) {
-        $ui[$power->getId()] = $power->getUiData($playerId);
+        $data = $power->getUiData($playerId);
+        if (array_key_exists('counter', $data) && is_array($data['counter'])) {
+          // When counter is an array, show different info to each player
+          // Select the correct value for the current player
+          $data['counter'] = array_key_exists($playerId, $data['counter']) ? $data['counter'][$playerId] : $data['counter']['all'];
+        }
+        $ui[$power->getId()] = $data;
       }
     }
     return $ui;

@@ -28,9 +28,9 @@ class Jason extends SantoriniHeroPower
     return $this->game->board->getPiece($ids[0]);
   }
 
-  public function getUiData($playerId)
+  public function getUiData()
   {
-    $data = parent::getUiData($playerId);
+    $data = parent::getUiData();
     $data['counter'] = ($this->playerId != null && $this->getExtraWorker()['location'] == 'board') ? 0 : 1;
     return $data;
   }

@@ -38,9 +38,9 @@ class Gaea extends SantoriniPower
     return $this->game->board->getPiecesByType('worker', null, 'hand');
   }
 
-  public function getUiData($playerId)
+  public function getUiData()
   {
-    $data = parent::getUiData($playerId);
+    $data = parent::getUiData();
     $data['counter'] = $this->playerId != null ? count($this->getExtraWorkers()) : 0;
     return $data;
   }

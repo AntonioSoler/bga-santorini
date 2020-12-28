@@ -21,18 +21,23 @@ class Tartarus extends SantoriniPower
 
   /* * */
 
-  public function getUiData($playerId)
+  public function getUiData()
   {
-
-    $data = parent::getUiData($playerId);
-    $data['counter'] = '--';
+    $data = parent::getUiData();
+    // Abyss not placed (must match 'all' value while secret)
+    $data['counter'] = '??';
     if ($this->playerId != null) {
       $token = $this->getToken();
-      if ($token['location'] != 'hand') {
-        // Abyss location shown in player panel
-        // While secret, only this player can see
-        // After token is revealed at game end, all players can see
-        $data['counter'] = ($token['location'] == 'board' || $this->playerId == $playerId) ? $this->game->board->getMsgCoords($token) : '??';
+      $coords = $this->game->board->getMsgCoords($token);
+      if ($token['location'] == 'board') {
+        // Abyss location visible to all
+        $data['counter'] = $coords;
+      } else if ($token['location'] == 'secret') {
+        // Abyss location visible to this player only
+        $data['counter'] = [
+          'all' => '??',
+          $this->playerId => $coords,
+        ];
       }
     }
     return $data;
@@ -90,11 +95,6 @@ class Tartarus extends SantoriniPower
     $space = $action[1];
     $this->placeToken($token, $space);
     $this->updateUI();
-    $this->game->notifyPlayer($this->playerId, 'updatePowerUI', '', [
-      'playerId' => $this->playerId,
-      'powerId' => $this->id,
-      'counter' => $this->game->board->getMsgCoords($space),
-    ]);
   }
 
   public function stateAfterUsePower()
