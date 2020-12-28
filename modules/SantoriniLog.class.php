@@ -222,6 +222,19 @@ class SantoriniLog extends APP_GameClass
     $this->insert(-1, $token['id'], 'placeToken', $stats, $args);
   }
 
+  /*
+   * addMoveToken: add a new move token entry to log (e.g., Europa)
+   */
+  public function addMoveToken($token, $space, $powerId, $stats = [])
+  {
+    $args = [
+      'power_id' => $powerId,
+      'from' => SantoriniBoard::getCoords($token),
+      'to'   => $space,
+    ];
+    $this->insert(-1, $token['id'], 'moveToken', $stats, $args);
+  }
+
 
   /*
    * addAction: add a new action to log
@@ -420,9 +433,14 @@ class SantoriniLog extends APP_GameClass
     foreach ($logs as $log) {
       $args = json_decode($log['action_arg'], true);
 
-      if ($log['action'] == 'move' or $log['action'] == 'force') {
+      if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'moveToken') {
         // Move/force : go back to initial position
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
+        if ($log['action'] == 'moveToken') {
+          // Europa needs to update the counter
+          $power = $this->game->powerManager->getPower($args['power_id'], $pId);
+          $power->updateUI();
+        }
       } else if ($log['action'] == 'build') {
         // Build : remove the piece
         self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");

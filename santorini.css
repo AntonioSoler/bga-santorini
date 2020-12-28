@@ -693,7 +693,9 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 /* Bottom of avatar */
 .mini-card.power-25 .power-counter, /* Morpheus */
 .mini-card.power-33 .power-counter, /* Clio */
-.mini-card.power-35 .power-counter,  /* Gaea */
+.mini-card.power-34 .power-counter, /* Europa & Talus */
+.mini-card.power-35 .power-counter, /* Gaea */
+.mini-card.power-43 .power-counter, /* Tartarus */
 .mini-card.power-51 .power-counter  /* Jason */
 {
   display: block;
