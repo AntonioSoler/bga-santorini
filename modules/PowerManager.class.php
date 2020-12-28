@@ -112,6 +112,7 @@ class PowerManager extends APP_GameClass
     [HADES, PAN],
     [HARPIES, HERMES],
     [HARPIES, MAENADS],
+    [HARPIES, TARTARUS], // until "forces after win" are deleted
     [HARPIES, TRITON],
     [HECATE, DIONYSUS],
     [HECATE, MEDEA],
@@ -131,7 +132,6 @@ class PowerManager extends APP_GameClass
     [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
     [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
-    [HARPIES, TARTARUS], // until "forces after win" are deleted
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
 
@@ -174,12 +174,12 @@ class PowerManager extends APP_GameClass
     [ADONIS, HERMES], // multiple moves
     [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
     [ADONIS, JASON], // alternative turn
+    [ADONIS, NEMESIS], // move workers at the end
     [ADONIS, PROMETHEUS],  // movement restriction
+    [ADONIS, PROTEUS], // can teleport a worker
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
-    [ADONIS, NEMESIS], // move workers at the end
-    [ADONIS, PROTEUS], // can teleport a worker
   ];
 
 
@@ -234,12 +234,12 @@ class PowerManager extends APP_GameClass
   /*
    * getUiData : get all ui data of all powers : id, name, title, text, hero
    */
-  public function getUiData()
+  public function getUiData($playerId)
   {
     $ui = [];
     foreach ($this->getPowers() as $power) {
       if ($power->isImplemented()) {
-        $ui[$power->getId()] = $power->getUiData();
+        $ui[$power->getId()] = $power->getUiData($playerId);
       }
     }
     return $ui;

@@ -120,10 +120,10 @@ class SantoriniPlayer extends APP_GameClass
     }
 
 
-    public function addToken($type, $type_arg = null, $location = 'hand')
+    public function addToken($type, $type_arg = null, $location = 'hand', $visibility = VISIBLE_TO_ALL)
     {
         $player_id = $this->id;
-        self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$player_id', '$type', " . (is_null($type_arg) ? "NULL" : "'$type_arg'") . ", '$location')");
+        self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`, `visibility`) VALUES ('$player_id', '$type', " . (is_null($type_arg) ? "NULL" : "'$type_arg'") . ", '$location', $visibility)");
         return self::DbGetLastId();
     }
 }

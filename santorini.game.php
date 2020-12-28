@@ -140,11 +140,11 @@ class santorini extends Table
    *  The method is called each time the game interface is displayed to a player, ie: when the game starts and when a player refreshes the game page (F5)
    */
   protected function getAllDatas()
-  {    
+  {
     return [
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
       'placedPieces' => $this->board->getPlacedPieces($this->getCurrentPlayerId()),
-      'powers' => $this->powerManager->getUiData(),
+      'powers' => $this->powerManager->getUiData($this->getCurrentPlayerId()),
       'goldenFleece' => $this->powerManager->getSpecialPowerId('ram'),
       'nyxNightPower' => $this->powerManager->getSpecialPowerId('nyxNight'),
       'cancelMoveIds' => $this->log->getCancelMoveIds(),
@@ -545,9 +545,9 @@ class santorini extends Table
    */
   public function stNextPlayer($next = true)
   {
-    $players = $this->playerManager->getRemeaningPlayersIds();
-    if (count($players) == 1) {
-      $this->announceWin($players[0]['id'], true);
+    $playerIds = $this->playerManager->getPlayerIds();
+    if (count($playerIds) == 1) {
+      $this->announceWin($playerIds[0], true);
       return;
     }
 
@@ -705,15 +705,15 @@ class santorini extends Table
       $this->announceWin($pId, false);
     } else {
       // 3 players => eliminate the player
-      $players = $this->playerManager->getRemeaningPlayersIds();
-      if (count($players) > 1) {
+      $playerIds = $this->playerManager->getPlayerIds();
+      if (count($playerIds) > 1) {
         if (self::getActivePlayerId() == $pId) {
           $this->gamestate->nextState("eliminate");
         } else {
           $this->playerManager->eliminate($pId);
         }
       } else {
-        $this->announceWin($players[0]['id'], true);
+        $this->announceWin($playerIds[0], true);
       }
     }
   }
@@ -970,15 +970,14 @@ class santorini extends Table
 
     // Undo the turn
     $moveIds = $this->log->cancelTurn();
-     $players = self::loadPlayersBasicInfos();
-     foreach( $players as $player_id => $player )
-     {
-        self::notifyPlayer($player_id, 'cancel', $this->msg['restart'], [
-          'placedPieces' => $this->board->getPlacedPieces($player_id),
-          'player_name' => self::getActivePlayerName(),
-          'moveIds' => $moveIds,
-         ]);
-     }
+    $playerIds = $this->playerManager->getPlayerIds();
+    foreach ($playerIds as $playerId) {
+      self::notifyPlayer($playerId, 'cancel', $this->msg['restart'], [
+        'placedPieces' => $this->board->getPlacedPieces($playerId),
+        'player_name' => self::getActivePlayerName(),
+        'moveIds' => $moveIds,
+      ]);
+    }
 
     // Apply power
     $this->gamestate->nextState('cancel');
@@ -1163,6 +1162,9 @@ class santorini extends Table
     if ($from_version <= 2009010714) {
       self::DbQuery("ALTER TABLE log DROP round");
     }
+    if ($from_version <= 2012121801) {
+      self::DbQuery("ALTER TABLE piece ADD visibility int(1) NOT NULL DEFAULT 0");
+    }
   }
 
 
@@ -1197,13 +1199,12 @@ class santorini extends Table
   public function loadBugSQL($reportId)
   {
     $studioPlayer = self::getCurrentPlayerId();
-    $players = $this->playerManager->getPlayers();
+    $playerIds = $this->playerManager->getPlayerIds();
 
     $sql = [
       "UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_BGA_GAME_END
     ];
-    foreach ($players as $player) {
-      $pId = $player->getId();
+    foreach ($playerIds as $pId) {
       $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$pId";
       $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$pId";
       $sql[] = "UPDATE stats SET stats_player_id=$studioPlayer WHERE stats_player_id=$pId";

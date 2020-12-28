@@ -52,13 +52,12 @@ class PlayerManager extends APP_GameClass
     return intval(self::getUniqueValueFromDB("SELECT COUNT(*) FROM player"));
   }
 
-
   /*
-   * getPlayingPlayers: return non-eliminated players
+   * getPlayerIds: return non-eliminated player IDs
    */
-  public function getRemeaningPlayersIds()
+  public function getPlayerIds()
   {
-    return self::getObjectListFromDb("SELECT player_id id FROM player WHERE `player_eliminated` = 0 AND `player_zombie` = 0");
+    return self::getObjectListFromDb("SELECT player_id FROM player WHERE player_eliminated = 0 AND player_zombie = 0", true);
   }
 
   /*

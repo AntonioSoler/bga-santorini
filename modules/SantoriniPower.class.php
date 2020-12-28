@@ -81,7 +81,7 @@ abstract class SantoriniPower extends APP_GameClass
     return $this->implemented;
   }
 
-  public function getUiData()
+  public function getUiData($playerId)
   {
     return [
       'id'          => $this->id,
@@ -123,7 +123,7 @@ abstract class SantoriniPower extends APP_GameClass
 
   public function updateUI()
   {
-    $data = $this->getUiData();
+    $data = $this->getUiData(null);
     if (array_key_exists('counter', $data)) {
       $this->game->notifyAllPlayers('updatePowerUI', '', [
         'playerId' => $this->playerId,
@@ -156,39 +156,71 @@ abstract class SantoriniPower extends APP_GameClass
   public function placeToken($token, $space)
   {
     $stats = [[$this->playerId, 'usePower']];
-    $this->game->board->setPieceAt($token, $space);
+    $location = $token['visibility'] == VISIBLE_TO_PLAYER ? 'secret' : 'board';
+    $this->game->board->setPieceAt($token, $space, $location);
     $token['x'] = $space['x'];
     $token['y'] = $space['y'];
     $token['z'] = $space['z'];
     $this->game->log->addPlaceToken($token, $this->id, $stats);
 
     // Notify
-    $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], [
+    $args = [
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
       'piece_name' => $this->game->pieceNames[$token['type']],
       'power_name' => $this->getName(),
       'player_name' => $this->game->getActivePlayerName(),
       'coords' => $this->game->board->getMsgCoords($token),
-    ]);
+    ];
+
+    if ($token['visibility'] == VISIBLE_TO_PLAYER) {
+      $this->game->notifyPlayer($this->getPlayerId(), 'workerPlaced', $this->game->msg['powerPlacePiece'], $args);
+      unset($args['piece']);
+      $args['i18n'][] = 'coords';
+      $args['coords'] = $this->game->specialNames['secret'];
+      $this->game->notifyAllPlayers('message', $this->game->msg['powerPlacePiece'], $args);
+    } else { // VISIBLE_TO_ALL
+      $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], $args);
+    }
   }
 
   public function moveToken($token, $space)
   {
-    $stats = [[$this->playerId, 'usePower']];
-    $this->game->board->setPieceAt($token, $space);
-    $this->game->log->addForce($token, $space, $stats);
+    if ($token['visibility'] == VISIBLE_TO_PLAYER) {
+      $this->game->board->setPieceAt($token, $space, 'secret');
+      $this->game->log->addMoveToken($token, $space, $this->id);
+      $this->game->notifyPlayer($this->getPlayerId(), 'workerMovedInstant', '', [
+        'piece' => $token,
+        'space' => $space,
+      ]);
+    } else { // VISIBLE_TO_ALL
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->board->setPieceAt($token, $space);
+      $this->game->log->addMoveToken($token, $space, $this->id, $stats);
+      // Notify
+      $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerMovePiece'], [
+        'i18n' => ['power_name', 'piece_name'],
+        'piece' => $token,
+        'piece_name' => $this->game->pieceNames[$token['type']],
+        'space' => $space,
+        'power_name' => $this->getName(),
+        'player_name' => $this->game->getActivePlayerName(),
+        'coords' => $this->game->board->getMsgCoords($token, $space),
+      ]);
+    }
+  }
 
-    // Notify
-    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerMovePiece'], [
-      'i18n' => ['power_name', 'piece_name'],
+  public function revealToken($token)
+  {
+    // Make a secret token visible on the public board
+    $this->game->board->setPieceVisibility($token, VISIBLE_TO_ALL);
+    $this->game->board->setPieceAt($token, $token);
+    // TODO: update JavaScript to treat duplicate piece placed notify as piece moved
+    // (keep notifyAllPlayers here because spectators want to see, too)
+    $this->game->notifyAllPlayers('workerPlacedInstant', '', [
       'piece' => $token,
-      'piece_name' => $this->game->pieceNames[$token['type']],
-      'space' => $space,
-      'power_name' => $this->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-      'coords' => $this->game->board->getMsgCoords($token, $space),
     ]);
+    $this->updateUI();
   }
 
   public function removePiece($piece)

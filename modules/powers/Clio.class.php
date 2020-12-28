@@ -34,9 +34,9 @@ class Clio extends SantoriniPower
     return $this->game->board->getPiecesByType('tokenCoin', null, 'hand');
   }
 
-  public function getUIData()
+  public function getUiData($playerId)
   {
-    $data = parent::getUIData();
+    $data = parent::getUiData($playerId);
     $data['counter'] = ($this->playerId != null) ? count($this->getTokens()) : 0;
     return $data;
   }

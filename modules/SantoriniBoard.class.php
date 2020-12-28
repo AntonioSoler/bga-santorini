@@ -103,6 +103,15 @@ class SantoriniBoard extends APP_GameClass
   }
 
   /*
+   * countBlocksAt: return the number of blocks at this x,y location
+   * params : array $space
+   */
+  public function countBlocksAt($space)
+  {
+    return (int) self::getUniqueValueFromDB("SELECT COUNT(*) FROM piece WHERE location = 'board' AND type IN ('lvl0', 'lvl1', 'lvl2') AND x = {$space['x']} AND y = {$space['y']}");
+  }
+
+  /*
    * getPiecesByType: return all info about pieces of the given type
    */
   public function getPiecesByType($type, $type_arg = null, $location = null)
@@ -123,32 +132,14 @@ class SantoriniBoard extends APP_GameClass
    * Order by tokens first, then by z-order ascending
    * parameter: send token visibles by this player
    */
-  public function getPlacedPieces($playerView= null)
+  public function getPlacedPieces($playerId = null)
   {
-  
-    // add the abyss for Tartarus -- not the cleanest way
-    $abyss = false;
-    $tokenabyss = null;
-    $spaceabyss = null;
-    if ($playerView != null)
-    {
-      $powers = $this->game->playerManager->getPlayer($playerView)->getPowers();
-      if (count($powers)==1 && $powers[0]->getId() == TARTARUS && $powers[0]->getAbyssSpace() != null)
-      {  
-        $abyss = true;
-        $tokenabyss = $powers[0]->getToken();
-        $spaceabyss = $powers[0]->getAbyssSpace();
-        $spaceabyss['z'] = count($this->getBlocksAt($spaceabyss));
-        $this->setPieceAt($tokenabyss, $spaceabyss);
-      }
+    $sql = "SELECT * FROM piece WHERE location = 'board'";
+    if ($playerId != null) {
+      $sql .= " OR (location = 'secret' AND player_id = $playerId)";
     }
-  
-    $return = array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' ORDER BY (type LIKE 'token%') DESC, z, x, y"));
-    
-    if ($abyss)
-      $this->setPieceAt($tokenabyss, $spaceabyss, 'hand');
-      
-    return $return;
+    $sql .= " ORDER BY (type LIKE 'token%') DESC, z, x, y, id";
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
 
@@ -516,5 +507,13 @@ class SantoriniBoard extends APP_GameClass
   public function setPieceAt($piece, $space, $location = 'board')
   {
     self::DbQuery("UPDATE piece SET location = '$location', x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
+  }
+
+  /*
+   * setPieceVisibility: update visibility of an already existing piece (e..g, at game end)
+   */
+  public function setPieceVisibility($piece, $visibility = VISIBLE_TO_ALL)
+  {
+    self::DbQuery("UPDATE piece SET visibility = $visibility WHERE id = {$piece['id']}");
   }
 }
