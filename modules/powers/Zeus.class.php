@@ -51,11 +51,18 @@ class Zeus extends SantoriniPower
     // Build under it
     $stats = [[$this->playerId, 'usePower']];
     $type = 'lvl' . $work['arg'];
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$this->playerId', '$type', 'board', '{$work['x']}', '{$work['y']}', '{$work['z']}') ");
+    $pieceId = $this->board->addPiece([
+      'player_id' => $this->playerId,
+      'type' => $type,
+      'location' => 'board',
+      'x' => $work['x'],
+      'y' => $work['y'],
+      'z' => $work['z'],
+    ]);
+    $piece = $this->board->getPiece($pieceId);
     $this->game->log->addBuild($worker, $work, $stats);
 
     // Notify
-    $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
     $this->game->notifyAllPlayers('blockBuiltUnder', clienttranslate('${power_name}: ${player_name} builds a block under themself (${coords})'), [
       'i18n' => ['power_name'],
       'piece' => $piece,

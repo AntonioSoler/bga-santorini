@@ -52,7 +52,7 @@ class Tartarus extends SantoriniPower
   public function setup()
   {
     // Abyss is secret
-    $this->getPlayer()->addToken('tokenAbyss', null, 'hand', VISIBLE_TO_PLAYER);
+    $this->getPlayer()->addToken('tokenAbyss');
     $this->updateUI();
   }
 
@@ -65,13 +65,7 @@ class Tartarus extends SantoriniPower
   {
     // Place Abyss on the first turn
     $token = $this->getToken();
-    if ($token['location'] == 'hand') {
-      return 'power';
-    } else {
-      // Needed vs. Nyx, fix Abyss after Tartarus power comes back
-      $this->updateAbyssHeight();
-      return null;
-    }
+    return ($token['location'] == 'hand') ? 'power' : null;
   }
 
   public function argUsePower(&$arg)
@@ -93,35 +87,13 @@ class Tartarus extends SantoriniPower
   {
     $token = $this->getToken();
     $space = $action[1];
-    $this->placeToken($token, $space);
+    $this->placeToken($token, $space, 'secret');
     $this->updateUI();
   }
 
   public function stateAfterUsePower()
   {
     return 'move';
-  }
-
-  public function updateAbyssHeight()
-  {
-    $token = $this->getToken();
-    $top = $this->game->board->countBlocksAt($token);
-    if ($token['z'] != $top) {
-      // Move Abyss to the top of the stack
-      $space = $token;
-      $space['z'] = $top;
-      $this->moveToken($token, $space);
-    }
-  }
-
-  public function preEndPlayerTurn()
-  {
-    $this->updateAbyssHeight();
-  }
-
-  public function preEndOpponentTurn()
-  {
-    $this->updateAbyssHeight();
   }
 
 
