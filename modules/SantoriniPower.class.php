@@ -130,7 +130,7 @@ abstract class SantoriniPower extends APP_GameClass
         'powerId' => $this->id,
         'counter' => $data['counter'],
       ];
-      if (!is_array($data['counter'])) {
+      if (is_array($data['counter'])) {
         // When counter is an array, show different info to each player
         foreach ($data['counter'] as $playerId => $counter) {
           $args['counter'] = $counter;
