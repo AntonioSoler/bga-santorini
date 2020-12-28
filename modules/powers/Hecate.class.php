@@ -16,7 +16,26 @@ class Hecate extends SantoriniPower
     $this->playerCount = [2, 3];
     $this->golden  = false;
     $this->orderAid = 64;
+    
+    $this->implemented = true;
+  }
+  
+  
+  
+  
+  public function setup()
+  {
+    $this->getPlayer()->addToken('tokenHecateF');
+    $this->getPlayer()->addToken('tokenHecateM');
+  }
+  
+
+
+  public function playerPlaceWorker($workerId, $x, $y, $z)
+  {
+    return true;
   }
 
-  /* * */
+
+
 }

@@ -211,6 +211,12 @@ abstract class SantoriniPower extends APP_GameClass
   public function setup()
   {
   }
+  
+  // return true if the original function should stop
+  public function playerPlaceWorker($workerId, $x, $y, $z)
+  {
+    return false;
+  }
 
   public function argChooseFirstPlayer(&$arg)
   {
