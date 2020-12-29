@@ -194,9 +194,6 @@ define('BLUE', 0);
 define('WHITE', 1);
 define('PURPLE', 2);
 
-define('VISIBLE_TO_ALL', 0);
-define('VISIBLE_TO_PLAYER', 1);
-
 define('DIRECTIONS', [
   N  => ['x' => 1,  'y' => 0],
   NE => ['x' => 1,  'y' => 1],

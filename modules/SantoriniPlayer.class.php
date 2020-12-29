@@ -113,17 +113,22 @@ class SantoriniPlayer extends APP_GameClass
 
     public function addWorker($type, $location = 'desk')
     {
-        $player_id = $this->id;
         $type_arg = $type . $this->team;
-        self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`) VALUES ('$player_id', 'worker', '$type_arg', '$location')");
-        return self::DbGetLastId();
+        return $this->game->board->addPiece([
+            'player_id' => $this->id,
+            'type' => 'worker',
+            'type_arg' => $type_arg,
+            'location' => $location,
+        ]);
     }
 
-
-    public function addToken($type, $type_arg = null, $location = 'hand', $visibility = VISIBLE_TO_ALL)
+    public function addToken($type, $type_arg = null, $location = 'hand')
     {
-        $player_id = $this->id;
-        self::DbQuery("INSERT INTO piece (`player_id`, `type`, `type_arg`, `location`, `visibility`) VALUES ('$player_id', '$type', " . (is_null($type_arg) ? "NULL" : "'$type_arg'") . ", '$location', $visibility)");
-        return self::DbGetLastId();
+        return $this->game->board->addPiece([
+            'player_id' => $this->id,
+            'type' => $type,
+            'type_arg' => $type_arg,
+            'location' => $location,
+        ]);
     }
 }

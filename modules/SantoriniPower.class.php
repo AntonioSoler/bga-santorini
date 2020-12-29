@@ -81,7 +81,7 @@ abstract class SantoriniPower extends APP_GameClass
     return $this->implemented;
   }
 
-  public function getUiData($playerId)
+  public function getUiData()
   {
     return [
       'id'          => $this->id,
@@ -123,13 +123,26 @@ abstract class SantoriniPower extends APP_GameClass
 
   public function updateUI()
   {
-    $data = $this->getUiData(null);
+    $data = $this->getUiData();
     if (array_key_exists('counter', $data)) {
-      $this->game->notifyAllPlayers('updatePowerUI', '', [
+      $args = [
         'playerId' => $this->playerId,
         'powerId' => $this->id,
         'counter' => $data['counter'],
-      ]);
+      ];
+      if (is_array($data['counter'])) {
+        // When counter is an array, show different info to each player
+        foreach ($data['counter'] as $playerId => $counter) {
+          $args['counter'] = $counter;
+          if ($playerId != 'all') {
+            // Don't notify all or it accidentally reveals secret token location
+            // This means 'all' value cannot change before reavled at game end!
+            $this->game->notifyPlayer($playerId, 'updatePowerUI', '', $args);
+          }
+        }
+      } else {
+        $this->game->notifyAllPlayers('updatePowerUI', '', $args);
+      }
     }
   }
 
@@ -139,7 +152,7 @@ abstract class SantoriniPower extends APP_GameClass
     $worker['x'] = $space['x'];
     $worker['y'] = $space['y'];
     $worker['z'] = $space['z'];
-    $this->game->log->addPlaceWorker($worker, $this->id);
+    $this->game->log->addPlaceWorker($worker, $this);
 
     // Notify
     $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], [
@@ -153,15 +166,14 @@ abstract class SantoriniPower extends APP_GameClass
   }
 
 
-  public function placeToken($token, $space)
+  public function placeToken($token, $space, $location = 'board')
   {
     $stats = [[$this->playerId, 'usePower']];
-    $location = $token['visibility'] == VISIBLE_TO_PLAYER ? 'secret' : 'board';
     $this->game->board->setPieceAt($token, $space, $location);
     $token['x'] = $space['x'];
     $token['y'] = $space['y'];
     $token['z'] = $space['z'];
-    $this->game->log->addPlaceToken($token, $this->id, $stats);
+    $this->game->log->addPlaceToken($token, $this, $stats);
 
     // Notify
     $args = [
@@ -173,47 +185,38 @@ abstract class SantoriniPower extends APP_GameClass
       'coords' => $this->game->board->getMsgCoords($token),
     ];
 
-    if ($token['visibility'] == VISIBLE_TO_PLAYER) {
+    if ($location == 'secret') {
       $this->game->notifyPlayer($this->getPlayerId(), 'workerPlaced', $this->game->msg['powerPlacePiece'], $args);
       unset($args['piece']);
       $args['i18n'][] = 'coords';
       $args['coords'] = $this->game->specialNames['secret'];
       $this->game->notifyAllPlayers('message', $this->game->msg['powerPlacePiece'], $args);
-    } else { // VISIBLE_TO_ALL
+    } else { // visible to all
       $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], $args);
     }
   }
 
   public function moveToken($token, $space)
   {
-    if ($token['visibility'] == VISIBLE_TO_PLAYER) {
-      $this->game->board->setPieceAt($token, $space, 'secret');
-      $this->game->log->addMoveToken($token, $space, $this->id);
-      $this->game->notifyPlayer($this->getPlayerId(), 'workerMovedInstant', '', [
-        'piece' => $token,
-        'space' => $space,
-      ]);
-    } else { // VISIBLE_TO_ALL
-      $stats = [[$this->playerId, 'usePower']];
-      $this->game->board->setPieceAt($token, $space);
-      $this->game->log->addMoveToken($token, $space, $this->id, $stats);
-      // Notify
-      $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerMovePiece'], [
-        'i18n' => ['power_name', 'piece_name'],
-        'piece' => $token,
-        'piece_name' => $this->game->pieceNames[$token['type']],
-        'space' => $space,
-        'power_name' => $this->getName(),
-        'player_name' => $this->game->getActivePlayerName(),
-        'coords' => $this->game->board->getMsgCoords($token, $space),
-      ]);
-    }
+
+    $stats = [[$this->playerId, 'usePower']];
+    $this->game->board->setPieceAt($token, $space);
+    $this->game->log->addMoveToken($token, $space, $this, $stats);
+    // Notify
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerMovePiece'], [
+      'i18n' => ['power_name', 'piece_name'],
+      'piece' => $token,
+      'piece_name' => $this->game->pieceNames[$token['type']],
+      'space' => $space,
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'coords' => $this->game->board->getMsgCoords($token, $space),
+    ]);
   }
 
   public function revealToken($token)
   {
-    // Make a secret token visible on the public board
-    $this->game->board->setPieceVisibility($token, VISIBLE_TO_ALL);
+    // Move from secret to public board at same space
     $this->game->board->setPieceAt($token, $token);
     // TODO: update JavaScript to treat duplicate piece placed notify as piece moved
     // (keep notifyAllPlayers here because spectators want to see, too)

@@ -170,7 +170,7 @@ abstract class Utils extends APP_GameClass
   public static function convertIntValues(&$array)
   {
     array_walk($array, function (&$value, $key) {
-      if (in_array($key, ['id', 'x', 'y', 'z', 'arg', 'direction', 'visibility'])) {
+      if (in_array($key, ['id', 'x', 'y', 'z', 'arg', 'direction'])) {
         $value = (int) $value;
       }
     });

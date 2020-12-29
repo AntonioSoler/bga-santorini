@@ -228,7 +228,10 @@ class santorini extends Table
 
     // Create the Ram figure
     if ($this->powerManager->isGoldenFleece()) {
-      self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
+      $this->board->addPiece([
+        'type' => 'ram',
+        'location' => 'desk',
+      ]);
     }
 
     // Prepare a deck with all possible powers for this game (if needed)
@@ -1070,11 +1073,18 @@ class santorini extends Table
       throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
     }
     $pieceName = $this->pieceNames[$type];
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$space['x']}', '{$space['y']}', '{$space['z']}') ");
+    $pieceId = $this->board->addPiece([
+      'player_id' => $pId,
+      'type' => $type,
+      'location' => 'board',
+      'x' => $space['x'],
+      'y' => $space['y'],
+      'z' => $space['z'],
+    ]);
+    $piece = $this->board->getPiece($pieceId);
     $this->log->addBuild($worker, $space);
 
     // Notify
-    $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
     self::notifyAllPlayers($notify, $this->msg['build'], [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
@@ -1161,9 +1171,6 @@ class santorini extends Table
   {
     if ($from_version <= 2009010714) {
       self::DbQuery("ALTER TABLE log DROP round");
-    }
-    if ($from_version <= 2012121801) {
-      self::DbQuery("ALTER TABLE piece ADD visibility int(1) NOT NULL DEFAULT 0");
     }
   }
 
