@@ -180,6 +180,18 @@ class PowerManager extends APP_GameClass
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
+    
+    // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
+    [HECATE, IRIS],
+    [HECATE, ERIS],
+    [HECATE, NEMESIS],
+    [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
+    [HECATE, SIREN],
+    [HECATE, ODYSSEUS],
+    [HECATE, ADONIS],
+    [HECATE, HARPIES], // notifications + stop at Hecate worker
+    [HECATE, MEDUSA], // kill + restart -> piece back on board instead of secret
+    [HECATE, BIA], // kill + restart -> piece back on board instead of secret
   ];
 
 

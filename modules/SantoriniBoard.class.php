@@ -190,10 +190,10 @@ class SantoriniBoard extends APP_GameClass
    * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
-  public function getPlacedWorkers($pId = -1)
+  public function getPlacedWorkers($pId = -1, $location = 'board')
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = '$location' AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
