@@ -190,8 +190,6 @@ class PowerManager extends APP_GameClass
     [HECATE, ODYSSEUS],
     [HECATE, ADONIS],
     [HECATE, HARPIES], // notifications + stop at Hecate worker
-    [HECATE, MEDUSA], // kill + restart -> piece back on board instead of secret
-    [HECATE, BIA], // kill + restart -> piece back on board instead of secret
   ];
 
 

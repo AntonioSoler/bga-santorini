@@ -22,7 +22,7 @@ class Maenads extends SantoriniPower
   public function endPlayerTurn()
   {
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId, true);
     foreach ($oppWorkers as $oppWorker) {
       foreach ($myWorkers as $myWorker) {
         if ($this->game->board->isNeighbour($myWorker, $oppWorker) && !is_null($this->game->board->getSpaceBehind($myWorker, $oppWorker, $myWorkers))) {

@@ -228,7 +228,10 @@ class santorinigretirse extends Table
 
     // Create the Ram figure
     if ($this->powerManager->isGoldenFleece()) {
-      self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
+      $this->board->addPiece([
+        'type' => 'ram',
+        'location' => 'desk',
+      ]);
     }
 
     // Prepare a deck with all possible powers for this game (if needed)
@@ -633,7 +636,7 @@ class santorinigretirse extends Table
 
     // Basic rule: Win by moving up to level 3 one of MY workers
     if ($work != null && $work['action'] == 'move') {
-      $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
+      $workers = $this->board->getPlacedWorkers(self::getActivePlayerId(), true);
       Utils::filterWorkersById($workers, $work['pieceId']);
       if (!empty($workers)) {
         $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
@@ -1081,11 +1084,18 @@ class santorinigretirse extends Table
       throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
     }
     $pieceName = $this->pieceNames[$type];
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$space['x']}', '{$space['y']}', '{$space['z']}') ");
+    $pieceId = $this->board->addPiece([
+      'player_id' => $pId,
+      'type' => $type,
+      'location' => 'board',
+      'x' => $space['x'],
+      'y' => $space['y'],
+      'z' => $space['z'],
+    ]);
+    $piece = $this->board->getPiece($pieceId);
     $this->log->addBuild($worker, $space);
 
     // Notify
-    $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
     self::notifyAllPlayers($notify, $this->msg['build'], [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
@@ -1109,14 +1119,17 @@ class santorinigretirse extends Table
     $this->log->addRemoval($worker, $stats);
 
     // Notify
-    $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], [
+    
+    $args = [
       'i18n' => ['power_name'],
       'piece' => $worker,
       'power_name' => $powerName,
       'player_name' => $this->getActivePlayerName(),
       'player_name2' => $this->playerManager->getPlayer($worker['player_id'])->getName(),
-      'coords' => $this->board->getMsgCoords($worker),
-    ]);
+      'coords' => $this->board->getMsgCoords($worker)
+    ];
+    
+    $this->notifyWithSecret($worker, $this->msg['powerKill'], $args, 'pieceRemoved');
   }
 
 
@@ -1172,9 +1185,6 @@ class santorinigretirse extends Table
   {
     if ($from_version <= 2009010714) {
       self::DbQuery("ALTER TABLE log DROP round");
-    }
-    if ($from_version <= 2012121801) {
-      self::DbQuery("ALTER TABLE piece ADD visibility int(1) NOT NULL DEFAULT 0");
     }
   }
 
@@ -1264,4 +1274,17 @@ class santorinigretirse extends Table
     self::DbQuery("INSERT INTO piece SELECT * FROM ebd_santorinigretirse_$tableId.piece");
     self::DbQuery("UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_PLACE_WORKER);
   }
+  
+  // UTILS
+  
+  
+  public function notifyWithSecret($piece, $msg, $args, $notif = 'message')
+  {
+    if ($piece['location'] == 'secret')
+      self::notifyPlayer($piece['player_id'], $notif, $msg, $args);
+    else
+      self::notifyAllPlayers($notif, $msg, $args);
+  }
+  
+  
 }

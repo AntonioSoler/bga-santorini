@@ -195,10 +195,13 @@ class SantoriniBoard extends APP_GameClass
    * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
-  public function getPlacedWorkers($pId = -1, $location = 'board')
+  public function getPlacedWorkers($pId = -1, $lookSecret= false)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = '$location' AND type = 'worker' $filter ORDER BY id"));
+    $location = "'board'";
+    if ($lookSecret)
+      $location = $location . " , 'secret' ";
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
@@ -232,9 +235,9 @@ class SantoriniBoard extends APP_GameClass
    * - passive powers like Aphrodite, Harpies, etc. that apply to Clio should not use this function
    *  (see also: getPlacedNotMineWorkers() which does not filter Clio)
    */
-  public function getPlacedOpponentWorkers($pId = null)
+  public function getPlacedOpponentWorkers($pId = null, $lookSecret = false)
   {
-    $workers = $this->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId));
+    $workers = $this->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId), $lookSecret);
 
     // Clio: Workers on top of a coin are invisible to opponents
     $tokensXY = array_map(function ($token) {

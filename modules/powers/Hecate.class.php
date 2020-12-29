@@ -20,6 +20,18 @@ class Hecate extends SantoriniPower
     $this->implemented = true;
   }
   
+  public function setup()
+  {
+    $dummy = $this->getPlayer()->addWorker('f', 'hand'); // dummy worker used only for display 
+  }
+  
+  public function getDummyWorker()
+  {
+    $dummy = $this->game->board->getPiecesByType('worker', null, 'hand');
+    if (count($dummy) != 1)
+      throw new BgaVisibleSystemException('Cannot find dummy worker in Hecate');
+    return $dummy[0];
+  }
   
   public function argChooseFirstPlayer(&$arg)
   {
@@ -32,40 +44,50 @@ class Hecate extends SantoriniPower
   
   public function getPlacedWorkers()
   {
-    return $this->game->board->getPlacedWorkers($this->playerId, 'secret');
+    return $this->game->board->getPlacedWorkers($this->playerId, true);
   }
 
 
   public function playerPlaceWorker($workerId, $x, $y, $z)
   {
     $worker = $this->game->board->getPiece($workerId);
-    $team = $this->game->playerManager->getPlayer($this->playerId)->getTeam();
-//    $typearg = $worker['type_arg'][0] . $team; // male or female
-    $typearg = 'f' . $team; // two female workers so that we can easily reveal the location but not identify the worker
-    $token = $this->getPlayer()->addToken('worker', $typearg, 'hand', VISIBLE_TO_PLAYER);
     
-    $space = ['x' => $x, 'y' => $y, 'z' => $z];
+    $space = ['x' => $x, 'y' => $y, 'z' => $z,  'arg' => null];
     
     
-    $this->placeToken($this->game->board->getPiece($token), $space);
-    $this->game->board->setPieceAt($worker, $space, 'box');
+    $this->game->board->setPieceAt($worker, $space, 'secret');
     
+    $worker = $this->game->board->getPiece($workerId); // update space
+    // Notify
+    $args = [
+      'i18n' => ['power_name', 'piece_name'],
+      'piece' => $worker,
+      'piece_name' => $this->game->pieceNames[$worker['type']],
+      'power_name' => $this->getName(),
+      'player_name' => $this->game->getActivePlayerName(),
+      'coords' => $this->game->board->getMsgCoords($space),
+    ];
+
+    $this->game->notifyPlayer($this->getPlayerId(), 'workerPlaced', $this->game->msg['powerPlacePiece'], $args);
+    unset($args['piece']);
+    $args['i18n'][] = 'coords';
+    $args['coords'] = $this->game->specialNames['secret'];
+    $this->game->notifyAllPlayers('message', $this->game->msg['powerPlacePiece'], $args);
     return true; // do not place another piece
   }
   
+  // TODO: selected worker not displayed with a blue circle underneath
   public function argPlayerWork(&$arg, $action)
   {
     $myworkers = $this->getPlacedWorkers();
-    foreach ($arg['workers'] as &$worker) {
-      
+    foreach ($arg['workers'] as &$worker)
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, $action);
-      
- /*     Utils::filterWorks($arg, function($space, $piece) use ($myworkers) {
-        return  !max(array_map(
-                      function($s) use ($space) {
-                      return ($space['x'] == $s['x'] && $space['y'] == $s['y']) ;
-                      } , $myworkers )); } ); // remove Hecate worker spaces
-    */}
+    
+    Utils::filterWorks($arg, function($space, $piece) use ($myworkers) {
+      return  !max(array_map(
+                    function($s) use ($space) {
+                    return ($space['x'] == $s['x'] && $space['y'] == $s['y']) ;
+                    } , $myworkers )); } ); // remove Hecate worker spaces
   }
   
   public function argPlayerMove(&$arg)
@@ -77,10 +99,11 @@ class Hecate extends SantoriniPower
   
   public function argPlayerBuild(&$arg)
   {
-      //TODO: problem: cannot build
     $move = $this->game->log->getLastMove();
     if ($move == null)
       throw new BgaVisibleSystemException('Hecate build before move');
+      
+    $arg['workers'] = $this->getPlacedWorkers();
     Utils::filterWorkersById($arg, $move['pieceId']);
     $this->argPlayerWork($arg, 'build');
   }
@@ -126,44 +149,59 @@ class Hecate extends SantoriniPower
   }
   
   
+// return null if the logged action is legal wrt the secret workers. Otherwise, return the problematic space
+  public function getAffectedSpaceFromLog($log, $myWorkers)
+  {    
+      if (count($myWorkers) == 0)
+        return null;
   
+      if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'build'
+       || $log['action'] == 'placeWorker' || $log['action'] == 'placeToken'
+       || $log['action'] == 'moveToken')
+      { 
+        $args = json_decode($log['action_arg'], true);
+        $space = $args['to'];
+      }
+      elseif ($log['action'] == 'removal')
+      {
+        $space = $this->game->board->getPiece($log['piece_id']);
+      }
+      else
+        return null;
+       
+      if (max(array_map(function($s) use ($space) {
+                      return ($space['x'] == $s['x'] && $space['y'] == $s['y']) ;
+                      } , $myWorkers )))
+         return $space;
+      else
+        return null;
+  
+  }
   // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
   // TODO: treat Apollo / Minotaur
-  // TODO: treat passive powers (Hypnus etc)
+  // TODO: Hecate win -> display workers
+
   public function endOpponentTurn()
   {
     $myWorkers = $this->getPlacedWorkers();
     
     $logs = $this->game->log->logsForCancelTurn();
     
-    $logIdBreak = null;
     $space = null;
     
     foreach (array_reverse($logs) as $log) {
-      if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'build'
-       || $log['action'] == 'placeWorker' || $log['action'] == 'placeToken'
-       || $log['action'] == 'moveToken') {
-        $args = json_decode($log['action_arg'], true);
-        $space = $args['to'];
-        if (max(array_map(function($s) use ($space) {
-                      return ($space['x'] == $s['x'] && $space['y'] == $s['y']) ;
-                      } , $myWorkers ))) 
-        {
-          $logIdBreak = $log['log_id'];
-          break;
-        }
-      }
+        $space = $this->getAffectedSpaceFromLog($log, $myWorkers);
+        if ($space == null)
+          continue;
+        // cancel end of turn
+        $moveIds = $this->game->log->cancelTurn($log['log_id']);    
+        break;
     }
     
-    if ($logIdBreak == null)
+    if ($space == null)
       return;
     
-    
-    
-    // cancel end of turn and display it
-    $moveIds = $this->game->log->cancelTurn($logIdBreak);
-    
-    
+    // display current board state
     $playerIds = $this->game->playerManager->getPlayerIds();
     foreach ($playerIds as $playerId) {
       $this->game->notifyPlayer($playerId, 'cancel', '' , [
@@ -171,7 +209,6 @@ class Hecate extends SantoriniPower
           'moveIds' => $moveIds,
         ]);
      }
-    
     
     // display the problematic secret worker
     $args = [
@@ -181,30 +218,19 @@ class Hecate extends SantoriniPower
       'coords' => $this->game->board->getMsgCoords($space)
     ];
     
-    $worker = Utils::search($myWorkers, function($s) use ($space) {return ($space['x'] == $s['x'] && $space['y'] == $s['y']);});
-    
-    if ($worker == null)
-      throw new BgaVisibleSystemException('Unexpected state in Hecate: worker expected on a space');
-    
-    $this->game->board->setPieceAt($worker, $worker, 'board'); // display the worker temporarily
-    
-    $this->game->notifyAllPlayers('workerPlaced', '', [
-      'piece' => $worker,
-    ]);
-    
+    $dummy = $this->getDummyWorker(); // use a dummy one to avoid duplicates
+    $dummy['x'] = $space['x'];
+    $dummy['y'] = $space['y'];
+    $dummy['z'] = $this->game->board->countBlocksAt($space);
+    $this->game->notifyAllPlayers('workerPlaced', '', ['piece' => $dummy]);
     
     // explain what is happening
     $this->game->notifyAllPlayers('message', '${power_name}: due to a secret worker in ${coords}, an action of ${player_name} is illegal which cancels the rest of the turn', $args);
     
     // hide the secret worker again
-    $this->game->board->setPieceAt($worker, $worker, 'secret');
-    
-    $this->game->notifyAllPlayers('pieceRemoved', '', [
-      'piece' => $worker,
-    ]);
+    $this->game->notifyAllPlayers('pieceRemoved', '', ['piece' => $dummy]);
     
   }
-
 
 
 

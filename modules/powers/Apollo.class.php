@@ -23,7 +23,7 @@ class Apollo extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId);
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId, true);
 
     foreach ($workers as &$worker) {
       $worker['works'] = [];
@@ -40,14 +40,15 @@ class Apollo extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = $this->game->board->getPiece($work);
-    if ($worker2 != null && $worker2['location'] == 'board') {
+    $worker2 = $this->game->board->getPiece($work); // TODO can this get Hecate??
+    if ($worker2 != null && ($worker2['location'] == 'board' || $worker2['location'] == 'secret')) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->board->setPieceAt($worker2, $worker);
       $this->game->log->addForce($worker2, $worker, $stats);
 
       // Notify force
-      $this->game->notifyAllPlayers('workerMovedInstant', $this->game->msg['powerForce'], [
+      
+      $args = [
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $worker,
@@ -56,7 +57,9 @@ class Apollo extends SantoriniPower
         'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
         'level_name' => $this->game->levelNames[intval($worker['z'])],
         'coords' => $this->game->board->getMsgCoords($worker2, $worker),
-      ]);
+      ];
+      
+      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMovedInstant');
     }
 
     // Always do a classic move

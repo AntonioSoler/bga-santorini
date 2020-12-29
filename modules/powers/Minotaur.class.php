@@ -24,7 +24,7 @@ class Minotaur extends SantoriniPower
   {
     $workers = $this->game->board->getPlacedActiveWorkers();
     // Must use getPlacedOpponentWorkers() so Minotaur cannot target Clio's invisible workers
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, true);
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
 
     foreach ($workers as &$worker) {
@@ -49,19 +49,18 @@ class Minotaur extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = $this->game->board->getPiece($work);
-    if ($worker2 != null && $worker2['location'] == 'board') {
+    $worker2 = $this->game->board->getPiece($work); // TODO: does it work with Hecate? not sure if getPiece gets an ID
+    if ($worker2 != null && ($worker2['location'] == 'board' || $worker2['location'] == 'secret')) {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
       $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
       if (is_null($space)) {
         throw new BgaVisibleSystemException("Minotaur: No available space behind opponent worker");
       }
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->board->setPieceAt($worker2, $space);
+      $this->game->board->setPieceAt($worker2, $space, $worker2['location']);
       $this->game->log->addForce($worker2, $space, $stats);
-
-      // Notify force
-      $this->game->notifyAllPlayers('workerMovedInstant', $this->game->msg['powerForce'], [
+      
+      $args = [
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $space,
@@ -70,7 +69,10 @@ class Minotaur extends SantoriniPower
         'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
         'level_name' => $this->game->levelNames[intval($space['z'])],
         'coords' => $this->game->board->getMsgCoords($worker2, $space),
-      ]);
+      ];
+      
+      // Notify force
+      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMovedInstant');
     }
 
     // Always do a classic move
