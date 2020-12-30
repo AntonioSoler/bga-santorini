@@ -30,6 +30,10 @@ class Apollo extends SantoriniPower
       foreach ($oppWorkers as $worker2) {
         if ($this->game->board->isNeighbour($worker, $worker2, 'move')) {
           Utils::addWork($worker, $worker2);
+          
+          // remove work to $worker2 space if exists (vs Hecate)
+          Utils::filterWorks($arg, function($space, $piece) use ($worker2) {
+            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']) ;} );
         }
       }
     }
@@ -40,10 +44,10 @@ class Apollo extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = $this->game->board->getPiece($work); // TODO can this get Hecate??
+    $worker2 = $this->game->board->getPiece($work);
     if ($worker2 != null && ($worker2['location'] == 'board' || $worker2['location'] == 'secret')) {
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->board->setPieceAt($worker2, $worker);
+      $this->game->board->setPieceAt($worker2, $worker, $worker2['location']);
       $this->game->log->addForce($worker2, $worker, $stats);
 
       // Notify force

@@ -182,14 +182,16 @@ class PowerManager extends APP_GameClass
     [ADONIS, TRITON], // multiple moves
     
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
-    [HECATE, IRIS],
+    [HECATE, IRIS], // can jump over secret workers + issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
     [HECATE, ERIS],
     [HECATE, NEMESIS],
     [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
     [HECATE, SIREN],
     [HECATE, ODYSSEUS],
     [HECATE, ADONIS],
-    [HECATE, HARPIES], // notifications + stop at Hecate worker
+    [HECATE, HARPIES], // notifications + need to stop at Hecate worker
+    [HECATE, NYX], // too confusing for the moment
+  //  [HECATE, MEDUSA], // need to cancel endOfTurn on an illegal action + not reveal info -> easiest might be to treat Medusa in Hecate directly
   ];
 
 

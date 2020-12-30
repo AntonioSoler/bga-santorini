@@ -1111,10 +1111,11 @@ class santorinigretirse extends Table
    * playerKill: kill a piece (only called with specific power eg Medusa, Bia)
    *  - obj $worker : the worker we want to kill
    */
-  public function playerKill($worker, $powerName, $incStats = true)
+  public function playerKill($worker, $powerName, $incStats = true, $notifAllWhenSecret = false)
   {
     // Kill worker
-    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
+    $location = $worker['location'] == 'secret' ? 'secretbox' : 'box';
+    self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$worker['id']}");
     $stats = $incStats ? [[$this->getActivePlayerId(), 'usePower']] : [];
     $this->log->addRemoval($worker, $stats);
 
@@ -1129,7 +1130,10 @@ class santorinigretirse extends Table
       'coords' => $this->board->getMsgCoords($worker)
     ];
     
-    $this->notifyWithSecret($worker, $this->msg['powerKill'], $args, 'pieceRemoved');
+    if ($notifAllWhenSecret)
+      $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], $args);
+    else
+      $this->notifyWithSecret($worker, $this->msg['powerKill'], $args, 'pieceRemoved');
   }
 
 

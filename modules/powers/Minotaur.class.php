@@ -26,6 +26,10 @@ class Minotaur extends SantoriniPower
     // Must use getPlacedOpponentWorkers() so Minotaur cannot target Clio's invisible workers
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, true);
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
+    // vs Hecate: make spaces where a secret opponent stands not accessible to a force
+    foreach ($oppWorkers as $opp)
+      if ($opp['location'] == 'secret')
+        Utils::filter($accessibleSpaces, function ($space) use ($opp){ return $opp['x'] != $space['x'] || $opp['y'] != $space['y']; });
 
     foreach ($workers as &$worker) {
       $worker['works'] = [];
@@ -39,6 +43,10 @@ class Minotaur extends SantoriniPower
         $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
         if (!is_null($space)) {
           Utils::addWork($worker, $worker2);
+          
+          // remove work to $worker2 space if exists (vs Hecate)
+          Utils::filterWorks($arg, function($space, $piece) use ($worker2) {
+            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']) ;} );
         }
       }
     }
@@ -49,7 +57,7 @@ class Minotaur extends SantoriniPower
   public function playerMove($worker, $work)
   {
     // If space is occupied, first do a force
-    $worker2 = $this->game->board->getPiece($work); // TODO: does it work with Hecate? not sure if getPiece gets an ID
+    $worker2 = $this->game->board->getPiece($work);
     if ($worker2 != null && ($worker2['location'] == 'board' || $worker2['location'] == 'secret')) {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
       $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);

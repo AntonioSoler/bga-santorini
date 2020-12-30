@@ -13,34 +13,35 @@ class Hecate extends SantoriniPower
       clienttranslate("[Your Turn:] Move a Worker Token on the Map as if it were on the game board. Build on the game board, as normal."),
       clienttranslate("[Any Time:] If an opponent attempts an action that would not be legal due to the presence of your secret Workers, their action is cancelled and they lose the rest of their turn. When possible, use their power on their behalf to make their turns legal without informing them."),
     ];
-    $this->playerCount = [2]; // TODO cases to check for 3 players: put workers last, interactions with powers...
+    $this->playerCount = [2]; // TODO problematic cases for 3 players: put workers last, interactions with powers and restart implementation (Limus)...
     $this->golden  = false;
     $this->orderAid = 64;
     
     $this->implemented = true;
   }
   
-  public function setup()
-  {
-    $dummy = $this->getPlayer()->addWorker('f', 'hand'); // dummy worker used only for display 
-  }
   
   public function getDummyWorker()
   {
-    $dummy = $this->game->board->getPiecesByType('worker', null, 'hand');
-    if (count($dummy) != 1)
-      throw new BgaVisibleSystemException('Cannot find dummy worker in Hecate');
-    return $dummy[0];
+    $logs = $this->game->log->getActions(['powerData'], $this->playerId);
+    $dummy = count($logs) > 0 ? json_decode($logs[0]['action_arg'], true) : null;
+    if ($dummy == null)
+    {
+      $dummy = $this->getPlayer()->addWorker('f', 'hand'); // dummy worker used only for display 
+      $this->game->log->addAction('powerData', [], $dummy, $this->playerId);
+    }
+    return $this->game->board->getPiece($dummy);
   }
   
+  /*
   public function argChooseFirstPlayer(&$arg)
   {
     // Hecate must not go first
     if (($key = array_search($this->id, $arg['powers'])) !== false) {
       unset($arg['powers'][$key]);
+  } // TODO error vs Hydra (any after in the alphabet???)
   }
-  }
-
+*/
   
   public function getPlacedWorkers()
   {
@@ -154,6 +155,8 @@ class Hecate extends SantoriniPower
   {    
       if (count($myWorkers) == 0)
         return null;
+      
+      Utils::filterWorkersById($myWorkers, $log['piece_id'], false);
   
       if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'build'
        || $log['action'] == 'placeWorker' || $log['action'] == 'placeToken'
@@ -178,8 +181,7 @@ class Hecate extends SantoriniPower
   
   }
   // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
-  // TODO: treat Apollo / Minotaur
-  // TODO: Hecate win -> display workers
+  // TODO: Hecate win // loose -> display workers
 
   public function endOpponentTurn()
   {
@@ -199,7 +201,19 @@ class Hecate extends SantoriniPower
     }
     
     if ($space == null)
+    {
+      // treat Medusa: kill secret workers only after we know the turn is legal
+      $powers = $this->game->playerManager->getPlayer($this->playerId)->getPowers();
+      foreach ($powers as $power)
+      {
+        if ($power->getId() != HECATE)
+          continue;
+        $argKill = ['workers' => []];
+        $power->argPlayerBuild($argKill, true);
+        $power->endPlayerTurn($argKill); // TODO: MEDUSA DOES NOT KILL
+      }
       return;
+    }
     
     // display current board state
     $playerIds = $this->game->playerManager->getPlayerIds();

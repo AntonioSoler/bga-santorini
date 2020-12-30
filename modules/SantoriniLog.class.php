@@ -452,8 +452,10 @@ class SantoriniLog extends APP_GameClass
         self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
         $this->game->board->adjustSecretTokens($args['to'], false);
       } else if ($log['action'] == 'removal') {
-        // Removal : put the piece back on the board
-        self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$log['piece_id']}");
+        // Removal : put the piece back on the board    
+        $piece = $this->game->board->getPiece($log['piece_id']);
+        $location = $piece['location'] == 'secretbox' ? 'secret' : 'board';
+        self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$log['piece_id']}");
         $piece = $this->game->board->getPiece($log['piece_id']);
         $this->game->board->adjustSecretTokens($piece, false);
       } else if ($log['action'] == 'powerRemoved' && $args['reason'] == 'hero') {

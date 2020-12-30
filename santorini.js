@@ -1263,7 +1263,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
       // Select the worker
       this._selectedWorker = worker;
-      if (worker.location == 'board') {
+      if (worker.location == 'board' || worker.location == 'secret') {
         // Highlight the worker if it's on the board
         // For Jason, Gaea, etc. the worker may not yet exist
         this.board.highlightPiece(worker);
