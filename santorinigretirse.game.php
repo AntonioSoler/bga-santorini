@@ -1120,7 +1120,6 @@ class santorinigretirse extends Table
     $this->log->addRemoval($worker, $stats);
 
     // Notify
-    
     $args = [
       'i18n' => ['power_name'],
       'piece' => $worker,

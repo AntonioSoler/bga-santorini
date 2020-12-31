@@ -189,7 +189,6 @@ class PowerManager extends APP_GameClass
     [HECATE, SIREN],
     [HECATE, ODYSSEUS],
     [HECATE, ADONIS],
-    [HECATE, HARPIES], // notifications + need to stop at Hecate worker
     [HECATE, NYX], // too confusing for the moment
   //  [HECATE, MEDUSA], // need to cancel endOfTurn on an illegal action + not reveal info -> easiest might be to treat Medusa in Hecate directly
   ];

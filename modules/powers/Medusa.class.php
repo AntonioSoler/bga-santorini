@@ -34,6 +34,7 @@ class Medusa extends SantoriniPower
     // Otherwise, we check if a kill is possible
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, $lookSecret);
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
+    
     foreach ($arg['workers'] as &$worker) {
       $worker['works'] = [];
       foreach ($oppWorkers as $worker2) {
@@ -58,7 +59,7 @@ class Medusa extends SantoriniPower
       foreach ($worker['works'] as $work) {
         $worker2 = $this->game->board->getPiece($work['id']);
         if ($worker2 != null && ($worker2['location'] == 'board' || $worker2['location'] == 'secret')) {
-          $this->game->playerKill($worker2, $this->getName(), true);
+          $this->game->playerKill($worker2, $this->getName(), true, true);
           $this->game->playerBuild($worker, SantoriniBoard::getCoords($worker2, 2));
         }
       }

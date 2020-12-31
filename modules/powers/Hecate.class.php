@@ -13,7 +13,7 @@ class Hecate extends SantoriniPower
       clienttranslate("[Your Turn:] Move a Worker Token on the Map as if it were on the game board. Build on the game board, as normal."),
       clienttranslate("[Any Time:] If an opponent attempts an action that would not be legal due to the presence of your secret Workers, their action is cancelled and they lose the rest of their turn. When possible, use their power on their behalf to make their turns legal without informing them."),
     ];
-    $this->playerCount = [2]; // TODO problematic cases for 3 players: put workers last, interactions with powers and restart implementation (Limus)...
+    $this->playerCount = [2]; // TODO problematic cases for 3 players: put workers last, interactions with powers and restart implementation (Limus, Harpies)...
     $this->golden  = false;
     $this->orderAid = 64;
     
@@ -182,6 +182,8 @@ class Hecate extends SantoriniPower
   }
   // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
   // TODO: Hecate win // loose -> display workers
+  // TODO: improve worker reveal: fade in? must not reveal orientation / sex
+  
 
   public function endOpponentTurn()
   {
@@ -203,14 +205,14 @@ class Hecate extends SantoriniPower
     if ($space == null)
     {
       // treat Medusa: kill secret workers only after we know the turn is legal
-      $powers = $this->game->playerManager->getPlayer($this->playerId)->getPowers();
+      $powers = $this->game->playerManager->getPlayer($this->game->getActivePlayerId())->getPowers();
       foreach ($powers as $power)
       {
-        if ($power->getId() != HECATE)
+        if ($power->getId() != MEDUSA)
           continue;
         $argKill = ['workers' => []];
-        $power->argPlayerBuild($argKill, true);
-        $power->endPlayerTurn($argKill); // TODO: MEDUSA DOES NOT KILL
+        $power->argPlayerBuild($argKill, true); // get killable secret workers
+        $power->endPlayerTurn($argKill); // kill them
       }
       return;
     }
