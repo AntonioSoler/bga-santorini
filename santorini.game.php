@@ -521,6 +521,15 @@ class santorini extends Table
       throw new BgaUserException(_("This space is not available"));
     }
 
+    // Hecate bypasses this function
+    $powers = $this->playerManager->getPlayer($this->getActivePlayerId())->getPowers();
+    
+    $r = array_map(function ($power) use ($workerId, $x, $y, $z) {
+      return $power->playerPlaceWorker($workerId, $x, $y, $z);
+    }, $powers);
+    
+    if (! (count($r) > 0 ? max($r) : false))
+    {
     // Place the worker in this space
     $this->board->setPieceAt($stateArgs['worker'], $space);
 
@@ -534,6 +543,7 @@ class santorini extends Table
       'coords' => $this->board->getMsgCoords($space),
     ]);
 
+    }
     $this->gamestate->nextState('workerPlaced');
   }
 
@@ -627,7 +637,7 @@ class santorini extends Table
 
     // Basic rule: Win by moving up to level 3 one of MY workers
     if ($work != null && $work['action'] == 'move') {
-      $workers = $this->board->getPlacedWorkers(self::getActivePlayerId());
+      $workers = $this->board->getPlacedWorkers(self::getActivePlayerId(), true);
       Utils::filterWorkersById($workers, $work['pieceId']);
       if (!empty($workers)) {
         $arg['win'] = $work['from']['z'] < $work['to']['z'] && $work['to']['z'] == 3;
@@ -679,6 +689,10 @@ class santorini extends Table
         'player_name' => $players[0]->getName(),
       ]);
     }
+    // endgame: reveal all secret info 
+    $secrets = $this->board->getSecretPieces();
+    foreach ($secrets as $secret)
+      $this->notifyAllPlayers('revealPiece', '', ['piece' => $secret]); 
 
     self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team = {$players[0]->getTeam()}");
     $this->gamestate->nextState('endgame');
@@ -1100,22 +1114,28 @@ class santorini extends Table
    * playerKill: kill a piece (only called with specific power eg Medusa, Bia)
    *  - obj $worker : the worker we want to kill
    */
-  public function playerKill($worker, $powerName, $incStats = true)
+  public function playerKill($worker, $powerName, $incStats = true, $notifAllWhenSecret = false)
   {
     // Kill worker
-    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$worker['id']}");
+    $location = $worker['location'] == 'secret' ? 'secretbox' : 'box';
+    self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$worker['id']}");
     $stats = $incStats ? [[$this->getActivePlayerId(), 'usePower']] : [];
     $this->log->addRemoval($worker, $stats);
 
     // Notify
-    $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], [
+    $args = [
       'i18n' => ['power_name'],
       'piece' => $worker,
       'power_name' => $powerName,
       'player_name' => $this->getActivePlayerName(),
       'player_name2' => $this->playerManager->getPlayer($worker['player_id'])->getName(),
-      'coords' => $this->board->getMsgCoords($worker),
-    ]);
+      'coords' => $this->board->getMsgCoords($worker)
+    ];
+    
+    if ($notifAllWhenSecret)
+      $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], $args);
+    else
+      $this->notifyWithSecret($worker, $this->msg['powerKill'], $args, 'pieceRemoved');
   }
 
 
@@ -1259,5 +1279,15 @@ class santorini extends Table
     self::DbQuery("DELETE FROM piece");
     self::DbQuery("INSERT INTO piece SELECT * FROM ebd_santorini_$tableId.piece");
     self::DbQuery("UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_PLACE_WORKER);
+  }
+  // UTILS
+  
+  
+  public function notifyWithSecret($piece, $msg, $args, $notif = 'message')
+  {
+    if ($piece['location'] == 'secret')
+      self::notifyPlayer($piece['player_id'], $notif, $msg, $args);
+    else
+      self::notifyAllPlayers($notif, $msg, $args);
   }
 }
