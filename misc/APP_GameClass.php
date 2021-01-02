@@ -158,6 +158,10 @@ class Table extends APP_GameClass
     static function notifyAllPlayers($notification_type, $notification_log, $notification_args)
     {
     }
+
+    static function notifyPlayer($player_id, $notification_type, $notification_log, $notification_args)
+    {
+    }
 }
 
 class BgaVisibleSystemException

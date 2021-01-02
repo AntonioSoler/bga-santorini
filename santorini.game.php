@@ -143,8 +143,8 @@ class santorini extends Table
   {
     return [
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
-      'placedPieces' => $this->board->getPlacedPieces(),
-      'powers' => $this->powerManager->getUiData(),
+      'placedPieces' => $this->board->getPlacedPieces($this->getCurrentPlayerId()),
+      'powers' => $this->powerManager->getUiData($this->getCurrentPlayerId()),
       'goldenFleece' => $this->powerManager->getSpecialPowerId('ram'),
       'nyxNightPower' => $this->powerManager->getSpecialPowerId('nyxNight'),
       'cancelMoveIds' => $this->log->getCancelMoveIds(),
@@ -228,7 +228,10 @@ class santorini extends Table
 
     // Create the Ram figure
     if ($this->powerManager->isGoldenFleece()) {
-      self::DbQuery("INSERT INTO piece (`type`, `location`) VALUES ('ram', 'desk')");
+      $this->board->addPiece([
+        'type' => 'ram',
+        'location' => 'desk',
+      ]);
     }
 
     // Prepare a deck with all possible powers for this game (if needed)
@@ -545,9 +548,9 @@ class santorini extends Table
    */
   public function stNextPlayer($next = true)
   {
-    $players = $this->playerManager->getRemeaningPlayersIds();
-    if (count($players) == 1) {
-      $this->announceWin($players[0]['id'], true);
+    $playerIds = $this->playerManager->getPlayerIds();
+    if (count($playerIds) == 1) {
+      $this->announceWin($playerIds[0], true);
       return;
     }
 
@@ -705,15 +708,15 @@ class santorini extends Table
       $this->announceWin($pId, false);
     } else {
       // 3 players => eliminate the player
-      $players = $this->playerManager->getRemeaningPlayersIds();
-      if (count($players) > 1) {
+      $playerIds = $this->playerManager->getPlayerIds();
+      if (count($playerIds) > 1) {
         if (self::getActivePlayerId() == $pId) {
           $this->gamestate->nextState("eliminate");
         } else {
           $this->playerManager->eliminate($pId);
         }
       } else {
-        $this->announceWin($players[0]['id'], true);
+        $this->announceWin($playerIds[0], true);
       }
     }
   }
@@ -970,11 +973,14 @@ class santorini extends Table
 
     // Undo the turn
     $moveIds = $this->log->cancelTurn();
-    self::notifyAllPlayers('cancel', $this->msg['restart'], [
-      'placedPieces' => $this->board->getPlacedPieces(),
-      'player_name' => self::getActivePlayerName(),
-      'moveIds' => $moveIds,
-    ]);
+    $playerIds = $this->playerManager->getPlayerIds();
+    foreach ($playerIds as $playerId) {
+      self::notifyPlayer($playerId, 'cancel', $this->msg['restart'], [
+        'placedPieces' => $this->board->getPlacedPieces($playerId),
+        'player_name' => self::getActivePlayerName(),
+        'moveIds' => $moveIds,
+      ]);
+    }
 
     // Apply power
     $this->gamestate->nextState('cancel');
@@ -1067,11 +1073,18 @@ class santorini extends Table
       throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
     }
     $pieceName = $this->pieceNames[$type];
-    self::DbQuery("INSERT INTO piece (`player_id`, `type`, `location`, `x`, `y`, `z`) VALUES ('$pId', '$type', 'board', '{$space['x']}', '{$space['y']}', '{$space['z']}') ");
+    $pieceId = $this->board->addPiece([
+      'player_id' => $pId,
+      'type' => $type,
+      'location' => 'board',
+      'x' => $space['x'],
+      'y' => $space['y'],
+      'z' => $space['z'],
+    ]);
+    $piece = $this->board->getPiece($pieceId);
     $this->log->addBuild($worker, $space);
 
     // Notify
-    $piece = self::getObjectFromDB("SELECT * FROM piece ORDER BY id DESC LIMIT 1");
     self::notifyAllPlayers($notify, $this->msg['build'], [
       'i18n' => ['piece_name', 'level_name'],
       'player_name' => self::getActivePlayerName(),
@@ -1193,13 +1206,12 @@ class santorini extends Table
   public function loadBugSQL($reportId)
   {
     $studioPlayer = self::getCurrentPlayerId();
-    $players = $this->playerManager->getPlayers();
+    $playerIds = $this->playerManager->getPlayerIds();
 
     $sql = [
       "UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_BGA_GAME_END
     ];
-    foreach ($players as $player) {
-      $pId = $player->getId();
+    foreach ($playerIds as $pId) {
       $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$pId";
       $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$pId";
       $sql[] = "UPDATE stats SET stats_player_id=$studioPlayer WHERE stats_player_id=$pId";

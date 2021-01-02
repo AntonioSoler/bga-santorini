@@ -65,11 +65,13 @@ $this->msg = [
   'powerNotNeighboring' => clienttranslate('${power_name}: ${player_name}\'s workers are not neighboring'),
   'powerCompleteTowers' => clienttranslate('${power_name}: ${count} Complete Towers are on the board'),
   'powerDomeBuilt' => clienttranslate('${power_name}: At least one dome was built this turn'),
+  'powerAbyss' => clienttranslate('${power_name}: ${player_name2} enters the Abyss (${coords}) and is eliminated!'),
 ];
 
 $this->specialNames = [
   'ram' => clienttranslate('Golden Fleece power'),
   'nyxNight' => clienttranslate("Nyx's Night Power"),
+  'secret' => clienttranslate('secret location'),
 ];
 
 $this->colorNames = [
@@ -94,4 +96,5 @@ $this->pieceNames = [
   'ram' => clienttranslate('the Ram figure'),
   'tokenTalus' => clienttranslate('the Talus Token'),
   'tokenCoin' => clienttranslate('a Coin Token'),
+  'tokenAbyss' => clienttranslate('the Abyss Token'),
 ];

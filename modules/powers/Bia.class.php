@@ -24,15 +24,8 @@ class Bia extends SantoriniPower
 
   public function argChooseFirstPlayer(&$arg)
   {
-    $pId = $this->getId();
-    Utils::filter($arg['powers'], function ($power) use ($pId) {
-      return $power == $pId;
-    });
-
-    $this->game->notifyAllPlayers('message', $this->game->msg['firstPlayer'], [
-      'i18n' => ['power_name'],
-      'power_name' => $this->getName(),
-    ]);
+    // Bia must go first
+    $arg['powers'] = [$this->id];
   }
 
   public function argPlayerPlaceWorker(&$arg)

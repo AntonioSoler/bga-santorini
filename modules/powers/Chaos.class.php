@@ -22,9 +22,9 @@ class Chaos extends SantoriniPower
 
   /* * */
 
-  public function getUIData()
+  public function getUiData()
   {
-    $data = parent::getUIData();
+    $data = parent::getUiData();
     $data['counter'] = ($this->playerId != null) ? $this->computeDeck() : 0;
     return $data;
   }

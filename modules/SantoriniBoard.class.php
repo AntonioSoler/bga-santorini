@@ -84,13 +84,18 @@ class SantoriniBoard extends APP_GameClass
   }
 
   /*
-   * getPiecesAt: return array the pieces at this x,y,z location.
+   * getPiecesAt: return array the pieces at this x,y or x,y,z location.
    * tokens make it possible to have multiple pieces (e.g., Clio coin + worker)
    * params : array $space
    */
-  public function getPiecesAt($space)
+  public function getPiecesAt($space, $location = 'board')
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND x = {$space['x']} AND y = {$space['y']} AND z = {$space['z']} ORDER BY id"));
+    $sql = "SELECT * FROM piece WHERE location = '$location' AND x = {$space['x']} AND y = {$space['y']}";
+    if (array_key_exists('z', $space)) {
+      $sql .= " AND z = {$space['z']}";
+    }
+    $sql .= " ORDER BY id";
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
   /*
@@ -100,6 +105,15 @@ class SantoriniBoard extends APP_GameClass
   public function getBlocksAt($space)
   {
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type IN ('lvl0', 'lvl1', 'lvl2') AND x = {$space['x']} AND y = {$space['y']} ORDER BY z DESC"));
+  }
+
+  /*
+   * countBlocksAt: return the number of blocks at this x,y location
+   * params : array $space
+   */
+  public function countBlocksAt($space)
+  {
+    return (int) self::getUniqueValueFromDB("SELECT COUNT(*) FROM piece WHERE location = 'board' AND type IN ('lvl0', 'lvl1', 'lvl2') AND x = {$space['x']} AND y = {$space['y']}");
   }
 
   /*
@@ -121,10 +135,16 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPlacedPieces: return all pieces on the board
    * Order by tokens first, then by z-order ascending
+   * parameter: send token visibles by this player
    */
-  public function getPlacedPieces()
+  public function getPlacedPieces($playerId = null)
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' ORDER BY (type LIKE 'token%') DESC, z, x, y"));
+    $sql = "SELECT * FROM piece WHERE location = 'board'";
+    if ($playerId != null) {
+      $sql .= " OR (location = 'secret' AND player_id = $playerId)";
+    }
+    $sql .= " ORDER BY (type LIKE 'token%') DESC, z, x, y, id";
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
 
@@ -485,6 +505,51 @@ class SantoriniBoard extends APP_GameClass
   /*##########################
   ######### Setters ##########
   ##########################*/
+
+  public function addPiece($piece)
+  {
+    // Insert the piece
+    $cols = [];
+    $values = [];
+    foreach ($piece as $key => $value) {
+      $cols[] = "`$key`";
+      $values[] = is_null($value) ? 'NULL' : "'$value'";
+    }
+    self::DbQuery("INSERT INTO piece (" . implode(', ', $cols) . ") VALUES (" . implode(', ', $values) . ")");
+    $pieceId = self::DbGetLastId();
+
+    // Adjust secret tokens 
+    if (array_key_exists('x', $piece) && array_key_exists('y', $piece)) {
+      $this->adjustSecretTokens($piece);
+    }
+
+    return $pieceId;
+  }
+
+  /*
+   * adjustSecretTokens: Automatically move secret tokens at this x,y space to the top (e.g., Tartarus and Morae)
+   */
+  public function adjustSecretTokens($space, $notify = true)
+  {
+    $tokens = $this->getPiecesAt(['x' => $space['x'], 'y' => $space['y']], 'secret');
+    foreach ($tokens as $token) {
+      if ($token['type'] != 'worker') {
+        $top = $this->countBlocksAt($token);
+        if ($token['z'] != $top) {
+          // Move to the top of the stack
+          $space = $token;
+          $space['z'] = $top;
+          $this->setPieceAt($token, $space, 'secret');
+          if ($notify) {
+            $this->game->notifyPlayer($token['player_id'], 'workerMovedInstant', '', [
+              'piece' => $token,
+              'space' => $space,
+            ]);
+          }
+        }
+      }
+    }
+  }
 
   /*
    * setPieceAt: update location of an already existing piece

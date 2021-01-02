@@ -22,6 +22,21 @@ class Europa extends SantoriniPower
 
   /* * */
 
+  public function getUiData()
+  {
+    $data = parent::getUiData();
+    // Talus not placed
+    $data['counter'] = '--';
+    if ($this->playerId != null) {
+      $token = $this->getToken();
+      if ($token['location'] == 'board') {
+        // Talus location visible to all
+        $data['counter'] = $this->game->board->getMsgCoords($token);
+      }
+    }
+    return $data;
+  }
+
   public function getToken()
   {
     return $this->game->board->getPiecesByType('tokenTalus')[0];
@@ -30,6 +45,7 @@ class Europa extends SantoriniPower
   public function setup()
   {
     $this->getPlayer()->addToken('tokenTalus');
+    $this->updateUI();
   }
 
   public function stateAfterBuild()
@@ -63,6 +79,7 @@ class Europa extends SantoriniPower
     } else {
       $this->moveToken($token, $space);
     }
+    $this->updateUI();
   }
 
   public function stateAfterSkipPower()

@@ -21,9 +21,9 @@ class Tyche extends SantoriniPower
 
   /* * */
 
-  public function getUIData()
+  public function getUiData()
   {
-    $data = parent::getUIData();
+    $data = parent::getUiData();
     $data['counter'] = ($this->playerId != null) ? $this->computeDeck() : 6;
     return $data;
   }

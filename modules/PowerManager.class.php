@@ -112,6 +112,7 @@ class PowerManager extends APP_GameClass
     [HADES, PAN],
     [HARPIES, HERMES],
     [HARPIES, MAENADS],
+    [HARPIES, TARTARUS], // until "forces after win" are deleted
     [HARPIES, TRITON],
     [HECATE, DIONYSUS],
     [HECATE, MEDEA],
@@ -173,11 +174,12 @@ class PowerManager extends APP_GameClass
     [ADONIS, HERMES], // multiple moves
     [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
     [ADONIS, JASON], // alternative turn
+    [ADONIS, NEMESIS], // move workers at the end
     [ADONIS, PROMETHEUS],  // movement restriction
+    [ADONIS, PROTEUS], // can teleport a worker
     [ADONIS, SIREN], // alternative turn
     [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
-    [ADONIS, NEMESIS] // move workers at the end
   ];
 
 
@@ -232,12 +234,18 @@ class PowerManager extends APP_GameClass
   /*
    * getUiData : get all ui data of all powers : id, name, title, text, hero
    */
-  public function getUiData()
+  public function getUiData($playerId)
   {
     $ui = [];
     foreach ($this->getPowers() as $power) {
       if ($power->isImplemented()) {
-        $ui[$power->getId()] = $power->getUiData();
+        $data = $power->getUiData($playerId);
+        if (array_key_exists('counter', $data) && is_array($data['counter'])) {
+          // When counter is an array, show different info to each player
+          // Select the correct value for the current player
+          $data['counter'] = array_key_exists($playerId, $data['counter']) ? $data['counter'][$playerId] : $data['counter']['all'];
+        }
+        $ui[$power->getId()] = $data;
       }
     }
     return $ui;
