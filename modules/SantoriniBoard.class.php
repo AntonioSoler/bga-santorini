@@ -267,10 +267,13 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPlacedWorkers: return all placed workers except those of the active player
    */
-  public function getPlacedNotMineWorkers($pId = null)
+  public function getPlacedNotMineWorkers($pId = null, $lookSecret = false)
   {
+    $location = "'board'";
+    if ($lookSecret)
+      $location = $location . " , 'secret' ";
     $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds($pId), true);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
   }
 
 

@@ -26,11 +26,24 @@ class Maenads extends SantoriniPower
     foreach ($oppWorkers as $oppWorker) {
       foreach ($myWorkers as $myWorker) {
         if ($this->game->board->isNeighbour($myWorker, $oppWorker) && !is_null($this->game->board->getSpaceBehind($myWorker, $oppWorker, $myWorkers))) {
-          $stats = [[$this->playerId, 'usePower']];
-          $this->game->log->addAction('stats', $stats);
 
           // Eliminate opponent
           $opponent = $this->game->playerManager->getPlayer($oppWorker['player_id']);
+          
+         
+          // treat Hecate: do not win if the turn is illegal
+          $powers = $opponent->getPowers();
+          foreach ($powers as $power)
+          {
+            if ($power->getId() != HECATE)
+              continue;
+            if ($power->endOpponentTurn(true))
+              return;
+          }
+          
+          $stats = [[$this->playerId, 'usePower']];
+          $this->game->log->addAction('stats', $stats);
+          
           $this->game->announceLose(clienttranslate('${power_name}: ${player_name2} (${coords}) is neighbored on opposite sides by ${player_name} and is eliminated!'), [
             'i18n' => ['power_name'],
             'power_name' => $this->getName(),

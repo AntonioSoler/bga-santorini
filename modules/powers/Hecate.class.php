@@ -183,7 +183,8 @@ class Hecate extends SantoriniPower
   
   
   // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
-  public function endOpponentTurn()
+  // parameter: for Maenads
+  public function endOpponentTurn($testOnly = false) 
   {
     $myWorkers = $this->getPlacedWorkers();
     
@@ -196,9 +197,15 @@ class Hecate extends SantoriniPower
         if ($space == null)
           continue;
         // cancel end of turn
+        
+        if ($testOnly)
+          return true;
         $moveIds = $this->game->log->cancelTurn($log['log_id']);    
         break;
     }
+    
+    if ($testOnly)
+      return false;
     
     if ($space == null)
     {
@@ -214,6 +221,8 @@ class Hecate extends SantoriniPower
       }
       return;
     }
+    
+    
     
     // display current board state
     $playerIds = $this->game->playerManager->getPlayerIds();
@@ -244,6 +253,7 @@ class Hecate extends SantoriniPower
     // hide the secret worker again
     $this->game->notifyAllPlayers('hidePiece', '', ['piece' => $dummy]);
     
+    return false;
   }
 
 
