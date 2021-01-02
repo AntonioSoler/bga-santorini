@@ -541,6 +541,18 @@ class SantoriniBoard extends APP_GameClass
     return $pieceId;
   }
 
+  public function removePiece($piece)
+  {
+    // Return the piece to the box
+    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
+
+    // Adjust secret tokens 
+    if (array_key_exists('x', $piece) && array_key_exists('y', $piece)) {
+      $this->adjustSecretTokens($piece);
+    }
+    return $piece['id'];
+  }
+
   /*
    * adjustSecretTokens: Automatically move secret tokens at this x,y space to the top (e.g., Tartarus and Morae)
    */
