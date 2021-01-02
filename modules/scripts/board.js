@@ -667,7 +667,7 @@ Board.prototype.clearHighlights = function () {
  * Take note of the order: Tokens must be added first!
  */
 Board.prototype.getCenter = function (space, zOffset = 0) {
-	var tokens = this._ids.filter((m) => m.space.x == space.x && m.space.y == space.y && m.space.z == space.z && m.name != null && m.name.startsWith("token")).length;
+	var tokens = this._ids.filter((m) => m.pieceId != space.id && m.space.x == space.x && m.space.y == space.y && m.space.z == space.z && m.name != null && m.name.startsWith("token")).length;
 	var x = xCenters[space.x];
 	var z = lvlHeights[space.z] + (tokens * 0.1) + zOffset;
 	var y = zCenters[space.y];
