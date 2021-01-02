@@ -228,7 +228,7 @@ abstract class SantoriniPower extends APP_GameClass
 
   public function removePiece($piece)
   {
-    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
+    $this->game->board->removePiece($piece);
     $this->game->log->addRemoval($piece);
 
     // Notify
