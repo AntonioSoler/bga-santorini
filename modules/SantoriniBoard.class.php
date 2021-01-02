@@ -148,7 +148,19 @@ class SantoriniBoard extends APP_GameClass
   }
 
 
-
+  public function getSecretPieces($playerId = null, $type = null)
+  {
+    $sql = "SELECT * FROM piece WHERE location = 'secret'";
+    if ($type != null) {
+      $sql .= " AND type = '$type'";
+    }
+    if ($playerId != null) {
+      $sql .= " AND  player_id = $playerId";
+    }
+    $sql .= " ORDER BY id";
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
+  }
+  
 
   /*
    * TODO

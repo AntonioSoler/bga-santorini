@@ -675,6 +675,7 @@ class santorinigretirse extends Table
    */
   public function announceWin($playerId, $win = true)
   {
+  
     $players = $win ? $this->playerManager->getTeammates($playerId) : $this->playerManager->getOpponents($playerId);
     if (count($players) == 2) {
       // 4 players
@@ -688,6 +689,10 @@ class santorinigretirse extends Table
         'player_name' => $players[0]->getName(),
       ]);
     }
+    // endgame: reveal all secret info 
+    $secrets = $this->board->getSecretPieces();
+    foreach ($secrets as $secret)
+      $this->notifyAllPlayers('revealPiece', '', ['piece' => $secret]); 
 
     self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team = {$players[0]->getTeam()}");
     $this->gamestate->nextState('endgame');

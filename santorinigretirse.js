@@ -3,21 +3,21 @@
 /**
 	*------
 	* BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
-	* santorini implementation : (c) Tisaac & Quietmint & Morgalad
+	* santorinigretirse implementation : (c) Tisaac & Quietmint & Morgalad
 	*
 	* This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
 	* See http://en.boardgamearena.com/#!doc/Studio for more information.
 	* -----
 	*
-	* santorini.js
+	* santorinigretirse.js
 	*
-	* santorini user interface script
+	* santorinigretirse user interface script
 	*
 	* In this file, you are describing the logic of your user interface, in Javascript language.
 	*
 	*/
-//# sourceURL=santorini.js
-//@ sourceURL=santorini.js
+//# sourceURL=santorinigretirse.js
+//@ sourceURL=santorinigretirse.js
 
 const HELPERS = 100;
 const HELPERS_ENABLED = 1;
@@ -115,7 +115,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     }
   }
 
-  return declare("bgagame.santorini", ebg.core.gamegui, {
+  return declare("bgagame.santorinigretirse", ebg.core.gamegui, {
     /*
      * [Undocumented] Override BGA framework functions
      */
@@ -472,7 +472,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       callback = callback || function (res) { };
       this.stopActionTimer();
       debug('Taking action: ' + action, data);
-      this.ajaxcall("/santorini/santorini/" + action + ".html", data, this, callback);
+      this.ajaxcall("/santorinigretirse/santorinigretirse/" + action + ".html", data, this, callback);
     },
 
 
@@ -1446,7 +1446,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     notif_revealPiece: function (n) {
       debug('Notif: reveal piece', n.args);
       if (n.args.piece.player_id != this.player_id)
-      this.board.addPiece(n.args.piece, "fadeIn");
+        this.board.addPiece(n.args.piece, "fadeIn");
     },
 
 
@@ -1607,7 +1607,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     /*
      * setupNotifications:
      *  In this method, you associate each of your game notifications with your local method to handle it.
-     *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorini.game.php file.
+     *	Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" in the santorinigretirse.game.php file.
      */
     setupNotifications: function () {
       var notifs = [

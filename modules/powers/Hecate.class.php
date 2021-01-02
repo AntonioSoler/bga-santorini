@@ -33,15 +33,16 @@ class Hecate extends SantoriniPower
     return $this->game->board->getPiece($dummy);
   }
   
-  /*
+  
   public function argChooseFirstPlayer(&$arg)
   {
-    // Hecate must not go first
-    if (($key = array_search($this->id, $arg['powers'])) !== false) {
-      unset($arg['powers'][$key]);
-  } // TODO error vs Hydra (any after in the alphabet???)
+  
+    $pId = $this->getId();
+    Utils::filter($arg['powers'], function ($power) use ($pId) {
+      return $power != $pId;
+    });
   }
-*/
+
   
   public function getPlacedWorkers()
   {
@@ -77,7 +78,6 @@ class Hecate extends SantoriniPower
     return true; // do not place another piece
   }
   
-  // TODO: selected worker not displayed with a blue circle underneath
   public function argPlayerWork(&$arg, $action)
   {
     $myworkers = $this->getPlacedWorkers();
@@ -180,11 +180,9 @@ class Hecate extends SantoriniPower
         return null;
   
   }
-  // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
-  // TODO: Hecate win // loose -> display workers
-  // TODO: improve worker reveal: fade in? must not reveal orientation / sex
   
-
+  
+  // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
   public function endOpponentTurn()
   {
     $myWorkers = $this->getPlacedWorkers();
@@ -238,13 +236,13 @@ class Hecate extends SantoriniPower
     $dummy['x'] = $space['x'];
     $dummy['y'] = $space['y'];
     $dummy['z'] = $this->game->board->countBlocksAt($space);
-    $this->game->notifyAllPlayers('workerPlaced', '', ['piece' => $dummy]);
+    $this->game->notifyAllPlayers('revealPiece', '', ['piece' => $dummy]);
     
     // explain what is happening
     $this->game->notifyAllPlayers('message', '${power_name}: due to a secret worker in ${coords}, an action of ${player_name} is illegal which cancels the rest of the turn', $args);
     
     // hide the secret worker again
-    $this->game->notifyAllPlayers('pieceRemoved', '', ['piece' => $dummy]);
+    $this->game->notifyAllPlayers('hidePiece', '', ['piece' => $dummy]);
     
   }
 
