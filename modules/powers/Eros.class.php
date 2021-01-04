@@ -48,19 +48,26 @@ class Eros extends SantoriniPower
     $this->argPlayerPlaceWorker($arg);
   }
 
-  public function checkPlayerWinning(&$arg)
+  public function checkWinning(&$arg)
   {
     if ($arg['win']) {
       return;
     }
 
     $move = $this->game->log->getLastWork();
-    $workers = $this->game->board->getPlacedActiveWorkers();
+    $workers = $this->game->board->getPlacedWorkers($this->playerId);
 
     // Last work should be a move and Eros must have two workers left
     if ($move == null || $move['action'] != 'move' || count($workers) != 2) {
       return;
     }
+    
+    // win if Eris moved this worker but not Dionysus
+    $piece = $this->game->board->getPiece($move['pieceId']);
+    if ($this->game->log->isAdditionalTurn(DIONYSUS))
+    	return;
+    if ($piece['player_id'] != $this->playerId)
+    	return;
 
     // The two workers must be adjacent and on same level
     if (!$this->game->board->isNeighbour($workers[0], $workers[1], 'move') || $workers[0]['z'] !=  $workers[1]['z']) {
@@ -75,6 +82,7 @@ class Eros extends SantoriniPower
     // Eros wins
     $arg['win'] = true;
     $arg['winStats'] = [[$this->playerId, 'usePower']];
+    $arg['pId'] = $this->playerId;
     $msg = clienttranslate('${power_name}: ${player_name} has neighboring workers on ${level_name}');
     $this->game->notifyAllPlayers('message', $msg, [
       'i18n' => ['power_name'],
@@ -83,4 +91,18 @@ class Eros extends SantoriniPower
       'level_name' => $this->game->levelNames[intval($workers[0]['z'])],
     ]);
   }
+  
+  
+  
+  public function checkPlayerWinning(&$arg)
+  {
+  	$this->checkWinning($arg);
+  }
+  public function checkOpponentWinning(&$arg)
+  {
+  	$this->checkWinning($arg);
+  }  
+  
+  
+  
 }
