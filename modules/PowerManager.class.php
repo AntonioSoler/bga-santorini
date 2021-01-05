@@ -190,6 +190,7 @@ class PowerManager extends APP_GameClass
     [HECATE, ODYSSEUS],
     [HECATE, ADONIS],
     [HECATE, NYX], // too confusing for the moment
+    [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal
   ];
 
 
