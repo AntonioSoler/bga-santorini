@@ -27,19 +27,16 @@ class Pan extends SantoriniPower
     }
 
     $move = $this->game->log->getLastWork();
-    
-    	
     if ($move == null || $move['action'] != 'move' || $move['to']['z'] > $move['from']['z'] - 2) {
       return;
     }
 
-    // win if Eris moved this worker but not Dionysus
+    // Pan wins during opponent turn if Eris moved this worker (but not Dionysus)
     $piece = $this->game->board->getPiece($move['pieceId']);
-    if ($this->game->log->isAdditionalTurn(DIONYSUS))
-    	return;
-    if ($piece['player_id'] != $this->playerId)
-    	return;
-    
+    if ($piece['player_id'] != $this->playerId || $this->game->log->isAdditionalTurn(DIONYSUS)) {
+      return;
+    }
+
     // Pan wins
     $arg['win'] = true;
     $arg['winStats'] = [[$this->playerId, 'usePower']];
@@ -50,16 +47,14 @@ class Pan extends SantoriniPower
       'player_name' => $this->getPlayer()->getName(),
     ]);
   }
-  
-  
+
   public function checkPlayerWinning(&$arg)
   {
-  	$this->checkWinning($arg);
+    $this->checkWinning($arg);
   }
+
   public function checkOpponentWinning(&$arg)
   {
-  	$this->checkWinning($arg);
-  }  
+    $this->checkWinning($arg);
+  }
 }
-
-

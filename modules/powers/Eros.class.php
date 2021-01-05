@@ -61,13 +61,12 @@ class Eros extends SantoriniPower
     if ($move == null || $move['action'] != 'move' || count($workers) != 2) {
       return;
     }
-    
-    // win if Eris moved this worker but not Dionysus
+
+    // Eros wins during opponent turn if Eris moved this worker (but not Dionysus)
     $piece = $this->game->board->getPiece($move['pieceId']);
-    if ($this->game->log->isAdditionalTurn(DIONYSUS))
-    	return;
-    if ($piece['player_id'] != $this->playerId)
-    	return;
+    if ($piece['player_id'] != $this->playerId || $this->game->log->isAdditionalTurn(DIONYSUS)) {
+      return;
+    }
 
     // The two workers must be adjacent and on same level
     if (!$this->game->board->isNeighbour($workers[0], $workers[1], 'move') || $workers[0]['z'] !=  $workers[1]['z']) {
@@ -91,18 +90,13 @@ class Eros extends SantoriniPower
       'level_name' => $this->game->levelNames[intval($workers[0]['z'])],
     ]);
   }
-  
-  
-  
+
   public function checkPlayerWinning(&$arg)
   {
-  	$this->checkWinning($arg);
+    $this->checkWinning($arg);
   }
   public function checkOpponentWinning(&$arg)
   {
-  	$this->checkWinning($arg);
-  }  
-  
-  
-  
+    $this->checkWinning($arg);
+  }
 }
