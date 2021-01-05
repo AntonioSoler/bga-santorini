@@ -20,7 +20,7 @@ class Pan extends SantoriniPower
 
   /* * */
 
-  public function checkPlayerWinning(&$arg)
+  public function checkWinning(&$arg)
   {
     if ($arg['win']) {
       return;
@@ -31,13 +31,30 @@ class Pan extends SantoriniPower
       return;
     }
 
+    // Pan wins during opponent turn if Eris moved this worker (but not Dionysus)
+    $piece = $this->game->board->getPiece($move['pieceId']);
+    if ($piece['player_id'] != $this->playerId || $this->game->log->isAdditionalTurn(DIONYSUS)) {
+      return;
+    }
+
     // Pan wins
     $arg['win'] = true;
     $arg['winStats'] = [[$this->playerId, 'usePower']];
+    $arg['pId'] = $this->playerId;
     $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} moved down two or more levels'), [
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),
       'player_name' => $this->getPlayer()->getName(),
     ]);
+  }
+
+  public function checkPlayerWinning(&$arg)
+  {
+    $this->checkWinning($arg);
+  }
+
+  public function checkOpponentWinning(&$arg)
+  {
+    $this->checkWinning($arg);
   }
 }
