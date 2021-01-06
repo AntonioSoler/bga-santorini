@@ -160,7 +160,7 @@ class SantoriniBoard extends APP_GameClass
     $sql .= " ORDER BY id";
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
-  
+
 
   /*
    * TODO
@@ -207,12 +207,13 @@ class SantoriniBoard extends APP_GameClass
    * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
-  public function getPlacedWorkers($pId = -1, $lookSecret= false)
+  public function getPlacedWorkers($pId = -1, $lookSecret = false)
   {
     $filter = $this->playerFilter($pId);
     $location = "'board'";
-    if ($lookSecret)
+    if ($lookSecret) {
       $location = $location . " , 'secret' ";
+    }
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
   }
 
@@ -571,7 +572,8 @@ class SantoriniBoard extends APP_GameClass
           $space['z'] = $top;
           $this->setPieceAt($token, $space, 'secret');
           if ($notify) {
-            $this->game->notifyPlayer($token['player_id'], 'workerMovedInstant', '', [
+            $this->game->notifyPlayer($token['player_id'], 'workerMoved', '', [
+              'duration' => INSTANT,
               'piece' => $token,
               'space' => $space,
             ]);

@@ -1,21 +1,21 @@
 "use strict";
 
 /**
-	*------
-	* BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
-	* santorini implementation : (c) Tisaac & Quietmint & Morgalad
-	*
-	* This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
-	* See http://en.boardgamearena.com/#!doc/Studio for more information.
-	* -----
-	*
-	* santorini.js
-	*
-	* santorini user interface script
-	*
-	* In this file, you are describing the logic of your user interface, in Javascript language.
-	*
-	*/
+  *------
+  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+  * santorini implementation : (c) Tisaac & Quietmint & Morgalad
+  *
+  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+  * See http://en.boardgamearena.com/#!doc/Studio for more information.
+  * -----
+  *
+  * santorini.js
+  *
+  * santorini user interface script
+  *
+  * In this file, you are describing the logic of your user interface, in Javascript language.
+  *
+  */
 //# sourceURL=santorini.js
 //@ sourceURL=santorini.js
 
@@ -333,12 +333,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.board.updateSize();
     },
 
-		/*
-		 * notif_cancel:
-		 *   called whenever a player restart their turn
-		 */
+    /*
+     * notif_cancel:
+     *   called whenever a player restart their turn
+     */
     notif_cancel: function (n) {
       debug('Notif: cancel turn', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1000);
       this.board.diff(n.args.placedPieces);
       this.cancelLogs(n.args.moveIds);
     },
@@ -446,12 +452,18 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.slideToObjectAndDestroy(card, animationTarget);
     },
 
-		/*
-		 * notif_updatePowerUI:
-		 *   called whenever a power UI is updated (eg Morpheus)
-		 */
+    /*
+     * notif_updatePowerUI:
+     *   called whenever a power UI is updated (eg Morpheus)
+     */
     notif_updatePowerUI: function (n) {
       debug('Notif: updating power UI', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 10);
       this.gamedatas.powers[n.args.powerId].counter = n.args.counter;
       var q = dojo.query('.mini-card.power-' + n.args.powerId + ' .power-counter');
       if (q.length > 0) {
@@ -463,9 +475,9 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       }
     },
 
-		/*
-		 * TODO description
-		 */
+    /*
+     * TODO description
+     */
     takeAction: function (action, data, callback) {
       data = data || {};
       data.lock = true;
@@ -770,6 +782,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     notif_addOffer: function (n) {
       var _this = this;
       debug('Notif: addOffer', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 500);
 
       // Create a dummy in the offer
       var dummy = this.createPowerSmall(0);
@@ -813,6 +831,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     notif_removeOffer: function (n) {
       var _this = this;
       debug('Notif: removeOffer', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 500);
 
       // Create a dummy in the deck
       var dummy = this.createPowerSmall(0);
@@ -1000,6 +1024,12 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     notif_powerAdded: function (n) {
       var _this = this;
       debug('Notif: power added', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1000);
 
       var playerId = n.args.player_id,
         powerId = n.args.power_id,
@@ -1012,8 +1042,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      *   called whenever a player loses a power
      */
     notif_powerRemoved: function (n) {
-      var _this = this;
       debug('Notif: power removed', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1000);
 
       var playerId = n.args.player_id,
         powerId = n.args.power_id,
@@ -1026,11 +1061,15 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      *   called whenever a power moves from one player to another (Circe)
      */
     notif_powerMoved: function (n) {
-      var _this = this;
       debug('Notif: power moved', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1000);
 
-      var oldPlayerId = n.args.player_id2,
-        newPlayerId = n.args.player_id,
+      var newPlayerId = n.args.player_id,
         powerId = n.args.power_id,
         reason = n.args.reason;
       this.addPower(newPlayerId, powerId, reason);
@@ -1061,6 +1100,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
 
     notif_specialPowerSet: function (n) {
       debug('Notif: Special power was set', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 10);
+
       if (n.args.location == 'ram') {
         this.addGoldenFleece(n.args.powerId);
       } else if (n.args.location == 'nyxNight') {
@@ -1115,7 +1161,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     notif_workerPlaced: function (n) {
       debug('Notif: new worker placed', n.args);
-      this.board.addPiece(n.args.piece);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1000);
+
+      this.board.addPiece(n.args.piece, n.args.animation);
     },
 
 
@@ -1158,7 +1211,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this._action = 'playerMove';
       this.makeWorkersSelectable(args.workers);
     },
-    
+
     usePowerTartarus: function (args) {
       this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
@@ -1417,6 +1470,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     notif_workerMoved: function (n) {
       debug('Notif: worker moved', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1600);
+
       this.board.movePiece(n.args.piece, n.args.space);
     },
 
@@ -1426,7 +1486,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     notif_blockBuilt: function (n) {
       debug('Notif: block built', n.args);
-      this.board.addPiece(n.args.piece);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 1000);
+
+      this.board.addPiece(n.args.piece, n.args.animation);
     },
 
     /*
@@ -1435,29 +1502,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     notif_blockBuiltUnder: function (n) {
       debug('Notif: block built under', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 2000);
+
       this.board.addPieceUnder(n.args.piece, n.args.under);
-    },
-
-
-    /*
-     * notif_revealPiece:
-     *   called whenever a secret piece is revealed (Hecate when an opponent attempts an illegal turn)
-     */
-    notif_revealPiece: function (n) {
-      debug('Notif: reveal piece', n.args);
-      if (n.args.piece.player_id != this.player_id)
-      this.board.addPiece(n.args.piece, "fadeIn");
-    },
-
-
-    /*
-     * notif_hidePiece:
-        reverse of revealPiece: remove it only from players unable to see it
-     */
-    notif_hidePiece: function (n) {
-      debug('Notif: hide piece', n.args);
-      if (n.args.piece.player_id != this.player_id)
-        this.board.removePiece(n.args.piece);
     },
 
 
@@ -1467,6 +1519,13 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     notif_pieceRemoved: function (n) {
       debug('Notif: piece removed', n.args);
+      if (Array.isArray(n.args.ignorePlayerIds) && n.args.ignorePlayerIds.includes(this.player_id)) {
+        debug('Notification ignored');
+        this.notifqueue.setSynchronousDuration(10);
+        return;
+      }
+      this.notifqueue.setSynchronousDuration(n.args.duration || 2000);
+
       this.board.removePiece(n.args.piece);
     },
 
@@ -1611,21 +1670,19 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     setupNotifications: function () {
       var notifs = [
-        ['cancel', 1000],
-        ['addOffer', 500],
-        ['removeOffer', 500],
-        ['powerAdded', 1000],
-        ['powerRemoved', 1000],
-        ['powerMoved', 1000],
-        ['workerPlaced', 1000],
-        ['workerMoved', 1600],
-        ['blockBuilt', 1000],
-        ['specialPowerSet', 10],
-        ['blockBuiltUnder', 2000],// Happens with Zeus
-        ['revealPiece', 2000],// Happens with Hecate
-        ['hidePiece', 2000],// Happens with Hecate
-        ['pieceRemoved', 2000], // Happens with Bia, Ares, Medusa
-        ['updatePowerUI', 10], // Happens with Morpheus, Chaos
+        ['cancel'],
+        ['addOffer'],
+        ['removeOffer'],
+        ['powerAdded'],
+        ['powerRemoved'],
+        ['powerMoved'],
+        ['workerPlaced'],
+        ['workerMoved'],
+        ['blockBuilt'],
+        ['specialPowerSet'],
+        ['blockBuiltUnder'],// Happens with Zeus
+        ['pieceRemoved'], // Happens with Bia, Ares, Medusa, Hecate
+        ['updatePowerUI'], // Happens with Morpheus, Chaos
         ['loadBug', 10], // used in studio only
       ];
 
@@ -1634,10 +1691,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         var functionname = "notif_" + notif[0];
         dojo.subscribe(notif[0], _this, functionname);
         _this.notifqueue.setSynchronous(notif[0], notif[1]);
-
-        // xxxInstant notification runs same function without delay
-        dojo.subscribe(notif[0] + 'Instant', _this, functionname);
-        _this.notifqueue.setSynchronous(notif[0] + 'Instant', 10);
       });
     },
 

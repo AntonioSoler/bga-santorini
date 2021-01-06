@@ -30,10 +30,11 @@ class Apollo extends SantoriniPower
       foreach ($oppWorkers as $worker2) {
         if ($this->game->board->isNeighbour($worker, $worker2, 'move')) {
           Utils::addWork($worker, $worker2);
-          
+
           // remove work to $worker2 space if exists (vs Hecate)
-          Utils::filterWorks($arg, function($space, $piece) use ($worker2) {
-            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']) ;} );
+          Utils::filterWorks($arg, function ($space, $piece) use ($worker2) {
+            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']);
+          });
         }
       }
     }
@@ -51,8 +52,8 @@ class Apollo extends SantoriniPower
       $this->game->log->addForce($worker2, $worker, $stats);
 
       // Notify force
-      
       $args = [
+        'duration' => INSTANT,
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $worker,
@@ -62,8 +63,8 @@ class Apollo extends SantoriniPower
         'level_name' => $this->game->levelNames[intval($worker['z'])],
         'coords' => $this->game->board->getMsgCoords($worker2, $worker),
       ];
-      
-      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMovedInstant');
+
+      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMoved');
     }
 
     // Always do a classic move

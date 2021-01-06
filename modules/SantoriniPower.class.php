@@ -220,7 +220,8 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->board->setPieceAt($token, $token);
     // TODO: update JavaScript to treat duplicate piece placed notify as piece moved
     // (keep notifyAllPlayers here because spectators want to see, too)
-    $this->game->notifyAllPlayers('workerPlacedInstant', '', [
+    $this->game->notifyAllPlayers('workerPlaced', '', [
+      'duration' => INSTANT,
       'piece' => $token,
     ]);
     $this->updateUI();
@@ -246,7 +247,7 @@ abstract class SantoriniPower extends APP_GameClass
   public function setup()
   {
   }
-  
+
   // return true if the original function should stop
   public function playerPlaceWorker($workerId, $x, $y, $z)
   {

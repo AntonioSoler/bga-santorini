@@ -427,8 +427,7 @@ class SantoriniLog extends APP_GameClass
   }
 
 
-// stop at $logIdBreak (for Hecate)
-
+  // stop at $logIdBreak (for Hecate)
   public function cancelTurn($logIdBreak = null)
   {
     $pId = $this->game->getActivePlayerId();
@@ -476,9 +475,11 @@ class SantoriniLog extends APP_GameClass
 
       $ids[] = intval($log['log_id']);
       $moveIds[] = intval($log['move_id']);
-      
-      if ($logIdBreak == $log['log_id'])
-        break;      
+
+      // Hecate: stop cancelling at this point
+      if ($logIdBreak == $log['log_id']) {
+        break;
+      }
     }
 
     // Remove the logs
@@ -490,9 +491,10 @@ class SantoriniLog extends APP_GameClass
     }
 
     // Count the number of restarts
-    if (!$logIdBreak)
+    if (!$logIdBreak) {
       $this->incrementStats([[$pId, 'restartTurn']]);
-      
+    }
+
     return $moveIds;
   }
 

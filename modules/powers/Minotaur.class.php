@@ -29,7 +29,9 @@ class Minotaur extends SantoriniPower
     // vs Hecate: make spaces where a secret opponent stands not accessible to a force
     foreach ($oppWorkers as $opp)
       if ($opp['location'] == 'secret')
-        Utils::filter($accessibleSpaces, function ($space) use ($opp){ return $opp['x'] != $space['x'] || $opp['y'] != $space['y']; });
+        Utils::filter($accessibleSpaces, function ($space) use ($opp) {
+          return $opp['x'] != $space['x'] || $opp['y'] != $space['y'];
+        });
 
     foreach ($workers as &$worker) {
       $worker['works'] = [];
@@ -43,10 +45,11 @@ class Minotaur extends SantoriniPower
         $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
         if (!is_null($space)) {
           Utils::addWork($worker, $worker2);
-          
+
           // remove work to $worker2 space if exists (vs Hecate)
-          Utils::filterWorks($arg, function($space, $piece) use ($worker2) {
-            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']) ;} );
+          Utils::filterWorks($arg, function ($space, $piece) use ($worker2) {
+            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']);
+          });
         }
       }
     }
@@ -67,8 +70,9 @@ class Minotaur extends SantoriniPower
       $stats = [[$this->playerId, 'usePower']];
       $this->game->board->setPieceAt($worker2, $space, $worker2['location']);
       $this->game->log->addForce($worker2, $space, $stats);
-      
+
       $args = [
+        'duration' => INSTANT,
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $space,
@@ -78,9 +82,9 @@ class Minotaur extends SantoriniPower
         'level_name' => $this->game->levelNames[intval($space['z'])],
         'coords' => $this->game->board->getMsgCoords($worker2, $space),
       ];
-      
+
       // Notify force
-      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMovedInstant');
+      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMoved');
     }
 
     // Always do a classic move

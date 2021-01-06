@@ -110,7 +110,8 @@ class Nemesis extends SantoriniPower
     $this->game->log->addForce($oppWorker, $mySpace);
 
     // Notify force
-    $this->game->notifyAllPlayers('workerMovedInstant', $this->game->msg['powerForce'], [
+    $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerForce'], [
+      'duration' => INSTANT,
       'i18n' => ['power_name', 'level_name'],
       'piece' => $worker,
       'space' => $oppSpace,

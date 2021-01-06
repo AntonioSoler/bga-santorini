@@ -9,56 +9,39 @@ class Hecate extends SantoriniPower
     $this->name  = clienttranslate('Hecate');
     $this->title = clienttranslate('Goddess of Magic');
     $this->text  = [
-      clienttranslate("[Setup:] Take the Map, Shield, and 2 Worker Tokens. Hide the Map behind the Shield and secretly place your Worker Tokens on the Map to represent the location of your Workers on the game board. Place your Workers last."),
-      clienttranslate("[Your Turn:] Move a Worker Token on the Map as if it were on the game board. Build on the game board, as normal."),
-      clienttranslate("[Any Time:] If an opponent attempts an action that would not be legal due to the presence of your secret Workers, their action is cancelled and they lose the rest of their turn. When possible, use their power on their behalf to make their turns legal without informing them."),
+      clienttranslate("[Setup:] Secretly place your Workers last. Your Workers are invisible to other players."),
+      clienttranslate("[Any Time:] If an opponent attempts an action that would not be legal due to the presence of your secret Workers, their action is cancelled and they lose the rest of their turn."),
     ];
     $this->playerCount = [2]; // TODO problematic cases for 3 players: put workers last, interactions with powers and restart implementation (Limus, Harpies)...
     $this->golden  = false;
     $this->orderAid = 64;
-    
+
     $this->implemented = true;
   }
-  
-  
-  public function getDummyWorker()
-  {
-    $logs = $this->game->log->getActions(['powerData'], $this->playerId);
-    $dummy = count($logs) > 0 ? json_decode($logs[0]['action_arg'], true) : null;
-    if ($dummy == null)
-    {
-      $dummy = $this->getPlayer()->addWorker('f', 'hand'); // dummy worker used only for display 
-      $this->game->log->addAction('powerData', [], $dummy, $this->playerId);
-    }
-    return $this->game->board->getPiece($dummy);
-  }
-  
-  
+
+  /* * */
+
   public function argChooseFirstPlayer(&$arg)
   {
-  
+    // Hecate must go last
     $pId = $this->getId();
     Utils::filter($arg['powers'], function ($power) use ($pId) {
       return $power != $pId;
     });
   }
 
-  
   public function getPlacedWorkers()
   {
     return $this->game->board->getPlacedWorkers($this->playerId, true);
   }
 
-
   public function playerPlaceWorker($workerId, $x, $y, $z)
   {
     $worker = $this->game->board->getPiece($workerId);
-    
-    $space = ['x' => $x, 'y' => $y, 'z' => $z,  'arg' => null];
-    
-    
+    $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
+
     $this->game->board->setPieceAt($worker, $space, 'secret');
-    
+
     $worker = $this->game->board->getPiece($workerId); // update space
     // Notify
     $args = [
@@ -77,45 +60,47 @@ class Hecate extends SantoriniPower
     $this->game->notifyAllPlayers('message', $this->game->msg['powerPlacePiece'], $args);
     return true; // do not place another piece
   }
-  
+
   public function argPlayerWork(&$arg, $action)
   {
     $myworkers = $this->getPlacedWorkers();
     foreach ($arg['workers'] as &$worker)
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, $action);
-    
-    Utils::filterWorks($arg, function($space, $piece) use ($myworkers) {
+
+    Utils::filterWorks($arg, function ($space, $piece) use ($myworkers) {
       return  !max(array_map(
-                    function($s) use ($space) {
-                    return ($space['x'] == $s['x'] && $space['y'] == $s['y']) ;
-                    } , $myworkers )); } ); // remove Hecate worker spaces
+        function ($s) use ($space) {
+          return ($space['x'] == $s['x'] && $space['y'] == $s['y']);
+        },
+        $myworkers
+      ));
+    }); // remove Hecate worker spaces
   }
-  
+
   public function argPlayerMove(&$arg)
   {
     $arg['workers'] = $this->getPlacedWorkers();
     $this->argPlayerWork($arg, 'move');
   }
-  
-  
+
+
   public function argPlayerBuild(&$arg)
   {
     $move = $this->game->log->getLastMove();
     if ($move == null)
       throw new BgaVisibleSystemException('Hecate build before move');
-      
+
     $arg['workers'] = $this->getPlacedWorkers();
     Utils::filterWorkersById($arg, $move['pieceId']);
     $this->argPlayerWork($arg, 'build');
   }
-  
-  
+
+
   public function playerMove($worker, $space)
   {
     $this->game->board->setPieceAt($worker, $space, 'secret');
     $this->game->log->addMove($worker, $space);
-    
-    
+
     // Notify
     if ($space['z'] > $worker['z']) {
       $msg = $this->game->msg['moveUp'];
@@ -133,130 +118,136 @@ class Hecate extends SantoriniPower
       'level_name' => $this->game->levelNames[intval($space['z'])],
       'coords' => $this->game->board->getMsgCoords($worker, $space)
     ];
-    
-    
+
+
     $this->game->notifyPlayer($this->playerId, 'workerMoved', $msg, $args);
-    
+
     $args = [
       'i18n' => ['player_name'],
       'player_name' => $this->game->getActivePlayerName(),
       'coords' => $this->game->specialNames['secret']
     ];
-    
+
     $this->game->notifyAllPlayers('message', '${player_name} moves to (${coords})', $args);
-  
-    
+
     return true; // do not move again
   }
-  
-  
-// return null if the logged action is legal wrt the secret workers. Otherwise, return the problematic space
-  public function getAffectedSpaceFromLog($log, $myWorkers)
-  {    
-      if (count($myWorkers) == 0)
-        return null;
-      
-      Utils::filterWorkersById($myWorkers, $log['piece_id'], false);
-  
-      if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'build'
-       || $log['action'] == 'placeWorker' || $log['action'] == 'placeToken'
-       || $log['action'] == 'moveToken')
-      { 
-        $args = json_decode($log['action_arg'], true);
-        $space = $args['to'];
+
+
+  // Return the secret worker that conflicts with this log action, or null if there is no conflict
+  public function getConflictingWorker($log, $myWorkers)
+  {
+    Utils::filterWorkersById($myWorkers, $log['piece_id'], false);
+    if (count($myWorkers) == 0) {
+      return null;
+    }
+
+    $space = null;
+    if (
+      $log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'build'
+      || $log['action'] == 'placeWorker' || $log['action'] == 'placeToken'
+      || $log['action'] == 'moveToken'
+    ) {
+      $args = json_decode($log['action_arg'], true);
+      $space = $args['to'];
+    } else if ($log['action'] == 'removal') {
+      $space = $this->game->board->getPiece($log['piece_id']);
+    }
+
+    if ($space != null) {
+      foreach ($myWorkers as $worker) {
+        if (SantoriniBoard::isSameSpace($worker, $space)) {
+          return $worker;
+        }
       }
-      elseif ($log['action'] == 'removal')
-      {
-        $space = $this->game->board->getPiece($log['piece_id']);
-      }
-      else
-        return null;
-       
-      if (max(array_map(function($s) use ($space) {
-                      return ($space['x'] == $s['x'] && $space['y'] == $s['y']) ;
-                      } , $myWorkers )))
-         return $space;
-      else
-        return null;
-  
+    }
+    return null;
   }
-  
-  
+
+
   // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
   // parameter: for Maenads
-  public function endOpponentTurn($testOnly = false) 
+  public function endOpponentTurn($testOnly = false)
   {
     $myWorkers = $this->getPlacedWorkers();
-    
     $logs = $this->game->log->logsForCancelTurn();
-    
-    $space = null;
-    
+    $conflict = null;
+    $logId = null;
     foreach (array_reverse($logs) as $log) {
-        $space = $this->getAffectedSpaceFromLog($log, $myWorkers);
-        if ($space == null)
-          continue;
-        // cancel end of turn
-        
-        if ($testOnly)
-          return true;
-        $moveIds = $this->game->log->cancelTurn($log['log_id']);    
+      $conflict = $this->getConflictingWorker($log, $myWorkers);
+      if ($conflict != null) {
+        $logId = $log['log_id'];
         break;
+      }
     }
-    
-    if ($testOnly)
-      return false;
-    
-    if ($space == null)
-    {
+
+    // In test mode, just return the true/false to indicate a conflict
+    if ($testOnly) {
+      return ($conflict == null);
+    }
+
+    // If no conflict, allow the turn to end normally
+    $opponent = $this->game->playerManager->getPlayer($this->game->getActivePlayerId());
+    if ($conflict == null) {
       // treat Medusa: kill secret workers only after we know the turn is legal
-      $powers = $this->game->playerManager->getPlayer($this->game->getActivePlayerId())->getPowers();
-      foreach ($powers as $power)
-      {
-        if ($power->getId() != MEDUSA)
+      foreach ($opponent->getPowers() as $power) {
+        if ($power->getId() != MEDUSA) {
           continue;
+        }
         $argKill = ['workers' => []];
         $power->argPlayerBuild($argKill, true); // get killable secret workers
         $power->endPlayerTurn($argKill); // kill them
       }
       return;
     }
-    
-    
-    
-    // display current board state
+
+    // Cancel the turn from this move onward
+    $moveIds = $this->game->log->cancelTurn($log['log_id']);
+    $conflict['z'] = $this->game->board->countBlocksAt($conflict);
+
+    // Compute the public view (no secret pieces) and private view for each player
+    $publicView = $this->game->board->getPlacedPieces();
+    $privateView = [];
     $playerIds = $this->game->playerManager->getPlayerIds();
     foreach ($playerIds as $playerId) {
-      $this->game->notifyPlayer($playerId, 'cancel', '' , [
-        'placedPieces' => $this->game->board->getPlacedPieces($playerId),
-          'moveIds' => $moveIds,
-        ]);
-     }
-    
-    // display the problematic secret worker
+      $view = $this->game->board->getPlacedPieces($playerId);
+      if ($view != $publicView) {
+        $privateView[$playerId] = $view;
+      }
+    }
+
+    // Send the public view to all (supports spectators)
+    // The players with a private view coming next will ignore this notification
+    $this->game->notifyAllPlayers('cancel', '', [
+      'ignorePlayerIds' => array_keys($privateView),
+      'placedPieces' => $publicView,
+      'moveIds' => $moveIds,
+    ]);
+
+    // Send the private view to individual player(s) as needed
+    foreach ($privateView as $playerId => $view) {
+      $this->game->notifyPlayer($playerId, 'cancel', '', [
+        'placedPieces' => $view,
+        'moveIds' => $moveIds,
+      ]);
+    }
+
+    // Briefly display the conflicting secret worker
     $args = [
-      'i18n' => ['player_name'],
-      'player_name' => $this->game->getActivePlayerName(),
+      'ignorePlayerIds' => [$this->playerId],
+      'duration' => 2000,
+      'piece' => $conflict,
+      'animation' => 'fadeIn',
+      'i18n' => ['power_name'],
       'power_name' => $this->getName(),
-      'coords' => $this->game->board->getMsgCoords($space)
+      'player_name' => $this->getPlayer()->getName(),
+      'player_name2' => $opponent->getName(),
+      'coords' => $this->game->board->getMsgCoords($conflict),
     ];
-    
-    $dummy = $this->getDummyWorker(); // use a dummy one to avoid duplicates
-    $dummy['x'] = $space['x'];
-    $dummy['y'] = $space['y'];
-    $dummy['z'] = $this->game->board->countBlocksAt($space);
-    $this->game->notifyAllPlayers('revealPiece', '', ['piece' => $dummy]);
-    
-    // explain what is happening
-    $this->game->notifyAllPlayers('message', '${power_name}: due to a secret worker in ${coords}, an action of ${player_name} is illegal which cancels the rest of the turn', $args);
-    
-    // hide the secret worker again
-    $this->game->notifyAllPlayers('hidePiece', '', ['piece' => $dummy]);
-    
+    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name}\'s secret Worker (${coords}) conflicts with ${player_name2}\'s turn! The illegal actions have been cancelled.'), $args);
+    unset($args['animation']);
+    $this->game->notifyAllPlayers('pieceRemoved', '', $args);
+
     return false;
   }
-
-
-
-
 }
