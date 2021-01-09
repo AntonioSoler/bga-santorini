@@ -146,7 +146,6 @@ class Hecate extends SantoriniPower
 
     // Cancel the turn from this move onward
     $moveIds = $this->game->log->cancelTurn($log['log_id']);
-    $conflict['z'] = $this->game->board->countBlocksAt($conflict);
 
     // Compute the public view (no secret pieces) and private view for each player
     $publicView = $this->game->board->getPlacedPieces();
@@ -176,6 +175,10 @@ class Hecate extends SantoriniPower
     }
 
     // Briefly display the conflicting secret worker
+    // Always show as female
+    $conflict['z'] = $this->game->board->countBlocksAt($conflict);
+    $conflict['name'] = 'f' . substr($conflict['name'], 1);
+    $conflict['type_arg'] = 'f' . substr($conflict['type_arg'], 1);
     $args = [
       'ignorePlayerIds' => [$this->playerId],
       'duration' => 2000,
