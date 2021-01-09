@@ -521,27 +521,22 @@ class santorini extends Table
       throw new BgaUserException(_("This space is not available"));
     }
 
-    // Hecate bypasses this function
-    $powers = $this->playerManager->getPlayer($this->getActivePlayerId())->getPowers();
+    // Place the worker in this space
+    // (Hecate places the worker in 'secret')
+    $location = $stateArgs['location'] ?? 'board';
+    $this->board->setPieceAt($stateArgs['worker'], $space, $location);
 
-    $r = array_map(function ($power) use ($workerId, $x, $y, $z) {
-      return $power->playerPlaceWorker($workerId, $x, $y, $z);
-    }, $powers);
+    // Notify
+    $piece = $this->board->getPiece($workerId);
+    $this->notifyWithSecret($piece, 'workerPlaced', $this->msg['placePiece'], [
+      'redacted' => true,
+      'i18n' => ['piece_name'],
+      'piece' => $piece,
+      'piece_name' => $this->pieceNames[$piece['type']],
+      'player_name' => self::getActivePlayerName(),
+      'coords' => $this->board->getMsgCoords($space),
+    ]);
 
-    if (!(count($r) > 0 ? max($r) : false)) {
-      // Place the worker in this space
-      $this->board->setPieceAt($stateArgs['worker'], $space);
-
-      // Notify
-      $piece = $this->board->getPiece($workerId);
-      self::notifyAllPlayers('workerPlaced', $this->msg['placePiece'], [
-        'i18n' => ['piece_name'],
-        'piece' => $piece,
-        'piece_name' => $this->pieceNames[$piece['type']],
-        'player_name' => self::getActivePlayerName(),
-        'coords' => $this->board->getMsgCoords($space),
-      ]);
-    }
     $this->gamestate->nextState('workerPlaced');
   }
 
@@ -687,12 +682,23 @@ class santorini extends Table
         'player_name' => $players[0]->getName(),
       ]);
     }
-    // endgame: reveal all secret info 
-    $secrets = $this->board->getSecretPieces();
-    foreach ($secrets as $secret)
-      $this->notifyAllPlayers('revealPiece', '', ['piece' => $secret]);
-
     self::DbQuery("UPDATE player SET player_score = 1 WHERE player_team = {$players[0]->getTeam()}");
+
+    // Reveal all secret pieces
+    $secrets = $this->board->getSecretPieces();
+    foreach ($secrets as $secret) {
+      $this->board->revealPiece($secret);
+    }
+    if (!empty($secrets)) {
+      // Update player panels (e.g., Tartarus)
+      $allPlayers = $this->playerManager->getPlayers();
+      foreach ($allPlayers as $player) {
+        foreach ($player->getPowers() as $power) {
+          $power->updateUI();
+        }
+      }
+    }
+
     $this->gamestate->nextState('endgame');
   }
 
@@ -1046,10 +1052,16 @@ class santorini extends Table
     $work = Utils::checkWork($stateArgs, $wId, $x, $y, $z, $actionArg);
 
     // Check if power apply
+    // - Power returns true to stop the work
+    // - Power returns false/array to proceed
     $worker = $this->board->getPiece($wId);
-    if (!$this->powerManager->$stateName($worker, $work)) {
+    $info = $this->powerManager->$stateName($worker, $work);
+    if ($info === false) {
+      $info = [];
+    }
+    if (is_array($info)) {
       // Otherwise, do the work
-      $this->$stateName($worker, $work);
+      $this->$stateName($worker, $work, $info);
     }
 
     // Apply post-work powers
@@ -1064,14 +1076,17 @@ class santorini extends Table
 
   /*
    * playerMove: move a worker to a new location on the board
+   * Called by santorini.game.php function work()
    *  - obj $worker : the piece id we want to move
    *  - obj $space : the new location on the board
    */
-  public function playerMove($worker, $space, $notifyOnly = false)
+  public function playerMove($worker, $space, $info = [])
   {
+    $notifyOnly = $info['notifyOnly'] ?? false;
     if (!$notifyOnly) {
       // Move worker
-      $this->board->setPieceAt($worker, $space);
+      $location = $info['location'] ?? 'board';
+      $this->board->setPieceAt($worker, $space, $location);
       $this->log->addMove($worker, $space);
     }
 
@@ -1083,9 +1098,9 @@ class santorini extends Table
     } else {
       $msg = $this->msg['moveOn'];
     }
-    $pId = self::getActivePlayerId();
 
-    self::notifyAllPlayers('workerMoved', $msg, [
+    $this->notifyWithSecret($worker, 'workerMoved', $msg, [
+      'redacted' => true,
       'i18n' => ['level_name'],
       'piece' => $worker,
       'space' => $space,
@@ -1097,10 +1112,11 @@ class santorini extends Table
 
   /*
    * playerBuild: build a piece to a location on the board
+   * Called by santorini.game.php function work()
    *  - obj $worker : the piece id we want to use to build
    *  - obj $space : the location and building type we want to build
    */
-  public function playerBuild($worker, $space, $instant = false)
+  public function playerBuild($worker, $space, $info = [])
   {
     // Build piece
     $pId = self::getActivePlayerId();
@@ -1130,8 +1146,8 @@ class santorini extends Table
       'level_name' => $this->levelNames[intval($space['z'])],
       'coords' => $this->board->getMsgCoords($space),
     ];
-    if ($instant) {
-      $args['duration'] = INSTANT;
+    if (array_key_exists('duration', $info)) {
+      $args['duration'] = $info['duration'];
     }
     self::notifyAllPlayers('blockBuilt', $this->msg['build'], $args);
   }
@@ -1144,10 +1160,9 @@ class santorini extends Table
   public function playerKill($worker, $powerName, $incStats = true, $notifAllWhenSecret = false)
   {
     // Kill worker
-    $location = $worker['location'] == 'secret' ? 'secretbox' : 'box';
-    self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$worker['id']}");
     $stats = $incStats ? [[$this->getActivePlayerId(), 'usePower']] : [];
     $this->log->addRemoval($worker, $stats);
+    $this->board->removePiece($worker);
 
     // Notify
     $args = [
@@ -1158,11 +1173,11 @@ class santorini extends Table
       'player_name2' => $this->playerManager->getPlayer($worker['player_id'])->getName(),
       'coords' => $this->board->getMsgCoords($worker)
     ];
-
-    if ($notifAllWhenSecret)
+    if ($notifAllWhenSecret) {
       $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], $args);
-    else
-      $this->notifyWithSecret($worker, $this->msg['powerKill'], $args, 'pieceRemoved');
+    } else {
+      $this->notifyWithSecret($worker, 'pieceRemoved', $this->msg['powerKill'], $args);
+    }
   }
 
 
@@ -1283,20 +1298,23 @@ class santorini extends Table
   {
     $worker = ['id' => 0, 'x' => 0, 'y' => 0, 'z' => 0];
 
-    $this->playerBuild($worker, ['x' => 4, 'y' => 1, 'z' => 0, 'arg' => 0], true);
+    $args = [
+      'duration' => INSTANT
+    ];
+    $this->playerBuild($worker, ['x' => 4, 'y' => 1, 'z' => 0, 'arg' => 0], $args);
 
-    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 0, 'arg' => 0], true);
-    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 1, 'arg' => 1], true);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 0, 'arg' => 0], $args);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 2, 'z' => 1, 'arg' => 1], $args);
 
-    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 0, 'arg' => 0], true);
-    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 1, 'arg' => 1], true);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 0, 'arg' => 0], $args);
+    $this->playerBuild($worker, ['x' => 4, 'y' => 3, 'z' => 1, 'arg' => 1], $args);
 
-    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 0, 'arg' => 0], true);
-    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 1, 'arg' => 1], true);
-    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 2, 'arg' => 2], true);
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 0, 'arg' => 0], $args);
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 1, 'arg' => 1], $args);
+    $this->playerBuild($worker, ['x' => 3, 'y' => 2, 'z' => 2, 'arg' => 2], $args);
 
-    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 0, 'arg' => 0], true);
-    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 1, 'arg' => 1], true);
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 0, 'arg' => 0], $args);
+    $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 1, 'arg' => 1], $args);
     $this->playerBuild($worker, ['x' => 2, 'y' => 4, 'z' => 2, 'arg' => 2]);
   }
 
@@ -1307,14 +1325,28 @@ class santorini extends Table
     self::DbQuery("INSERT INTO piece SELECT * FROM ebd_santorini_$tableId.piece");
     self::DbQuery("UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_PLACE_WORKER);
   }
+
   // UTILS
 
-
-  public function notifyWithSecret($piece, $msg, $args, $notif = 'message')
+  public function notifyWithSecret($piece, $notif, $msg, $args)
   {
-    if ($piece['location'] == 'secret')
+    if ($piece['location'] == 'secret') {
+      $redacted = array_key_exists('redacted', $args) && $args['redacted'];
+      unset($args['redacted']);
       self::notifyPlayer($piece['player_id'], $notif, $msg, $args);
-    else
+      if ($redacted) {
+        // Also send a public version of the notication, without the specific piece
+        unset($args['piece']);
+        $args['ignorePlayerIds'] = [$piece['player_id']];
+        $args['i18n'][] = 'coords';
+        $args['coords'] = $this->specialNames['secret'];
+        if ($msg == $this->msg['moveUp'] || $msg == $this->msg['moveDown'] || $msg == $this->msg['moveOn']) {
+          $msg = $this->msg['move'];
+        }
+        self::notifyAllPlayers('message', $msg, $args);
+      }
+    } else {
       self::notifyAllPlayers($notif, $msg, $args);
+    }
   }
 }

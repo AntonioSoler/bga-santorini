@@ -35,30 +35,9 @@ class Hecate extends SantoriniPower
     return $this->game->board->getPlacedWorkers($this->playerId, true);
   }
 
-  public function playerPlaceWorker($workerId, $x, $y, $z)
+  public function argPlayerPlaceWorker(&$arg)
   {
-    $worker = $this->game->board->getPiece($workerId);
-    $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
-
-    $this->game->board->setPieceAt($worker, $space, 'secret');
-
-    $worker = $this->game->board->getPiece($workerId); // update space
-    // Notify
-    $args = [
-      'i18n' => ['power_name', 'piece_name'],
-      'piece' => $worker,
-      'piece_name' => $this->game->pieceNames[$worker['type']],
-      'power_name' => $this->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-      'coords' => $this->game->board->getMsgCoords($space),
-    ];
-
-    $this->game->notifyPlayer($this->getPlayerId(), 'workerPlaced', $this->game->msg['powerPlacePiece'], $args);
-    unset($args['piece']);
-    $args['i18n'][] = 'coords';
-    $args['coords'] = $this->game->specialNames['secret'];
-    $this->game->notifyAllPlayers('message', $this->game->msg['powerPlacePiece'], $args);
-    return true; // do not place another piece
+    $arg['location'] = 'secret';
   }
 
   public function argPlayerWork(&$arg, $action)
@@ -83,56 +62,22 @@ class Hecate extends SantoriniPower
     $this->argPlayerWork($arg, 'move');
   }
 
-
   public function argPlayerBuild(&$arg)
   {
     $move = $this->game->log->getLastMove();
-    if ($move == null)
+    if ($move == null) {
       throw new BgaVisibleSystemException('Hecate build before move');
+    }
 
     $arg['workers'] = $this->getPlacedWorkers();
     Utils::filterWorkersById($arg, $move['pieceId']);
     $this->argPlayerWork($arg, 'build');
   }
 
-
   public function playerMove($worker, $space)
   {
-    $this->game->board->setPieceAt($worker, $space, 'secret');
-    $this->game->log->addMove($worker, $space);
-
-    // Notify
-    if ($space['z'] > $worker['z']) {
-      $msg = $this->game->msg['moveUp'];
-    } else if ($space['z'] < $worker['z']) {
-      $msg = $this->game->msg['moveDown'];
-    } else {
-      $msg = $this->game->msg['moveOn'];
-    }
-
-    $args = [
-      'i18n' => ['level_name'],
-      'piece' => $worker,
-      'space' => $space,
-      'player_name' => $this->game->getActivePlayerName(),
-      'level_name' => $this->game->levelNames[intval($space['z'])],
-      'coords' => $this->game->board->getMsgCoords($worker, $space)
-    ];
-
-
-    $this->game->notifyPlayer($this->playerId, 'workerMoved', $msg, $args);
-
-    $args = [
-      'i18n' => ['player_name'],
-      'player_name' => $this->game->getActivePlayerName(),
-      'coords' => $this->game->specialNames['secret']
-    ];
-
-    $this->game->notifyAllPlayers('message', '${player_name} moves to (${coords})', $args);
-
-    return true; // do not move again
+    return ['powerId' => HECATE, 'location' => 'secret'];
   }
-
 
   // Return the secret worker that conflicts with this log action, or null if there is no conflict
   public function getConflictingWorker($log, $myWorkers)
@@ -172,11 +117,9 @@ class Hecate extends SantoriniPower
     $myWorkers = $this->getPlacedWorkers();
     $logs = $this->game->log->logsForCancelTurn();
     $conflict = null;
-    $logId = null;
     foreach (array_reverse($logs) as $log) {
       $conflict = $this->getConflictingWorker($log, $myWorkers);
       if ($conflict != null) {
-        $logId = $log['log_id'];
         break;
       }
     }
@@ -247,7 +190,5 @@ class Hecate extends SantoriniPower
     $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name}\'s secret Worker (${coords}) conflicts with ${player_name2}\'s turn! The illegal actions have been cancelled.'), $args);
     unset($args['animation']);
     $this->game->notifyAllPlayers('pieceRemoved', '', $args);
-
-    return false;
   }
 }

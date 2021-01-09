@@ -39,14 +39,15 @@ class Harpies extends SantoriniPower
       if (is_null($newSpace) || $newSpace['z'] > $space['z']) {
         return;
       }
-      
+
       // if secret, stop at secret
-      if ($worker['location'] == 'secret')
-      {
+      if ($worker['location'] == 'secret') {
         $secretWorkers = $this->game->board->getPlacedWorkers($worker['player_id'], true);
-        foreach($secretWorkers as $secretWorker)
-          if ($this->game->board->isSameSpace($secretWorker, $newSpace))
+        foreach ($secretWorkers as $secretWorker) {
+          if ($this->game->board->isSameSpace($secretWorker, $newSpace)) {
             return;
+          }
+        }
       }
 
       $stats = [[$this->playerId, 'usePower']];
@@ -54,9 +55,8 @@ class Harpies extends SantoriniPower
       $this->game->log->addForce($space, $newSpace, $stats);
       $this->game->board->setPieceAt($space, $newSpace, $worker['location']);
 
-
-      // Notify force 
-      $args = [
+      // Notify force
+      $this->game->notifyWithSecret($worker, 'workerMoved', $this->game->msg['powerForce'], [
         'i18n' => ['power_name', 'level_name'],
         'piece' => $space,
         'space' => $newSpace,
@@ -65,9 +65,7 @@ class Harpies extends SantoriniPower
         'player_name2' => $opponent->getName(),
         'level_name' => $this->game->levelNames[intval($newSpace['z'])],
         'coords' => $this->game->board->getMsgCoords($space, $newSpace),
-      ];
-
-      $this->game->notifyWithSecret($worker, $this->game->msg['powerForce'], $args, 'workerMoved');
+      ]);
 
       $space = $newSpace;
     }

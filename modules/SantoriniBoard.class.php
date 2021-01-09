@@ -147,20 +147,14 @@ class SantoriniBoard extends APP_GameClass
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
-
-  public function getSecretPieces($playerId = null, $type = null)
+  /*
+   * getSecretPieces: return all hidden pieces on the 'secret' board
+   */
+  public function getSecretPieces()
   {
-    $sql = "SELECT * FROM piece WHERE location = 'secret'";
-    if ($type != null) {
-      $sql .= " AND type = '$type'";
-    }
-    if ($playerId != null) {
-      $sql .= " AND  player_id = $playerId";
-    }
-    $sql .= " ORDER BY id";
+    $sql = "SELECT * FROM piece WHERE location = 'secret' ORDER BY id";
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
-
 
   /*
    * TODO
@@ -271,8 +265,9 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedNotMineWorkers($pId = null, $lookSecret = false)
   {
     $location = "'board'";
-    if ($lookSecret)
+    if ($lookSecret) {
       $location = $location . " , 'secret' ";
+    }
     $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds($pId), true);
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
   }
@@ -589,5 +584,19 @@ class SantoriniBoard extends APP_GameClass
   public function setPieceAt($piece, $space, $location = 'board')
   {
     self::DbQuery("UPDATE piece SET location = '$location', x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
+  }
+
+  /*
+   * revealPiece: move a hidden piece from 'secret' to the public 'board'
+   * includes sending the instant notification
+   */
+  public function revealPiece($piece)
+  {
+    self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$piece['id']}");
+    $this->game->notifyAllPlayers('workerPlaced', '', [
+      'ignorePlayerIds' => [$piece['player_id']],
+      'duration' => INSTANT,
+      'piece' => $piece,
+    ]);
   }
 }

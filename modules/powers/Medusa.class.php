@@ -20,9 +20,7 @@ class Medusa extends SantoriniPower
 
   /* * */
 
-
-// optionnal parameters are used by Hecate 
-
+  // Optional parameter used by Hecate
   public function argPlayerBuild(&$arg, $lookSecret = false)
   {
     // If no build before => usual rule
@@ -34,7 +32,6 @@ class Medusa extends SantoriniPower
     // Otherwise, we check if a kill is possible
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, $lookSecret);
     $arg['workers'] = $this->game->board->getPlacedActiveWorkers();
-    
     foreach ($arg['workers'] as &$worker) {
       $worker['works'] = [];
       foreach ($oppWorkers as $worker2) {
@@ -46,11 +43,13 @@ class Medusa extends SantoriniPower
     }
   }
 
+  // Optional parameter used by Hecate
   public function endPlayerTurn($arg = null)
   {
     // Check if any kill is possible (using argPlayerBuild)
-    if ($arg == null)
+    if ($arg == null) {
       $arg = $this->game->argPlayerBuild();
+    }
     if (count($arg['workers']) == 0) {
       return;
     }

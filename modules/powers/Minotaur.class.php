@@ -27,11 +27,13 @@ class Minotaur extends SantoriniPower
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, true);
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
     // vs Hecate: make spaces where a secret opponent stands not accessible to a force
-    foreach ($oppWorkers as $opp)
-      if ($opp['location'] == 'secret')
+    foreach ($oppWorkers as $opp) {
+      if ($opp['location'] == 'secret') {
         Utils::filter($accessibleSpaces, function ($space) use ($opp) {
           return $opp['x'] != $space['x'] || $opp['y'] != $space['y'];
         });
+      }
+    }
 
     foreach ($workers as &$worker) {
       $worker['works'] = [];
@@ -71,7 +73,8 @@ class Minotaur extends SantoriniPower
       $this->game->board->setPieceAt($worker2, $space, $worker2['location']);
       $this->game->log->addForce($worker2, $space, $stats);
 
-      $args = [
+      // Notify force
+      $this->game->notifyWithSecret($worker2, 'workerMoved', $this->game->msg['powerForce'], [
         'duration' => INSTANT,
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
@@ -81,10 +84,7 @@ class Minotaur extends SantoriniPower
         'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
         'level_name' => $this->game->levelNames[intval($space['z'])],
         'coords' => $this->game->board->getMsgCoords($worker2, $space),
-      ];
-
-      // Notify force
-      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMoved');
+      ]);
     }
 
     // Always do a classic move

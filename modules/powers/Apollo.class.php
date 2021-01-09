@@ -52,7 +52,7 @@ class Apollo extends SantoriniPower
       $this->game->log->addForce($worker2, $worker, $stats);
 
       // Notify force
-      $args = [
+      $this->game->notifyWithSecret($worker2, 'workerMoved', $this->game->msg['powerForce'], [
         'duration' => INSTANT,
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
@@ -62,9 +62,7 @@ class Apollo extends SantoriniPower
         'player_name2' => $this->game->playerManager->getPlayer($worker2['player_id'])->getName(),
         'level_name' => $this->game->levelNames[intval($worker['z'])],
         'coords' => $this->game->board->getMsgCoords($worker2, $worker),
-      ];
-
-      $this->game->notifyWithSecret($worker2, $this->game->msg['powerForce'], $args, 'workerMoved');
+      ]);
     }
 
     // Always do a classic move

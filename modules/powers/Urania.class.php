@@ -41,8 +41,7 @@ class Urania extends SantoriniPower
     $this->game->log->addForce($worker, $space, $stats);
     $this->game->log->addMove($space, $work);
     $this->game->board->setPieceAt($worker, $work);
-    $this->game->playerMove($worker, $work, true);
 
-    return true;
+    return ['powerId' => URANIA, 'notifyOnly' => true];
   }
 }

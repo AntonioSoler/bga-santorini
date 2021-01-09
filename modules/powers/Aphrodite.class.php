@@ -54,15 +54,13 @@ class Aphrodite extends SantoriniPower
         return $this->game->board->getMsgCoords($worker);
       }, $workers));
       $opponent = $this->game->playerManager->getPlayer($playerId);
-      $args = [
+      $this->game->notifyWithSecret($workers[0], 'message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),
         'player_name' => $opponent->getName(), // opponent
         'player_name2' => $this->getPlayer()->getName(), // Aphrodite
         'coords' => $coords,
-      ];
-      $msg = clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}');
-      $this->game->notifyWithSecret($workers[0], $msg, $args);
+      ]);
     }
 
     if (!empty($forcedWorkers)) {

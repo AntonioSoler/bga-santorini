@@ -117,7 +117,6 @@ class Tartarus extends SantoriniPower
     }
 
     if ($loserId && $loose) {
-      $this->revealToken($token);
       $loser = $this->game->playerManager->getPlayer($loserId);
       $this->game->announceLose($this->game->msg['powerAbyss'], [
         'i18n' => ['power_name'],
@@ -150,7 +149,6 @@ class Tartarus extends SantoriniPower
     $loserId = $this->checkTurn(false);
     if ($loserId != null) {
       $token = $this->getToken();
-      $this->revealToken($token);
       $loser = $this->game->playerManager->getPlayer($loserId);
       $this->game->notifyAllPlayers('message', $this->game->msg['powerAbyss'], [
         'i18n' => ['power_name'],
