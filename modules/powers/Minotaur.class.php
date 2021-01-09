@@ -49,9 +49,13 @@ class Minotaur extends SantoriniPower
           Utils::addWork($worker, $worker2);
 
           // remove work to $worker2 space if exists (vs Hecate)
-          Utils::filterWorks($arg, function ($space, $piece) use ($worker2) {
-            return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']);
-          });
+          foreach($arg['workers'] as &$argworker)
+          {
+          	if ($argworker['id'] == $worker['id'])
+	          	Utils::filter($argworker['works'], function ($space) use ($worker2) {
+        	 	   return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']);
+        	  	});
+          }
         }
       }
     }
