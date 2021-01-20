@@ -1208,9 +1208,11 @@ class santorini extends Table
     $studioPlayer = self::getCurrentPlayerId();
     $playerIds = $this->playerManager->getPlayerIds();
 
-    $sql = [
-      "UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_BGA_GAME_END
-    ];
+    $sql = [];
+    if (self::getUniqueValueFromDB("SHOW COLUMNS FROM gamelog WHERE field = 'cancel'") == null) {
+      $sql[] = "ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0";
+    }
+    $sql[] = "UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_BGA_GAME_END;
     foreach ($playerIds as $pId) {
       $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$pId";
       $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$pId";

@@ -23,7 +23,8 @@ class Eris extends SantoriniPower
   public function getLastOpponentMoveWorkerId()
   {
     $ids = implode(",", $this->game->playerManager->getOpponentsIds($this->playerId));
-    $pieceId = self::getUniqueValueFromDB("SELECT l.piece_id FROM log l JOIN piece p ON (p.id = l.piece_id AND p.player_id = l.player_id) WHERE l.action = 'move' AND l.player_id IN ($ids) ORDER BY l.log_id DESC LIMIT 1");
+    // Must compare team (not player ID) to support 4-player games
+    $pieceId = self::getUniqueValueFromDB("SELECT l.piece_id FROM log l JOIN player tl ON (tl.player_id = l.player_id) JOIN piece p ON (p.id = l.piece_id) JOIN player tp ON (tp.player_id = p.player_id) WHERE l.action = 'move' AND l.player_id IN ($ids) AND tl.player_team = tp.player_team ORDER BY l.log_id DESC LIMIT 1");
     return $pieceId;
   }
 
