@@ -145,34 +145,7 @@ class Hecate extends SantoriniPower
     }
 
     // Cancel the turn from this move onward
-    $moveIds = $this->game->log->cancelTurn($log['log_id']);
-
-    // Compute the public view (no secret pieces) and private view for each player
-    $publicView = $this->game->board->getPlacedPieces();
-    $privateView = [];
-    $playerIds = $this->game->playerManager->getPlayerIds();
-    foreach ($playerIds as $playerId) {
-      $view = $this->game->board->getPlacedPieces($playerId);
-      if ($view != $publicView) {
-        $privateView[$playerId] = $view;
-      }
-    }
-
-    // Send the public view to all (supports spectators)
-    // The players with a private view coming next will ignore this notification
-    $this->game->notifyAllPlayers('cancel', '', [
-      'ignorePlayerIds' => array_keys($privateView),
-      'placedPieces' => $publicView,
-      'moveIds' => $moveIds,
-    ]);
-
-    // Send the private view to individual player(s) as needed
-    foreach ($privateView as $playerId => $view) {
-      $this->game->notifyPlayer($playerId, 'cancel', '', [
-        'placedPieces' => $view,
-        'moveIds' => $moveIds,
-      ]);
-    }
+    $this->game->cancelPreviousWorks($log['log_id']);
 
     // Briefly display the conflicting secret worker
     // Always show as female

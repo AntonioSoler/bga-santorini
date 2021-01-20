@@ -982,26 +982,50 @@ class santorini extends Table
 
   /*
    * cancelPreviousWorks: called when a player decide to go back at the beggining of the turn
+   * - int $moveId : used by Hecate to cancel only part of the turn
    */
-  public function cancelPreviousWorks()
+  public function cancelPreviousWorks($moveId = null)
   {
     if (!$this->log->canCancelTurn()) {
       throw new BgaUserException(_("You have nothing to cancel"));
     }
 
     // Undo the turn
-    $moveIds = $this->log->cancelTurn();
+    $moveIds = $this->log->cancelTurn($moveId);
+
+    // Compute the public view (no secret pieces) and private view for each player
+    $publicView = $this->board->getPlacedPieces();
+    $privateView = [];
     $playerIds = $this->playerManager->getPlayerIds();
     foreach ($playerIds as $playerId) {
-      self::notifyPlayer($playerId, 'cancel', $this->msg['restart'], [
-        'placedPieces' => $this->board->getPlacedPieces($playerId),
-        'player_name' => self::getActivePlayerName(),
+      $view = $this->board->getPlacedPieces($playerId);
+      if ($view != $publicView) {
+        $privateView[$playerId] = $view;
+      }
+    }
+
+    // Send the public view to all (supports spectators)
+    // The players with a private view coming next will ignore this notification
+    $msg = $moveId == null ? $this->msg['restart'] : '';
+    self::notifyAllPlayers('cancel', $msg, [
+      'ignorePlayerIds' => array_keys($privateView),
+      'placedPieces' => $publicView,
+      'moveIds' => $moveIds,
+      'player_name' => self::getActivePlayerName(),
+    ]);
+
+    // Send the private view to individual player(s) as needed
+    foreach ($privateView as $playerId => $view) {
+      self::notifyPlayer($playerId, 'cancel', '', [
+        'placedPieces' => $view,
         'moveIds' => $moveIds,
       ]);
     }
 
     // Apply power
-    $this->gamestate->nextState('cancel');
+    if ($moveId == null) {
+      $this->gamestate->nextState('cancel');
+    }
   }
 
   /* 
