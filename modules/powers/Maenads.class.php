@@ -37,7 +37,7 @@ class Maenads extends SantoriniPower
           {
             if ($power->getId() != HECATE)
               continue;
-            if ($power->endOpponentTurn(true))
+            if (!$power->endOpponentTurn(true))
               return;
           }
           
