@@ -42,7 +42,7 @@ class Bia extends SantoriniPower
     $y = 2 * $work['y'] - $worker['y'];
 
     // Must use getPlacedOpponentWorkers() so Bia cannot target Clio's invisible workers
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, true);
     foreach ($oppWorkers as &$oppWorker) {
       if ($oppWorker['x'] == $x and $oppWorker['y'] == $y) {
         $this->game->playerKill($oppWorker, $this->getName());

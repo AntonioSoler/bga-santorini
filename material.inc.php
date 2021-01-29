@@ -42,6 +42,7 @@ $this->msg = [
   'colorPlayer' => clienttranslate('${player_name} controls of the ${color} workers'),
   'colorTeam' => clienttranslate('${player_name} and ${player_name2} share control of the ${color} workers'),
   'placePiece' => clienttranslate('${player_name} places ${piece_name} (${coords})'),
+  'move' => clienttranslate('${player_name} moves (${coords})'),
   'moveUp' => clienttranslate('${player_name} moves up to ${level_name} (${coords})'),
   'moveDown' => clienttranslate('${player_name} moves down to ${level_name} (${coords})'),
   'moveOn' => clienttranslate('${player_name} moves on ${level_name} (${coords})'),

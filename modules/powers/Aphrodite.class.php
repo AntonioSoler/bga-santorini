@@ -35,7 +35,7 @@ class Aphrodite extends SantoriniPower
     // Don't use getPlacedOpponentWorkers() because the power should affect Clio
     // Need filterWorksUnlessMine for Dionysus additional turn
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
-    $oppWorkers = $this->game->board->getPlacedNotMineWorkers($this->playerId);
+    $oppWorkers = $this->game->board->getPlacedNotMineWorkers($this->playerId, true);
     $forcedWorkers = [];
     $forcedPlayers = [];
     foreach ($oppWorkers as $worker) {
@@ -54,7 +54,7 @@ class Aphrodite extends SantoriniPower
         return $this->game->board->getMsgCoords($worker);
       }, $workers));
       $opponent = $this->game->playerManager->getPlayer($playerId);
-      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
+      $this->game->notifyWithSecret($workers[0], 'message', clienttranslate('${power_name}: ${player_name} (${coords}) must end this turn neighboring ${player_name2}'), [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),
         'player_name' => $opponent->getName(), // opponent

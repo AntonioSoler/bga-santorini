@@ -194,6 +194,8 @@ define('BLUE', 0);
 define('WHITE', 1);
 define('PURPLE', 2);
 
+define('INSTANT', 10);
+
 define('DIRECTIONS', [
   N  => ['x' => 1,  'y' => 0],
   NE => ['x' => 1,  'y' => 1],

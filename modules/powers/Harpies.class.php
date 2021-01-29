@@ -40,13 +40,23 @@ class Harpies extends SantoriniPower
         return;
       }
 
+      // if secret, stop at secret
+      if ($worker['location'] == 'secret') {
+        $secretWorkers = $this->game->board->getPlacedWorkers($worker['player_id'], true);
+        foreach ($secretWorkers as $secretWorker) {
+          if ($this->game->board->isSameSpace($secretWorker, $newSpace)) {
+            return;
+          }
+        }
+      }
+
       $stats = [[$this->playerId, 'usePower']];
       $space['id'] = $worker['id'];
       $this->game->log->addForce($space, $newSpace, $stats);
-      $this->game->board->setPieceAt($space, $newSpace);
+      $this->game->board->setPieceAt($space, $newSpace, $worker['location']);
 
       // Notify force
-      $this->game->notifyAllPlayers('workerMoved', $this->game->msg['powerForce'], [
+      $this->game->notifyWithSecret($worker, 'workerMoved', $this->game->msg['powerForce'], [
         'i18n' => ['power_name', 'level_name'],
         'piece' => $space,
         'space' => $newSpace,

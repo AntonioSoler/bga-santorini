@@ -147,8 +147,14 @@ class SantoriniBoard extends APP_GameClass
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
   }
 
-
-
+  /*
+   * getSecretPieces: return all hidden pieces on the 'secret' board
+   */
+  public function getSecretPieces()
+  {
+    $sql = "SELECT * FROM piece WHERE location = 'secret' ORDER BY id";
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
+  }
 
   /*
    * TODO
@@ -195,10 +201,14 @@ class SantoriniBoard extends APP_GameClass
    * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
-  public function getPlacedWorkers($pId = -1)
+  public function getPlacedWorkers($pId = -1, $lookSecret = false)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
+    $location = "'board'";
+    if ($lookSecret) {
+      $location = $location . " , 'secret' ";
+    }
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
@@ -232,9 +242,9 @@ class SantoriniBoard extends APP_GameClass
    * - passive powers like Aphrodite, Harpies, etc. that apply to Clio should not use this function
    *  (see also: getPlacedNotMineWorkers() which does not filter Clio)
    */
-  public function getPlacedOpponentWorkers($pId = null)
+  public function getPlacedOpponentWorkers($pId = null, $lookSecret = false)
   {
-    $workers = $this->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId));
+    $workers = $this->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId), $lookSecret);
 
     // Clio: Workers on top of a coin are invisible to opponents
     $tokensXY = array_map(function ($token) {
@@ -252,10 +262,14 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPlacedWorkers: return all placed workers except those of the active player
    */
-  public function getPlacedNotMineWorkers($pId = null)
+  public function getPlacedNotMineWorkers($pId = null, $lookSecret = false)
   {
+    $location = "'board'";
+    if ($lookSecret) {
+      $location = $location . " , 'secret' ";
+    }
     $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds($pId), true);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
   }
 
 
@@ -553,7 +567,8 @@ class SantoriniBoard extends APP_GameClass
           $space['z'] = $top;
           $this->setPieceAt($token, $space, 'secret');
           if ($notify) {
-            $this->game->notifyPlayer($token['player_id'], 'workerMovedInstant', '', [
+            $this->game->notifyPlayer($token['player_id'], 'workerMoved', '', [
+              'duration' => INSTANT,
               'piece' => $token,
               'space' => $space,
             ]);
@@ -569,5 +584,19 @@ class SantoriniBoard extends APP_GameClass
   public function setPieceAt($piece, $space, $location = 'board')
   {
     self::DbQuery("UPDATE piece SET location = '$location', x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
+  }
+
+  /*
+   * revealPiece: move a hidden piece from 'secret' to the public 'board'
+   * includes sending the instant notification
+   */
+  public function revealPiece($piece)
+  {
+    self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$piece['id']}");
+    $this->game->notifyAllPlayers('workerPlaced', '', [
+      'ignorePlayerIds' => [$piece['player_id']],
+      'duration' => INSTANT,
+      'piece' => $piece,
+    ]);
   }
 }

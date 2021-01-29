@@ -29,7 +29,7 @@ class Hypnus extends SantoriniPower
   public function startOpponentTurn()
   {
     // If at least two workers remeaining
-    $workers = $this->game->board->getPlacedWorkers($this->game->getActivePlayerId());
+    $workers = $this->game->board->getPlacedWorkers($this->game->getActivePlayerId(), true);
     if (count($workers) < 2) {
       return;
     }
@@ -37,7 +37,7 @@ class Hypnus extends SantoriniPower
     // Sort them by height and see if first one is strictly higher
     usort($workers, 'self::cmpZ');
     if (self::cmpZ($workers[0], $workers[1]) != 0) {
-      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} (${coords}) cannot move this turn'), [
+      $this->game->notifyWithSecret($workers[0], 'message', clienttranslate('${power_name}: ${player_name} (${coords}) cannot move this turn'), [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),
         'player_name' => $this->game->getActivePlayerName(), // opponent

@@ -24,8 +24,16 @@ class Minotaur extends SantoriniPower
   {
     $workers = $this->game->board->getPlacedActiveWorkers();
     // Must use getPlacedOpponentWorkers() so Minotaur cannot target Clio's invisible workers
-    $oppWorkers = $this->game->board->getPlacedOpponentWorkers();
+    $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, true);
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
+    // vs Hecate: make spaces where a secret opponent stands not accessible to a force
+    foreach ($oppWorkers as $opp) {
+      if ($opp['location'] == 'secret') {
+        Utils::filter($accessibleSpaces, function ($space) use ($opp) {
+          return $opp['x'] != $space['x'] || $opp['y'] != $space['y'];
+        });
+      }
+    }
 
     foreach ($workers as &$worker) {
       $worker['works'] = [];
@@ -39,6 +47,14 @@ class Minotaur extends SantoriniPower
         $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
         if (!is_null($space)) {
           Utils::addWork($worker, $worker2);
+
+          // remove work to $worker2 space if exists (vs Hecate)
+          foreach ($arg['workers'] as &$argworker) {
+            if ($argworker['id'] == $worker['id'])
+              Utils::filter($argworker['works'], function ($space) use ($worker2) {
+                return !($space['x'] == $worker2['x'] && $space['y'] == $worker2['y']);
+              });
+          }
         }
       }
     }
@@ -50,18 +66,19 @@ class Minotaur extends SantoriniPower
   {
     // If space is occupied, first do a force
     $worker2 = $this->game->board->getPiece($work);
-    if ($worker2 != null && $worker2['location'] == 'board') {
+    if ($worker2 != null && ($worker2['location'] == 'board' || $worker2['location'] == 'secret')) {
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
       $space = $this->game->board->getSpaceBehind($worker, $worker2, $accessibleSpaces);
       if (is_null($space)) {
         throw new BgaVisibleSystemException("Minotaur: No available space behind opponent worker");
       }
       $stats = [[$this->playerId, 'usePower']];
-      $this->game->board->setPieceAt($worker2, $space);
+      $this->game->board->setPieceAt($worker2, $space, $worker2['location']);
       $this->game->log->addForce($worker2, $space, $stats);
 
       // Notify force
-      $this->game->notifyAllPlayers('workerMovedInstant', $this->game->msg['powerForce'], [
+      $this->game->notifyWithSecret($worker2, 'workerMoved', $this->game->msg['powerForce'], [
+        'duration' => INSTANT,
         'i18n' => ['power_name', 'level_name'],
         'piece' => $worker2,
         'space' => $space,

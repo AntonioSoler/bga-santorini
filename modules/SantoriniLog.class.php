@@ -187,13 +187,16 @@ class SantoriniLog extends APP_GameClass
     $this->addWork($piece, $space, 'force', $stats);
   }
 
-
   /*
    * addRemoval: add a piece removal entry to log (eg. Bia or Ares)
+   * NOTE: call this BEFORE updating board, since it saves the current location
    */
   public function addRemoval($piece, $stats = [])
   {
-    $this->insert(-1, $piece['id'], 'removal', $stats);
+    $args = [
+      'location' => $piece['location'],
+    ];
+    $this->insert(-1, $piece['id'], 'removal', $stats, $args);
   }
 
   /*
@@ -426,7 +429,9 @@ class SantoriniLog extends APP_GameClass
     return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
   }
 
-  public function cancelTurn()
+
+  // stop at $logIdBreak (for Hecate)
+  public function cancelTurn($logIdBreak = null)
   {
     $pId = $this->game->getActivePlayerId();
     $logs = $this->logsForCancelTurn();
@@ -449,8 +454,10 @@ class SantoriniLog extends APP_GameClass
         self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
         $this->game->board->adjustSecretTokens($args['to'], false);
       } else if ($log['action'] == 'removal') {
-        // Removal : put the piece back on the board
-        self::DbQuery("UPDATE piece SET location = 'board' WHERE id = {$log['piece_id']}");
+        // Removal : put the piece back on the board    
+        $piece = $this->game->board->getPiece($log['piece_id']);
+        $location = $args['location'] ?? 'board';
+        self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$log['piece_id']}");
         $piece = $this->game->board->getPiece($log['piece_id']);
         $this->game->board->adjustSecretTokens($piece, false);
       } else if ($log['action'] == 'powerRemoved' && $args['reason'] == 'hero') {
@@ -471,6 +478,11 @@ class SantoriniLog extends APP_GameClass
 
       $ids[] = intval($log['log_id']);
       $moveIds[] = intval($log['move_id']);
+
+      // Hecate: stop cancelling at this point
+      if ($logIdBreak == $log['log_id']) {
+        break;
+      }
     }
 
     // Remove the logs
@@ -482,7 +494,10 @@ class SantoriniLog extends APP_GameClass
     }
 
     // Count the number of restarts
-    $this->incrementStats([[$pId, 'restartTurn']]);
+    if (!$logIdBreak) {
+      $this->incrementStats([[$pId, 'restartTurn']]);
+    }
+
     return $moveIds;
   }
 

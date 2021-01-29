@@ -149,9 +149,7 @@ abstract class SantoriniPower extends APP_GameClass
   public function placeWorker($worker, $space)
   {
     $this->game->board->setPieceAt($worker, $space);
-    $worker['x'] = $space['x'];
-    $worker['y'] = $space['y'];
-    $worker['z'] = $space['z'];
+    $worker = $this->game->board->getPiece($worker['id']);
     $this->game->log->addPlaceWorker($worker, $this);
 
     // Notify
@@ -170,13 +168,12 @@ abstract class SantoriniPower extends APP_GameClass
   {
     $stats = [[$this->playerId, 'usePower']];
     $this->game->board->setPieceAt($token, $space, $location);
-    $token['x'] = $space['x'];
-    $token['y'] = $space['y'];
-    $token['z'] = $space['z'];
+    $token = $this->game->board->getPiece($token['id']);
     $this->game->log->addPlaceToken($token, $this, $stats);
 
     // Notify
     $args = [
+      'redacted' => true,
       'i18n' => ['power_name', 'piece_name'],
       'piece' => $token,
       'piece_name' => $this->game->pieceNames[$token['type']],
@@ -185,15 +182,7 @@ abstract class SantoriniPower extends APP_GameClass
       'coords' => $this->game->board->getMsgCoords($token),
     ];
 
-    if ($location == 'secret') {
-      $this->game->notifyPlayer($this->getPlayerId(), 'workerPlaced', $this->game->msg['powerPlacePiece'], $args);
-      unset($args['piece']);
-      $args['i18n'][] = 'coords';
-      $args['coords'] = $this->game->specialNames['secret'];
-      $this->game->notifyAllPlayers('message', $this->game->msg['powerPlacePiece'], $args);
-    } else { // visible to all
-      $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], $args);
-    }
+    $this->game->notifyWithSecret($token, 'workerPlaced', $this->game->msg['powerPlacePiece'], $args);
   }
 
   public function moveToken($token, $space)
@@ -214,22 +203,10 @@ abstract class SantoriniPower extends APP_GameClass
     ]);
   }
 
-  public function revealToken($token)
-  {
-    // Move from secret to public board at same space
-    $this->game->board->setPieceAt($token, $token);
-    // TODO: update JavaScript to treat duplicate piece placed notify as piece moved
-    // (keep notifyAllPlayers here because spectators want to see, too)
-    $this->game->notifyAllPlayers('workerPlacedInstant', '', [
-      'piece' => $token,
-    ]);
-    $this->updateUI();
-  }
-
   public function removePiece($piece)
   {
-    $this->game->board->removePiece($piece);
     $this->game->log->addRemoval($piece);
+    $this->game->board->removePiece($piece);
 
     // Notify
     $this->game->notifyAllPlayers('pieceRemoved', $this->game->msg['powerRemovePiece'], [
@@ -306,6 +283,8 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  // Return true to stop the default move
+  // Return false or array to do default move (customized by array args)
   public function playerMove($worker, $work)
   {
     return false;
@@ -335,6 +314,8 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+  // Return true to stop the default build
+  // Return false or array to do default build (customized by array args)
   public function playerBuild($worker, $work)
   {
     return false;
