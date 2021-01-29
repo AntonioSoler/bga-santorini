@@ -51,7 +51,7 @@ class Zeus extends SantoriniPower
     // Build under it
     $stats = [[$this->playerId, 'usePower']];
     $type = 'lvl' . $work['arg'];
-    $pieceId = $this->board->addPiece([
+    $pieceId = $this->game->board->addPiece([
       'player_id' => $this->playerId,
       'type' => $type,
       'location' => 'board',
@@ -59,7 +59,7 @@ class Zeus extends SantoriniPower
       'y' => $work['y'],
       'z' => $work['z'],
     ]);
-    $piece = $this->board->getPiece($pieceId);
+    $piece = $this->game->board->getPiece($pieceId);
     $this->game->log->addBuild($worker, $work, $stats);
 
     // Notify
