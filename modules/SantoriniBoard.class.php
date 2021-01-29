@@ -80,7 +80,7 @@ class SantoriniBoard extends APP_GameClass
     if ($id == null) {
       return null;
     }
-    return self::addInfo(self::getObjectFromDB("SELECT * FROM piece WHERE id = '$id'"));
+    return self::addInfo(self::getObjectFromDB("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE id = '$id'"));
   }
 
   /*
@@ -90,7 +90,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPiecesAt($space, $location = 'board')
   {
-    $sql = "SELECT * FROM piece WHERE location = '$location' AND x = {$space['x']} AND y = {$space['y']}";
+    $sql = "SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = '$location' AND x = {$space['x']} AND y = {$space['y']}";
     if (array_key_exists('z', $space)) {
       $sql .= " AND z = {$space['z']}";
     }
@@ -104,7 +104,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getBlocksAt($space)
   {
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type IN ('lvl0', 'lvl1', 'lvl2') AND x = {$space['x']} AND y = {$space['y']} ORDER BY z DESC"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board' AND type IN ('lvl0', 'lvl1', 'lvl2') AND x = {$space['x']} AND y = {$space['y']} ORDER BY z DESC"));
   }
 
   /*
@@ -121,7 +121,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPiecesByType($type, $type_arg = null, $location = null)
   {
-    $sql = "SELECT * FROM piece WHERE type = '$type'";
+    $sql = "SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE type = '$type'";
     if ($type_arg) {
       $sql .= " AND type_arg = '$type_arg'";
     }
@@ -139,7 +139,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedPieces($playerId = null)
   {
-    $sql = "SELECT * FROM piece WHERE location = 'board'";
+    $sql = "SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board'";
     if ($playerId != null) {
       $sql .= " OR (location = 'secret' AND player_id = $playerId)";
     }
@@ -179,7 +179,7 @@ class SantoriniBoard extends APP_GameClass
   public function getAvailableWorkers($pId = -1)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'desk' AND type = 'worker' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'desk' AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
@@ -198,7 +198,7 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedWorkers($pId = -1)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
   }
 
   /*
@@ -208,7 +208,7 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedTokens($pId = -1)
   {
     $filter = $this->playerFilter($pId);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type LIKE 'token%' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board' AND type LIKE 'token%' $filter ORDER BY id"));
   }
 
   /*
@@ -255,7 +255,7 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedNotMineWorkers($pId = null)
   {
     $filter = $this->playerFilter($this->game->playerManager->getTeammatesIds($pId), true);
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT * FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
+    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location = 'board' AND type = 'worker' $filter ORDER BY id"));
   }
 
 

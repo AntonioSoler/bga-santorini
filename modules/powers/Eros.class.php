@@ -64,7 +64,7 @@ class Eros extends SantoriniPower
 
     // Eros wins during opponent turn if Eris moved this worker (but not Dionysus)
     $piece = $this->game->board->getPiece($move['pieceId']);
-    if ($piece['player_id'] != $this->playerId || $this->game->log->isAdditionalTurn(DIONYSUS)) {
+    if ($piece['player_team'] != $this->getPlayer()->getTeam() || $this->game->log->isAdditionalTurn(DIONYSUS)) {
       return;
     }
 
