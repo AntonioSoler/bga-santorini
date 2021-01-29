@@ -60,6 +60,8 @@ class Clio extends SantoriniPower
         throw new BgaVisibleSystemException("Clio: Invalid build attempt (id: {$piece['id']}, type: {$piece['type']})");
       }
     }
+
+    return false;
   }
 
   public function afterPlayerBuild($worker, $work)

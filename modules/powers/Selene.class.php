@@ -48,5 +48,7 @@ class Selene extends SantoriniPower
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('stats', $stats);
     }
+
+    return false;
   }
 }
