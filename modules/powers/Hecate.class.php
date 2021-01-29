@@ -163,7 +163,7 @@ class Hecate extends SantoriniPower
       'player_name2' => $opponent->getName(),
       'coords' => $this->game->board->getMsgCoords($conflict),
     ];
-    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name}\'s secret Worker (${coords}) conflicts with ${player_name2}\'s turn! The illegal actions have been cancelled and the rest of the turn is lost.'), $args); // add "rest of the turn" to clarify why Hydra / Medusa / Charybdis / Maenads etc do not activate their power at the end
+    $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name}\'s secret Worker (${coords}) conflicts with ${player_name2}\'s action! The illegal actions are cancelled and ${player_name2} loses the rest of their turn.'), $args);
     unset($args['animation']);
     $this->game->notifyAllPlayers('pieceRemoved', '', $args);
   }
