@@ -182,15 +182,16 @@ class PowerManager extends APP_GameClass
     [ADONIS, TRITON], // multiple moves
 
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
-    [HECATE, IRIS], // can jump over secret workers + issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
-    [HECATE, ERIS],
-    [HECATE, NEMESIS],
-    [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
-    [HECATE, SIREN],
-    [HECATE, ODYSSEUS],
     [HECATE, ADONIS],
-    [HECATE, NYX], // too confusing for the moment
     [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal
+    [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
+    [HECATE, ERIS],
+    [HECATE, IRIS], // can jump over secret workers + issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
+    [HECATE, NEMESIS],
+    [HECATE, NYX], // too confusing for the moment
+    [HECATE, ODYSSEUS],
+    [HECATE, SIREN],
+    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
   ];
 
 
