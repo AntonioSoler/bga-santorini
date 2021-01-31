@@ -192,6 +192,15 @@ class PowerManager extends APP_GameClass
     [HECATE, ODYSSEUS],
     [HECATE, SIREN],
     [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
+
+    // https://boardgamearena.com/bug?id=33066
+    [HECATE, ARTEMIS],
+    [HECATE, ATALANTA],
+    [HECATE, EROS],
+    [HECATE, HERA],
+    [HECATE, MINOTAUR],
+    [HECATE, PAN],
+    [HECATE, TRITON],
   ];
 
 
