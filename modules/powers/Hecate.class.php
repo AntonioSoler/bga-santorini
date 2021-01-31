@@ -43,17 +43,19 @@ class Hecate extends SantoriniPower
   public function argPlayerWork(&$arg, $action)
   {
     $myworkers = $this->getPlacedWorkers();
-    foreach ($arg['workers'] as &$worker)
+    foreach ($arg['workers'] as &$worker) {
       $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, $action);
+    }
 
+    // remove Hecate worker spaces
     Utils::filterWorks($arg, function ($space, $piece) use ($myworkers) {
-      return  !max(array_map(
+      return !max(array_map(
         function ($s) use ($space) {
           return ($space['x'] == $s['x'] && $space['y'] == $s['y']);
         },
         $myworkers
       ));
-    }); // remove Hecate worker spaces
+    });
   }
 
   public function argPlayerMove(&$arg)
@@ -124,9 +126,9 @@ class Hecate extends SantoriniPower
       }
     }
 
-    // In test mode, just return the true/false to indicate a conflict
+    // In test mode, stop here and return true if there is a conflict
     if ($testOnly) {
-      return ($conflict == null);
+      return !is_null($conflict);
     }
 
     // If no conflict, allow the turn to end normally
@@ -166,5 +168,18 @@ class Hecate extends SantoriniPower
     $this->game->notifyAllPlayers('workerPlaced', clienttranslate('${power_name}: ${player_name}\'s secret Worker (${coords}) conflicts with ${player_name2}\'s action! The illegal actions are cancelled and ${player_name2} loses the rest of their turn.'), $args);
     unset($args['animation']);
     $this->game->notifyAllPlayers('pieceRemoved', '', $args);
+  }
+
+
+  // check if the turn was legal based on Hecate power before an opponent can win
+  public function checkOpponentWinning(&$arg)
+  {
+    if ($arg['win'] && $this->endOpponentTurn(true)) {
+      // Stop the win if the turn was illegal
+      $arg['win'] = false;
+
+      // endOpponentTurn will cancel the illegal actions
+      // TODO: We should end the opponent turn immediately (e.g., Pan moves down but we still let him build)
+    }
   }
 }
