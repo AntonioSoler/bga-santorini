@@ -49,8 +49,6 @@ class Charybdis extends SantoriniPower
   	return count($tokens) > 0 ? 'power' : null;
   }
   
-  
- // TODO: more visible token when stepped on it??
 
   public function argUsePower(&$arg)
   {
