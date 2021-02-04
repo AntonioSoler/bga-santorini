@@ -134,6 +134,7 @@ class PowerManager extends APP_GameClass
     [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
+    [CHARYBDIS, HARPIES], // Charybdis should go first which does not work with 3 (and 4?) players. Fine with 2 though but cannot ban only 2
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],

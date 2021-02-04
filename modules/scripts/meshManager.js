@@ -97,7 +97,7 @@ const Meshes = [
 		s: 0.8,
 	},
 	{
-		n: 'tokenWhirpool',
+		n: 'tokenWhirlpool',
 		g: 'token',
 		s: 0.8,
 	},

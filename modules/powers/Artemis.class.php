@@ -41,6 +41,9 @@ class Artemis extends SantoriniPower
   public function stateAfterMove()
   {
     $count = count($this->game->log->getLastMoves());
+    $lastMove = $this->game->log->getLastMove();
+    if ($this->game->board->isSameSpace($lastMove['from'], $lastMove['to'])) // dummy move from Charybdis
+    	$count = $count - 1;
     if ($count > 1) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('stats', $stats);

@@ -109,7 +109,7 @@ class SantoriniLog extends APP_GameClass
   /*
    * insert: add a new log entry
    * params:
-   *   - $playerId: the player who is making the action
+   *   - $playerId: the player who is action making the
    *   - $pieceId : the piece whose is making the action
    *   - string $action : the name of the action
    *   - array $stats: game statistics simple array (e.g. [ ['table', 'move'], ['287392', 'usePower'], ... ]
@@ -429,6 +429,23 @@ class SantoriniLog extends APP_GameClass
     return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
   }
 
+  public function deleteLogEntry($logId) // for Charybdis
+  {
+    self::DbQuery("UPDATE log SET action = 'force' WHERE `log_id` = '$logId'");   // hide it from getLastMove even if delete is not processed yet
+    self::DbQuery("DELETE FROM log WHERE `log_id` = '$logId'");
+  }
+  
+  public function updateLogEntry($logId, $from, $to) // for Charybdis
+  {
+    $args = [
+      'from' => SantoriniBoard::getCoords($from),
+      'to'   => SantoriniBoard::getCoords($to),
+    ];
+    $arg_encode = json_encode($args);
+  
+    self::DbQuery("UPDATE log SET action_arg = '$arg_encode' WHERE `log_id` = '$logId'");    
+  }
+	
 
   // stop at $logIdBreak (for Hecate)
   public function cancelTurn($logIdBreak = null)

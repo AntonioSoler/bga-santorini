@@ -315,10 +315,10 @@ class SantoriniBoard extends APP_GameClass
         // Find next free space above ground
         for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
           $p = $board[$x][$y][$z];
-          if ($p['type'] == 'tokenCoin' && in_array(CLIO, $powerIds)) {
+          if ($p['type'] == 'tokenWhirlpool' || ($p['type'] == 'tokenCoin' && in_array(CLIO, $powerIds))) {
             break;
           }
-          $blocked = $p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3' || $p['type'] == 'tokenTalus' || $p['type'] == 'tokenCoin';
+          $blocked = $p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3' || $p['type'] == 'tokenTalus' || $p['type'] == 'tokenCoin'; // TODO: Coin / Talus should be active only if Clio / Europa is face up (vs Nyx)
         }
 
         if ($blocked || $z > 3) {
@@ -542,8 +542,12 @@ class SantoriniBoard extends APP_GameClass
 
   public function removePiece($piece)
   {
+    $location = 'box';
+    if ($piece['type'] == 'tokenWhirlpool' || $piece['type'] == 'tokenTalus') // tokens can be built on (e.g., vs Nyx) and then go back either to the box or to the hand
+    	$location = 'hand';
+    
     // Return the piece to the box
-    self::DbQuery("UPDATE piece SET location = 'box' WHERE id = {$piece['id']}");
+    self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$piece['id']}");
 
     // Adjust secret tokens 
     if (array_key_exists('x', $piece) && array_key_exists('y', $piece)) {

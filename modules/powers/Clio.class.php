@@ -49,6 +49,7 @@ class Clio extends SantoriniPower
     $this->updateUI();
   }
 
+/*
   public function playerBuild($worker, $work)
   {
     // Remove the coin token if Clio builds on top of it
@@ -63,6 +64,7 @@ class Clio extends SantoriniPower
 
     return false;
   }
+*/
 
   public function afterPlayerBuild($worker, $work)
   {
