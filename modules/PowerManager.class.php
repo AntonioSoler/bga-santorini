@@ -187,13 +187,12 @@ class PowerManager extends APP_GameClass
     [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal
     [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
     [HECATE, ERIS],
-    [HECATE, IRIS], // can jump over secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
+    [HECATE, IRIS], // can jump over secret workers + issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
     [HECATE, NEMESIS],
     [HECATE, NYX], // too confusing for the moment
     [HECATE, ODYSSEUS],
     [HECATE, SIREN],
-//    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
-    [HECATE, HYDRA], // should propose a higher level to spawn when <3 are of minimal height
+    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
 
     // https://boardgamearena.com/bug?id=33066
     [HECATE, ARTEMIS],

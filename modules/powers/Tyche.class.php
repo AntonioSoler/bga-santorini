@@ -65,8 +65,7 @@ class Tyche extends SantoriniPower
 
   public function stateEndOfTurn()
   {
-    // check build (illegal turn vs Hecate)
-    return (!is_null($this->game->log->getLastBuild()) && !$this->game->log->isAdditionalTurn(TYCHE) && $this->drawCard()) ? 'additionalTurn' : null;
+    return (!$this->game->log->isAdditionalTurn(TYCHE) && $this->drawCard()) ? 'additionalTurn' : null;
   }
 
   public function argPlayerMove(&$arg)
