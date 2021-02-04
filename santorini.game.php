@@ -1106,13 +1106,10 @@ class santorini extends Table
    */
   public function playerMove($worker, $space, $info = [])
   {
-    $notifyOnly = $info['notifyOnly'] ?? false;
-    if (!$notifyOnly) {
-      // Move worker
-      $location = $info['location'] ?? 'board';
-      $this->board->setPieceAt($worker, $space, $location);
-      $this->log->addMove($worker, $space);
-    }
+    // Move worker
+    $location = $info['location'] ?? 'board';
+    $this->board->setPieceAt($worker, $space, $location);
+    $this->log->addMove($worker, $space);
 
     // Notify
     if ($space['z'] > $worker['z']) {
