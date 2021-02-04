@@ -22,15 +22,10 @@ class Urania extends SantoriniPower
 
   public function playerMove($worker, $work)
   {
-    // Normal neighbouring => classic move
-    if ($this->game->board->isNeighbour($worker, $work, 'move')) {
-      return false;
+    if (!$this->game->board->isNeighbour($worker, $work, 'move')) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('stats', $stats);
     }
-
-    $stats = [[$this->playerId, 'usePower']];
-    $this->game->log->addMove($worker, $work, $stats);
-    $this->game->board->setPieceAt($worker, $work);
-
-    return ['powerId' => URANIA, 'notifyOnly' => true];
+    return false;
   }
 }
