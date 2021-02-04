@@ -49,22 +49,7 @@ class Clio extends SantoriniPower
     $this->updateUI();
   }
 
-/*
-  public function playerBuild($worker, $work)
-  {
-    // Remove the coin token if Clio builds on top of it
-    $pieces = $this->game->board->getPiecesAt($work);
-    foreach ($pieces as $piece) {
-      if ($piece['type'] == 'tokenCoin') {
-        $this->removePiece($piece);
-      } else {
-        throw new BgaVisibleSystemException("Clio: Invalid build attempt (id: {$piece['id']}, type: {$piece['type']})");
-      }
-    }
 
-    return false;
-  }
-*/
 
   public function afterPlayerBuild($worker, $work)
   {
