@@ -31,7 +31,8 @@ class Harpies extends SantoriniPower
 
     // currently, no power affects this series of forces as Tartarus is only a 2-player god
     $opponent = $this->game->playerManager->getPlayer();
-    $space = $work;
+    $space = $this->game->board->getPiece($worker['id']); // vs Charybdis, $worker is not at $work anymore
+    $space['direction'] = $work['direction'];
     while (true) {
       // Must be a free space behind
       $accessibleSpaces = $this->game->board->getAccessibleSpaces('move', $opponent->getPowerIds());

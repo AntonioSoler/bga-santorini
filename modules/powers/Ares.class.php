@@ -48,13 +48,21 @@ class Ares extends SantoriniPower
     // Extract info from action
     $wId = $action[0];
     $space = $action[1];
+    
+    // remove tokens as well
+    $pieces = $this->game->board->getPiecesAt($space);
+    foreach ($pieces as $piece) {
+      $this->removePiece($piece);
+    }
+    
     $space['z']--;
-
     // Remove the piece(s) at this space x,y,z
     $pieces = $this->game->board->getPiecesAt($space);
     foreach ($pieces as $piece) {
       $this->removePiece($piece);
     }
+    
+    
   }
 
   public function stateAfterUsePower()

@@ -23,6 +23,9 @@ class Hermes extends SantoriniPower
   public function hasMovedUpOrDown()
   {
     $moves = $this->game->log->getLastMoves($this->playerId);
+    $lastMove = $this->game->log->getLastMove();
+    if ($this->game->board->isSameSpace($lastMove['from'], $lastMove['to'])) // dummy move from Charybdis
+      array_shift($moves);
     return array_reduce($moves, function ($movedUp, $move) {
       return $movedUp || $move['to']['z'] != $move['from']['z'];
     }, false);

@@ -45,6 +45,8 @@ class Zeus extends SantoriniPower
     if ($space['z'] > 3) {
       throw new BgaUserException(_("Zeus: This worker would go too high"));
     }
+    
+    $this->game->removeTokens($work); 
     $this->game->board->setPieceAt($worker, $space);
     $this->game->log->addForce($worker, $space);
 

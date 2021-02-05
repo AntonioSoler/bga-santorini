@@ -24,6 +24,12 @@ class Castor extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $moves = $this->game->log->getLastMoves();
+    if (count($moves) > 1)
+    {
+      $lastMove = $this->game->log->getLastMove();
+      if ($this->game->board->isSameSpace($lastMove['from'], $lastMove['to'])) // dummy move from Charybdis
+      	$moves = [$moves[1]];
+    }
     // Allow usual turn or skip
     if (count($moves) <= 1) {
       $arg['skippable'] = true;
@@ -39,6 +45,9 @@ class Castor extends SantoriniPower
   public function stateAfterMove()
   {
     $moves = count($this->game->log->getLastMoves());
+    $lastMove = $this->game->log->getLastMove();
+    if ($this->game->board->isSameSpace($lastMove['from'], $lastMove['to'])) // dummy move from Charybdis
+    	$moves = $moves - 1;
     $workers = count($this->game->board->getPlacedActiveWorkers());
     if ($moves == 0 || $workers == 1) {
       return null;
