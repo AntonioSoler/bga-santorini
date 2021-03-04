@@ -1266,6 +1266,16 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this._action = 'playerMove';
       this.makeWorkersSelectable(args.workers);
     },
+    
+    usePowerAeolus: function (args) {
+      this._action = 'playerBuild';
+      this.makeWorkersSelectable(args.workers);
+    },
+    
+    usePowerSiren: function (args) {
+      this._action = 'playerMove';
+      this.makeWorkersSelectable(args.workers);
+    },
 
     /////////////////////////////////////////
     /////////////////////////////////////////

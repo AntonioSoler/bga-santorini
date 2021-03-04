@@ -36,8 +36,8 @@ const hoveringColor = 0x000000;
 const highlightColor = 0x0012AA;
 
 const lvlHeights = [0, 1.24, 2.44, 3.18];
-const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5": -5.2 };
-const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -5.2 };
+const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5": -6.2 };
+const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -6.2 };
 const startPos = new THREE.Vector3(40, 24, 0);
 const enterPos = new THREE.Vector3(20, 28, 0);
 const lookAt = new THREE.Vector3(0, -1.5, 0);
