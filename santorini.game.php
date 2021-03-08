@@ -621,7 +621,7 @@ class santorini extends Table
    */
   public function stCheckEndOfGame()
   {
-    $work = $this->log->getLastWork();
+    $work = $this->log->getLastWinableWork();
     $arg = [
       'win' => false,
       'pId' => self::getActivePlayerId(),

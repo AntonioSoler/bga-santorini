@@ -14,7 +14,7 @@ class Charybdis extends SantoriniPower
       clienttranslate("[Any Time:] If a Worker moves onto a Whirlpool and the other Whirlpool is on the board in an unoccupied space, it is forced to the other Whirlpool's space. In this case, the player cannot win by moving their Worker to the first Whirlpool's space but can win as if it had moved up to the second space. Whirlpool Tokens built on or removed are returned to your God Power card."),
       clienttranslate("[REVISED POWER]"),
     ];
-    $this->playerCount = [2, 3]; //, 4]; // TODO: cannot call checkTeammateWinning with 4 players to remove the dummy move
+    $this->playerCount = [2, 3, 4]; 
     $this->golden  = false;
     $this->orderAid = 6;
     
@@ -120,7 +120,7 @@ class Charybdis extends SantoriniPower
     if (count($acc) == 0)
       return;
       
-    // force then move up to activate wins and keep direction. The dummy move will be reduced to a force after checking win conditions
+    // force to the whirlpool, while logging a special action and animating the teleport
     $target = $acc[0];
     $target['direction'] = $work['direction'];
     $forceTarget = $target;
@@ -129,8 +129,8 @@ class Charybdis extends SantoriniPower
     $work['id'] = $worker['id'];
     
     $stats = [[$this->playerId, 'usePower']];
-    $this->game->log->addForce($work, $forceTarget, $stats);
-    $this->game->log->addMove($forceTarget, $target);
+    $this->game->log->addForce($work, $target, $stats);
+    $this->game->log->addWhirlpoolMove($forceTarget, $target); // add special log that mimics a move and is triggered only when checking wins
     $this->game->board->setPieceAt($work, $target, $worker['location']);
 
     // Notify force
@@ -145,7 +145,7 @@ class Charybdis extends SantoriniPower
       'coords' => $this->game->board->getMsgCoords($work, $target),
       'duration' => 200,
     ]);
-    // Notify move up
+    
     $worker['x'] = $forceTarget['x'];
     $worker['y'] = $forceTarget['y'];
     $worker['z'] = $forceTarget['z'];
@@ -173,55 +173,6 @@ class Charybdis extends SantoriniPower
   {
     $this->afterMove($worker, $work);
   }
-  
- /* 
-  public function afterTeammateMove($worker, $work)
-  {
-    $this->afterMove($worker, $work);
-  }
-  */
-  
-  public function checkWinning(&$arg)
-  {
-  	// remove dummy move after winning has been checked
-  	
-    $logs = $this->game->log->logsForCancelTurn();
-    $updateForce = false;
-    foreach ($logs as $log) 
-    {
-      $args = json_decode($log['action_arg'], true);
-      
-      if ($log['action'] == 'move' && !$updateForce)
-      {
-        if ($this->game->board->isSameSpace($args['from'], $args['to'])) // dummy move found
-        {
-          $updateForce = true;
-          $this->game->log->deleteLogEntry($log['log_id']);
-        }
-        else
-          break;
-      }
-      
-      if ($log['action'] == 'force' && $updateForce)
-      {
-        $to = $args['to'];
-        $to['z'] = $to['z'] +1;
-        $this->game->log->updateLogEntry($log['log_id'], $args['from'], $to); // update force to go directly to the correct square
-        break;
-      }
-      
-    }
-  }
-  
-  public function checkPlayerWinning(&$arg)
-  {
-    $this->checkWinning($arg);
-  }
-  public function checkOpponentWinning(&$arg)
-  {
-    $this->checkWinning($arg);
-  }
-  
 }
 
   

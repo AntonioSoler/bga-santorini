@@ -54,7 +54,7 @@ class Eros extends SantoriniPower
       return;
     }
 
-    $move = $this->game->log->getLastWork();
+    $move = $this->game->log->getLastWinableWork();
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
 
     // Last work should be a move and Eros must have two workers left

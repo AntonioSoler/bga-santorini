@@ -188,6 +188,15 @@ class SantoriniLog extends APP_GameClass
   }
 
   /*
+   * addWhirlpoolMove: add a new whirlpool move entry to log. $piece contains the space below $space
+   */
+  public function addWhirlpoolMove($piece, $space, $stats = [])
+  {
+    $this->addWork($piece, $space, 'whirlpoolMove', $stats);
+  }
+
+  /*
+  /*
    * addRemoval: add a piece removal entry to log (eg. Bia or Ares)
    * NOTE: call this BEFORE updating board, since it saves the current location
    */
@@ -318,6 +327,20 @@ class SantoriniLog extends APP_GameClass
   {
     $works = $this->getLastWorks(['move', 'build'], $pId, 1);
     return (count($works) == 1) ? $works[0] : null;
+  }
+  
+  /*
+   * getLastWork: fetch the last move/build/whirlpool teleport of player of current round if it exists, null otherwise
+   */
+  public function getLastWinableWork($pId = null, $additionalTurns = false)
+  {
+    $works = $this->getLastWorks(['move', 'build', 'whirlpoolMove'], $pId, 1);
+    if (count($works) == 0)
+      return null;
+    $work = $works[0];
+    if ($work['action'] == 'whirlpoolMove')
+      $work['action'] = 'move'; // whirlpoolMove acts as a move regarding winning conditions
+    return $work;
   }
 
 

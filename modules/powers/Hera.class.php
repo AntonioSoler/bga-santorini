@@ -26,7 +26,7 @@ class Hera extends SantoriniPower
       return;
     }
 
-    $work = $this->game->log->getLastWork();
+    $work = $this->game->log->getLastWinableWork();
     if ($work == null || $work['action'] != 'move') {
       return;
     }
