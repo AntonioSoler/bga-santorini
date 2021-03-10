@@ -764,6 +764,7 @@ class PowerManager extends APP_GameClass
 
 
 
+
   /*
    * argChooseFirstPlayer: is called either when the contestant has to choose first player
    *  or when the powers are assigned randomly
@@ -775,6 +776,36 @@ class PowerManager extends APP_GameClass
       $this->getPower($powerId)->argChooseFirstPlayer($arg);
     }
   }
+
+
+  /*
+   * argPlaceSetup: is called when a player may perform a setup
+   */
+  public function argPlaceSetup(&$arg)
+  {
+    $this->applyPower(["argPlaceSetup"], [&$arg]);
+    Utils::cleanWorkers($arg);
+  }
+
+  /*
+   *placeSetup: is called when a player wants to setup
+   */
+  public function placeSetup($powerId, $action)
+  {
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power) {
+      if ($power->getId() == $powerId) {
+        $power->placeSetup($action);
+      }
+    }
+  }
+
+  public function stateAfterPlaceSetup()
+  {
+    return $this->getNewState("stateAfterPlaceSetup");
+  }
+
 
 
   /*

@@ -515,7 +515,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       this.focusContainer();
 
       // Stop here if it's not the current player's turn for some states
-      if (["playerUsePower", "playerPlaceWorker", "playerPlaceRam", "playerMove", "playerBuild", "confirmTurn", "gameEnd"].includes(stateName)) {
+      if (["playerUsePower", "playerPlaceWorker", "playerPlaceSetup", "playerPlaceRam", "playerMove", "playerBuild", "confirmTurn", "gameEnd"].includes(stateName)) {
         if (!this.isCurrentPlayerActive()) {
           return;
         }
@@ -1183,6 +1183,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
      */
     onEnteringStatePlayerUsePower: function (args) {
       this._powerId = args.power;
+      this._mystate = 'playerUsePower';
       var power = this.getPower(args.power);
       var usePowerFn = this['usePower' + power.nameEnglish];
       if (typeof usePowerFn != 'function') {
@@ -1275,6 +1276,25 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     usePowerSiren: function (args) {
       this._action = 'playerMove';
       this.makeWorkersSelectable(args.workers);
+    },
+    
+    placeSetupSiren: function (args) {
+      this._action = 'playerBuild';
+      this.makeWorkersSelectable(args.workers);
+    },
+
+
+    
+    onEnteringStatePlayerPlaceSetup: function (args) {
+      this._powerId = args.power;
+      this._mystate = 'placeSetup';
+      var power = this.getPower(args.power);
+      var placeSetupFn = this['placeSetup' + power.nameEnglish];
+      if (typeof placeSetupFn != 'function') {
+        gameui.showMessage('Missing function: placeSetup' + power.nameEnglish, 'error');
+        return;
+      }
+      placeSetupFn.call(this, args);
     },
 
     /////////////////////////////////////////
@@ -1418,7 +1438,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       } else {
         // Power work
         data.powerId = this._powerId;
-        this.takeAction("usePowerWork", data);
+        if (this._mystate == 'placeSetup')
+        {
+          this.takeAction("placeSetup", data);
+        }
+        else
+        {
+          this.takeAction("usePowerWork", data);
+        }
       }
 
       this.clearPossible(); // Make sur to clear after sending ajax otherwise selectedWorker will be null

@@ -224,6 +224,20 @@ abstract class SantoriniPower extends APP_GameClass
   {
   }
 
+
+  public function argPlaceSetup(&$arg)
+  {
+  }
+  
+  public function placeSetup($action)
+  {
+  }
+  
+  public function stateAfterPlaceSetup()
+  {
+    return 'done';
+  }
+
   public function argChooseFirstPlayer(&$arg)
   {
   }

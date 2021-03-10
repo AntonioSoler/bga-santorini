@@ -396,6 +396,13 @@ class SantoriniLog extends APP_GameClass
     return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) AND `player_id` = '$pId' ORDER BY log_id DESC");
   }
 
+  public function getAllActions($actions)
+  {
+    $actionsNames = "'" . implode("','", $actions) . "'";
+
+    return self::getObjectListFromDb("SELECT * FROM log WHERE `action` IN ($actionsNames) ORDER BY log_id DESC");
+  }
+
 
   public function isAdditionalTurn($powerId = null)
   {

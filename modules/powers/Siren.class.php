@@ -43,15 +43,6 @@ class Siren extends SantoriniPower
   {
     $this->getPlayer()->addToken('tokenArrow');
     $this->updateUI();
-    
-    // TODO: remove this default placement when the setup is done correctly
-    $token = $this->getToken();
-    
-    $token['type_arg'] = 2;
-    $space = $this->getTokenSpace();
-    $this->placeToken($token, $space);
-    
-    $this->updateUI();
   }
 
   public function getToken()
@@ -65,8 +56,7 @@ class Siren extends SantoriniPower
   }
 
 
-// TODO: call this somehow before placing the workers
-  public function argSetupPower(&$arg)
+  public function argPlaceSetup(&$arg)
   {
     $arg['power'] = $this->id;
     $arg['power_name'] = $this->name;
@@ -99,10 +89,10 @@ class Siren extends SantoriniPower
   }
   
   
-  public function setupPower($action)
+  public function placeSetup($action)
   {
-    $token = $this->getToken();
-    $space = $action[1];
+    $token = $this->getToken();    
+    $space = $action[0];
     
     $token['type_arg'] = $space['direction'];
     $space = $this->getTokenSpace();
