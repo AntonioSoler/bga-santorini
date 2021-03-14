@@ -37,11 +37,7 @@ class Terpsichore extends SantoriniPower
 
   public function stateAfterMove()
   {
-    $count = count($this->game->log->getLastMoves());
-    $lastMove = $this->game->log->getLastMove();
-    if ($this->game->board->isSameSpace($lastMove['from'], $lastMove['to'])) // dummy move from Charybdis
-    	$count = $count - 1;
-    return $count < count($this->game->board->getPlacedActiveWorkers()) ? 'move' : null;
+    return count($this->game->log->getLastMoves()) < count($this->game->board->getPlacedActiveWorkers()) ? 'move' : null;
   }
 
 

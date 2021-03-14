@@ -1,4 +1,5 @@
 <?php
+
 class Charybdis extends SantoriniPower
 {
   public function __construct($game, $playerId)

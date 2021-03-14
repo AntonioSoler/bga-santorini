@@ -62,8 +62,6 @@ class Ares extends SantoriniPower
     foreach ($pieces as $piece) {
       $this->removePiece($piece);
     }
-    
-    
   }
 
   public function stateAfterUsePower()
