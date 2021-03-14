@@ -188,6 +188,15 @@ class SantoriniLog extends APP_GameClass
   }
 
   /*
+   * addWhirlpoolMove: add a new whirlpool move entry to log. $piece contains the space below $space
+   */
+  public function addWhirlpoolMove($piece, $space, $stats = [])
+  {
+    $this->addWork($piece, $space, 'whirlpoolMove', $stats);
+  }
+
+  /*
+  /*
    * addRemoval: add a piece removal entry to log (eg. Bia or Ares)
    * NOTE: call this BEFORE updating board, since it saves the current location
    */
@@ -320,6 +329,22 @@ class SantoriniLog extends APP_GameClass
     return (count($works) == 1) ? $works[0] : null;
   }
 
+  /*
+   * getLastWork: fetch the last move/build/whirlpool teleport of player of current round if it exists, null otherwise
+   */
+  public function getLastWinableWork($pId = null, $additionalTurns = false)
+  {
+    $works = $this->getLastWorks(['move', 'build', 'whirlpoolMove'], $pId, 1);
+    if (count($works) == 0) {
+      return null;
+    }
+    $work = $works[0];
+    if ($work['action'] == 'whirlpoolMove') {
+      $work['action'] = 'move'; // whirlpoolMove acts as a move regarding winning conditions
+    }
+    return $work;
+  }
+
 
   /*
    * getLastMoves: fetch last moves of player of current round
@@ -429,7 +454,6 @@ class SantoriniLog extends APP_GameClass
     return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
   }
 
-
   // stop at $logIdBreak (for Hecate)
   public function cancelTurn($logIdBreak = null)
   {
@@ -444,17 +468,12 @@ class SantoriniLog extends APP_GameClass
       if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'moveToken') {
         // Move/force : go back to initial position
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
-        if ($log['action'] == 'moveToken') {
-          // Europa needs to update the counter
-          $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
-          $power->updateUI();
-        }
       } else if ($log['action'] == 'build') {
         // Build : remove the piece
         self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
         $this->game->board->adjustSecretTokens($args['to'], false);
       } else if ($log['action'] == 'removal') {
-        // Removal : put the piece back on the board    
+        // Removal : put the piece back on the board
         $piece = $this->game->board->getPiece($log['piece_id']);
         $location = $args['location'] ?? 'board';
         self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$log['piece_id']}");
@@ -465,10 +484,8 @@ class SantoriniLog extends APP_GameClass
         $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
         $this->game->powerManager->addPower($power, 'hero');
       } else if ($log['action'] == 'placeWorker' || $log['action'] == 'placeToken') {
-        // Place worker : remove the worker, update power UI
+        // Place worker : remove the worker
         self::DbQuery("UPDATE piece SET x = null, y = null, z = null, location = '" . $args['location'] . "' WHERE id = {$log['piece_id']}");
-        $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
-        $power->updateUI();
       }
 
       if (array_key_exists('stats', $args)) {

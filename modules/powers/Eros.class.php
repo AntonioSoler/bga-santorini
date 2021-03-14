@@ -54,7 +54,7 @@ class Eros extends SantoriniPower
       return;
     }
 
-    $move = $this->game->log->getLastWork();
+    $move = $this->game->log->getLastWinableWork();
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
 
     // Last work should be a move and Eros must have two workers left
@@ -69,7 +69,10 @@ class Eros extends SantoriniPower
     }
 
     // The two workers must be adjacent and on same level
-    if (!$this->game->board->isNeighbour($workers[0], $workers[1], 'move') || $workers[0]['z'] !=  $workers[1]['z']) {
+    $other = $workers;
+    Utils::filterWorkersById($other, $move['pieceId'], false);
+    
+    if (!$this->game->board->isNeighbour($other[0], $move['to'], 'move') || $move['to']['z'] !=  $other[0]['z']) { // vs Harpies: need to check last move position, not current position
       return;
     }
 

@@ -26,7 +26,7 @@ class Pan extends SantoriniPower
       return;
     }
 
-    $move = $this->game->log->getLastWork();
+    $move = $this->game->log->getLastWinableWork();
     if ($move == null || $move['action'] != 'move' || $move['to']['z'] > $move['from']['z'] - 2) {
       return;
     }

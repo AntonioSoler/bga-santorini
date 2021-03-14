@@ -621,7 +621,7 @@ class santorini extends Table
    */
   public function stCheckEndOfGame()
   {
-    $work = $this->log->getLastWork();
+    $work = $this->log->getLastWinableWork();
     $arg = [
       'win' => false,
       'pId' => self::getActivePlayerId(),
@@ -691,12 +691,7 @@ class santorini extends Table
     }
     if (!empty($secrets)) {
       // Update player panels (e.g., Tartarus)
-      $allPlayers = $this->playerManager->getPlayers();
-      foreach ($allPlayers as $player) {
-        foreach ($player->getPowers() as $power) {
-          $power->updateUI();
-        }
-      }
+      $this->updateUIAllPlayers();
     }
 
     $this->gamestate->nextState('endgame');
@@ -1026,6 +1021,9 @@ class santorini extends Table
     if ($moveId == null) {
       $this->gamestate->nextState('cancel');
     }
+
+    // Update player panel UI
+    $this->updateUIAllPlayers();
   }
 
   /* 
@@ -1131,6 +1129,38 @@ class santorini extends Table
     ]);
   }
 
+  public function removeTokens($space)
+  {
+    // any piece which is not a worker at this z is a token and has to be removed. Some tokens go back to the hand and not the box
+    $pieces = $this->board->getPiecesAt($space);
+    foreach ($pieces as $piece) {
+      if (strpos($piece['type'], 'token') === 0) {
+        $this->log->addRemoval($piece);
+        $this->board->removePiece($piece);
+        // Notify
+        $this->notifyAllPlayers('pieceRemoved', '', [
+          'duration' => INSTANT,
+          'piece' => $piece,
+          'tokenName' => ucfirst($this->pieceNames[$piece['type']]),
+        ]);
+      }
+    }
+
+    if (!empty($pieces)) {
+      // Update player panels (e.g., Charybdis)
+      $this->updateUIAllPlayers();
+    }
+  }
+
+  public function updateUIAllPlayers()
+  {
+    foreach ($this->playerManager->getPlayers() as $player) {
+      foreach ($player->getPowers() as $power) {
+        $power->updateUI();
+      }
+    }
+  }
+
   /*
    * playerBuild: build a piece to a location on the board
    * Called by santorini.game.php function work()
@@ -1146,6 +1176,10 @@ class santorini extends Table
       // What can cause this? https://boardgamearena.com/bug?id=23675
       throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
     }
+
+    // Remove tokens
+    $this->removeTokens($space);
+
     $pieceName = $this->pieceNames[$type];
     $pieceId = $this->board->addPiece([
       'player_id' => $pId,
