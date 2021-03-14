@@ -1217,6 +1217,7 @@ class santorini extends Table
       'coords' => $this->board->getMsgCoords($worker, $space)
     ]);
   }
+
   public function removeTokens($space)
   {
     // any piece which is not a worker at this z is a token and has to be removed. Some tokens go back to the hand and not the box
