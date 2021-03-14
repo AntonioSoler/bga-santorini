@@ -299,8 +299,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         var powers = Object.values(_this.gamedatas.powers).sort(function (power1, power2) {
           return power1.sort - power2.sort;
         });
-        var txt = "\n<!--\n\n\n\n    Please do not modify anything below this point.\n    Content generated directly from the game code.\n\n\n\n-->\n"
-          + "== List of Powers (" + powers.length + ") ==\n"
+        var txt = "== List of Powers (" + powers.length + ") ==\n"
+          + "<!--\n\n\n    Please do not modify anything in this section.\n    Content generated directly from the game code.\n\n\n-->\n"
           + powers.map(function (p) {
             var info = ['Players: ' + p.playerCount];
             var color = '';
@@ -321,7 +321,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
           }).join('\n----\n');
         console.log(txt);
         navigator.clipboard.writeText(txt);
-        _this.showMessage('Text copied to clipboard &mdash; <a href="https://en.doc.boardgamearena.com/index.php?title=Gamehelpsantor' + 'ini&action=edit" target="_blank">edit Gamehelpsantor' + 'ini</a>', 'info');
+        _this.showMessage('Text copied to clipboard &mdash; <a href="https://en.doc.boardgamearena.com/index.php?title=Gamehelpsantor' + 'ini&action=edit&section=11" target="_blank">edit Gamehelpsantor' + 'ini</a>', 'info');
       });
     },
 

@@ -277,72 +277,58 @@ class SantoriniBoard extends APP_GameClass
 
 
   /*
-   * getBoard:
-   *   return a 3d matrix reprensenting the board with all the placed pieces
-   */
-  public function getBoard()
-  {
-    // Create an empty 5*5*4 board
-    $board = [];
-    for ($x = 0; $x < 5; $x++) {
-      $board[$x] = [];
-      for ($y = 0; $y < 5; $y++) {
-        $board[$x][$y] = [];
-      }
-    }
-
-    // Add all placed pieces
-    $pieces = $this->getPlacedPieces();
-    for ($i = 0; $i < count($pieces); $i++) {
-      $p = $pieces[$i];
-      $board[$p['x']][$p['y']][$p['z']] = $p;
-    }
-
-    return $board;
-  }
-
-
-  /*
    * getAccessibleSpaces:
    *   return the list of all accessible spaces for either placing a worker, moving or building
    */
   public function getAccessibleSpaces($action = null, $powerIds = [])
   {
-    $board = $this->getBoard();
+    $board = [];
+    foreach ($this->getPlacedPieces() as $piece) {
+      // Ignore all tokens except talus (Europa) and coin (Clio)
+      $ignore = $piece['type'] != 'tokenTalus' && $piece['type'] != 'tokenCoin' && strpos($piece['type'], 'token') === 0;
+      if (!$ignore) {
+        $board[$piece['x']][$piece['y']][$piece['z']][] = $piece;
+      }
+    }
 
     $accessible = [];
     for ($x = 0; $x < 5; $x++) {
       for ($y = 0; $y < 5; $y++) {
-        $z = 0;
-        $blocked = false; // If we see a worker, ram, or dome, the space is not accessible
-        // Find next free space above ground
-        for (; $z < 4 && !$blocked && array_key_exists($z, $board[$x][$y]); $z++) {
-          $p = $board[$x][$y][$z]; 
-          if ($p['type'] == 'tokenWhirlpool' || ($p['type'] == 'tokenCoin' && in_array(CLIO, $powerIds))) { // TODO: not sure what happens when the Whirlpool + something else (e.g., Talus) is on the same place. Seems to work but don't understand why / if it is robust
+        for ($z = 0; $z < 4; $z++) {
+          $pieces = $board[$x][$y][$z] ?? null;
+          // This x,y,z is accessible if no pieces exist
+          if (empty($pieces)) {
+            $space = [
+              'x' => $x,
+              'y' => $y,
+              'z' => $z,
+              'arg' => null,
+            ];
+            if ($action == "build") {
+              $space['arg'] = [$z];
+            }
+            $accessible[] = $space;
             break;
           }
-          $blocked = $p['type'] == 'worker' || $p['type'] == 'ram' || $p['type'] == 'lvl3' || $p['type'] == 'tokenTalus' || $p['type'] == 'tokenCoin'; // TODO: Coin / Talus should be active only if Clio / Europa is face up (vs Nyx)
-        }
 
-        if ($blocked || $z > 3) {
-          continue;
+          // Stop the loop if we find any blocking piece
+          // Can't build above any worker, ram, or dome
+          // Some tokens act like domes
+          // TODO: Coin / Talus should be active only if Clio / Europa is face up (vs Nyx)
+          foreach ($pieces as $p) {
+            if (
+              $p['type'] == 'worker'
+              || $p['type'] == 'ram'
+              || $p['type'] == 'lvl3'
+              || $p['type'] == 'tokenTalus'
+              || ($p['type'] == 'tokenCoin' && !in_array(CLIO, $powerIds))
+            ) {
+              break 2;
+            }
+          }
         }
-
-        // Add the space to accessible
-        $space = [
-          'x' => $x,
-          'y' => $y,
-          'z' => $z,
-          'arg' => null,
-        ];
-        if ($action == "build") {
-          $space['arg'] = [$z];
-        }
-
-        $accessible[] = $space;
       }
     }
-
     return $accessible;
   }
 
@@ -545,10 +531,12 @@ class SantoriniBoard extends APP_GameClass
 
   public function removePiece($piece)
   {
+    // tokens can be built on (e.g., vs Nyx) and then go back either to the box or to the hand
     $location = 'box';
-    if ($piece['type'] == 'tokenWhirlpool' || $piece['type'] == 'tokenTalus') // tokens can be built on (e.g., vs Nyx) and then go back either to the box or to the hand
-    	$location = 'hand';
-    
+    if ($piece['type'] == 'tokenWhirlpool' || $piece['type'] == 'tokenTalus') {
+      $location = 'hand';
+    }
+
     // Return the piece to the box
     self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$piece['id']}");
 

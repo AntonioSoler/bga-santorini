@@ -31,7 +31,7 @@ class Maenads extends SantoriniPower
           // Hecate: do not win if the turn is illegal
           $powers = $opponent->getPowers();
           foreach ($powers as $power) {
-            if ($power->getId() == HECATE && !$power->endOpponentTurn(true)) {
+            if ($power->getId() == HECATE && $power->endOpponentTurn(true)) {
               return;
             }
           }
