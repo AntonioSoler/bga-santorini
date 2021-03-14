@@ -691,12 +691,7 @@ class santorini extends Table
     }
     if (!empty($secrets)) {
       // Update player panels (e.g., Tartarus)
-      $allPlayers = $this->playerManager->getPlayers();
-      foreach ($allPlayers as $player) {
-        foreach ($player->getPowers() as $power) {
-          $power->updateUI();
-        }
-      }
+      $this->updateUIAllPlayers();
     }
 
     $this->gamestate->nextState('endgame');
@@ -1026,6 +1021,9 @@ class santorini extends Table
     if ($moveId == null) {
       $this->gamestate->nextState('cancel');
     }
+
+    // Update player panel UI
+    $this->updateUIAllPlayers();
   }
 
   /* 
@@ -1133,7 +1131,7 @@ class santorini extends Table
 
   public function removeTokens($space)
   {
-    // any piece which is not a worker at this z is a token and has to be removed. Some tokens go back to the hand and not the box 
+    // any piece which is not a worker at this z is a token and has to be removed. Some tokens go back to the hand and not the box
     $pieces = $this->board->getPiecesAt($space);
     foreach ($pieces as $piece) {
       if (strpos($piece['type'], 'token') === 0) {
@@ -1145,6 +1143,20 @@ class santorini extends Table
           'piece' => $piece,
           'tokenName' => ucfirst($this->pieceNames[$piece['type']]),
         ]);
+      }
+    }
+
+    if (!empty($pieces)) {
+      // Update player panels (e.g., Charybdis)
+      $this->updateUIAllPlayers();
+    }
+  }
+
+  public function updateUIAllPlayers()
+  {
+    foreach ($this->playerManager->getPlayers() as $player) {
+      foreach ($player->getPowers() as $power) {
+        $power->updateUI();
       }
     }
   }

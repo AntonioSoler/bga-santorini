@@ -23,6 +23,13 @@ class Charybdis extends SantoriniPower
 
   /* * */
 
+  public function getUiData()
+  {
+    $data = parent::getUiData();
+    $data['counter'] = $this->playerId != null ? count($this->getUnplacedTokens()) : 0;
+    return $data;
+  }
+
   public function getTokens()
   {
     return $this->game->board->getPiecesByType('tokenWhirlpool');
@@ -42,6 +49,7 @@ class Charybdis extends SantoriniPower
   {
     $this->getPlayer()->addToken('tokenWhirlpool');
     $this->getPlayer()->addToken('tokenWhirlpool');
+    $this->updateUI();
   }
 
   public function stateAfterBuild()
@@ -84,6 +92,7 @@ class Charybdis extends SantoriniPower
     $token = $this->getUnplacedTokens()[0];
     $space = $action[1];
     $this->placeToken($token, $space);
+    $this->updateUI();
   }
 
   public function stateAfterSkipPower()
@@ -104,20 +113,19 @@ class Charybdis extends SantoriniPower
 
     // check if a worker moved on a token
     $startindex = $this->game->board->isSameSpace($work, $tokens[0]) ? 0 : ($this->game->board->isSameSpace($work, $tokens[1]) ? 1 : null);
-    if (is_null($startindex))
+    if (is_null($startindex)) {
       return;
+    }
 
-    $startToken = $tokens[$startindex];
     $endToken = $tokens[1 - $startindex];
 
     $acc = $this->game->board->getAccessibleSpaces('build');
-
     Utils::filter($acc, function ($space) use ($endToken) {
       return ($space['x'] == $endToken['x'] && $space['y'] == $endToken['y']);
     });
-
-    if (count($acc) == 0)
+    if (count($acc) == 0) {
       return;
+    }
 
     // force to the whirlpool, while logging a special action and animating the teleport
     $target = $acc[0];
@@ -151,7 +159,7 @@ class Charybdis extends SantoriniPower
     $this->game->notifyWithSecret($worker, 'workerPlaced', '', [
       'piece' => $worker,
       'animation' => 'none',
-      'duration' => 1,
+      'duration' => INSTANT,
     ]);
     // Notify move up
     $this->game->notifyWithSecret($worker, 'workerMoved', '', [

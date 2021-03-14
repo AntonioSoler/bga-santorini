@@ -468,17 +468,12 @@ class SantoriniLog extends APP_GameClass
       if ($log['action'] == 'move' || $log['action'] == 'force' || $log['action'] == 'moveToken') {
         // Move/force : go back to initial position
         self::DbQuery("UPDATE piece SET x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
-        if ($log['action'] == 'moveToken') {
-          // Europa needs to update the counter
-          $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
-          $power->updateUI();
-        }
       } else if ($log['action'] == 'build') {
         // Build : remove the piece
         self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
         $this->game->board->adjustSecretTokens($args['to'], false);
       } else if ($log['action'] == 'removal') {
-        // Removal : put the piece back on the board    
+        // Removal : put the piece back on the board
         $piece = $this->game->board->getPiece($log['piece_id']);
         $location = $args['location'] ?? 'board';
         self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$log['piece_id']}");
@@ -489,10 +484,8 @@ class SantoriniLog extends APP_GameClass
         $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
         $this->game->powerManager->addPower($power, 'hero');
       } else if ($log['action'] == 'placeWorker' || $log['action'] == 'placeToken') {
-        // Place worker : remove the worker, update power UI
+        // Place worker : remove the worker
         self::DbQuery("UPDATE piece SET x = null, y = null, z = null, location = '" . $args['location'] . "' WHERE id = {$log['piece_id']}");
-        $power = $this->game->powerManager->getPower($args['power_id'], $args['player_id']);
-        $power->updateUI();
       }
 
       if (array_key_exists('stats', $args)) {
