@@ -201,14 +201,20 @@ class SantoriniBoard extends APP_GameClass
    * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
-  public function getPlacedWorkers($pId = -1, $lookSecret = false)
+  public function getPlacedWorkers($pId = -1, $lookSecret = false, $type = null)
   {
     $filter = $this->playerFilter($pId);
     $location = "'board'";
     if ($lookSecret) {
       $location = $location . " , 'secret' ";
     }
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
+    $workers = array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
+    if ($type) {
+      $workers = array_values(array_filter($workers, function ($worker) use ($type) {
+        return $worker['type_arg'][0] == $type;
+      }));
+    }
+    return $workers;
   }
 
   /*
@@ -226,14 +232,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedActiveWorkers($type = null)
   {
-    $workers = $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds());
-    if ($type == null) {
-      return $workers;
-    }
-
-    return array_values(array_filter($workers, function ($worker) use ($type) {
-      return $worker['type_arg'][0] == $type;
-    }));
+    return $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds(), false, $type);
   }
 
   /*
