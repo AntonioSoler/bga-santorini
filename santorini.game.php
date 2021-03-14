@@ -1131,18 +1131,17 @@ class santorini extends Table
     ]);
   }
 
-
   public function removeTokens($space)
   {
     // any piece which is not a worker at this z is a token and has to be removed. Some tokens go back to the hand and not the box 
     $pieces = $this->board->getPiecesAt($space);
     foreach ($pieces as $piece) {
-      if ($piece['type'] != 'worker') {
+      if (strpos($piece['type'], 'token') === 0) {
         $this->log->addRemoval($piece);
         $this->board->removePiece($piece);
-
         // Notify
-        $this->notifyAllPlayers('pieceRemoved', '${tokenName} is built on and removed', [
+        $this->notifyAllPlayers('pieceRemoved', '', [
+          'duration' => INSTANT,
           'piece' => $piece,
           'tokenName' => ucfirst($this->pieceNames[$piece['type']]),
         ]);
@@ -1165,9 +1164,10 @@ class santorini extends Table
       // What can cause this? https://boardgamearena.com/bug?id=23675
       throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
     }
-    
+
+    // Remove tokens
     $this->removeTokens($space);
-        
+
     $pieceName = $this->pieceNames[$type];
     $pieceId = $this->board->addPiece([
       'player_id' => $pId,

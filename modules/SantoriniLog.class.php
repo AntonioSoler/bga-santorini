@@ -109,7 +109,7 @@ class SantoriniLog extends APP_GameClass
   /*
    * insert: add a new log entry
    * params:
-   *   - $playerId: the player who is action making the
+   *   - $playerId: the player who is making the action
    *   - $pieceId : the piece whose is making the action
    *   - string $action : the name of the action
    *   - array $stats: game statistics simple array (e.g. [ ['table', 'move'], ['287392', 'usePower'], ... ]
@@ -328,18 +328,20 @@ class SantoriniLog extends APP_GameClass
     $works = $this->getLastWorks(['move', 'build'], $pId, 1);
     return (count($works) == 1) ? $works[0] : null;
   }
-  
+
   /*
    * getLastWork: fetch the last move/build/whirlpool teleport of player of current round if it exists, null otherwise
    */
   public function getLastWinableWork($pId = null, $additionalTurns = false)
   {
     $works = $this->getLastWorks(['move', 'build', 'whirlpoolMove'], $pId, 1);
-    if (count($works) == 0)
+    if (count($works) == 0) {
       return null;
+    }
     $work = $works[0];
-    if ($work['action'] == 'whirlpoolMove')
+    if ($work['action'] == 'whirlpoolMove') {
       $work['action'] = 'move'; // whirlpoolMove acts as a move regarding winning conditions
+    }
     return $work;
   }
 
@@ -451,24 +453,6 @@ class SantoriniLog extends APP_GameClass
     }
     return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
   }
-
-  public function deleteLogEntry($logId) // for Charybdis
-  {
-    self::DbQuery("UPDATE log SET action = 'force' WHERE `log_id` = '$logId'");   // hide it from getLastMove even if delete is not processed yet
-    self::DbQuery("DELETE FROM log WHERE `log_id` = '$logId'");
-  }
-  
-  public function updateLogEntry($logId, $from, $to) // for Charybdis
-  {
-    $args = [
-      'from' => SantoriniBoard::getCoords($from),
-      'to'   => SantoriniBoard::getCoords($to),
-    ];
-    $arg_encode = json_encode($args);
-  
-    self::DbQuery("UPDATE log SET action_arg = '$arg_encode' WHERE `log_id` = '$logId'");    
-  }
-	
 
   // stop at $logIdBreak (for Hecate)
   public function cancelTurn($logIdBreak = null)

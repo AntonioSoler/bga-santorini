@@ -22,7 +22,7 @@ class Triton extends SantoriniPower
 
   public function hasMovedOnPerimeter()
   {
-    $move = $this->game->log->getLastMove($this->playerId); 
+    $move = $this->game->log->getLastMove($this->playerId);
     return $this->game->board->isPerimeter($move['to']);
   }
 

@@ -24,7 +24,6 @@ class Castor extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $moves = $this->game->log->getLastMoves();
-    
     // Allow usual turn or skip
     if (count($moves) <= 1) {
       $arg['skippable'] = true;
