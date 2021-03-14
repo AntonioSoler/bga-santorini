@@ -109,7 +109,7 @@ class SantoriniLog extends APP_GameClass
   /*
    * insert: add a new log entry
    * params:
-   *   - $playerId: the player who ismaking the  action
+   *   - $playerId: the player who is making the action
    *   - $pieceId : the piece whose is making the action
    *   - string $action : the name of the action
    *   - array $stats: game statistics simple array (e.g. [ ['table', 'move'], ['287392', 'usePower'], ... ]
