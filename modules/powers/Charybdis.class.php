@@ -179,4 +179,9 @@ class Charybdis extends SantoriniPower
   {
     $this->afterMove($worker, $work);
   }
+  
+  public function afterTeammateMove($worker, $work)
+  {
+    $this->afterMove($worker, $work);
+  }
 }
