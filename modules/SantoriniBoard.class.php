@@ -201,14 +201,20 @@ class SantoriniBoard extends APP_GameClass
    * getPlacedWorkers: return all placed workers
    * opt params : int $pId -> if specified, return only placed workers of corresponding player
    */
-  public function getPlacedWorkers($pId = -1, $lookSecret = false)
+  public function getPlacedWorkers($pId = -1, $lookSecret = false, $type = null)
   {
     $filter = $this->playerFilter($pId);
     $location = "'board'";
     if ($lookSecret) {
       $location = $location . " , 'secret' ";
     }
-    return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
+    $workers = array_map('SantoriniBoard::addInfo', self::getObjectListFromDb("SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE location IN ($location) AND type = 'worker' $filter ORDER BY id"));
+    if ($type) {
+      $workers = array_values(array_filter($workers, function ($worker) use ($type) {
+        return $worker['type_arg'][0] == $type;
+      }));
+    }
+    return $workers;
   }
 
   /*
@@ -226,14 +232,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedActiveWorkers($type = null)
   {
-    $workers = $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds());
-    if ($type == null) {
-      return $workers;
-    }
-
-    return array_values(array_filter($workers, function ($worker) use ($type) {
-      return $worker['type_arg'][0] == $type;
-    }));
+    return $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds(), false, $type);
   }
 
   /*
@@ -279,11 +278,24 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getAccessibleSpaces($action = null, $powerIds = [])
   {
+    // Treat these pieces like domes (cannot build above)
+    $domes = ['lvl3', 'ram', 'worker'];
+
+    $allPowerIds = $this->game->powerManager->getPowerIdsInLocation('hand');
+    // If Europa is in play, all players treat tokenTalus as a dome
+    if (in_array(EUROPA, $allPowerIds)) {
+      $domes[] = 'tokenTalus';
+    }
+    // If Clio is in play, *other* players treat tokenCoin as a dome
+    if (in_array(CLIO, $allPowerIds) && !in_array(CLIO, $powerIds)) {
+      $domes[] = 'tokenCoin';
+    }
+
     $board = [];
     foreach ($this->getPlacedPieces() as $piece) {
-      // Ignore all tokens except talus (Europa) and coin (Clio)
-      $ignore = $piece['type'] != 'tokenTalus' && $piece['type'] != 'tokenCoin' && strpos($piece['type'], 'token') === 0;
-      if (!$ignore) {
+      // Tokens not treated like domes should be filtered out to allow building on the same space
+      $ignoreToken = strpos($piece['type'], 'token') === 0 && !in_array($piece['type'], $domes);
+      if (!$ignoreToken) {
         $board[$piece['x']][$piece['y']][$piece['z']][] = $piece;
       }
     }
@@ -308,18 +320,9 @@ class SantoriniBoard extends APP_GameClass
             break;
           }
 
-          // Stop the loop if we find any blocking piece
-          // Can't build above any worker, ram, or dome
-          // Some tokens act like domes
-          // TODO: Coin / Talus should be active only if Clio / Europa is face up (vs Nyx)
-          foreach ($pieces as $p) {
-            if (
-              $p['type'] == 'worker'
-              || $p['type'] == 'ram'
-              || $p['type'] == 'lvl3'
-              || $p['type'] == 'tokenTalus'
-              || ($p['type'] == 'tokenCoin' && !in_array(CLIO, $powerIds))
-            ) {
+          // Stop the loop if we find a dome (cannot build above)
+          foreach ($pieces as $piece) {
+            if (in_array($piece['type'], $domes)) {
               break 2;
             }
           }

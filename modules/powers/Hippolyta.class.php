@@ -19,6 +19,7 @@ class Hippolyta extends SantoriniPower
   }
 
   /* * */
+
   public function argPlayerPlaceWorker(&$arg)
   {
     $arg['displayType'] = true;
@@ -26,7 +27,7 @@ class Hippolyta extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
-    $femaleWorkers = $this->game->board->getPlacedActiveWorkers('f');
+    $femaleWorkers = $this->game->board->getPlacedWorkers($this->playerId, false, 'f');
     Utils::filterWorksUnlessMine($arg, $femaleWorkers, array($this->game->board, 'isDiagonal'));
   }
 
@@ -37,7 +38,7 @@ class Hippolyta extends SantoriniPower
 
   public function argOpponentMove(&$arg)
   {
-    Utils::filterWorks($arg, array($this->game->board, 'isDiagonal'));
+    $this->argPlayerMove($arg);
   }
 
   public function endPlayerTurn()
