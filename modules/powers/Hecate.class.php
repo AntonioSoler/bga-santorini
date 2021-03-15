@@ -177,6 +177,9 @@ class Hecate extends SantoriniPower
     if ($arg['win'] && $this->endOpponentTurn(true)) {
       // Stop the win if the turn was illegal
       $arg['win'] = false;
+      $arg['stopTheTurn'] = true;
+      // actually cancel the turn in this new implmentation
+      $this->endOpponentTurn();
 
       // endOpponentTurn will cancel the illegal actions
       // TODO: We should end the opponent turn immediately (e.g., Pan moves down but we still let him build)

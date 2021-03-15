@@ -264,6 +264,7 @@ $machinestates = [
       'move'       => ST_MOVE,
       'power' => ST_USE_POWER,
       'eliminate'  => ST_ELIMINATE_PLAYER,
+      'cancelRestOfTurn'    => ST_END_OF_TURN,
     ],
   ],
 
@@ -291,6 +292,7 @@ $machinestates = [
       'power'      => ST_USE_POWER,
       'switch'     => ST_SWITCH_PLAYER,
       'eliminate'  => ST_ELIMINATE_PLAYER,
+      'cancelRestOfTurn'    => ST_END_OF_TURN,
     ],
   ],
 
