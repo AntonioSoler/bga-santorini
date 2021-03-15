@@ -605,7 +605,7 @@ class santorini extends Table
   public function stEndOfTurn()
   {
     // First check if one player has won
-    if ($this->stCheckEndOfGame()) {
+    if ($this->stCheckEndOfGame()[0]) {
       return;
     }
 
@@ -626,6 +626,7 @@ class santorini extends Table
       'win' => false,
       'pId' => self::getActivePlayerId(),
       'work' => $work,
+      'stopTheTurn' => false
     ];
 
     // Basic rule: Win by moving up to level 3 one of MY workers
@@ -649,7 +650,7 @@ class santorini extends Table
       $this->powerManager->preEndOfTurn();
       $this->announceWin($arg['pId']);
     }
-    return $arg['win'];
+    return [$arg['win'], $arg['stopTheTurn']];
   }
 
   /*
@@ -928,9 +929,16 @@ class santorini extends Table
    */
   public function stBeforeWork()
   {
-    if ($this->stCheckEndOfGame()) {
+    $end = $this->stCheckEndOfGame();
+    if ($end[0]) {
       return;
     }
+// Hecate cancels the rest of the turn because of a failed win attempt
+    if (!$end[0] && $end[1]){      
+        $this->gamestate->nextState('cancelRestOfTurn');
+      return;
+    }
+    
     $state = $this->gamestate->state();
     // TODO: apply power before work ?
 
