@@ -1127,9 +1127,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onEnteringStatePlayerPlaceWorker: function (args) {
       this.worker = args.worker;
       this.board.makeClickable(args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
-      if (args.displayType && this.isCurrentPlayerActive()) {
-        $('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f' ? _("female") : _("male")) + ")";
-      }
+      $('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f' ? _("female") : _("male")) + ")";
     },
 
     /*
@@ -1223,7 +1221,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     usePowerJason: function (args) {
-      this._action = 'playerMove';
+      this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
     },
 
