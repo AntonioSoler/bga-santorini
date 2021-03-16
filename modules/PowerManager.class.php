@@ -129,9 +129,8 @@ class PowerManager extends APP_GameClass
     [NEMESIS, TERPSICHORE],
     [NEMESIS, THESEUS],
     [NYX, CHAOS], // https://boardgamearena.com/bug?id=29287
-    [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
+    [NYX, CHRONUS], // https://boardgamearena.com/bug?id=33571
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
-    [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
     [CHARYBDIS, HARPIES], // Charybdis should go first which does not work with 3 (and 4?) players. Fine with 2 though but cannot ban only 2
@@ -192,7 +191,7 @@ class PowerManager extends APP_GameClass
     [HECATE, NYX], // too confusing for the moment
     [HECATE, ODYSSEUS],
     [HECATE, SIREN],
-//    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
+    //    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
     [HECATE, HYDRA], // should propose a higher level to spawn when <3 are of minimal height
 
     // https://boardgamearena.com/bug?id=33066
