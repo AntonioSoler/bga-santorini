@@ -91,8 +91,6 @@ class Charybdis extends SantoriniPower
   {
     $token = $this->getUnplacedTokens()[0];
     $space = $action[1];
-    # so that we don't forget the initial place of the token if it was removed + replaced in the same turn, then the turn gets cancelled
-    $this->game->log->addMoveToken($token, $space, $this, []);
     $this->placeToken($token, $space);
     $this->updateUI();
   }
