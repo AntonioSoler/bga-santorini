@@ -192,17 +192,7 @@ class PowerManager extends APP_GameClass
     [HECATE, NYX], // too confusing for the moment
     [HECATE, ODYSSEUS],
     [HECATE, SIREN],
-//    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
     [HECATE, HYDRA], // should propose a higher level to spawn when <3 are of minimal height
-
-    // https://boardgamearena.com/bug?id=33066
- /*   [HECATE, ARTEMIS],
-    [HECATE, ATALANTA],
-    [HECATE, EROS],
-    [HECATE, HERA],
-    [HECATE, MINOTAUR],
-    [HECATE, PAN],
-    [HECATE, TRITON],*/
   ];
 
 
