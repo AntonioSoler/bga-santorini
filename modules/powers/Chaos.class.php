@@ -46,7 +46,7 @@ class Chaos extends SantoriniPower
   public function setup()
   {
     // Recreate the deck with just non-banned Simple Gods
-    $powerIds = $this->game->powerManager->getPowerIdsInLocation('hand');
+    $powerIds = array_merge($this->game->powerManager->getPowerIdsInLocation('offer'), $this->game->powerManager->getPowerIdsInLocation('hand'));
     $nyxNightId = $this->game->powerManager->getSpecialPowerId('nyxNight');
     if ($nyxNightId != null) {
       $powerIds[] = $nyxNightId;
