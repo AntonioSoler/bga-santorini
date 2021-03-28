@@ -18,6 +18,7 @@ class Chaos extends SantoriniPower
     $this->orderAid = 34;
 
     $this->implemented = true;
+    $this->perfectInformation = false;
   }
 
   /* * */
