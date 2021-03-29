@@ -30,6 +30,7 @@ abstract class SantoriniPower extends APP_GameClass
   protected $golden;
   protected $orderAid;
   protected $implemented = false;
+  protected $perfectInformation = true;
 
   public function getId()
   {
@@ -76,6 +77,16 @@ abstract class SantoriniPower extends APP_GameClass
     return $this instanceof SantoriniHeroPower;
   }
 
+  public function isAdvanced()
+  {
+    return !$this->isSimple() && !$this->isHero();
+  }
+
+  public function isPerfectInformation()
+  {
+    return $this->perfectInformation;
+  }
+
   public function isImplemented()
   {
     return $this->implemented;
@@ -92,18 +103,6 @@ abstract class SantoriniPower extends APP_GameClass
       'golden'      => $this->golden,
       'playerCount' => $this->playerCount,
     ];
-  }
-
-  public function isSupported($nPlayers, $optionPowers)
-  {
-    return $this->implemented
-      && in_array($nPlayers, $this->getPlayerCount())
-      && (($optionPowers == GODS_AND_HEROES)
-        || ($optionPowers == SIMPLE && $this->isSimple())
-        || ($optionPowers == GODS && !$this->isHero())
-        || ($optionPowers == HEROES && $this->isHero())
-        || ($optionPowers == GOLDEN_FLEECE && $this->isGoldenFleece())
-        || ($optionPowers == PRESET && Presets::isSupported($this->id)));
   }
 
   public function setPlayerId($newPlayerId)

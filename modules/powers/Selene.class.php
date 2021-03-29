@@ -20,11 +20,6 @@ class Selene extends SantoriniPower
 
   /* * */
 
-  public function argPlayerPlaceWorker(&$arg)
-  {
-    $arg['displayType'] = true;
-  }
-
   public function argPlayerBuild(&$arg)
   {
     $fworkers = $this->game->board->getPlacedActiveWorkers('f');

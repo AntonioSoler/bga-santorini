@@ -31,9 +31,12 @@ class santorini extends Table
     //  You can use any number of global variables with IDs between 10 and 99.
     //  If your game has options (variants), you also have to associate here a label to  the corresponding ID in gameoptions.inc.php.
     self::initGameStateLabels([
-      'optionPowers' => OPTION_POWERS,
-      'optionSetup' => OPTION_SETUP,
       'optionTeams' => OPTION_TEAMS,
+      'optionGoldenFleece' => OPTION_GOLDEN_FLEECE,
+      'optionSimple' => OPTION_SIMPLE,
+      'optionHero' => OPTION_HERO,
+      'optionAdvanced' => OPTION_ADVANCED,
+      'optionSetup' => OPTION_SETUP,
       'firstPlayer' => FIRST_PLAYER,
       'switchPlayer' => SWITCH_PLAYER,
       'switchState' => SWITCH_STATE,
@@ -1296,8 +1299,8 @@ class santorini extends Table
    */
   public function upgradeTableDb($from_version)
   {
-    if ($from_version <= 2009010714) {
-      self::DbQuery("ALTER TABLE log DROP round");
+    if ($from_version <= 2103160509) {
+      self::applyDbUpgradeToAllDB("INSERT INTO DBPREFIX_global SELECT " . OPTION_GOLDEN_FLEECE . " AS global_id, IF(global_value = 5, 1, 0) AS global_value FROM DBPREFIX_global WHERE global_id = 100");
     }
   }
 

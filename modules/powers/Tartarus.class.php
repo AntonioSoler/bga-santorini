@@ -17,6 +17,7 @@ class Tartarus extends SantoriniPower
     $this->orderAid = 0;
 
     $this->implemented = true;
+    $this->perfectInformation = false;
   }
 
   /* * */

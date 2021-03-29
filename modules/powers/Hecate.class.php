@@ -17,6 +17,7 @@ class Hecate extends SantoriniPower
     $this->orderAid = 64;
 
     $this->implemented = true;
+    $this->perfectInformation = false;
   }
 
   /* * */

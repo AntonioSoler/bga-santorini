@@ -204,6 +204,7 @@ class SantoriniLog extends APP_GameClass
   {
     $args = [
       'location' => $piece['location'],
+      'from' => SantoriniBoard::getCoords($piece),
     ];
     $this->insert(-1, $piece['id'], 'removal', $stats, $args);
   }
@@ -473,10 +474,15 @@ class SantoriniLog extends APP_GameClass
         self::DbQuery("DELETE FROM piece WHERE location = 'board' AND x = {$args['to']['x']} AND y = {$args['to']['y']} AND z = {$args['to']['z']}");
         $this->game->board->adjustSecretTokens($args['to'], false);
       } else if ($log['action'] == 'removal') {
-        // Removal : put the piece back on the board
+        // Removal : put the piece back
         $piece = $this->game->board->getPiece($log['piece_id']);
         $location = $args['location'] ?? 'board';
-        self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$log['piece_id']}");
+        if (isset($args['from'])) {
+          self::DbQuery("UPDATE piece SET location = '$location', x = {$args['from']['x']}, y = {$args['from']['y']}, z = {$args['from']['z']} WHERE id = {$log['piece_id']}");
+        } else {
+          // Old version 210315-0017
+          self::DbQuery("UPDATE piece SET location = '$location' WHERE id = {$log['piece_id']}");
+        }
         $piece = $this->game->board->getPiece($log['piece_id']);
         $this->game->board->adjustSecretTokens($piece, false);
       } else if ($log['action'] == 'powerRemoved' && $args['reason'] == 'hero') {

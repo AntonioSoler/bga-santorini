@@ -21,7 +21,7 @@ class SantoriniBoard extends APP_GameClass
    */
   public static function getCoords($mixed, $arg = 0, $keepId = false)
   {
-    $data = ['x' =>  $mixed['x'], 'y' => $mixed['y'], 'z' => $mixed['z']];
+    $data = ['x' => $mixed['x'], 'y' => $mixed['y'], 'z' => $mixed['z']];
     if ($arg == 1) {
       $data['arg'] = [$mixed['z']];
     }

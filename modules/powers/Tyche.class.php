@@ -17,6 +17,7 @@ class Tyche extends SantoriniPower
     $this->orderAid = 48;
 
     $this->implemented = true;
+    $this->perfectInformation = false;
   }
 
   /* * */

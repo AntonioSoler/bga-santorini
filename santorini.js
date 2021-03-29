@@ -923,6 +923,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       powerDialog.setContent(powerDetail);
       powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
       dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+      // 34700: override OrbitControls touch listener
+      dojo.connect(div, "ontouchstart", function (ev) { ev.stopPropagation(); powerDialog.show(); });
     },
 
 
@@ -1096,6 +1098,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       powerDialog.setContent(powerDetail);
       powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
       dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+      // 34700: override OrbitControls touch listener
+      dojo.connect(div, "ontouchstart", function (ev) { ev.stopPropagation(); powerDialog.show(); });
     },
 
     notif_specialPowerSet: function (n) {
@@ -1127,9 +1131,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onEnteringStatePlayerPlaceWorker: function (args) {
       this.worker = args.worker;
       this.board.makeClickable(args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
-      if (args.displayType && this.isCurrentPlayerActive()) {
-        $('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f' ? _("female") : _("male")) + ")";
-      }
+      $('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f' ? _("female") : _("male")) + ")";
     },
 
     /*
@@ -1223,7 +1225,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     usePowerJason: function (args) {
-      this._action = 'playerMove';
+      this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
     },
 
