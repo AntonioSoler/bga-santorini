@@ -182,26 +182,34 @@ class PowerManager extends APP_GameClass
     [ADONIS, TRITON], // multiple moves
 
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
-    [HECATE, ADONIS],
     [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal
     [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
     [HECATE, ERIS],
     [HECATE, IRIS], // can jump over secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
     [HECATE, NEMESIS],
     [HECATE, NYX], // too confusing for the moment
-    [HECATE, ODYSSEUS],
     [HECATE, SIREN],
-    //    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
     [HECATE, HYDRA], // should propose a higher level to spawn when <3 are of minimal height
 
     // https://boardgamearena.com/bug?id=33066
     [HECATE, ARTEMIS],
-    [HECATE, ATALANTA],
     [HECATE, EROS],
     [HECATE, HERA],
     [HECATE, MINOTAUR],
     [HECATE, PAN],
     [HECATE, TRITON],
+
+    // Hecate ban all heroes https://boardgamearena.com/bug?id=37708
+    [HECATE, ACHILLES],
+    [HECATE, ADONIS],
+    [HECATE, ATALANTA],
+    [HECATE, BELLEROPHON],
+    [HECATE, HERACLES],
+    [HECATE, JASON],
+    [HECATE, MEDEA],
+    [HECATE, ODYSSEUS],
+    [HECATE, POLYPHEMUS],
+    [HECATE, THESEUS],
   ];
 
 
@@ -262,6 +270,7 @@ class PowerManager extends APP_GameClass
     foreach ($this->getPowers() as $power) {
       if ($power->isImplemented()) {
         $data = $power->getUiData($playerId);
+        $data['banned'] = $this->computeBannedIds([$power->getId()]);
         if (array_key_exists('counter', $data) && is_array($data['counter'])) {
           // When counter is an array, show different info to each player
           // Select the correct value for the current player
@@ -423,14 +432,14 @@ class PowerManager extends APP_GameClass
     foreach ($powers as $power) {
       foreach (self::$bannedMatchups as $matchup) {
         if ($matchup[0] == $power) {
-          $ids[] = $matchup[1];
+          $ids[$matchup[1]] = true;
         }
         if ($matchup[1] == $power) {
-          $ids[] = $matchup[0];
+          $ids[$matchup[0]] = true;
         }
       }
     }
-    return $ids;
+    return array_keys($ids);
   }
 
 
