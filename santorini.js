@@ -316,8 +316,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
             if (p.text.includes('REVISED POWER')) {
               info.push('REVISED POWER');
             }
+            var bans = p.banned.map(function (id) {
+              return _this.gamedatas.powers[id];
+            }).filter(function (power) {
+              return power != null;
+            }).sort(function (power1, power2) {
+              return power1.sort - power2.sort;
+            }).map(function (power) {
+              return power.name;
+            }).join(', ');
             var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em;' + color + '">');
-            return '<p style="' + color + '"><b>' + p.name + '</b>, <i>' + p.title + '</i><br>' + '<small>' + info.join(' &mdash; ') + '</small></p>\n' + txt;
+            return '<p style="' + color + '"><b>' + p.name + '</b>, <i>' + p.title + '</i>\n<br><small>' + info.join(' &mdash; ') + (bans ? '\n<br>Banned: ' + bans : '') + '</small></p>\n' + txt;
           }).join('\n----\n');
         console.log(txt);
         navigator.clipboard.writeText(txt);

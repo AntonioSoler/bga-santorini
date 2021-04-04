@@ -262,6 +262,7 @@ class PowerManager extends APP_GameClass
     foreach ($this->getPowers() as $power) {
       if ($power->isImplemented()) {
         $data = $power->getUiData($playerId);
+        $data['banned'] = $this->computeBannedIds([$power->getId()]);
         if (array_key_exists('counter', $data) && is_array($data['counter'])) {
           // When counter is an array, show different info to each player
           // Select the correct value for the current player
@@ -423,14 +424,14 @@ class PowerManager extends APP_GameClass
     foreach ($powers as $power) {
       foreach (self::$bannedMatchups as $matchup) {
         if ($matchup[0] == $power) {
-          $ids[] = $matchup[1];
+          $ids[$matchup[1]] = true;
         }
         if ($matchup[1] == $power) {
-          $ids[] = $matchup[0];
+          $ids[$matchup[0]] = true;
         }
       }
     }
-    return $ids;
+    return array_keys($ids);
   }
 
 
