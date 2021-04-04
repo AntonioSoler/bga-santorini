@@ -603,6 +603,21 @@ class santorini extends Table
   }
 
   /*
+   * stCancelTurn: triggered by Hecate when the opponent makes a winning move that is invalid
+   */
+  public function stCancelTurn()
+  {
+    // For now, only Hecate can trigger this
+    foreach ($this->powerManager->getPowersInLocation('hand') as $power) {
+      if ($power->getId() == HECATE) {
+        $power->endOpponentTurn();
+        break;
+      }
+    }
+    $this->gamestate->nextState('');
+  }
+
+  /*
    * stEndOfTurn: called at the end of each player turn, after the player confirms
    */
   public function stEndOfTurn()
@@ -629,7 +644,7 @@ class santorini extends Table
       'win' => false,
       'pId' => self::getActivePlayerId(),
       'work' => $work,
-      'stopTheTurn' => false,
+      'cancelTurn' => false,
     ];
 
     // Basic rule: Win by moving up to level 3 one of MY workers
@@ -655,7 +670,7 @@ class santorini extends Table
     }
     return [
       'win' => $arg['win'],
-      'stopTheTurn' => $arg['stopTheTurn'],
+      'cancelTurn' => $arg['cancelTurn'],
     ];
   }
 
@@ -938,9 +953,9 @@ class santorini extends Table
     $end = $this->stCheckEndOfGame();
     if ($end['win']) {
       return;
-    } else if ($end['stopTheTurn']) {
+    } else if ($end['cancelTurn']) {
       // Hecate cancels the rest of the turn because of a failed win attempt
-      $this->gamestate->nextState('cancelRestOfTurn');
+      $this->gamestate->nextState('cancelTurn');
       return;
     }
 

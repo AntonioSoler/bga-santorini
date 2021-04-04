@@ -108,28 +108,25 @@ define('TITANS', 120);
  * State constants
  */
 define('ST_BGA_GAME_SETUP', 1);
-define('ST_POWERS_SETUP', 10);
-define('ST_BUILD_OFFER', 12);
-define('ST_CHOOSE_NYX_POWER', 66);
-define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
-define('ST_POWERS_CHOOSE', 14);
-define('ST_CHOOSE_FIRST_PLAYER', 18);
-
 define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);
-define('ST_PLACE_RAM', 41);
-
 define('ST_NEXT_PLAYER', 5);
-define('ST_START_OF_TURN', 16);
 define('ST_MOVE', 6);
 define('ST_BUILD', 7);
-define('ST_PRE_END_OF_TURN', 19);
-define('ST_END_OF_TURN', 17);
+define('ST_POWERS_SETUP', 10);
+define('ST_BUILD_OFFER', 12);
+define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
+define('ST_POWERS_CHOOSE', 14);
 define('ST_USE_POWER', 15);
-
+define('ST_START_OF_TURN', 16);
+define('ST_END_OF_TURN', 17);
+define('ST_CHOOSE_FIRST_PLAYER', 18);
+define('ST_PRE_END_OF_TURN', 19);
 define('ST_ELIMINATE_PLAYER', 20);
+define('ST_CANCEL_TURN', 21);
 define('ST_SWITCH_PLAYER', 30);
-
+define('ST_PLACE_RAM', 41);
+define('ST_CHOOSE_NYX_POWER', 66);
 define('ST_GAME_END', 98);
 define('ST_BGA_GAME_END', 99);
 
