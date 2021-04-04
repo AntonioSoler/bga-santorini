@@ -262,8 +262,9 @@ $machinestates = [
       'skip'       => ST_BUILD,
       'cancel'     => ST_START_OF_TURN,
       'move'       => ST_MOVE,
-      'power' => ST_USE_POWER,
+      'power'      => ST_USE_POWER,
       'eliminate'  => ST_ELIMINATE_PLAYER,
+      'cancelTurn' => ST_CANCEL_TURN,
     ],
   ],
 
@@ -291,6 +292,7 @@ $machinestates = [
       'power'      => ST_USE_POWER,
       'switch'     => ST_SWITCH_PLAYER,
       'eliminate'  => ST_ELIMINATE_PLAYER,
+      'cancelTurn' => ST_CANCEL_TURN,
     ],
   ],
 
@@ -307,6 +309,17 @@ $machinestates = [
       'confirm'    => ST_END_OF_TURN,
       'cancel'     => ST_START_OF_TURN,
       'eliminate'  => ST_ELIMINATE_PLAYER,
+    ],
+  ],
+
+  // Triggered by Hecate when the opponent makes a winning move that is invalid
+  ST_CANCEL_TURN => [
+    'name' => 'cancelTurn',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stCancelTurn',
+    'transitions' => [
+      '' => ST_END_OF_TURN,
     ],
   ],
 
