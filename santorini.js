@@ -316,8 +316,17 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
             if (p.text.includes('REVISED POWER')) {
               info.push('REVISED POWER');
             }
+            var bans = p.banned.map(function (id) {
+              return _this.gamedatas.powers[id];
+            }).filter(function (power) {
+              return power != null;
+            }).sort(function (power1, power2) {
+              return power1.sort - power2.sort;
+            }).map(function (power) {
+              return power.name;
+            }).join(', ');
             var txt = p.text.replace('<p><b>REVISED POWER</b></p>', '').replace(/<p>/g, '<p style="padding-left: 2em;' + color + '">');
-            return '<p style="' + color + '"><b>' + p.name + '</b>, <i>' + p.title + '</i><br>' + '<small>' + info.join(' &mdash; ') + '</small></p>\n' + txt;
+            return '<p style="' + color + '"><b>' + p.name + '</b>, <i>' + p.title + '</i>\n<br><small>' + info.join(' &mdash; ') + (bans ? '\n<br>Banned: ' + bans : '') + '</small></p>\n' + txt;
           }).join('\n----\n');
         console.log(txt);
         navigator.clipboard.writeText(txt);
@@ -923,6 +932,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       powerDialog.setContent(powerDetail);
       powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
       dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+      // 34700: override OrbitControls touch listener
+      dojo.connect(div, "ontouchstart", function (ev) { ev.stopPropagation(); powerDialog.show(); });
     },
 
 
@@ -1096,6 +1107,8 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       powerDialog.setContent(powerDetail);
       powerDialog.replaceCloseCallback(function () { powerDialog.hide(); });
       dojo.connect(div, "onclick", function (ev) { powerDialog.show(); });
+      // 34700: override OrbitControls touch listener
+      dojo.connect(div, "ontouchstart", function (ev) { ev.stopPropagation(); powerDialog.show(); });
     },
 
     notif_specialPowerSet: function (n) {
@@ -1127,9 +1140,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     onEnteringStatePlayerPlaceWorker: function (args) {
       this.worker = args.worker;
       this.board.makeClickable(args.accessibleSpaces, this.onClickPlaceWorker.bind(this), 'place');
-      if (args.displayType && this.isCurrentPlayerActive()) {
-        $('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f' ? _("female") : _("male")) + ")";
-      }
+      $('pagemaintitletext').innerHTML += " (" + (args.worker.type_arg[0] == 'f' ? _("female") : _("male")) + ")";
     },
 
     /*
@@ -1224,7 +1235,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
 
     usePowerJason: function (args) {
-      this._action = 'playerMove';
+      this._action = 'playerBuild';
       this.makeWorkersSelectable(args.workers);
     },
 

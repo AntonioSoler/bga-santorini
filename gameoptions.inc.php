@@ -27,142 +27,167 @@
 require_once("modules/constants.inc.php");
 
 $game_options = [
-  OPTION_POWERS => [
-    'name' => totranslate('Powers'),
+  OPTION_TEAMS => [
+    'name' => totranslate('Teams'),
+    'default' => TEAMS_RANDOM,
     'values' => [
-      SIMPLE => [
-        'name' => totranslate('Simple Gods'),
-        'tmdisplay' => totranslate('Simple Gods'),
-        'description' => totranslate('Each player receives a powerful ongoing ability')
+      TEAMS_RANDOM => [
+        'name' => totranslate('Random'),
       ],
-      GODS => [
-        'name' => totranslate('All Gods'),
-        'tmdisplay' => totranslate('All Gods'),
-        'description' => totranslate('Each player receives a powerful ongoing ability'),
-        'nobeginner' => true,
+      TEAMS_1_AND_2 => [
+        'name' => totranslate('By table order (1st/2nd versus 3rd/4th)'),
       ],
-      HEROES => [
-        'name' => totranslate('Hero Powers'),
-        'tmdisplay' => totranslate('Hero Powers'),
-        'description' => totranslate('Each player receives a once-per-game ability'),
-        'nobeginner' => true,
+      TEAMS_1_AND_3 => [
+        'name' => totranslate('By table order (1st/3rd versus 2nd/4th)'),
       ],
-      GODS_AND_HEROES => [
-        'name' => totranslate('All Gods and Hero Powers'),
-        'tmdisplay' => totranslate('All Gods and Hero Powers'),
-        'description' => totranslate('Allows for balanced games between 2 players of unequal skill, with the more experienced choosing a Hero Power and the less experienced choosing a God Power'),
+      TEAMS_1_AND_4 => [
+        'name' => totranslate('By table order (1st/4th versus 2nd/3rd)'),
       ],
-      GOLDEN_FLEECE => [
-        'name' => totranslate('Golden Fleece Variant'),
+    ],
+    'displaycondition' => [
+      [
+        'type' => 'maxplayers',
+        'value' => 4,
+      ],
+    ],
+  ],
+
+  OPTION_GOLDEN_FLEECE => [
+    'name' => totranslate('Golden Fleece Variant'),
+    'default' => NO,
+    'values' => [
+      NO => [
+        'name' => totranslate('No'),
+      ],
+      YES => [
+        'name' => totranslate('Yes'),
         'tmdisplay' => totranslate('Golden Fleece Variant'),
         'description' => totranslate('One powerful ability is available to any player neighboring the Ram figure'),
         'nobeginner' => true,
       ],
-      NONE => [
-        'name' => totranslate('No Powers'),
-        'tmdisplay' => totranslate('No Powers'),
-      ],
-      /*
-      PRESET => [
-        'name' => totranslate('Preset matchup'),
-        'tmdisplay' => totranslate('Preset matchup'),
-        'description' => totranslate('Power matchup of the week'),
-      ],
-      */
     ],
-    'startcondition' => [
-      HEROES => [
-        [
-          'type' => 'maxplayers',
-          'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players'),
-        ],
+    'displaycondition' => [
+      [
+        'type' => 'maxplayers',
+        'value' => 2,
       ],
-      GODS_AND_HEROES => [
-        [
-          'type' => 'maxplayers',
-          'value' => 2,
-          'message' => totranslate('Hero Powers requires exactly 2 players'),
-        ],
-      ],
-      GOLDEN_FLEECE => [
-        [
-          'type' => 'maxplayers',
-          'value' => 2,
-          'message' => totranslate('Golden Fleece Variant requires exactly 2 players'),
-        ],
-      ],
-      NONE => [
-        [
-          'type' => 'maxplayers',
-          'value' => 2,
-          'message' => totranslate('No Powers requires exactly 2 players'),
-        ],
-      ],
-      /*
-      PRESET => [
-        [
-          'type' => 'maxplayers',
-          'value' => 2,
-          'message' => totranslate('Preset matchup requires exactly 2 players'),
-        ],
-      ],
-      */
     ],
   ],
 
-  OPTION_SETUP => [
-    'name' => totranslate('Setup'),
+  OPTION_SIMPLE => [
+    'name' => totranslate('Simple Gods'),
+    'default' => YES,
     'values' => [
-      QUICK => [
-        'name' => totranslate('Quick Setup'),
-        'tmdisplay' => totranslate('Quick Setup'),
+      NO => [
+        'name' => totranslate('No'),
       ],
-      TOURNAMENT => [
-        'name' => totranslate('Tournament Setup'),
-        'tmdisplay' => totranslate('Tournament Setup'),
-        'description' => totranslate('First player builds an offer from a limited set of power cards randomly selected by BGA'),
-      ],
-      CUSTOM => [
-        'name' => totranslate('Custom Setup'),
-        'tmdisplay' => totranslate('Custom Setup'),
-        'description' => totranslate('First player builds an offer from all available powers cards'),
+      YES => [
+        'name' => totranslate('Yes'),
+        'tmdisplay' => totranslate('Simple Gods'),
+        'description' => totranslate('Includes 10 basic powers'),
       ],
     ],
     'displaycondition' => [
       [
         'type' => 'otheroptionisnot',
-        'id' => OPTION_POWERS,
-        'value' => NONE,
+        'id' => OPTION_GOLDEN_FLEECE,
+        'value' => YES,
       ],
-      /*
-      [
-        'type' => 'otheroptionisnot',
-        'id' => OPTION_POWERS,
-        'value' => PRESET,
-      ],
-      */
     ],
   ],
 
-  OPTION_TEAMS => [
-    'name' => totranslate('Teams'),
+  OPTION_HERO => [
+    'name' => totranslate('Hero Powers'),
+    'default' => NO,
     'values' => [
-      TEAMS_RANDOM => [
-        'name' => totranslate('Random'),
-        'description' => totranslate('Only applies with 4 players'),
+      NO => [
+        'name' => totranslate('No'),
       ],
-      TEAMS_1_AND_2 => [
-        'name' => totranslate('By table order (1st/2nd versus 3rd/4th)'),
-        'description' => totranslate('Only applies with 4 players'),
+      YES => [
+        'name' => totranslate('Yes'),
+        'tmdisplay' => totranslate('Hero Powers'),
+        'description' => totranslate('Includes 10 once-per-game powers'),
       ],
-      TEAMS_1_AND_3 => [
-        'name' => totranslate('By table order (1st/3rd versus 2nd/4th)'),
-        'description' => totranslate('Only applies with 4 players'),
+    ],
+    'displaycondition' => [
+      [
+        'type' => 'otheroptionisnot',
+        'id' => OPTION_GOLDEN_FLEECE,
+        'value' => YES,
       ],
-      TEAMS_1_AND_4 => [
-        'name' => totranslate('By table order (1st/4th versus 2nd/3rd)'),
-        'description' => totranslate('Only applies with 4 players'),
+      [
+        'type' => 'maxplayers',
+        'value' => 2,
+      ],
+    ],
+  ],
+
+  OPTION_ADVANCED => [
+    'name' => totranslate('Advanced Gods'),
+    'default' => NO,
+    'values' => [
+      NO => [
+        'name' => totranslate('No'),
+      ],
+      YES => [
+        'name' => totranslate('Yes'),
+        'tmdisplay' => totranslate('Advanced Gods'),
+        'description' => totranslate('Includes all other powers'),
+        'nobeginner' => true,
+      ],
+      PERFECT => [
+        'name' => totranslate('Perfect Information'),
+        'tmdisplay' => totranslate('Perfect Information'),
+        'description' => totranslate('Includes all other powers, except those involving hidden information or luck'),
+        'nobeginner' => true,
+      ],
+    ],
+    'displaycondition' => [
+      [
+        'type' => 'otheroptionisnot',
+        'id' => OPTION_GOLDEN_FLEECE,
+        'value' => YES,
+      ],
+    ],
+  ],
+
+  OPTION_SETUP => [
+    'name' => totranslate('Setup'),
+    'default' => QUICK,
+    'values' => [
+      QUICK => [
+        'name' => totranslate('Quick Setup'),
+      ],
+      LIMITED => [
+        'name' => totranslate('Limited Choice'),
+        'description' => totranslate('First player chooses available powers from a limited set'),
+      ],
+      FULL => [
+        'name' => totranslate('Full Choice'),
+        'description' => totranslate('First player chooses available powers from the complete set'),
+      ],
+    ],
+    'displayconditionoperand' => 'or',
+    'displaycondition' => [
+      [
+        'type' => 'otheroptionisnot',
+        'id' => OPTION_GOLDEN_FLEECE,
+        'value' => NO,
+      ],
+      [
+        'type' => 'otheroptionisnot',
+        'id' => OPTION_SIMPLE,
+        'value' => NO,
+      ],
+      [
+        'type' => 'otheroptionisnot',
+        'id' => OPTION_HERO,
+        'value' => NO,
+      ],
+      [
+        'type' => 'otheroptionisnot',
+        'id' => OPTION_ADVANCED,
+        'value' => NO,
       ],
     ],
   ],

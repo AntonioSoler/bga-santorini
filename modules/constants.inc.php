@@ -108,55 +108,53 @@ define('TITANS', 120);
  * State constants
  */
 define('ST_BGA_GAME_SETUP', 1);
-define('ST_POWERS_SETUP', 10);
-define('ST_BUILD_OFFER', 12);
-define('ST_CHOOSE_NYX_POWER', 66);
-define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
-define('ST_POWERS_CHOOSE', 14);
-define('ST_CHOOSE_FIRST_PLAYER', 18);
-
 define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);
+
 define('ST_NEXT_PLAYER_PLACE_SETUP', 33);
 define('ST_PLACE_SETUP', 34);
-define('ST_PLACE_RAM', 41);
 
 define('ST_NEXT_PLAYER', 5);
-define('ST_START_OF_TURN', 16);
 define('ST_MOVE', 6);
 define('ST_BUILD', 7);
-define('ST_PRE_END_OF_TURN', 19);
-define('ST_END_OF_TURN', 17);
+define('ST_POWERS_SETUP', 10);
+define('ST_BUILD_OFFER', 12);
+define('ST_POWERS_NEXT_PLAYER_CHOOSE', 13);
+define('ST_POWERS_CHOOSE', 14);
 define('ST_USE_POWER', 15);
-
+define('ST_START_OF_TURN', 16);
+define('ST_END_OF_TURN', 17);
+define('ST_CHOOSE_FIRST_PLAYER', 18);
+define('ST_PRE_END_OF_TURN', 19);
 define('ST_ELIMINATE_PLAYER', 20);
+define('ST_CANCEL_TURN', 21);
 define('ST_SWITCH_PLAYER', 30);
-
+define('ST_PLACE_RAM', 41);
+define('ST_CHOOSE_NYX_POWER', 66);
 define('ST_GAME_END', 98);
 define('ST_BGA_GAME_END', 99);
 
 /*
  * Options constants
  */
-define('OPTION_POWERS', 100);
-define('SIMPLE', 1);
-define('GODS', 2);
-define('HEROES', 3);
-define('GODS_AND_HEROES', 4);
-define('GOLDEN_FLEECE', 5);
-define('NONE', 6);
-define('PRESET', 7);
-
-define('OPTION_SETUP', 102);
-define('QUICK', 0);
-define('TOURNAMENT', 1);
-define('CUSTOM', 2);
-
 define('OPTION_TEAMS', 103);
 define('TEAMS_RANDOM', 1);
 define('TEAMS_1_AND_2', 2);
 define('TEAMS_1_AND_3', 3);
 define('TEAMS_1_AND_4', 4);
+
+define('OPTION_GOLDEN_FLEECE', 104);
+define('OPTION_SIMPLE', 110);
+define('OPTION_HERO', 111);
+define('OPTION_ADVANCED', 112);
+define('NO', 0);
+define('YES', 1);
+define('PERFECT', 2);
+
+define('OPTION_SETUP', 102);
+define('QUICK', 0);
+define('LIMITED', 1);
+define('FULL', 2);
 
 define('HELPERS', 100);
 define('HELPERS_ENABLED', 1);

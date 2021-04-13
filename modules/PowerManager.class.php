@@ -129,9 +129,8 @@ class PowerManager extends APP_GameClass
     [NEMESIS, TERPSICHORE],
     [NEMESIS, THESEUS],
     [NYX, CHAOS], // https://boardgamearena.com/bug?id=29287
-    [NYX, CLIO], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
+    [NYX, CHRONUS], // https://boardgamearena.com/bug?id=33571
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
-    [NYX, EUROPA], // https://boardgamearena.com/bug?id=23797 -- until tokens are fixed
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
     [CHARYBDIS, HARPIES], // Charybdis should go first which does not work with 3 (and 4?) players. Fine with 2 though but cannot ban only 2
@@ -183,26 +182,26 @@ class PowerManager extends APP_GameClass
     [ADONIS, TRITON], // multiple moves
 
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
-    [HECATE, ADONIS],
     [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal
     [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
     [HECATE, ERIS],
     [HECATE, IRIS], // can jump over secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
     [HECATE, NEMESIS],
     [HECATE, NYX], // too confusing for the moment
-    [HECATE, ODYSSEUS],
     [HECATE, SIREN],
-//    [HECATE, URANIA], // https://boardgamearena.com/bug?id=33054
     [HECATE, HYDRA], // should propose a higher level to spawn when <3 are of minimal height
 
-    // https://boardgamearena.com/bug?id=33066
-    [HECATE, ARTEMIS],
+    // Hecate ban all heroes https://boardgamearena.com/bug?id=37708
+    [HECATE, ACHILLES],
+    [HECATE, ADONIS],
     [HECATE, ATALANTA],
-    [HECATE, EROS],
-    [HECATE, HERA],
-    [HECATE, MINOTAUR],
-    [HECATE, PAN],
-    [HECATE, TRITON],
+    [HECATE, BELLEROPHON],
+    [HECATE, HERACLES],
+    [HECATE, JASON],
+    [HECATE, MEDEA],
+    [HECATE, ODYSSEUS],
+    [HECATE, POLYPHEMUS],
+    [HECATE, THESEUS],
   ];
 
 
@@ -263,6 +262,7 @@ class PowerManager extends APP_GameClass
     foreach ($this->getPowers() as $power) {
       if ($power->isImplemented()) {
         $data = $power->getUiData($playerId);
+        $data['banned'] = $this->computeBannedIds([$power->getId()]);
         if (array_key_exists('counter', $data) && is_array($data['counter'])) {
           // When counter is an array, show different info to each player
           // Select the correct value for the current player
@@ -346,57 +346,66 @@ class PowerManager extends APP_GameClass
    */
   public function preparePowers()
   {
-    $optionPowers = intval($this->game->getGameStateValue('optionPowers'));
-    if ($optionPowers == NONE) {
-      $this->game->gamestate->nextState('placeWorker');
-      return;
-    }
-
-    // Filter supported powers depending on the number of players and game option
     $nPlayers = $this->game->playerManager->getPlayerCount();
-    $powers = array_filter($this->getPowers(), function ($power) use ($nPlayers, $optionPowers) {
-      return $power->isSupported($nPlayers, $optionPowers);
-    });
-    $powerIds = array_values(array_map(function ($power) {
-      return $power->getId();
-    }, $powers));
-
-    // Additional filtering for QUICK and TOURNAMENT
+    $optionGoldenFleece = intval($this->game->getGameStateValue('optionGoldenFleece'));
+    $optionSimple = intval($this->game->getGameStateValue('optionSimple'));
+    $optionHero = intval($this->game->getGameStateValue('optionHero'));
+    $optionAdvanced = intval($this->game->getGameStateValue('optionAdvanced'));
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
-    if ($optionPowers == GODS_AND_HEROES && $optionSetup == QUICK) {
-      // Fix invalid gameoptions at runtime
-      // https://boardgamearena.com/bug?id=21524
-      $optionSetup = TOURNAMENT;
+
+    if ($nPlayers > 2 && $optionSimple == NO && $optionAdvanced == NO) {
+      // Can't play without powers for 3 or 4 players
+      // Pretend they picked Simple Gods + Quick Setup
+      $optionSimple = YES;
+      $optionSetup = QUICK;
     }
-    if (($optionSetup == QUICK || $optionSetup == TOURNAMENT)) {
-      $count = $optionSetup == QUICK ? ($optionPowers == GOLDEN_FLEECE ? 1 : $nPlayers) : ($nPlayers + 1) * 2;
-      if (count($powerIds) < $count) {
-        throw new BgaVisibleSystemException("preparePowers: Not enough powers available (expected: $count, actual: " . count($powerIds) . ")");
+
+    $powerIds = [];
+    foreach ($this->getPowers() as $power) {
+      if ($power->isImplemented() && in_array($nPlayers, $power->getPlayerCount())) {
+        if ($optionGoldenFleece == YES) {
+          $match = $power->isGoldenFleece();
+        } else {
+          $match = ($optionSimple == YES && $power->isSimple())
+            || ($optionHero == YES && $power->isHero())
+            || ($optionAdvanced == YES && $power->isAdvanced())
+            || ($optionAdvanced == PERFECT && $power->isPerfectInformation() && $power->isAdvanced());
+        }
+        if ($match) {
+          $powerIds[]  = $power->getId();
+        }
       }
+    }
+
+    if (!empty($powerIds) && ($optionSetup == QUICK || $optionSetup == LIMITED)) {
+      $count = $optionSetup == QUICK ? ($optionGoldenFleece == YES ? 1 : $nPlayers) : ($nPlayers + 1) * 2;
       $offer = [];
       for ($i = 0; $i < $count; $i++) {
         $offer[] = $powerIds[array_rand($powerIds, 1)];
-        Utils::filter($powerIds, function ($power) use ($offer) {
+        Utils::filter($powerIds, function ($id) use ($offer) {
           // Remove the selected powers AND any banned powers
-          return !in_array($power, $offer) && !in_array($power, $this->computeBannedIds($offer));
+          return !in_array($id, $offer) && !in_array($id, $this->computeBannedIds($offer));
         });
       }
-      $powerIds = $offer;
-      if (count($powerIds) != $count) {
-        throw new BgaVisibleSystemException("preparePowers: Wrong number of powers (expected: $count, actual: " . count($powerIds) . ")");
+      if (count($offer) != $count) {
+        throw new Exception("preparePowers: Wrong number of limited powers (expected: $count, actual: " . count($offer) . ")");
       }
+      $powerIds = $offer;
     }
 
-    if ($optionSetup == QUICK && $optionPowers == GOLDEN_FLEECE) {
-      // QUICK: Go to place worker
+    if (empty($powerIds)) {
+      // No powers
+      $this->game->gamestate->nextState('placeWorker');
+    } else if ($optionSetup == QUICK && $optionGoldenFleece == YES) {
+      // Golden Fleece already chosen
       $this->setSpecialPower('ram', $powerIds[0], true);
       $this->game->gamestate->nextState('placeWorker');
     } else if ($optionSetup == QUICK) {
-      // QUICK: Auto-confirm the offer
+      // Auto-confirm the offer
       $this->cards->moveCards($powerIds, 'offer');
       $this->game->confirmOffer(true);
     } else {
-      // TOURNAMENT and CUSTOM: Build offer
+      // Build offer
       $this->cards->moveCards($powerIds, 'deck');
       $this->cards->shuffle('deck');
       $this->game->gamestate->nextState('offer');
@@ -415,14 +424,14 @@ class PowerManager extends APP_GameClass
     foreach ($powers as $power) {
       foreach (self::$bannedMatchups as $matchup) {
         if ($matchup[0] == $power) {
-          $ids[] = $matchup[1];
+          $ids[$matchup[1]] = true;
         }
         if ($matchup[1] == $power) {
-          $ids[] = $matchup[0];
+          $ids[$matchup[0]] = true;
         }
       }
     }
-    return $ids;
+    return array_keys($ids);
   }
 
 
@@ -544,7 +553,7 @@ class PowerManager extends APP_GameClass
 
   public function isGoldenFleece()
   {
-    return intval($this->game->getGameStateValue('optionPowers')) == GOLDEN_FLEECE;
+    return intval($this->game->getGameStateValue('optionGoldenFleece')) == YES;
   }
 
   public function checkGoldenFleece()
@@ -580,14 +589,14 @@ class PowerManager extends APP_GameClass
   {
     $offer = $this->getPowerIdsInLocation('offer');
     $powers = array_filter($this->getPowers(), function ($power) use ($offer) {
-      return !in_array($power->getId(), $offer) && !in_array($power->getId(), $this->computeBannedIds($offer)) && $power->isSupported(2, GOLDEN_FLEECE);
+      return !in_array($power->getId(), $offer) && !in_array($power->getId(), $this->computeBannedIds($offer)) && $power->isImplemented() && $power->isGoldenFleece();
     });
     $powerIds = array_values(array_map(function ($power) {
       return $power->getId();
     }, $powers));
 
     $optionSetup = intval($this->game->getGameStateValue('optionSetup'));
-    if (($optionSetup == QUICK || $optionSetup == TOURNAMENT)) {
+    if ($optionSetup == QUICK || $optionSetup == LIMITED) {
       $count = $optionSetup == QUICK ? 1 : 6;
       if (count($powerIds) < $count) {
         throw new BgaVisibleSystemException("prepareNyxNightPowers: Not enough powers available (expected: $count, actual: " . count($powerIds) . ")");
@@ -597,11 +606,11 @@ class PowerManager extends APP_GameClass
     }
 
     if ($optionSetup == QUICK) {
-      // QUICK: Auto-confirm Nyx's Night Power
+      // Auto-confirm Nyx's Night Power
       $this->setSpecialPower('nyxNight', $powerIds[0], true);
       $this->game->gamestate->nextState('chooseFirstPlayer');
     } else {
-      // TOURNAMENT and CUSTOM: Build offer
+      // Build offer
       $this->cards->moveCards($powerIds, 'nyxDeck');
       $this->game->gamestate->nextState('nyx');
     }

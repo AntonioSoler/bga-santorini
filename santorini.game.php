@@ -31,9 +31,12 @@ class santorini extends Table
     //  You can use any number of global variables with IDs between 10 and 99.
     //  If your game has options (variants), you also have to associate here a label to  the corresponding ID in gameoptions.inc.php.
     self::initGameStateLabels([
-      'optionPowers' => OPTION_POWERS,
-      'optionSetup' => OPTION_SETUP,
       'optionTeams' => OPTION_TEAMS,
+      'optionGoldenFleece' => OPTION_GOLDEN_FLEECE,
+      'optionSimple' => OPTION_SIMPLE,
+      'optionHero' => OPTION_HERO,
+      'optionAdvanced' => OPTION_ADVANCED,
+      'optionSetup' => OPTION_SETUP,
       'firstPlayer' => FIRST_PLAYER,
       'switchPlayer' => SWITCH_PLAYER,
       'switchState' => SWITCH_STATE,
@@ -689,12 +692,27 @@ class santorini extends Table
   }
 
   /*
+   * stCancelTurn: triggered by Hecate when the opponent makes a winning move that is invalid
+   */
+  public function stCancelTurn()
+  {
+    // For now, only Hecate can trigger this
+    foreach ($this->powerManager->getPowersInLocation('hand') as $power) {
+      if ($power->getId() == HECATE) {
+        $power->endOpponentTurn();
+        break;
+      }
+    }
+    $this->gamestate->nextState('');
+  }
+
+  /*
    * stEndOfTurn: called at the end of each player turn, after the player confirms
    */
   public function stEndOfTurn()
   {
     // First check if one player has won
-    if ($this->stCheckEndOfGame()) {
+    if ($this->stCheckEndOfGame()['win']) {
       return;
     }
 
@@ -715,6 +733,7 @@ class santorini extends Table
       'win' => false,
       'pId' => self::getActivePlayerId(),
       'work' => $work,
+      'cancelTurn' => false,
     ];
 
     // Basic rule: Win by moving up to level 3 one of MY workers
@@ -738,7 +757,10 @@ class santorini extends Table
       $this->powerManager->preEndOfTurn();
       $this->announceWin($arg['pId']);
     }
-    return $arg['win'];
+    return [
+      'win' => $arg['win'],
+      'cancelTurn' => $arg['cancelTurn'],
+    ];
   }
 
   /*
@@ -1017,9 +1039,15 @@ class santorini extends Table
    */
   public function stBeforeWork()
   {
-    if ($this->stCheckEndOfGame()) {
+    $end = $this->stCheckEndOfGame();
+    if ($end['win']) {
+      return;
+    } else if ($end['cancelTurn']) {
+      // Hecate cancels the rest of the turn because of a failed win attempt
+      $this->gamestate->nextState('cancelTurn');
       return;
     }
+
     $state = $this->gamestate->state();
     // TODO: apply power before work ?
 
@@ -1375,8 +1403,8 @@ class santorini extends Table
    */
   public function upgradeTableDb($from_version)
   {
-    if ($from_version <= 2009010714) {
-      self::DbQuery("ALTER TABLE log DROP round");
+    if ($from_version <= 2103160509) {
+      self::applyDbUpgradeToAllDB("INSERT INTO DBPREFIX_global SELECT " . OPTION_GOLDEN_FLEECE . " AS global_id, IF(global_value = 5, 1, 0) AS global_value FROM DBPREFIX_global WHERE global_id = 100");
     }
   }
 
