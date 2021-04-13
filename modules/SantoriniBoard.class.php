@@ -42,7 +42,7 @@ class SantoriniBoard extends APP_GameClass
   public static function getMsgCoords($worker, $space = null)
   {
     $cols = ['A', 'B', 'C', 'D', 'E'];
-    $dirs = [ '' , '5', 'E5', 'E', 'E1', '1', 'A1', 'A', 'A5'];
+    $dirs = [ '' , 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
     if ($worker['y'] < 0 || $worker['y'] > 4 || $worker['x'] < 0 || $worker['x'] > 4)
       return '-> ' . $dirs[$worker['type_arg']];
     $msg = $cols[$worker['y']] . ($worker['x']  + 1);

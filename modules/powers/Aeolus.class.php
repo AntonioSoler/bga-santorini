@@ -52,7 +52,7 @@ class Aeolus extends SantoriniPower
   
   public function getTokenSpace()
   {
-    return ['x' => 5, 'y' => 4, 'z' => 1];
+    return ['x' => 5, 'y' => 4, 'z' => 1, 'id' => $this->getToken()['id']];
   }
 
   public function argUsePower(&$arg)

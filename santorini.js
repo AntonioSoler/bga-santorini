@@ -1269,7 +1269,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
     
     usePowerAeolus: function (args) {
-      this._action = 'playerBuild';
+      this._action = 'tokenWind';
       this.makeWorkersSelectable(args.workers);
     },
     
@@ -1279,7 +1279,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     },
     
     placeSetupSiren: function (args) {
-      this._action = 'playerBuild';
+      this._action = 'tokenArrow';
       this.makeWorkersSelectable(args.workers);
     },
 
