@@ -692,10 +692,12 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 
 /* Bottom of avatar */
 .mini-card.power-25 .power-counter, /* Morpheus */
+.mini-card.power-31 .power-counter, /* Aeolus */
 .mini-card.power-32 .power-counter, /* Charybdis */
 .mini-card.power-33 .power-counter, /* Clio */
 .mini-card.power-34 .power-counter, /* Europa & Talus */
 .mini-card.power-35 .power-counter, /* Gaea */
+.mini-card.power-42 .power-counter, /* Siren */
 .mini-card.power-43 .power-counter, /* Tartarus */
 .mini-card.power-51 .power-counter  /* Jason */
 {
@@ -703,6 +705,14 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   top: 75px;
   left: 35px;
 }
+
+/* Wider, to fit wind/song direction */
+.mini-card.power-31 .power-counter, /* Aeolus */
+.mini-card.power-42 .power-counter /* Siren */
+{
+  width: 35px;
+}
+
 /* Tyche: on top of the deck */
 .mini-card.power-56 .power-counter {
   display: block;
