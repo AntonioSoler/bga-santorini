@@ -167,13 +167,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
           power.nameEnglish = power.name.split(" ")[0];
 
           // For HTML template: Translate text, add counter
+          // (must translate counter if it is a direction -- Aeolus, Siren)
           power.name = _(power.name);
           power.title = _(power.title);
           power.text = '<p>' + power.text.map(function (text) {
             return _(text).replace(/\[/g, '<b>').replace(/\]/g, '</b>');
           }).join('</p>\n<p>') + '</p>';
           power.type = power.hero ? 'hero' : '';
-          power.counter = power.counter || 0;
+          power.counter = _(power.counter || 0);
           power.playerCount = power.playerCount.join(', ');
           power.tooltipGolden = power.golden ? _('Golden Fleece') : '';
           power.tooltipPlayerCount = _('Supported player count');
@@ -473,10 +474,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         return;
       }
       this.notifqueue.setSynchronousDuration(n.args.duration || 10);
-      this.gamedatas.powers[n.args.powerId].counter = n.args.counter;
+      // (must translate counter if it is a direction -- Aeolus, Siren)
+      this.gamedatas.powers[n.args.powerId].counter = _(n.args.counter);
       var q = dojo.query('.mini-card.power-' + n.args.powerId + ' .power-counter');
       if (q.length > 0) {
-        q[0].textContent = n.args.counter;
+        q[0].textContent = this.gamedatas.powers[n.args.powerId].counter;
         // Restart the CSS animation
         q[0].style.animation = 'none';
         q[0].offsetWidth; // force repaint

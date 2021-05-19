@@ -39,12 +39,12 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getMsgCoords: return a string to log move/build in the following format: A4 -> A3
    */
-  public static function getMsgCoords($worker, $space = null)
+  public function getMsgCoords($worker, $space = null)
   {
     $cols = ['A', 'B', 'C', 'D', 'E'];
-    $dirs = [ '' , 'N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    if ($worker['y'] < 0 || $worker['y'] > 4 || $worker['x'] < 0 || $worker['x'] > 4)
-      return '-> ' . $dirs[$worker['type_arg']];
+    if ($worker['y'] < 0 || $worker['y'] > 4 || $worker['x'] < 0 || $worker['x'] > 4) {
+      return $this->game->directionNames[$worker['type_arg']];
+    }
     $msg = $cols[$worker['y']] . ($worker['x']  + 1);
     if ($space != null) {
       $msg .= ' -> ' . $cols[$space['y']] . ($space['x']  + 1);
