@@ -119,7 +119,7 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getPiecesByType: return all info about pieces of the given type
    */
-  public function getPiecesByType($type, $type_arg = null, $location = null)
+  public function getPiecesByType($type, $type_arg = null, $location = null, $playerId = null)
   {
     $sql = "SELECT *, (SELECT player_team FROM player WHERE player.player_id = piece.player_id) AS player_team FROM piece WHERE type = '$type'";
     if ($type_arg) {
@@ -127,6 +127,9 @@ class SantoriniBoard extends APP_GameClass
     }
     if ($location) {
       $sql .= " AND location = '$location'";
+    }
+    if ($playerId) {
+      $sql .= " AND player_id = $playerId";
     }
     $sql .= " ORDER BY id";
     return array_map('SantoriniBoard::addInfo', self::getObjectListFromDb($sql));
