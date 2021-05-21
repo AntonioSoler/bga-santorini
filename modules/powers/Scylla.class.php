@@ -19,6 +19,7 @@ class Scylla extends SantoriniPower
   }
 
   /* * */
+
   public function afterPlayerMove($worker, $work)
   {
     // Must use getPlacedOpponentWorkers() so Scylla cannot target Clio's invisible workers
@@ -32,16 +33,25 @@ class Scylla extends SantoriniPower
       }
     }
 
-    if(!empty($targets)){
-      $this->game->log->addAction("ScyllaTargets", [], ['workers' => $targets]);
+    if (!empty($targets)) {
+      $this->game->log->addAction("ScyllaTargets", [], ['space' => $space, 'workers' => $targets]);
     }
   }
 
   public function stateAfterMove()
   {
-    return is_null($this->game->log->getLastAction("ScyllaTargets"))? null : 'power';
+    $action = $this->game->log->getLastAction("ScyllaTargets");
+    if ($action != null) {
+      // Verify the space is actually empty (e.g., Charybdis may force Scylla back)
+      $acc = $this->game->board->getAccessibleSpaces('build');
+      Utils::filter($acc, function ($space) use ($action) {
+        return ($space['x'] == $action['space']['x'] && $space['y'] == $action['space']['y']);
+      });
+      if (count($acc) > 0) {
+        return 'power';
+      }
+    }
   }
-
 
   public function argUsePower(&$arg)
   {
@@ -51,7 +61,6 @@ class Scylla extends SantoriniPower
     $action = $this->game->log->getLastAction("ScyllaTargets");
     $arg['workers'] = $action['workers'];
   }
-
 
   public function usePower($action)
   {
