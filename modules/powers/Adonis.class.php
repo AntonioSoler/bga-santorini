@@ -108,9 +108,12 @@ class Adonis extends SantoriniHeroPower
     }
 
     $test = ['workers' => $arg['workers']];
-    Utils::filterWorkersById($test, $powerData['oppWorker']['id']);
+    $already = $this->game->board->isNeighbour($powerData['adonisWorker'], $powerData['oppWorker']);
+    if (!$already) {
+      Utils::filterWorkersById($test, $powerData['oppWorker']['id']);
+    }
     Utils::filterWorks($test, function ($space, $worker) use ($powerData) {
-      return $this->game->board->isNeighbour($powerData['adonisWorker'], $space);
+      return $worker['id'] != $powerData['oppWorker']['id'] || $this->game->board->isNeighbour($powerData['adonisWorker'], $space);
     });
     if (empty($test['workers'])) {
       // Notify
@@ -129,7 +132,7 @@ class Adonis extends SantoriniHeroPower
       // Allow skip only if condition is already satisfied
       $arg['workers'] = $test['workers'];
       if ($arg['skippable']) {
-        $arg['skippable'] = $arg['skippable'] && $this->game->board->isNeighbour($powerData['adonisWorker'], $powerData['oppWorker']);
+        $arg['skippable'] = $arg['skippable'] && $already;
       }
     }
   }
