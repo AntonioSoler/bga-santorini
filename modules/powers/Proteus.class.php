@@ -21,6 +21,7 @@ class Proteus extends SantoriniPower
   }
 
   /* * */
+
   public function setup()
   {
     $this->getPlayer()->addWorker('m');
@@ -28,9 +29,18 @@ class Proteus extends SantoriniPower
 
   public function stateAfterMove()
   {
-    return count($this->game->board->getPlacedWorkers($this->playerId)) > 1 ? 'power' : null;
+    if (count($this->game->board->getPlacedWorkers($this->playerId)) > 1) {
+      // Verify the space is actually empty (e.g., Charybdis may force Proteus back)
+      $move = $this->game->log->getLastMove();
+      $acc = $this->game->board->getAccessibleSpaces('build');
+      Utils::filter($acc, function ($space) use ($move) {
+        return ($space['x'] == $move['from']['x'] && $space['y'] == $move['from']['y']);
+      });
+      if (count($acc) > 0) {
+        return 'power';
+      }
+    }
   }
-
 
   public function argUsePower(&$arg)
   {
@@ -46,7 +56,6 @@ class Proteus extends SantoriniPower
     }
     $arg['workers'] = $workers;
   }
-
 
   public function usePower($action)
   {
