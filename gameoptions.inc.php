@@ -157,13 +157,16 @@ $game_options = [
     'values' => [
       QUICK => [
         'name' => totranslate('Quick Setup'),
+        'tmdisplay' => totranslate('Quick Setup'),
       ],
       LIMITED => [
         'name' => totranslate('Limited Choice'),
+        'tmdisplay' => totranslate('Limited Choice'),
         'description' => totranslate('First player chooses available powers from a limited set'),
       ],
       FULL => [
         'name' => totranslate('Full Choice'),
+        'tmdisplay' => totranslate('Full Choice'),
         'description' => totranslate('First player chooses available powers from the complete set'),
       ],
     ],
