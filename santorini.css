@@ -253,7 +253,7 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
   padding-top: 1px;
 }
 
-.power-container .mini-card .power-avatar {
+.power-avatar {
   position: absolute;
   width: 65px;
   height: 67px;
@@ -961,7 +961,11 @@ div#popin_chooseArg_contents div.arg-prompt.arg-3 {
 .power-29 .power-avatar { background-image:url('img/avatars/029.png'); }
 .power-30 .power-avatar { background-image:url('img/avatars/030.png'); }
 .power-31 .power-avatar { background-image:url('img/avatars/031.png'); }
-.power-32 .power-avatar { background-image:url('img/avatars/032.png'); }
+.power-32 .power-avatar {
+  background-image: url('img/avatars/032.png');
+  background-size: 180%;
+  background-position: 50% 75%;
+}
 .power-33 .power-avatar { background-image:url('img/avatars/033.png'); }
 .power-34 .power-avatar { background-image:url('img/avatars/034.png'); }
 .power-35 .power-avatar { background-image:url('img/avatars/035.png'); }
