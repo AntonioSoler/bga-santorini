@@ -36,11 +36,13 @@ const hoveringColor = 0x000000;
 const highlightColor = 0x0012AA;
 
 const lvlHeights = [0, 1.24, 2.44, 3.18];
-const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5": -5.2 };
-const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -5.2 };
+const xCenters = { "-1": 6.1, 0: 4.2, 1: 2.12, 2: -0.04, 3: -2.12, 4: -4.2, "5": -6.2 };
+const zCenters = { "-1": 6.1, 0: 4.15, 1: 2.13, 2: 0, 3: -2.12, 4: -4.2, "5": -6.2 };
 const startPos = new THREE.Vector3(40, 24, 0);
 const enterPos = new THREE.Vector3(20, 28, 0);
 const lookAt = new THREE.Vector3(0, -1.5, 0);
+
+const opacityExtTokens = 0.52
 
 var Board = function (container, url) {
 	console.info("Creating board");
@@ -303,6 +305,14 @@ Board.prototype.initCoordsHelpers = function () {
 		textMesh.position.set(xCenters[i], 0.01, zCenters[0] + 1.6);
 		this._scene.add(textMesh);
 	}
+	
+	// North
+	var north = ['N', String.fromCharCode(8593)]; //upwards arrow
+	for (var i = 0; i < 2; i++) {
+		var textMesh = this.computeText(north[i], i*1.2)
+		textMesh.position.set(xCenters[1]-i*1.2, 0.01, zCenters[4] - 1.6-i*0.12);
+		this._scene.add(textMesh);
+	}
 };
 
 Board.prototype.showCoordsHelpers = function () {
@@ -519,7 +529,13 @@ Board.prototype.raycasting = function (hover) {
 				this._hover = intersectObj;
 				var marker = intersectObj.children[0];
 				this._originalHex = marker.material.color.getHex();
-				marker.material.color.setHex(hoveringColor);
+				if (marker.material.opacity == opacityExtTokens){
+				  marker.material.emissive.setHex(0x333333); // for Aeolus and Siren tokens
+				}
+				else
+				{
+				  marker.material.color.setHex(hoveringColor);
+				}
 				if (intersectObj.piece != null) {
 					intersectObj.piece.material.emissive.setHex(0x333333);
 				}
@@ -549,6 +565,7 @@ Board.prototype.clearHovering = function (intersectObj) {
 	this._renderNeedUpdate = true;
 	var marker = this._hover.children[0];
 	marker.material.color.setHex(this._originalHex);
+	marker.material.emissive.setHex(0x000000);
 	if (this._hover.piece != null) {
 		this._hover.piece.material.emissive.setHex(0x000000);
 	}
@@ -607,8 +624,9 @@ Board.prototype.makeClickable = function (objects, callback, action) {
 			piece.clickableMesh = transparent;
 
 			// Circle unerneath selected worker
+			var radius = (o.x == 5 && o.y == 4) ? .9 : 0.728; // hack to target Aeolus
 			marker = new THREE.Mesh(
-				new THREE.CircleGeometry(0.728, 32).rotateX(-Math.PI / 2),
+				new THREE.CircleGeometry(radius, 32).rotateX(-Math.PI / 2),
 				new THREE.MeshPhysicalMaterial({ color: color, opacity: 0.7, transparent: true, side: THREE.DoubleSide, })
 			);
 		} else if (action == "playerBuild") {
@@ -617,6 +635,14 @@ Board.prototype.makeClickable = function (objects, callback, action) {
 				new THREE.PlaneBufferGeometry(1.4, 1.4).rotateX(-Math.PI / 2),
 				new THREE.MeshPhysicalMaterial({ color: color, opacity: 0.5, transparent: true, side: THREE.DoubleSide, })
 			);
+		} else if (action == "tokenWind" || action == "tokenArrow") {
+			// Token with orientation
+    	marker = this._meshManager.createMesh(action);
+    	var orientations = [7,0,1,6,-1,2,5,4,3];
+    	var orientation = orientations[((o.x+1))+(o.y+1)/3];
+      var theta = orientation * Math.PI/4+Math.PI/8
+      marker.rotation.set(0, theta, 0);
+      marker.material.opacity = opacityExtTokens;
 		} else {
 			// Ring on space for move
 			marker = new THREE.Mesh(

@@ -787,6 +787,36 @@ class PowerManager extends APP_GameClass
 
 
   /*
+   * argPlaceSetup: is called when a player may perform a setup
+   */
+  public function argPlaceSetup(&$arg)
+  {
+    $this->applyPower(["argPlaceSetup"], [&$arg]);
+    Utils::cleanWorkers($arg);
+  }
+
+  /*
+   *placeSetup: is called when a player wants to setup
+   */
+  public function placeSetup($powerId, $action)
+  {
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    foreach ($player->getPowers() as $power) {
+      if ($power->getId() == $powerId) {
+        $power->placeSetup($action);
+      }
+    }
+  }
+
+  public function stateAfterPlaceSetup()
+  {
+    return $this->getNewState("stateAfterPlaceSetup");
+  }
+
+
+
+  /*
    * argPlaceWorker: is called when a player has to place a worker
    */
   public function argPlaceWorker(&$arg)

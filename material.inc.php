@@ -80,6 +80,17 @@ $this->colorNames = [
   PURPLE => clienttranslate('purple'),
 ];
 
+$this->directionNames = [
+  N => clienttranslate('N'),
+  NE => clienttranslate('NE'),
+  E => clienttranslate('E'),
+  SE => clienttranslate('SE'),
+  S => clienttranslate('S'),
+  SW => clienttranslate('SW'),
+  W => clienttranslate('W'),
+  NW => clienttranslate('NW'),
+];
+
 $this->levelNames = [
   0 => clienttranslate('ground level'),
   1 => clienttranslate('level 1'),
@@ -98,4 +109,6 @@ $this->pieceNames = [
   'tokenCoin' => clienttranslate('a Coin Token'),
   'tokenAbyss' => clienttranslate('the Abyss Token'),
   'tokenWhirlpool' => clienttranslate('a Whirlpool Token'),
+  'tokenWind' => clienttranslate('the Wind Token'),
+  'tokenArrow' => clienttranslate('the Arrow Token'),
 ];

@@ -110,6 +110,10 @@ define('TITANS', 120);
 define('ST_BGA_GAME_SETUP', 1);
 define('ST_NEXT_PLAYER_PLACE_WORKER', 3);
 define('ST_PLACE_WORKER', 4);
+
+define('ST_NEXT_PLAYER_PLACE_SETUP', 33);
+define('ST_PLACE_SETUP', 34);
+
 define('ST_NEXT_PLAYER', 5);
 define('ST_MOVE', 6);
 define('ST_BUILD', 7);

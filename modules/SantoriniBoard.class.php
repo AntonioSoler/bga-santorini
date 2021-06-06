@@ -39,9 +39,12 @@ class SantoriniBoard extends APP_GameClass
   /*
    * getMsgCoords: return a string to log move/build in the following format: A4 -> A3
    */
-  public static function getMsgCoords($worker, $space = null)
+  public function getMsgCoords($worker, $space = null)
   {
     $cols = ['A', 'B', 'C', 'D', 'E'];
+    if ($worker['y'] < 0 || $worker['y'] > 4 || $worker['x'] < 0 || $worker['x'] > 4) {
+      return $this->game->directionNames[$worker['type_arg']];
+    }
     $msg = $cols[$worker['y']] . ($worker['x']  + 1);
     if ($space != null) {
       $msg .= ' -> ' . $cols[$space['y']] . ($space['x']  + 1);
@@ -582,6 +585,8 @@ class SantoriniBoard extends APP_GameClass
   public function setPieceAt($piece, $space, $location = 'board')
   {
     self::DbQuery("UPDATE piece SET location = '$location', x = {$space['x']}, y = {$space['y']}, z = {$space['z']} WHERE id = {$piece['id']}");
+    if (array_key_exists('type_arg', $piece))
+      self::DbQuery("UPDATE piece SET type_arg = '{$piece['type_arg']}' WHERE id = {$piece['id']}"); // for Wind and Arrow tokens directions
   }
 
   /*

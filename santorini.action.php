@@ -119,6 +119,23 @@ class action_santorini extends APP_GameAction
   }
 
 
+  public function placeSetup()
+  {
+    self::setAjaxMode();
+    $this->game->checkAction('placeSetup');
+    $powerId = (int) self::getArg('powerId', AT_posint, true);
+    $workerId = (int) self::getArg('workerId', AT_posint, true);
+    $x = (int) self::getArg('x', AT_int, true);
+    $y = (int) self::getArg('y', AT_int, true);
+    $z = (int) self::getArg('z', AT_posint, true);
+    $arg = self::getArg('arg', AT_int, false, null);
+    if ($arg != null) {
+      $arg = (int) $arg;
+    }
+    $this->game->placeSetup($powerId, $x, $y, $z);
+    self::ajaxResponse();
+  }
+
 
   /*
    * TODO
