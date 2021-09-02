@@ -469,7 +469,6 @@ class santorini extends Table
     Utils::cleanWorkers($arg);
     
     if (count($arg['workers']) == 0) {
-      $pId = $this->activeNextPlayer();
       $this->gamestate->nextState('skip');
       return;
     }
