@@ -110,6 +110,12 @@ class Gaea extends SantoriniPower
 
     $powerData = $this->getPowerData();
     $worker = $this->game->board->getPiece($powerData['activeWorkerId']);
+    if ($worker['location'] == 'secret')
+    {
+        $worker['location'] = 'dummy'; // the js displays secret workers by default
+        $worker['type'] = '';
+        $worker['x'] = $worker['y'] = $worker['z'] = []; // remove any secret info transmitted
+    }
     $worker['works'] = $powerData['works'];
     $arg['workers'] = [$worker];
   }
