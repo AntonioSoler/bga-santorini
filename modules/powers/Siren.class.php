@@ -14,7 +14,7 @@ class Siren extends SantoriniPower
       clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2, 3, 4];
-    $this->golden  = true;
+    $this->golden  = false;
     $this->orderAid = 44;
     
 

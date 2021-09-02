@@ -15,7 +15,7 @@ class Aeolus extends SantoriniPower
       clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2, 3, 4];
-    $this->golden  = true;
+    $this->golden  = false;
     $this->orderAid = 56;
 
     $this->implemented = true;
