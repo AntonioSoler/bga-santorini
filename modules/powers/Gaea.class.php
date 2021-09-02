@@ -35,7 +35,7 @@ class Gaea extends SantoriniPower
 
   public function getExtraWorkers()
   {
-    return $this->game->board->getPiecesByType('worker', null, 'hand');
+    return $this->game->board->getPiecesByType('worker', null, 'hand', $this->playerId);
   }
 
   public function getUiData()
