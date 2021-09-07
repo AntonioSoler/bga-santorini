@@ -189,7 +189,7 @@ class Siren extends SantoriniPower
   public function argPlayerBuild(&$arg)
   {
     // No power use -> normal rule
-    if (count($this->game->log->getLastActions(['force'])) == 0) {
+    if (count($this->game->log->getLastActions(['move'])) > 0) {
       return;
     }
 
