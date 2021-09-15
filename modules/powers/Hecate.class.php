@@ -112,6 +112,13 @@ class Hecate extends SantoriniPower
     return null;
   }
 
+  // Used when an opponent makes an illegal action during our turn (Gaea)
+  // For Gaea's interaction, we can simply cancel the remainder of the current turn
+  public function endPlayerTurn()
+  {
+    return $this->endOpponentTurn();
+  }
+
 
   // check if the turn was legal based on Hecate power, and cancel the last actions if necessary
   // parameter: for Maenads
