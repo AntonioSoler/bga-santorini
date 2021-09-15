@@ -152,8 +152,9 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addPlaceWorker($worker, $this);
 
     // Notify
+    // (must translate coords if it is a direction -- Aeolus, Siren)
     $this->game->notifyAllPlayers('workerPlaced', $this->game->msg['powerPlacePiece'], [
-      'i18n' => ['power_name', 'piece_name'],
+      'i18n' => ['power_name', 'piece_name', 'coords'],
       'piece' => $worker,
       'piece_name' => $this->game->pieceNames[$worker['type']],
       'power_name' => $this->getName(),
@@ -171,9 +172,10 @@ abstract class SantoriniPower extends APP_GameClass
     $this->game->log->addPlaceToken($token, $this, $stats);
 
     // Notify
+    // (must translate coords if it is a direction -- Aeolus, Siren)
     $args = [
       'redacted' => true,
-      'i18n' => ['power_name', 'piece_name'],
+      'i18n' => ['power_name', 'piece_name', 'coords'],
       'piece' => $token,
       'piece_name' => $this->game->pieceNames[$token['type']],
       'power_name' => $this->getName(),
@@ -221,6 +223,20 @@ abstract class SantoriniPower extends APP_GameClass
 
   public function setup()
   {
+  }
+
+
+  public function argPlaceSetup(&$arg)
+  {
+  }
+
+  public function placeSetup($action)
+  {
+  }
+
+  public function stateAfterPlaceSetup()
+  {
+    return 'done';
   }
 
   public function argChooseFirstPlayer(&$arg)

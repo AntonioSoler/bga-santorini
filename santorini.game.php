@@ -433,6 +433,94 @@ class santorini extends Table
   }
 
 
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+  ////////      Power Setup      ////////
+  ///////////////////////////////////////
+  ///////////////////////////////////////
+
+  /*
+   * stNextPlayerPlaceSetup:
+   *   if the active player has no more setup, go to next player
+   *   if every player is done with setup, go to worker placement
+   */
+  public function stNextPlayerPlaceSetup()
+  {
+    $count = count($this->log->getAllActions(['powerSetup']));
+    $firstTime = ($count == 0);
+    $this->log->addAction('powerSetup');
+    // First switch to first player if first time else get next player
+    if ($firstTime) {
+      $this->gamestate->changeActivePlayer($this->getGameStateValue('firstPlayer'));
+    }
+    else
+      $this->activeNextPlayer();
+    
+    
+    $lastTime = ($count >= count($this->playerManager->getPlayers()));
+    if ($lastTime)
+    {
+       $this->gamestate->nextState('done');      
+       return;
+    }
+
+    // Get if this power needs a setup
+    $arg = $this->argPlaceSetup();
+    Utils::cleanWorkers($arg);
+    
+    if (count($arg['workers']) == 0) {
+      $this->gamestate->nextState('skip');
+      return;
+    }
+    
+    $pId = self::getActivePlayerId();
+    self::giveExtraTime($pId);
+    $this->gamestate->nextState('next');
+  }
+
+
+  /*
+   * argPlaceSetup: 
+   */
+  public function argPlaceSetup()
+  {
+    $pId = self::getActivePlayerId();
+    
+    $empty = [
+      'id' => 0,
+      'playerId' => $pId,
+      'works' => []
+    ];
+    $arg = ['workers' => [$empty]];
+
+    // Apply powers if a setup is needed (Siren)
+    $this->powerManager->argPlaceSetup($arg);
+    return $arg;
+  }
+
+
+  /*
+   * placeSetup: 
+   */
+  public function placeSetup($powerId, $x, $y, $z)
+  {    
+    // Check the power and the work
+    $args = $this->gamestate->state()['args'];
+    if ($args['power'] != $powerId) {
+      throw new BgaUserException(_("You can't use this power setup"));
+    }
+    $work = Utils::checkWork($args, null, $x, $y, $z, null);
+
+    // Use power setup
+    $this->powerManager->placeSetup($powerId, [$work]);
+
+    $state = $this->powerManager->stateAfterPlaceSetup();
+    if ($state == null) {
+      throw new BgaVisibleSystemException("stateAfterPlaceSetup: Missing next state");
+    }
+    $this->gamestate->nextState($state);
+  }
+  
 
   ///////////////////////////////////////
   ///////////////////////////////////////

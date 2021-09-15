@@ -129,7 +129,7 @@ $machinestates = [
     'action' => 'stPowersNextPlayerChoose',
     'transitions' => [
       'next' => ST_POWERS_CHOOSE,
-      'done' => ST_NEXT_PLAYER_PLACE_WORKER,
+      'done' => ST_NEXT_PLAYER_PLACE_SETUP,
     ],
   ],
 
@@ -143,6 +143,36 @@ $machinestates = [
     'transitions' => [
       'zombiePass' => ST_GAME_END,
       'done' => ST_POWERS_NEXT_PLAYER_CHOOSE,
+    ],
+  ],
+
+
+
+  ST_NEXT_PLAYER_PLACE_SETUP => [
+    'name' => 'nextPlayerPlaceSetup',
+    'description' => '',
+    'type' => 'game',
+    'action' => 'stNextPlayerPlaceSetup',
+    'transitions' => [
+      'zombiePass' => ST_NEXT_PLAYER_PLACE_SETUP,
+      'next' => ST_PLACE_SETUP,
+      'skip' => ST_NEXT_PLAYER_PLACE_SETUP,
+      'done' => ST_NEXT_PLAYER_PLACE_WORKER,
+    ],
+    'updateGameProgression' => true,
+  ],
+
+  ST_PLACE_SETUP => [
+    'name' => 'playerPlaceSetup',
+    'description' => clienttranslate('${actplayer} must perform his/her power setup'),
+    'descriptionmyturn' => clienttranslate('${you} must perform your power setup'),
+    'type' => 'activeplayer',
+    'args' => 'argPlaceSetup',
+    'possibleactions' => ['placeSetup'],
+    'transitions' => [
+      'zombiePass' => ST_NEXT_PLAYER_PLACE_SETUP,
+      'done' => ST_NEXT_PLAYER_PLACE_SETUP,
+      'setup' => ST_PLACE_SETUP,
     ],
   ],
 
