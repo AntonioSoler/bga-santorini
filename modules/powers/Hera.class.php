@@ -38,10 +38,32 @@ class Hera extends SantoriniPower
     // Stop the win
     $arg['win'] = false;
     $arg['winStats'] = [[$this->playerId, 'usePower']];
-    $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} cannot win by moving into a perimeter space'), [
-      'i18n' => ['power_name'],
-      'power_name' => $this->getName(),
-      'player_name' => $this->game->getActivePlayerName(),
-    ]);
+    
+    
+    // Hecate: do not reveal opponent location
+    $opponent = $this->game->playerManager->getPlayer($arg['pId']);
+    $hecate = false;
+    $powers = $opponent->getPowers();
+    foreach ($powers as $power) {
+    if ($power->getId() == HECATE) {
+      $hecate = true;
+      break;
+    }
+    }
+    
+    if ($hecate){
+      $this->game->notifyPlayer($arg['pId'], 'message', clienttranslate('${power_name}: ${player_name} cannot win by moving into a perimeter space'), [
+          'i18n' => ['power_name'],
+          'power_name' => $this->getName(),
+          'player_name' => $this->game->getActivePlayerName(),
+        ]);
+    }
+    else{
+      $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name} cannot win by moving into a perimeter space'), [
+        'i18n' => ['power_name'],
+        'power_name' => $this->getName(),
+        'player_name' => $this->game->getActivePlayerName(),
+        ]);
+    }
   }
 }
