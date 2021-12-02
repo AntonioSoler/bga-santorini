@@ -34,6 +34,9 @@ class Maenads extends SantoriniPower
             if ($power->getId() == HECATE && $power->endOpponentTurn(true)) {
               return;
             }
+            if ($power->getId() == TARTARUS && $power->checkTurn(false) != null) {
+              return;
+            }
           }
 
           $stats = [[$this->playerId, 'usePower']];
