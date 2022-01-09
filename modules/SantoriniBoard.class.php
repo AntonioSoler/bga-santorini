@@ -238,7 +238,27 @@ class SantoriniBoard extends APP_GameClass
    */
   public function getPlacedActiveWorkers($type = null)
   {
-    return $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds(), false, $type);
+    $workers = $this->getPlacedWorkers($this->game->playerManager->getTeammatesIds(), false, $type);
+    
+    $allPowerIds = $this->game->powerManager->getPowerIdsInLocation('hand');
+    $tokensXY = array_merge();
+    
+    if (in_array(EUROPA, $allPowerIds)) {
+    // Europa: Workers on top of Talus are invisible
+        $tokensXY_e = array_map(function ($token) {
+          return [intval($token['x']), intval($token['y'])];
+        }, $this->getPiecesByType('tokenTalus', null, 'board'));
+        $tokensXY = array_merge($tokensXY, $tokensXY_e);
+    }
+    
+    if (!empty($tokensXY)) {
+      Utils::filterWorkers($workers, function ($worker) use ($tokensXY) {
+        return !in_array([intval($worker['x']), intval($worker['y'])], $tokensXY);
+      });
+    }
+    
+    return $workers;
+    
   }
 
   /*
@@ -250,17 +270,32 @@ class SantoriniBoard extends APP_GameClass
   public function getPlacedOpponentWorkers($pId = null, $lookSecret = false)
   {
     $workers = $this->getPlacedWorkers($this->game->playerManager->getOpponentsIds($pId), $lookSecret);
-
+    
+    $allPowerIds = $this->game->powerManager->getPowerIdsInLocation('hand');
+    
+    $tokensXY = array_merge();
+    
+    if (in_array(CLIO, $allPowerIds)) {
     // Clio: Workers on top of a coin are invisible to opponents
-    $tokensXY = array_map(function ($token) {
-      return [intval($token['x']), intval($token['y'])];
-    }, $this->getPiecesByType('tokenCoin', null, 'board'));
+        $tokensXY = array_map(function ($token) {
+          return [intval($token['x']), intval($token['y'])];
+        }, $this->getPiecesByType('tokenCoin', null, 'board'));
+    }
+    
+    if (in_array(EUROPA, $allPowerIds)) {
+    // Europa: Workers on top of Talus are invisible
+        $tokensXY_e = array_map(function ($token) {
+          return [intval($token['x']), intval($token['y'])];
+        }, $this->getPiecesByType('tokenTalus', null, 'board'));
+        $tokensXY = array_merge($tokensXY, $tokensXY_e);
+    }
+    
     if (!empty($tokensXY)) {
       Utils::filterWorkers($workers, function ($worker) use ($tokensXY) {
         return !in_array([intval($worker['x']), intval($worker['y'])], $tokensXY);
       });
     }
-
+    
     return $workers;
   }
 
