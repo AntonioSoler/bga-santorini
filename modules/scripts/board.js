@@ -479,8 +479,9 @@ Board.prototype.moveMesh = function (mesh, space, delay, animation) {
 Board.prototype.movePiece = function (piece, space, delay, animation) {
 	// Update location on (abstract) board
 	var mesh = this._ids[piece.id];
-	mesh.space = { x: space.x, y: space.y, z: space.z };
 	this.moveMesh(mesh, space, delay, animation);
+	// update mesh space after moving so that moving a token (Talus) gets the correct z value, and not an extra token
+	mesh.space = { x: space.x, y: space.y, z: space.z };
 };
 
 
