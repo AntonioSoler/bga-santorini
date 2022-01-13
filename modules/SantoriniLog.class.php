@@ -459,9 +459,10 @@ class SantoriniLog extends APP_GameClass
     if ($this->game->powerManager->hasPower(GAEA) &&  $this->game->gamestate->state()['name'] == 'playerUsePower') {
       return false;
     }
-    return !empty($this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']));
+    
+    $logs = $this->logsForCancelTurn(['startTurn', 'morpheusStart', 'blockedWorker', 'forcedWorkers']);
+    return !(empty($logs) or $logs[0]['action'] == 'switchPlayer');
   }
-
   // stop at $logIdBreak (for Hecate)
   public function cancelTurn($logIdBreak = null)
   {
@@ -499,6 +500,9 @@ class SantoriniLog extends APP_GameClass
       } else if ($log['action'] == 'placeWorker' || $log['action'] == 'placeToken') {
         // Place worker : remove the worker
         self::DbQuery("UPDATE piece SET x = null, y = null, z = null, location = '" . $args['location'] . "' WHERE id = {$log['piece_id']}");
+      }
+       else if ($log['action'] == 'switchPlayer'){
+        break; 
       }
 
       if (array_key_exists('stats', $args)) {

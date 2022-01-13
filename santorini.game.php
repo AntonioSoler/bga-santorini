@@ -678,7 +678,12 @@ class santorini extends Table
    */
   public function confirmTurn()
   {
-    $this->gamestate->nextState('confirm');
+    if ($this->getGameStateValue('switchState') > 0){
+        $this->gamestate->nextState('switch');
+    }
+    else {
+        $this->gamestate->nextState('confirm');
+    }
   }
 
   /*
@@ -686,8 +691,25 @@ class santorini extends Table
    */
   public function stPreEndOfTurn()
   {
+    
+    $logs = $this->log->logsForCancelTurn();
+    $autoConfirm = False;
+    foreach ($logs as $log) {
+        if ($log['action'] == 'stats'){
+          continue;
+        }
+        if ($log['action'] == 'switchPlayer'){
+          $autoConfirm = True;
+        }
+        break;
+    }
+  
     // Apply power
     $this->powerManager->preEndOfTurn();
+    
+    if ($autoConfirm){
+        $this->confirmTurn();
+    }
   }
 
   /*
@@ -1135,8 +1157,34 @@ class santorini extends Table
 
     // Apply power
     if ($moveId == null) {
-      $this->gamestate->nextState('cancel');
+    
+        $logs = $this->log->logsForCancelTurn();
+        $wasSwitched = False;
+        foreach ($logs as $log) {
+            if ($log['action'] == 'switchPlayer'){
+              $wasSwitched = True;
+            }
+            break;
+        }
+        
+        if ($wasSwitched) {
+          $next = $this->powerManager->stateAfterPlayerBuild() ?: 'done';
+          // Translate ambiguous state names for "build" context
+          if ($next == 'done' || $next == 'skip') {
+            $next = 'endturn';
+          }
+          if ($next == null) {
+            throw new BgaVisibleSystemException("cancelPreviousWorks: Missing next state");
+          }
+          $this->gamestate->nextState($next);
+        }
+        else{
+          $this->gamestate->nextState('cancel');
+        }
     }
+    
+    
+    
 
     // Update player panel UI
     $this->updateUIAllPlayers();

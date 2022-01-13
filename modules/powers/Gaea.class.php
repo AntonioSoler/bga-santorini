@@ -139,6 +139,7 @@ class Gaea extends SantoriniPower
       // Opponent becomes active again
       $this->game->setGamestateValue('switchPlayer', $powerData['activePlayerId']);
       $this->game->setGamestateValue('switchState', ST_BUILD);
+      $this->game->log->addAction('switchPlayer');
       return 'switch';
     }
   }
