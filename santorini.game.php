@@ -1056,9 +1056,9 @@ class santorini extends Table
 
 
   /*
-   * stBeforeWork: Check if a work is possible/skippable, otherwise lose
+   * stBeforeAction: Check if the game is already over, or if a work is possible/skippable, otherwise lose
    */
-  public function stBeforeWork()
+  public function stBeforeAction()
   {
     $end = $this->stCheckEndOfGame();
     if ($end['win']) {
@@ -1070,8 +1070,11 @@ class santorini extends Table
     }
 
     $state = $this->gamestate->state();
-    // TODO: apply power before work ?
-
+    
+    if ($state['name'] == 'playerUsePower'){
+        return;
+    }
+    
     // No move or build => loose unless skippable or cancelable
     if (count($state['args']['workers']) == 0) {
       if ($state['args']['skippable']) {
