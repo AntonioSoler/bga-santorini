@@ -22,6 +22,16 @@ class Harpies extends SantoriniPower
 
   public function afterOpponentMove($worker, $work)
   {
+    // do nothing if someone already won
+    $end = $this->game->stCheckEndOfGame();
+    if ($end['win']) {
+      return;
+    } else if ($end['cancelTurn']) {
+      // Hecate cancels the rest of the turn because of a failed win attempt
+      $this->game->gamestate->nextState('cancelTurn');
+      return;
+    }
+    
     // Don't use getPlacedOpponentWorkers() because the power applies to Clio
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
     Utils::filterWorkersById($myWorkers, $worker['id']);

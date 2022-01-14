@@ -112,7 +112,6 @@ class PowerManager extends APP_GameClass
     [HADES, PAN],
     [HARPIES, HERMES],
     [HARPIES, MAENADS],
-    [HARPIES, TARTARUS], // until "forces after win" are deleted
     [HARPIES, TRITON],
     [HECATE, DIONYSUS],
     [HECATE, MEDEA],
@@ -186,6 +185,7 @@ class PowerManager extends APP_GameClass
     [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
     [HECATE, ERIS],
     [HECATE, IRIS], // can jump over secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
+    [HECATE, PROTEUS], // same niche issue as Iris: Proteus should be allowed to pass a turn if he moves into Hecate even if he cannot move after
     [HECATE, NEMESIS],
     [HECATE, NYX], // too confusing for the moment
     [HECATE, SIREN],
