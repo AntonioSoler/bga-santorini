@@ -83,6 +83,17 @@ class Proteus extends SantoriniPower
 
   public function stateAfterUsePower()
   {
+    $move = $this->game->log->getLastMove();
+    
+    $worker = $this->game->board->getPiece($move['pieceId']);
+    $worker['x'] = $move['from']['x'];
+    $worker['y'] = $move['from']['y'];
+    $worker['z'] = $move['from']['z'];
+    $work = $move['to'];
+    
+    $this->game->powerManager->applyPower(["afterTeammateMove", "afterOpponentMove"], [$worker, $work]);
+  
     return 'build';
   }
+  
 }

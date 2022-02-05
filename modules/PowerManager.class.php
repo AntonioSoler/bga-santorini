@@ -741,6 +741,9 @@ class PowerManager extends APP_GameClass
     $playerId = $this->game->getActivePlayerId();
     $player = $this->game->playerManager->getPlayer($playerId);
     $method = array_shift($methods);
+    
+    $ProteusOrScylla = False;
+    
     foreach ($player->getPowers() as $power) {
       // Circe: Removed powers are still in this loop
       // For example, prevent startPlayerTurn() after Circe returns Morpheus
@@ -748,7 +751,21 @@ class PowerManager extends APP_GameClass
         continue;
       }
       call_user_func_array([$power, $method], $arg);
+      
+      if ($power->getId() == PROTEUS or $power->getId() == SCYLLA){
+        $ProteusOrScylla = True;
+      }
     }
+    
+    
+    // finish here for Proteus and Scylla if the current state is 'move', these functions will be called in the state "usePower"
+
+    $stateName = $this->game->gamestate->state()['name'];
+    
+    if ($ProteusOrScylla and $stateName == 'playerMove'){
+      return;
+    }
+    
 
     // Then apply teammate power(s) if needed
     if (count($methods) > 1) {
@@ -762,7 +779,7 @@ class PowerManager extends APP_GameClass
 
     // Then apply opponent power(s) if needed
     if (!empty($methods)) {
-      $method = array_shift($methods);
+      $method = array_shift($methods);      
       foreach ($this->game->playerManager->getOpponents($playerId) as $opponent) {
         foreach ($opponent->getPowers() as $power) {
           call_user_func_array([$power, $method], $arg);
