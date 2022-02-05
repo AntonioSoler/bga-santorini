@@ -109,6 +109,19 @@ class Gaea extends SantoriniPower
     $arg['skippable'] = true;
 
     $powerData = $this->getPowerData();
+    
+    // hotfix for bugged tables where Gaea cannot skip her power
+    if ($powerData == null){
+    
+        $empty = [
+          'id' => 0,
+          'playerId' => $this->playerId,
+          'works' => []
+        ];
+        $arg['workers'] = [$empty];
+        return;
+    }
+    
     $worker = $this->game->board->getPiece($powerData['activeWorkerId']);
     if ($worker['location'] == 'secret')
     {
@@ -132,12 +145,18 @@ class Gaea extends SantoriniPower
   public function stateAfterUsePower()
   {
     $powerData = $this->getPowerData(false);
-    if ($powerData['activePlayerId'] == $this->playerId) {
+    if ($powerData != null and $powerData['activePlayerId'] == $this->playerId) {
       // Gaea ends turn normally
       return 'endturn';
     } else {
       // Opponent becomes active again
-      $this->game->setGamestateValue('switchPlayer', $powerData['activePlayerId']);
+      if ($powerData == null){
+        $opponentId = $this->game->playerManager->getOpponentsIds($this->playerId)[0]; // hotfix for bugged tables where Gaea is not able to skip her power
+      }
+      else{
+        $opponentId = $powerData['activePlayerId'];
+      }
+      $this->game->setGamestateValue('switchPlayer', $opponentId);
       $this->game->setGamestateValue('switchState', ST_BUILD);
       $this->game->log->addAction('switchPlayer');
       return 'switch';

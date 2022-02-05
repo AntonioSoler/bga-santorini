@@ -1157,6 +1157,11 @@ class santorini extends Table
         'moveIds' => $moveIds,
       ]);
     }
+    
+    // reset future planned switches
+    
+    $this->setGamestateValue('switchState', 0);
+    
 
     // Apply power
     if ($moveId == null) {
