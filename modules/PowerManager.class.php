@@ -754,10 +754,12 @@ class PowerManager extends APP_GameClass
       call_user_func_array([$power, $method], $arg);
       
       if (($power->getId() == PROTEUS or $power->getId() == SCYLLA)  and $stateName == 'playerMove' ){
-        $argdummy = ['workers' => []];
-        $power->argUsePower($argdummy);
-        if (!empty($argdummy['workers'])){
-            $ProteusOrScylla = True;
+        if (in_array("afterOpponentMove", $methods) ){
+            $argdummy = ['workers' => []];
+            $power->argUsePower($argdummy);
+            if (!empty($argdummy['workers'])){
+                $ProteusOrScylla = True;
+            }
         }
       }
     }
