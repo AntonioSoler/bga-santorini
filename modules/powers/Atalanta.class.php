@@ -22,14 +22,14 @@ class Atalanta extends SantoriniHeroPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg['mayMoveAgain'] = ATALANTA;
     $move = $this->game->log->getLastMove();
     // No move before => usual rule
     if ($move == null) {
-      $arg['mayMoveAgain'] = ATALANTA;
       return;
     }
 
-    // Otherwise, let the player do a second move (not mandatory) with same worker
+    // Otherwise, let the player do another move (not mandatory) with same worker
     $arg['skippable'] = true;
     Utils::filterWorkersById($arg, $move['pieceId']);
   }

@@ -59,7 +59,12 @@ class Scylla extends SantoriniPower
     $arg['power_name'] = $this->name;
     $arg['skippable'] = true;
     $action = $this->game->log->getLastAction("ScyllaTargets");
-    $arg['workers'] = $action['workers'];
+    if ($action == NULL){
+        $arg['workers'] = [];
+    }
+    else{
+        $arg['workers'] = $action['workers'];
+    }
   }
 
   public function usePower($action)

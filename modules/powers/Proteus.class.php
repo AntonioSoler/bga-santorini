@@ -49,6 +49,10 @@ class Proteus extends SantoriniPower
     $arg['skippable'] = false;
 
     $move = $this->game->log->getLastMove();
+    if ($move == NULL){
+        $arg['workers'] = [];
+        return;
+    }
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
     Utils::filterWorkersById($workers, $move['pieceId'], false);
     foreach ($workers as &$worker) {

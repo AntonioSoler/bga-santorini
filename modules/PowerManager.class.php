@@ -743,6 +743,7 @@ class PowerManager extends APP_GameClass
     $method = array_shift($methods);
     
     $ProteusOrScylla = False;
+    $stateName = $this->game->gamestate->state()['name'];
     
     foreach ($player->getPowers() as $power) {
       // Circe: Removed powers are still in this loop
@@ -752,17 +753,20 @@ class PowerManager extends APP_GameClass
       }
       call_user_func_array([$power, $method], $arg);
       
-      if ($power->getId() == PROTEUS or $power->getId() == SCYLLA){
-        $ProteusOrScylla = True;
+      if (($power->getId() == PROTEUS or $power->getId() == SCYLLA)  and $stateName == 'playerMove' ){
+        $argdummy = ['workers' => []];
+        $power->argUsePower($argdummy);
+        if (!empty($argdummy['workers'])){
+            $ProteusOrScylla = True;
+        }
       }
     }
     
     
     // finish here for Proteus and Scylla if the current state is 'move', these functions will be called in the state "usePower"
 
-    $stateName = $this->game->gamestate->state()['name'];
     
-    if ($ProteusOrScylla and $stateName == 'playerMove'){
+    if ($ProteusOrScylla){
       return;
     }
     
