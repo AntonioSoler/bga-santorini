@@ -20,6 +20,12 @@ class Scylla extends SantoriniPower
 
   /* * */
 
+
+  public function argPlayerMove(&$arg)
+  {
+    $arg['mayMoveAgain'] = SCYLLA;
+  }
+
   public function afterPlayerMove($worker, $work)
   {
     // Must use getPlacedOpponentWorkers() so Scylla cannot target Clio's invisible workers
@@ -64,6 +70,17 @@ class Scylla extends SantoriniPower
     }
     else{
         $arg['workers'] = $action['workers'];
+    }
+    
+    $opponents = $this->game->playerManager->getOpponentsIds();
+    foreach ($opponents as $opp) {
+      $opponent = $this->game->playerManager->getPlayer($opp);
+      $powers = $opponent->getPowers();
+      foreach ($powers as $power) {
+        if ($power->getId() == APHRODITE && $power->endOpponentTurn(true)) {
+          $arg['skippable'] = false;
+        }
+      }
     }
   }
 

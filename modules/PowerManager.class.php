@@ -83,11 +83,7 @@ class PowerManager extends APP_GameClass
    * TODO
    */
   public static $bannedMatchups = [
-    [APHRODITE, BIA], // https://boardgamearena.com/bug?id=21093
-    [APHRODITE, MEDUSA], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, NEMESIS],
-    [APHRODITE, SCYLLA], // Scylla should be allowed to go away and drag Aphrodite
-    [APHRODITE, THESEUS], // https://boardgamearena.com/bug?id=21093
     [APHRODITE, URANIA],
     [ASTERIA, HADES],
     [ATLAS, GAEA],

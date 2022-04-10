@@ -138,24 +138,46 @@ class Aphrodite extends SantoriniPower
       return $this->canFinishHere($worker, $space, $forcedWorkers, $myWorkers) || $this->canKeepMoving($worker, $space, $mayMoveAgain);
     });
   }
+  
 
-  public function endOpponentTurn()
+ // if $testOnly, simply return whether the position is illegal and do not end the game
+  public function endOpponentTurn($testOnly = false)
   {
+    $result = false;
+  
     $forcedWorkers = $this->getForcedWorkers();
     if ($forcedWorkers == null) {
       return;
     }
 
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
+    
+    $killedlogs = $this->game->log->getLastActions(['removal']);
+    
+    // so far, Aphrodite can only be killed after all opponent moves, so killed workers count towards her power
+    foreach ($killedlogs as $log) {
+      $piece = $this->game->board->getPiece($log['piece_id']);
+      if ($piece['type'] == 'worker' && $piece['player_id'] == $this->playerId)
+        $myWorkers[] = $piece;
+    }
+
+    
     foreach ($this->getForcedWorkers() as $workerId) {
       $move = $this->game->log->getLastMoveOfWorker($workerId);
       if ($move != null && !$this->isNeighbouring($myWorkers, $move['to'])) {
-        $this->game->announceLose(clienttranslate('${power_name}: ${player_name} cannot move to a space neighboring ${player_name2} and is eliminated!'), [
-          'i18n' => ['power_name'],
-          'power_name' => $this->getName(),
-          'player_name2' => $this->getPlayer()->getName(),
-        ]);
+        if ($testOnly)
+            $result = true;
+        else
+            $this->game->announceLose(clienttranslate('${power_name}: ${player_name} cannot move to a space neighboring ${player_name2} and is eliminated!'), [
+              'i18n' => ['power_name'],
+              'power_name' => $this->getName(),
+              'player_name2' => $this->getPlayer()->getName(),
+            ]);
       }
     }
+    
+    if ($testOnly)
+        return $result;
+    
   }
 }
