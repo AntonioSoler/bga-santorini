@@ -1075,7 +1075,7 @@ class santorini extends Table
         return;
     }
     
-    // No move or build => loose unless skippable or cancelable
+    // No move or build => lose unless skippable or cancelable
     if (count($state['args']['workers']) == 0) {
       if ($state['args']['skippable']) {
         $this->skipWork(false);

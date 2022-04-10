@@ -184,4 +184,48 @@ class Charybdis extends SantoriniPower
   {
     $this->afterMove($worker, $work);
   }
+  
+  
+  // prevent premature wins vs Proteus or Scylla which delay Charybdis power
+  public function checkOpponentWinning(&$arg)
+  {
+    if (!$arg['win']) {
+      return;
+    }
+    
+    $playerId = $this->game->getActivePlayerId();
+    $player = $this->game->playerManager->getPlayer($playerId);
+    
+    $stateName = $this->game->gamestate->state()['name'];
+    
+    if ($stateName != 'playerUsePower')
+        return;
+    
+    
+    $targetpower = false;
+    foreach ($player->getPowers() as $power) {
+      if (($power->getId() == PROTEUS or $power->getId() == SCYLLA))
+              $targetpower = true;            
+      }
+    
+    if (!$targetpower)
+        return;    
+    
+    // check if a worker moved on a potentially usable whirlpool, otherwise no need to wait for the power usage
+    
+    $work = $this->game->log->getLastMove();
+    if ($work == null)
+      return;
+    $tokens = $this->getPlacedTokens();
+    if (count($tokens) < 2)
+      return;
+    $startindex = $this->game->board->isSameSpace($work['to'], $tokens[0]) ? 0 : ($this->game->board->isSameSpace($work['to'], $tokens[1]) ? 1 : null);
+    if (is_null($startindex)) {
+      return;
+    }    
+    
+    $arg['win'] = false; 
+    
+  }
+  
 }
