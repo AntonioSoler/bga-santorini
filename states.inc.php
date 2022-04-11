@@ -344,6 +344,7 @@ $machinestates = [
       'move'       => ST_MOVE,
       'build'      => ST_BUILD,
       'power'      => ST_USE_POWER,
+      'endgame'    => ST_GAME_END,
     ],
   ],
 

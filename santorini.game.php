@@ -691,6 +691,7 @@ class santorini extends Table
    */
   public function stPreEndOfTurn()
   {
+    $this->stCheckEndOfGame(); // useful if the last work wins the game before confirming (eg, C&P 2nd move or Chronus build)
     
     $logs = $this->log->logsForCancelTurn();
     $autoConfirm = False;
