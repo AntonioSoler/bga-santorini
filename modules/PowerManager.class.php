@@ -128,7 +128,6 @@ class PowerManager extends APP_GameClass
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
-    [CHARYBDIS, HARPIES], // Charybdis should go first which does not work with 3 (and 4?) players. Fine with 2 though but cannot ban only 2
 
     // Circe ban all heroes
     [CIRCE, ACHILLES],
@@ -148,7 +147,6 @@ class PowerManager extends APP_GameClass
     [PERSEPHONE, BELLEROPHON], // cannot require use of hero power
     [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350
     [PERSEPHONE, CHARON],  // CF PERSEPHONE
-    [PERSEPHONE, CHARYBDIS], // complex moves
     [PERSEPHONE, ERIS], // rulebook & alternative turn
     [PERSEPHONE, HERMES], // multiple moves
     [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
@@ -181,7 +179,7 @@ class PowerManager extends APP_GameClass
     [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
     [HECATE, ERIS],
     [HECATE, IRIS], // can jump over secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
-    [HECATE, PROTEUS], // same niche issue as Iris: Proteus should be allowed to pass a turn if he moves into Hecate even if he cannot move after
+    [HECATE, PROTEUS], // same niche issue as Iris: Proteus should be allowed to pass a turn if he moves into Hecate even if he cannot build after
     [HECATE, NEMESIS],
     [HECATE, NYX], // too confusing for the moment
     [HECATE, SIREN],

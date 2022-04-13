@@ -107,6 +107,17 @@ class Charybdis extends SantoriniPower
 
   public function afterMove($worker, $work)
   {
+    // do nothing if after the last move, a whirpool has already been triggered or the worker has been forced elsewhere (happens vs harpies in multiplayer)
+    $logs = $this->game->log->logsForCancelTurn();
+    foreach ($logs as $log) {
+        if ($log['action'] == 'whirlpoolMove' || ($log['action'] == 'force' && $log['piece_id'] == $worker['id'])){
+          return;
+        }
+        if ($log['action'] == 'move' && $log['piece_id'] == $worker['id']){
+          break;
+        }
+    }
+  
     $tokens = $this->getPlacedTokens();
     if (count($tokens) < 2)
       return;
@@ -135,7 +146,7 @@ class Charybdis extends SantoriniPower
     $forceTarget['id'] = $worker['id'];
     $work['id'] = $worker['id'];
 
-    $stats = [[$this->playerId, 'usePower']];
+    $stats = [[$this->playerId, 'usePower']];    
     $this->game->log->addForce($work, $target, $stats);
     $this->game->log->addWhirlpoolMove($forceTarget, $target); // add special log that mimics a move and is triggered only when checking wins
     $this->game->board->setPieceAt($work, $target, $worker['location']);
@@ -211,6 +222,7 @@ class Charybdis extends SantoriniPower
     if (!$targetpower)
         return;    
     
+    
     // check if a worker moved on a potentially usable whirlpool, otherwise no need to wait for the power usage
     
     $work = $this->game->log->getLastMove();
@@ -223,6 +235,18 @@ class Charybdis extends SantoriniPower
     if (is_null($startindex)) {
       return;
     }    
+    
+    
+    // do nothing if after the last move, a whirpool has already been triggered 
+    $logs = $this->game->log->logsForCancelTurn();
+    foreach ($logs as $log) {
+        if ($log['action'] == 'whirlpoolMove' ){
+          return;
+        }
+        if ($log['action'] == 'move' ){
+          break;
+        }
+    }
     
     $arg['win'] = false; 
     

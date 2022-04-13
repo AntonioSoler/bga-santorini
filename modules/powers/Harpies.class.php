@@ -22,6 +22,15 @@ class Harpies extends SantoriniPower
 
   public function afterOpponentMove($worker, $work)
   {
+  
+    // at 3&4 player games, first activate whirlpools    
+    foreach ($this->game->playerManager->getPlayers() as $player){
+        foreach ($player->getPowers() as $power) {
+            if ($power->getId() == CHARYBDIS)
+                  $power->afterMove($worker,$work);
+        }
+    }
+  
     // do nothing if someone already won
     $end = $this->game->stCheckEndOfGame();
     if ($end['win']) {
@@ -31,7 +40,7 @@ class Harpies extends SantoriniPower
       $this->game->gamestate->nextState('cancelTurn');
       return;
     }
-    
+
     // Don't use getPlacedOpponentWorkers() because the power applies to Clio
     $myWorkers = $this->game->board->getPlacedWorkers($this->playerId);
     Utils::filterWorkersById($myWorkers, $worker['id']);
