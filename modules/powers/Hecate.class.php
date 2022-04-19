@@ -12,7 +12,7 @@ class Hecate extends SantoriniPower
       clienttranslate("[Setup:] Secretly place your Workers last. Your Workers are invisible to other players."),
       clienttranslate("[Any Time:] If an opponent attempts an action that would not be legal due to the presence of your secret Workers, their action is cancelled and they lose the rest of their turn."),
     ];
-    $this->playerCount = [2]; // TODO problematic cases for 3 players: put workers last, interactions with powers and restart implementation (Limus, Harpies)...
+    $this->playerCount = [2]; // TODO problematic cases for 3 players: put workers last, interactions with powers and restart implementation (Limus, Harpies)..., complex powers requiring tweaks assuming no other power can change the flow
     $this->golden  = false;
     $this->orderAid = 64;
 

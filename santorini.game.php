@@ -1281,7 +1281,7 @@ class santorini extends Table
     $location = $info['location'] ?? 'board';
     $this->board->setPieceAt($worker, $space, $location);
     $this->log->addMove($worker, $space);
-
+    
     // Notify
     if ($space['z'] > $worker['z']) {
       $msg = $this->msg['moveUp'];

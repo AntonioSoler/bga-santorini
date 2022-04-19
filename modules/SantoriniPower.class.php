@@ -275,6 +275,14 @@ abstract class SantoriniPower extends APP_GameClass
   public function argUsePower(&$arg)
   {
   }
+  
+  public function argTeammateUsePower(&$arg)
+  {
+  }
+  
+  public function argOpponentUsePower(&$arg)
+  {
+  }
 
   public function stateAfterUsePower()
   {

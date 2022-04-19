@@ -126,6 +126,7 @@ class PowerManager extends APP_GameClass
     [NYX, CHAOS], // https://boardgamearena.com/bug?id=29287
     [NYX, CHRONUS], // https://boardgamearena.com/bug?id=33571
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
+    [PERSEPHONE, ERIS],
     [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
 
@@ -142,48 +143,58 @@ class PowerManager extends APP_GameClass
     [CIRCE, THESEUS],
 
     // Incomplete Persephone implementation
-    [PERSEPHONE, ARTEMIS],  // multiple moves
+    [PERSEPHONE, ARTEMIS],  // multiple moves -- hard to solve 3p vs eg harpies...
     [PERSEPHONE, ATALANTA], // multiple moves
-    [PERSEPHONE, BELLEROPHON], // cannot require use of hero power
-    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350
-    [PERSEPHONE, CHARON],  // CF PERSEPHONE
-    [PERSEPHONE, ERIS], // rulebook & alternative turn
-    [PERSEPHONE, HERMES], // multiple moves
-    [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
-    [PERSEPHONE, JASON], // alternative turn
-    [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE
-    [PERSEPHONE, SIREN], // alternative turn
-    [PERSEPHONE, TERPSICHORE], // both workers must move
     [PERSEPHONE, TRITON], // multiple moves
+    [PERSEPHONE, HERMES], // multiple moves
+    [PERSEPHONE, BELLEROPHON], // cannot require use of hero power -- only if dz<2
+    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350 -- prevent skip
+    [PERSEPHONE, CHARON],  // CF PERSEPHONE -- remove opponent and test if move then either force or prevent skip (issue vs eg hippolyta, athena, aeolus, hypnus). Force if blocks unique level+1 or only the other worker could -- needs argusepower
+    [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286 -- persephone should call first other arg teammate and opponent move as hippolyta, athena... in multiplayer
+    [PERSEPHONE, JASON], // alternative turn -- test if move remove skip but needs argOpponentUsePower
+    [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE -- test if move then force skip
+    [PERSEPHONE, SIREN], // alternative turn -- test if move then remove skip
+    [PERSEPHONE, TERPSICHORE], // both workers must move -- 1) test if can move up and store info, also removing the highest if neighbors 2) if info stored, test if already moved up before
+    [PERSEPHONE, ACHILLES], // 1st build can prevent moving up -- test initially if he can move up and forbid to build if it prevents it
+    [PERSEPHONE, ODYSSEUS], // teleport can prevent moving up -- same as achilles
+    
 
     // Incomplete Adonis implementation
+    // need to check at start turn and log empty action if impossible
     [ADONIS, ARTEMIS], // multiple moves
-    [ADONIS, ATALANTA], // multiple moves
-    [ADONIS, BELLEROPHON], // cannot require use of hero power
-    [ADONIS, CASTOR], // alternative turn
-    [ADONIS, CHARON],  // pre-chosen worker
-    [ADONIS, CHARYBDIS], // complex moves
-    [ADONIS, ERIS], // alternative turn
-    [ADONIS, HERMES], // multiple moves
-    [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286
-    [ADONIS, JASON], // alternative turn
-    [ADONIS, NEMESIS], // move workers at the end
-    [ADONIS, PROMETHEUS],  // movement restriction
-    [ADONIS, PROTEUS], // can teleport a worker
-    [ADONIS, SIREN], // alternative turn
-    [ADONIS, TERPSICHORE], // both workers must move
     [ADONIS, TRITON], // multiple moves
+    [ADONIS, HERMES], // multiple moves -- all: 2p = can just go through the whole board
+    [ADONIS, ATALANTA], // multiple moves -- same but force power only if starts using it
+    [ADONIS, BELLEROPHON], // cannot require use of hero power -- check if only way uses power // remove power usage not following it
+    [ADONIS, CASTOR], // alternative turn -- 1st test: ok if already neighbor or 1 away or if the other neighbor and can move away. Restriction: cannot move away nor skip if not neighbor
+    [ADONIS, CHARON],  // pre-chosen worker -- 1st test: if one teleporting + move ok, allow it else force skip. If teleport from the other is not neighbor restrict the other.
+    [ADONIS, CHARYBDIS], // complex moves + must check if build is legal
+    [ADONIS, ERIS], // alternative turn -- if moving adons helps force it
+    [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286 -- should be fine, heroes are 2p only
+    [ADONIS, JASON], // alternative turn -- needs argoppo
+    [ADONIS, NEMESIS], // move workers at the end
+    [ADONIS, PROMETHEUS],  // movement restriction -- call argplayermove with additional param after each build try
+    [ADONIS, PROTEUS], // can teleport a worker -- must check if another neighbor can move + build + teleport the correct one
+    [ADONIS, SIREN], // alternative turn -- call argusepower to see which adonis workers can be forced and force to force the correct one(s) + chain of usepower + force / remove skip
+    [ADONIS, TERPSICHORE], // both workers must move -- check if move one away + other in + build possible for both
+    [ADONIS, APOLLO], // -- must check if build is legal
+    [ADONIS, IRIS], // -- must check if build is legal
+    [ADONIS, ACHILLES], // should not be able to use power to prevent getting there
+    [ADONIS, ODYSSEUS], // teleports
+    [ADONIS, BIA], // must not kill Adonis worker
+    [ADONIS, MEDUSA], // idem
+    [ADONIS, THESEUS], // idem
+    
+    
 
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
-    [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal
-    [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn
-    [HECATE, ERIS],
-    [HECATE, IRIS], // can jump over secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
+    [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal -- call endPlayerTurn if Chaos is the power 
+    [HECATE, CHARYBDIS], // not compatible with restarts if Hecate blocks the other whirlpool + during Hecate turn -- whirlpools need to check secrets & charybdis needs to confirm before moving on a whirlpool...
+    [HECATE, IRIS], // can jump over guessed secret workers but not build on the step / Hecate has to detect if this was legal + niche issue with restart implementation: may jump to a place where she cannot build, which is a possible move if Hecate is here (equivalent to pass the turn)
     [HECATE, PROTEUS], // same niche issue as Iris: Proteus should be allowed to pass a turn if he moves into Hecate even if he cannot build after
-    [HECATE, NEMESIS],
+    [HECATE, NEMESIS], // -- add fake workers to try switching
     [HECATE, NYX], // too confusing for the moment
-    [HECATE, SIREN],
-    [HECATE, HYDRA], // should propose a higher level to spawn when <3 are of minimal height
+    [HECATE, SIREN], // -- vs hecate: can target empty squares with a possible force, and cannot build on force targets
 
     // Hecate ban all heroes https://boardgamearena.com/bug?id=37708
     [HECATE, ACHILLES],
@@ -853,7 +864,7 @@ class PowerManager extends APP_GameClass
    */
   public function argUsePower(&$arg)
   {
-    $this->applyPower(["argUsePower"], [&$arg]);
+    $this->applyPower(["argUsePower", "argTeammateUsePower", "argOpponentUsePower"], [&$arg]);
     Utils::cleanWorkers($arg);
   }
 

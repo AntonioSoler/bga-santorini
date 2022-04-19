@@ -395,7 +395,7 @@ Board.prototype.addPiece = function (piece, animation) {
 	mesh.name = piece.name;
 	mesh.pieceId = piece.id;
 	mesh.position.copy(animation == "fall" ? sky : center);
-	mesh.material.opacity = (animation == "fall" || animation == "none") ? 1 : 0;
+	mesh.material.opacity = piece.special ? opacityExtTokens : ((animation == "fall" || animation == "none") ? 1 : 0);
 	var theta = piece.direction ? (-(piece.direction + 2.55) * Math.PI / 4) : ((Math.floor(Math.random() * 4) - 1) * Math.PI / 2);
 	mesh.rotation.set(0, theta, 0);
 	this._scene.add(mesh);
@@ -624,7 +624,7 @@ Board.prototype.makeClickable = function (objects, callback, action) {
 			this._clickable.push(piece);
 			piece.clickableMesh = transparent;
 
-			// Circle unerneath selected worker
+			// Circle underneath selected worker
 			var radius = (o.x == 5 && o.y == 4) ? .9 : 0.728; // hack to target Aeolus
 			marker = new THREE.Mesh(
 				new THREE.CircleGeometry(radius, 32).rotateX(-Math.PI / 2),
