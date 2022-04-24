@@ -148,7 +148,7 @@ class PowerManager extends APP_GameClass
     [PERSEPHONE, TRITON], // multiple moves
     [PERSEPHONE, HERMES], // multiple moves
     [PERSEPHONE, BELLEROPHON], // cannot require use of hero power -- only if dz<2
-    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350 -- prevent skip
+    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350 -- prevent skip, test if can move away one and move up the other in place
     [PERSEPHONE, CHARON],  // CF PERSEPHONE -- remove opponent and test if move then either force or prevent skip (issue vs eg hippolyta, athena, aeolus, hypnus). Force if blocks unique level+1 or only the other worker could -- needs argusepower
     [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286 -- persephone should call first other arg teammate and opponent move as hippolyta, athena... in multiplayer
     [PERSEPHONE, JASON], // alternative turn -- test if move remove skip but needs argOpponentUsePower
@@ -159,31 +159,11 @@ class PowerManager extends APP_GameClass
     [PERSEPHONE, ODYSSEUS], // teleport can prevent moving up -- same as achilles
     
 
-    // Incomplete Adonis implementation
-    // need to check at start turn and log empty action if impossible
-    [ADONIS, ARTEMIS], // multiple moves
-    [ADONIS, TRITON], // multiple moves
-    [ADONIS, HERMES], // multiple moves -- all: 2p = can just go through the whole board
+    // Incomplete Adonis implementation: needs to handle hero powers
     [ADONIS, ATALANTA], // multiple moves -- same but force power only if starts using it
     [ADONIS, BELLEROPHON], // cannot require use of hero power -- check if only way uses power // remove power usage not following it
-    [ADONIS, CASTOR], // alternative turn -- 1st test: ok if already neighbor or 1 away or if the other neighbor and can move away. Restriction: cannot move away nor skip if not neighbor
-    [ADONIS, CHARON],  // pre-chosen worker -- 1st test: if one teleporting + move ok, allow it else force skip. If teleport from the other is not neighbor restrict the other.
-    [ADONIS, CHARYBDIS], // complex moves + must check if build is legal
-    [ADONIS, ERIS], // alternative turn -- if moving adons helps force it
-    [ADONIS, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286 -- should be fine, heroes are 2p only
-    [ADONIS, JASON], // alternative turn -- needs argoppo
-    [ADONIS, NEMESIS], // move workers at the end
-    [ADONIS, PROMETHEUS],  // movement restriction -- call argplayermove with additional param after each build try
-    [ADONIS, PROTEUS], // can teleport a worker -- must check if another neighbor can move + build + teleport the correct one
-    [ADONIS, SIREN], // alternative turn -- call argusepower to see which adonis workers can be forced and force to force the correct one(s) + chain of usepower + force / remove skip
-    [ADONIS, TERPSICHORE], // both workers must move -- check if move one away + other in + build possible for both
-    [ADONIS, APOLLO], // -- must check if build is legal
-    [ADONIS, IRIS], // -- must check if build is legal
-    [ADONIS, ACHILLES], // should not be able to use power to prevent getting there
+    [ADONIS, ACHILLES], // should not be able to use power to prevent getting there -- check if only 1 move is allowed and if z=workerZ+1
     [ADONIS, ODYSSEUS], // teleports
-    [ADONIS, BIA], // must not kill Adonis worker
-    [ADONIS, MEDUSA], // idem
-    [ADONIS, THESEUS], // idem
     
     
 

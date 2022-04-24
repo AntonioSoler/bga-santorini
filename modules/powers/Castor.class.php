@@ -27,6 +27,7 @@ class Castor extends SantoriniPower
     // Allow usual turn or skip
     if (count($moves) <= 1) {
       $arg['skippable'] = true;
+      $arg['ifPossiblePower'] = CASTOR;
     }
 
     // Otherwise, every worker must move once

@@ -22,6 +22,7 @@ class Terpsichore extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg['ifPossiblePower'] = TERPSICHORE;
     $moves = $this->game->log->getLastMoves();
     // No move before => usual rule
     if (count($moves) == 0) {

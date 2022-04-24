@@ -19,6 +19,12 @@ class Bellerophon extends SantoriniHeroPower
   }
 
   /* * */
+  
+  
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = BELLEROPHON;
+  }
 
   public function afterPlayerMove($worker, $work)
   {

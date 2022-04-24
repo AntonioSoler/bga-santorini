@@ -30,6 +30,7 @@ class Triton extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $arg['mayMoveAgain'] = TRITON;
+    $arg['ifPossiblePower'] = TRITON;
     // No move before => usual rule
     $moves = $this->game->log->getLastMoves();
     if (count($moves) == 0) {

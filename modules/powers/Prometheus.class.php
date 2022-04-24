@@ -36,6 +36,7 @@ class Prometheus extends SantoriniPower
     }
 
     $arg = $this->game->argPlayerWork('build');
+    $arg['ifPossiblePower'] = PROMETHEUS;
     $arg['skippable'] = true;
   }
 

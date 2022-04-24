@@ -63,6 +63,7 @@ class Nemesis extends SantoriniPower
     $this->game->log->addAction('powerData', [], $workers, $this->playerId);
     return true;
   }
+  
 
   public function stateAfterBuild()
   {
@@ -76,13 +77,19 @@ class Nemesis extends SantoriniPower
     $arg['skippable'] = true;
 
     $arg['workers'] = $this->game->log->getLastAction('powerData', $this->playerId);
-    $used = $this->game->log->getLastAction('usePowerNemesis', $this->playerId);
-    if ($used != null) {
+    $used = $this->game->log->getLastActions(['usePowerNemesis'], $this->playerId);
+    if (count($used) == 1) {
       // Second swap is required, filter same opponent
       $arg['skippable'] = false;
+      $used = json_decode($used[0]['action_arg'], true);
       Utils::filterWorks($arg, function ($space, $worker) use ($used) {
         return $worker['id'] != $used['nemesisWorkerId'] && $space['id'] != $used['oppWorkerId'] && $space['player_id'] == $used['oppId'];
       });
+    }
+    if (count($used) == 2) {
+      // allow to swap both opponent workers
+      $arg['workers'] = [$this->game->board->getPiece(json_decode($used[0]['action_arg'], true)['oppWorkerId'])];
+      $arg['workers'][0]['works'] = [$this->game->board->getPiece(json_decode($used[1]['action_arg'], true)['oppWorkerId'])];
     }
   }
 
@@ -146,7 +153,7 @@ class Nemesis extends SantoriniPower
 
   public function stateAfterUsePower()
   {
-    return count($this->game->log->getLastActions(['usePowerNemesis'])) == 2 ? 'endturn' : 'power';
+    return count($this->game->log->getLastActions(['usePowerNemesis'])) == 3 ? 'endturn' : 'power';
   }
 
   public function stateAfterSkipPower()

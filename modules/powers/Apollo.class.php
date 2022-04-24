@@ -22,6 +22,7 @@ class Apollo extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg['ifPossiblePower'] = APOLLO;
     $workers = $this->game->board->getPlacedWorkers($this->playerId);
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers($this->playerId, true);
 

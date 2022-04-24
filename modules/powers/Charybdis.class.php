@@ -58,6 +58,10 @@ class Charybdis extends SantoriniPower
     return count($tokens) > 0 ? 'power' : null;
   }
 
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = CHARYBDIS;
+  }
 
   public function argUsePower(&$arg)
   {
@@ -105,6 +109,27 @@ class Charybdis extends SantoriniPower
     return 'endturn';
   }
 
+  public function whirlpooledSpace($work){
+  
+    $tokens = $this->getPlacedTokens();
+    if (count($tokens) < 2)
+      return [];
+
+    // check if a worker moved on a token
+    $startindex = $this->game->board->isSameSpace($work, $tokens[0]) ? 0 : ($this->game->board->isSameSpace($work, $tokens[1]) ? 1 : null);
+    if (is_null($startindex)) {
+      return [];
+    }
+
+    $endToken = $tokens[1 - $startindex];
+
+    $acc = $this->game->board->getAccessibleSpaces('build');
+    Utils::filter($acc, function ($space) use ($endToken) {
+      return ($space['x'] == $endToken['x'] && $space['y'] == $endToken['y']);
+    });
+    return $acc;
+  }
+
   public function afterMove($worker, $work)
   {
     // do nothing if after the last move, a whirpool has already been triggered or the worker has been forced elsewhere (happens vs harpies in multiplayer)
@@ -118,22 +143,8 @@ class Charybdis extends SantoriniPower
         }
     }
   
-    $tokens = $this->getPlacedTokens();
-    if (count($tokens) < 2)
-      return;
-
-    // check if a worker moved on a token
-    $startindex = $this->game->board->isSameSpace($work, $tokens[0]) ? 0 : ($this->game->board->isSameSpace($work, $tokens[1]) ? 1 : null);
-    if (is_null($startindex)) {
-      return;
-    }
-
-    $endToken = $tokens[1 - $startindex];
-
-    $acc = $this->game->board->getAccessibleSpaces('build');
-    Utils::filter($acc, function ($space) use ($endToken) {
-      return ($space['x'] == $endToken['x'] && $space['y'] == $endToken['y']);
-    });
+    $acc = $this->whirlpooledSpace($work);
+  
     if (count($acc) == 0) {
       return;
     }

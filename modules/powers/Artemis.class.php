@@ -26,6 +26,7 @@ class Artemis extends SantoriniPower
     // No move before => usual rule
     if ($move == null) {
       $arg['mayMoveAgain'] = ARTEMIS;
+      $arg['ifPossiblePower'] = ARTEMIS;
       return;
     }
 

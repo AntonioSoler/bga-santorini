@@ -20,6 +20,11 @@ class Theseus extends SantoriniHeroPower
 
   /* * */
 
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = THESEUS;
+  }
+
   public function stateAfterBuild()
   {
     $arg = [];

@@ -1011,6 +1011,7 @@ class santorini extends Table
       'cancelable' => $this->log->canCancelTurn(),
       'skippable' => false,
       'workers' => $workers ?: $this->board->getPlacedActiveWorkers(),
+      'ifPossiblePower' => false,
     ];
     if ($action == 'move') {
       $arg['mayMoveAgain'] = false;

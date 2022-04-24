@@ -24,6 +24,7 @@ class Scylla extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $arg['mayMoveAgain'] = SCYLLA;
+    $arg['ifPossiblePower'] = SCYLLA;
   }
 
   public function afterPlayerMove($worker, $work)

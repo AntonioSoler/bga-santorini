@@ -22,6 +22,7 @@ class Iris extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg['ifPossiblePower'] = IRIS;
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
     $workers = $this->game->board->getPlacedActiveWorkers();
     $allWorkers = $workers;

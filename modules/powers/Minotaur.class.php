@@ -22,6 +22,7 @@ class Minotaur extends SantoriniPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg['ifPossiblePower'] = MINOTAUR;
     $workers = $this->game->board->getPlacedActiveWorkers();
     // Must use getPlacedOpponentWorkers() so Minotaur cannot target Clio's invisible workers
     $oppWorkers = $this->game->board->getPlacedOpponentWorkers(null, true);

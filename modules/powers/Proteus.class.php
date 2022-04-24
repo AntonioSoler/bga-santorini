@@ -27,6 +27,11 @@ class Proteus extends SantoriniPower
     $this->getPlayer()->addWorker('m');
   }
 
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = PROTEUS;
+  }
+  
   public function stateAfterMove()
   {
     if (count($this->game->board->getPlacedWorkers($this->playerId)) > 1) {

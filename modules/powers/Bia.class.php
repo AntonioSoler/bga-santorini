@@ -34,6 +34,12 @@ class Bia extends SantoriniPower
       return $this->game->board->isPerimeter($space);
     });
   }
+  
+  
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = BIA;
+  }
 
 
   public function afterPlayerMove($worker, $work)

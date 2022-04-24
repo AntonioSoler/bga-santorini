@@ -23,7 +23,6 @@ class Siren extends SantoriniPower
 
 
 
-// TODO: don't know why UI is not displayed
   public function getUiData()
   {
     $data = parent::getUiData();
@@ -176,6 +175,7 @@ class Siren extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $arg['skippable'] = ($this->stateAfterUsePower() == 'power');
+    $arg['ifPossiblePower'] = SIREN;
     return false;
   }
 

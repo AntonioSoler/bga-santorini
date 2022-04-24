@@ -20,6 +20,12 @@ class Medusa extends SantoriniPower
 
   /* * */
 
+  
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = MEDUSA;
+  }
+
   // Optional parameter used by Hecate
   public function argPlayerBuild(&$arg, $lookSecret = false)
   {
