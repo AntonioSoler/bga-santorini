@@ -160,9 +160,6 @@ class PowerManager extends APP_GameClass
     
 
     // Incomplete Adonis implementation: needs to handle hero powers
-    [ADONIS, ATALANTA], // multiple moves -- same but force power only if starts using it
-    [ADONIS, BELLEROPHON], // cannot require use of hero power -- check if only way uses power // remove power usage not following it
-    [ADONIS, ACHILLES], // should not be able to use power to prevent getting there -- check if only 1 move is allowed and if z=workerZ+1
     [ADONIS, ODYSSEUS], // teleports
     
     

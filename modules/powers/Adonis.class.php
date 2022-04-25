@@ -144,7 +144,7 @@ class Adonis extends SantoriniHeroPower
           $nextparam = 'once';
         if ($arg['ifPossiblePower'] == TRITON && $this->game->board->isPerimeter($sp))
           $nextparam = 'conti';
-        if ($arg['ifPossiblePower'] == HERMES)
+        if ($arg['ifPossiblePower'] == HERMES || $arg['ifPossiblePower'] == ATALANTA)
           $nextparam = 'conti';
         $queue[] = [$sp, $nextparam];
       }
@@ -376,7 +376,63 @@ class Adonis extends SantoriniHeroPower
     
     return false;
   }
-
+  
+  public function testHeroPower(&$arg, $powerData)
+  {
+    $already = $this->game->board->isNeighbour($powerData['adonisWorker'], $powerData['oppWorker']);
+    
+    // compute possible future moves for the other worker to know if it can be the moving worker next
+    $workers = $this->game->board->getPlacedActiveWorkers();
+    if (count($workers) == 2) {
+      if($workers[0]['id'] == $powerData['oppWorker']['id'])
+        $otherworker = $workers[1];
+      else
+        $otherworker = $workers[0];
+      $otherworks = $this->game->board->getNeighbouringSpaces($otherworker, 'move');
+    }
+    
+    // compute moves of the targetted worker satisfying the condition
+    $works = $this->game->board->getNeighbouringSpaces($powerData['oppWorker'], 'move');
+    Utils::filter($works, function ($s) use ($powerData) {return $this->game->board->isNeighbour($s, $powerData['adonisWorker']);});
+    
+    $okWithoutPower = !empty($works) || ($already && !empty($otherworks));
+    
+    if ($arg['ifPossiblePower'] == BELLEROPHON){
+      $works = $this->game->board->getNeighbouringSpaces($powerData['oppWorker'], 'move', [BELLEROPHON]);
+      $works = array_filter($works, function ($s) use ($powerData) {return $this->game->board->isNeighbour($s, $powerData['adonisWorker']);});
+      $otherworks = $this->game->board->getNeighbouringSpaces($otherworker, 'move', [BELLEROPHON]);
+      $okWithPower = !empty($works)  || ($already && !empty($otherworks));
+    }
+    elseif ($arg['ifPossiblePower'] == ACHILLES){
+      if (!$okWithoutPower)
+        $okWithPower = false;
+      else{
+        $Bworks = $this->game->board->getNeighbouringSpaces($powerData['oppWorker'], 'build');
+        $Botherworks = $this->game->board->getNeighbouringSpaces($otherworker, 'build');
+        if ($already && empty($works) && count($otherworks) == 1)
+          $okWithPower = ($otherworks[0]['z'] <= $otherworker['z']+1) || (count($Botherworks) > 1);
+        elseif ($already && count($otherworks) + count($works) > 1)
+          $okWithPower = true;
+        elseif (count($works) >= 1)
+          $okWithPower = ($works[0]['z'] <= $powerData['oppWorker']['z']+1) || (count($Bworks) > 1);
+        else
+          throw new BgaVisibleSystemException("Unexpected state in Adonis vs Achilles");
+      }
+    }
+    elseif($arg['ifPossiblePower'] == ODYSSEUS){
+      // TODO
+      // check which corners are free
+      // check if $already -> can teleport the target worker and move next to a corner
+      // check if can teleport the other worker and this frees a space towards the target or a corner if $already
+    }
+    elseif($arg['ifPossiblePower'] == ATALANTA){
+      $okWithPower = $this->testMultipleMoves($arg, $powerData);
+    }
+    else
+      throw new BgaVisibleSystemException("Unexpected hero power vs Adonis");
+      
+    return [$okWithPower, $okWithoutPower];    
+  }
 
 
   public function argOpponentUsePower(&$arg)
@@ -402,11 +458,9 @@ class Adonis extends SantoriniHeroPower
     $works = array_filter($works, function ($s) use ($powerData) {return $this->game->board->isNeighbour($s, $powerData['adonisWorker']);});
     
     if ($arg['power'] == JASON){
+      // using the power would prevent fulfilling the condition, this is the only thing that should change as the power cannot be forced to be used
       if (!$already && !empty($works))
         $arg['workers'] = [];
-      // test if the second worker can move, otherwise remove skippable
-      if ($already && empty($works) && empty($otherworks))
-        $arg['skippable'] = false;
     }
     
     if ($arg['power'] == THESEUS){
@@ -425,6 +479,18 @@ class Adonis extends SantoriniHeroPower
         Utils::filterWorkersById($arg, $powerData['oppWorker']['id'], true);
       if (!$already && !$neighb)
         $arg['workers'] = []; // should never happen
+    }
+    
+    if ($arg['power'] == ODYSSEUS){ // does not prevent deadends for now
+      $alreadytested = $this->game->log->getLastAction('adonisTest');
+      if ($alreadytested != null)
+        $withOrWithoutHero = $alreadytested['possible'];
+      else{
+        $withOrWithoutHero = $this->testHeroPower($arg, $powerData);
+        $this->game->log->addAction('adonisTest', [],  ['possible' => $withOrWithoutHero]);
+      }
+      
+      // TODO            
     }
     
     if ($arg['power'] == SCYLLA){
@@ -531,6 +597,21 @@ class Adonis extends SantoriniHeroPower
         });
       }
     }
+    if ($arg['ifPossiblePower'] == ACHILLES){ // does not prevent deadends for now
+      $alreadytested = $this->game->log->getLastAction('adonisTest');
+      if ($alreadytested != null)
+        $withOrWithoutHero = $alreadytested['possible'];
+      else{
+        $withOrWithoutHero = $this->testHeroPower($arg, $powerData);
+        $this->game->log->addAction('adonisTest', [],  ['possible' => $withOrWithoutHero]);
+      }
+      
+      if ($withOrWithoutHero[1] && !$withOrWithoutHero[0])
+        $arg['workers'] = [];
+      
+      if ($withOrWithoutHero[1] && !$already)
+        Utils::filterWorkersById($arg, $powerData['oppWorker']['id']);
+    }
     
   }
 
@@ -545,9 +626,30 @@ class Adonis extends SantoriniHeroPower
     $already = $this->game->board->isNeighbour($powerData['adonisWorker'], $powerData['oppWorker']);
     
     $alreadytested = $this->game->log->getLastAction('adonisTest');
-    if ($alreadytested != null && $alreadytested['possible'] == false)
+    $testedHero = false;
+    $testedNoHero = false;
+    if ($alreadytested != null && is_array($alreadytested['possible'])){
+      $testedHero = $alreadytested['possible'][0];
+      $testedNoHero = $alreadytested['possible'][1];
+      if ($testedNoHero)
+        $alreadytested['possible'] = true;
+      elseif (!$testedHero)
+        $alreadytested['possible'] = false;
+      elseif (in_array($arg['ifPossiblePower'], [ACHILLES, ODYSSEUS]))
+        $alreadytested['possible'] = !empty($this->game->log->getLastActions(['force','build','move'])); // if used the power, must respect the condition
+      elseif (in_array($arg['ifPossiblePower'], [BELLEROPHON]))
+        $alreadytested['possible'] = false;
+      elseif (in_array($arg['ifPossiblePower'], [ATALANTA])){
+        $alreadytested['possible'] = count($this->game->log->getLastActions(['move'])) > 1;
+      }
+      else
+        throw new BgaVisibleSystemException("Unexpected hero power vs Adonis argOpponentMove");
+        
+    }
+    if ($alreadytested != null && ($alreadytested['possible'] == false && !$testedHero))
       return;
-    $alreadytested = ($alreadytested == null) ? false : true;
+      
+    $alreadytested = ($alreadytested == null) ? false : $alreadytested['possible'];
     
     // get opponent power if relevant
     $oppPower = null;
@@ -560,10 +662,22 @@ class Adonis extends SantoriniHeroPower
     // complex powers involving multiple worker moves in a turn.
     // At the firt pass of the turn, compute if the condition can be satisfied. If it cannot, we terminate.
     // If it can, we compute here if the move can be passed or not
-    if (in_array($arg['ifPossiblePower'], [ARTEMIS, TRITON, CASTOR, TERPSICHORE, SIREN, HERMES])){
-      if (!$alreadytested){
+    if (in_array($arg['ifPossiblePower'], [ARTEMIS, TRITON, CASTOR, TERPSICHORE, SIREN, HERMES, ATALANTA, BELLEROPHON, ACHILLES, ODYSSEUS])){
+      if (!$alreadytested && !$testedHero){
         if ($arg['ifPossiblePower'] == CASTOR)
           $alreadytested = $this->testCastorMove($arg, $powerData);
+        elseif ($arg['ifPossiblePower'] == BELLEROPHON){
+          $alreadytested = $this->testHeroPower($arg, $powerData);
+          $testedHero = $alreadytested[0];
+          $testedNoHero = $alreadytested[1];
+        }
+        elseif ($arg['ifPossiblePower'] == ATALANTA){
+          $alreadytested = $this->testHeroPower($arg, $powerData);
+          $testedHero = $alreadytested[0];
+          $testedNoHero = $alreadytested[1];
+        }
+        elseif ($arg['ifPossiblePower'] == ACHILLES || $arg['ifPossiblePower'] == ODYSSEUS)
+          throw new BgaVisibleSystemException("Unexpected state in Adonis: ACHILLES or ODYSSEUS have incoherent data vs Adonis");
         elseif($arg['ifPossiblePower'] == TERPSICHORE)
           $alreadytested = $this->testTerpsiMove($arg, $powerData);
         elseif($arg['ifPossiblePower'] == SIREN)
@@ -573,8 +687,14 @@ class Adonis extends SantoriniHeroPower
         else
           $alreadytested = $this->testMultipleMoves($arg, $powerData);
         $this->game->log->addAction('adonisTest', [],  ['possible' => $alreadytested]);
+        
+        // for hero, revert $alreadytested to a single boolean
+        if ($arg['ifPossiblePower'] == BELLEROPHON)
+          $alreadytested = $testedNoHero;
+        if ($arg['ifPossiblePower'] == ATALANTA)
+          $alreadytested = $testedNoHero ? true : (!$testedHero? false : count($this->game->log->getLastActions(['move'])) > 1 );
       }
-      if (!$alreadytested){
+      if (!$alreadytested && !$testedHero){
         $adonisPlayer = $this->game->playerManager->getPlayer($powerData['adonisWorker']['player_id']);
         $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: It is not possible for ${player_name2} (${coords2}) to end this turn neighboring ${player_name} (${coords})'), [
           'i18n' => ['power_name'],
@@ -590,21 +710,23 @@ class Adonis extends SantoriniHeroPower
       }
         
       // all powers excet Siren cannot move workers after skipping
-      if ($arg['ifPossiblePower'] != SIREN)
-        $arg['skippable'] = $arg['skippable'] && $already;
-      else
+      if ($arg['ifPossiblePower'] == SIREN)
         $arg['skippable'] = $this->testSirenMove($arg, $powerData, $oppPower, true);
+      if ($arg['ifPossiblePower'] == ATALANTA)
+        $arg['skippable'] = $arg['skippable'] && ($already || (!$alreadytested && count($this->game->log->getLastActions(['move'])) == 1));
+      else
+        $arg['skippable'] = $arg['skippable'] && $already;
     }
     
     
     // if the power does not force Adonis, or does not move both workers, prevent the non-targetted worker to move if the condition is not satisfied 
-    if (!$already && !in_array($arg['ifPossiblePower'], [APOLLO, MINOTAUR, PROTEUS, CASTOR, TERPSICHORE, SCYLLA, HERMES])) {
+    if (!$already && !in_array($arg['ifPossiblePower'], [APOLLO, MINOTAUR, PROTEUS, CASTOR, TERPSICHORE, SCYLLA, HERMES]) && ($alreadytested || !in_array($arg['ifPossiblePower'], [BELLEROPHON, ATALANTA]) )){
       Utils::filterWorkersById($test, [$powerData['oppWorker']['id'], $powerData['adonisWorker']['id']]);
     }
   
     // keep only the works respecting the condition
     $accessibleSpaces = $this->game->board->getAccessibleSpaces('move');
-    Utils::filterWorks($test, function ($space, $worker) use ($powerData, $arg, $already, $accessibleSpaces, $oppPower) {
+    Utils::filterWorks($test, function ($space, $worker) use ($powerData, $arg, $already, $accessibleSpaces, $oppPower, $alreadytested) {
       if (in_array($arg['ifPossiblePower'],  [APOLLO, MINOTAUR]) && $worker['id'] != $powerData['oppWorker']['id']){
         $forced = ($arg['ifPossiblePower'] == APOLLO) ? $worker :  $this->game->board->getSpaceBehind($worker, $space, $accessibleSpaces);
         if (!$already)
@@ -620,6 +742,14 @@ class Adonis extends SantoriniHeroPower
         return true; // keep all moves using the power
       if ($arg['ifPossiblePower'] == HERMES && $worker['id'] != $powerData['oppWorker']['id'])
         return $already; // can change level only if $already
+      if ($arg['ifPossiblePower'] == ATALANTA && $worker['id'] == $powerData['oppWorker']['id'])
+        return $this->testMultipleMoves($arg, $powerData, [$space, 'conti']); 
+      if ($arg['ifPossiblePower'] == ATALANTA && $worker['id'] != $powerData['oppWorker']['id'])
+        return $already || (!$alreadytested && !$arg['skippable']); 
+      if ($arg['ifPossiblePower'] == BELLEROPHON && $space['z'] == $worker['z']+2)
+        return ($already && $worker['id'] != $powerData['oppWorker']['id']) || ($worker['id'] == $powerData['oppWorker']['id'] && $this->game->board->isNeighbour($powerData['adonisWorker'], $space)); // must respect the condition if the power is used
+      if ($arg['ifPossiblePower'] == BELLEROPHON && $space['z'] <= $worker['z']+1 && !$alreadytested)
+        return true; // must respect the condition only if the power is used
       if ($arg['ifPossiblePower'] == PROTEUS && !$already && $worker['id'] != $powerData['oppWorker']['id'])
         return $this->game->board->isNeighbour($powerData['adonisWorker'], $worker);
       if ($arg['ifPossiblePower'] == SCYLLA && !$already && $worker['id'] != $powerData['oppWorker']['id'])
@@ -707,7 +837,7 @@ class Adonis extends SantoriniHeroPower
     }
     
     
-    if (empty($test['workers']) && !$alreadytested) {
+    if (empty($test['workers']) && !$alreadytested && !$testedHero) {
       // Notify
       $adonisPlayer = $this->game->playerManager->getPlayer($powerData['adonisWorker']['player_id']);
       $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: It is not possible for ${player_name2} (${coords2}) to end this turn neighboring ${player_name} (${coords})'), [
@@ -723,7 +853,7 @@ class Adonis extends SantoriniHeroPower
     } else {
       // Allow skip only if condition is already satisfied
       $arg['workers'] = $test['workers'];
-      if ($arg['skippable'] && !$alreadytested) {
+      if ($arg['skippable'] && !$alreadytested && !$testedHero) {
         $arg['skippable'] = $arg['skippable'] && $already;
       }
       if (!$arg['skippable'] && $alreadytested && empty($test['workers'])){

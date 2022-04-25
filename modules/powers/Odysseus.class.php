@@ -49,6 +49,11 @@ class Odysseus extends SantoriniHeroPower
       }
     }
   }
+  
+  public function argPlayerMove(&$arg)
+  {
+    $arg['ifPossiblePower'] = ODYSSEUS;
+  }
 
   public function usePower($action)
   {

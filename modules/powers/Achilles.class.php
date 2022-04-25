@@ -27,6 +27,7 @@ class Achilles extends SantoriniHeroPower
 
   public function argPlayerBuild(&$arg)
   {
+    $arg['ifPossiblePower'] = ACHILLES;
     $build = $this->game->log->getLastBuild();
     $move  = $this->game->log->getLastMove();
     // Already built or move before => usual rule
@@ -50,6 +51,7 @@ class Achilles extends SantoriniHeroPower
 
   public function argPlayerMove(&$arg)
   {
+    $arg['ifPossiblePower'] = ACHILLES;
     $build = $this->game->log->getLastBuild();
     // No build before => usual rule
     if ($build == null) {

@@ -23,6 +23,7 @@ class Atalanta extends SantoriniHeroPower
   public function argPlayerMove(&$arg)
   {
     $arg['mayMoveAgain'] = ATALANTA;
+    $arg['ifPossiblePower'] = ATALANTA;
     $move = $this->game->log->getLastMove();
     // No move before => usual rule
     if ($move == null) {
