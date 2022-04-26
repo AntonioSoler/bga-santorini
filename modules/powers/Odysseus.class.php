@@ -31,6 +31,7 @@ class Odysseus extends SantoriniHeroPower
   public function argUsePower(&$arg)
   {
     $arg['power'] = $this->id;
+    $arg['ifPossiblePower'] = ODYSSEUS;
     $arg['power_name'] = $this->name;
     $arg['skippable'] = true;
 

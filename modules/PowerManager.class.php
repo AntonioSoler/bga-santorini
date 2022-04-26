@@ -143,25 +143,21 @@ class PowerManager extends APP_GameClass
     [CIRCE, THESEUS],
 
     // Incomplete Persephone implementation
+    // test if already moved up
     [PERSEPHONE, ARTEMIS],  // multiple moves -- hard to solve 3p vs eg harpies...
     [PERSEPHONE, ATALANTA], // multiple moves
     [PERSEPHONE, TRITON], // multiple moves
-    [PERSEPHONE, HERMES], // multiple moves
-    [PERSEPHONE, BELLEROPHON], // cannot require use of hero power -- only if dz<2
-    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350 -- prevent skip, test if can move away one and move up the other in place
-    [PERSEPHONE, CHARON],  // CF PERSEPHONE -- remove opponent and test if move then either force or prevent skip (issue vs eg hippolyta, athena, aeolus, hypnus). Force if blocks unique level+1 or only the other worker could -- needs argusepower
+    [PERSEPHONE, HERMES], // remove skip
+    [PERSEPHONE, CHARON],  // CF PERSEPHONE -- remove opponent and test if move then either force or prevent skip (issue vs eg hippolyta, athena, aeolus, hypnus, aphrodite). Force if blocks unique level+1 or only the other worker could -- needs argusepower
     [PERSEPHONE, HIPPOLYTA], // https://boardgamearena.com/bug?id=20286 -- persephone should call first other arg teammate and opponent move as hippolyta, athena... in multiplayer
-    [PERSEPHONE, JASON], // alternative turn -- test if move remove skip but needs argOpponentUsePower
     [PERSEPHONE, PROMETHEUS],  // CF PERSEPHONE -- test if move then force skip
-    [PERSEPHONE, SIREN], // alternative turn -- test if move then remove skip
+    [PERSEPHONE, SIREN], // alternative turn -- remove skip
+    [PERSEPHONE, CASTOR], // alternative turn, https://boardgamearena.com/bug?id=22350 -- prevent skip, test if can move away one and move up the other in place
     [PERSEPHONE, TERPSICHORE], // both workers must move -- 1) test if can move up and store info, also removing the highest if neighbors 2) if info stored, test if already moved up before
-    [PERSEPHONE, ACHILLES], // 1st build can prevent moving up -- test initially if he can move up and forbid to build if it prevents it
-    [PERSEPHONE, ODYSSEUS], // teleport can prevent moving up -- same as achilles
-    
-
-    // Incomplete Adonis implementation: needs to handle hero powers
-    [ADONIS, ODYSSEUS], // teleports
-    
+    [PERSEPHONE, BELLEROPHON], // cannot require use of hero power -- only if dz<2
+    [PERSEPHONE, JASON], // alternative turn -- only 2p: if canmoveup, force places where the new player can also move up
+    [PERSEPHONE, ACHILLES], // 1st build can prevent moving up -- only 2p: if 1 worker can move up, foreach worker with a single move up, prevent build on this. If a worker cannot move up, prevent build on level +2
+    [PERSEPHONE, ODYSSEUS], // teleport can prevent moving up -- 1) forbid teleporting on the last corner where can move up if it does not free a move up 2) if teleporting allows a move up somehow, forbid teleports not allowing it
     
 
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add

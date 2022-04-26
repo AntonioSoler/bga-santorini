@@ -420,10 +420,79 @@ class Adonis extends SantoriniHeroPower
       }
     }
     elseif($arg['ifPossiblePower'] == ODYSSEUS){
-      // TODO
-      // check which corners are free
-      // check if $already -> can teleport the target worker and move next to a corner
-      // check if can teleport the other worker and this frees a space towards the target or a corner if $already
+      
+      $corners = array_values(array_filter($this->game->board->getAccessibleSpaces(), function ($space) {
+        return $this->game->board->isCorner($space);
+      }));
+      $adWorkers = $this->game->board->getPlacedOpponentWorkers();
+      if (count($adWorkers) == 2) {
+        if($adWorkers[0]['id'] == $powerData['adonisWorker']['id'])
+          $adotherworker = $adWorkers[1];
+        else
+          $adotherworker = $adWorkers[0];
+      }
+    
+      $otheradnb = $this->game->board->isNeighbour($powerData['oppWorker'], $adotherworker) || $this->game->board->isNeighbour($otherworker, $adotherworker);
+      $targetadnb = $this->game->board->isNeighbour($powerData['oppWorker'], $powerData['adonisWorker']) || $this->game->board->isNeighbour($otherworker, $powerData['adonisWorker']);
+      $targetnbotherad = $this->game->board->isNeighbour($powerData['oppWorker'], $adotherworker);
+      $adnbs = $this->game->board->isNeighbour($powerData['adonisWorker'], $adotherworker);
+      $canmoveonotherad = $this->game->board->isNeighbour($powerData['oppWorker'], $adotherworker) && $powerData['oppWorker']['z'] >= $adotherworker['z'] - 1;
+      $canmoveontargetad = $already && $powerData['oppWorker']['z'] >= $powerData['adonisWorker']['z'] - 1;
+      $othercanmoveonotherad = $this->game->board->isNeighbour($otherworker, $adotherworker) && $otherworker['z'] >= $adotherworker['z'] - 1;
+      $othercanmoveontargetad = $this->game->board->isNeighbour($otherworker, $powerData['adonisWorker']) && $otherworker['z'] >= $powerData['adonisWorker']['z'] - 1;
+      
+      $targetadnbcorner = !empty(array_filter($corners, function ($c) use ($powerData) {return $this->game->board->isNeighbour($c, $powerData['adonisWorker']);}));
+      $otheradnbcorner = !empty(array_filter($corners, function ($c) use ($adotherworker) {return $this->game->board->isNeighbour($c, $adotherworker);}));
+      $nbcorners = !empty(array_filter($corners, function ($c) use ($powerData) {return $this->game->board->isNeighbour($c, $powerData['oppWorker']);}));
+      $cannotnbsamecorner = !$this->game->board->isNeighbour($powerData['oppWorker'], $otherworker);;
+      
+      $workscorner = $this->game->board->getNeighbouringSpaces($powerData['oppWorker'], 'move');
+      Utils::filter($workscorner, function ($s) use ($corners) {
+          foreach($corners as $c){
+            if ($this->game->board->isNeighbour($s, $c))
+              return true;
+          }
+          return false;
+          });
+      
+      $worksotherad = $this->game->board->getNeighbouringSpaces($powerData['oppWorker'], 'move');
+      Utils::filter($worksotherad, function ($s) use ($adotherworker) {return $this->game->board->isNeighbour($s, $adotherworker);});
+          
+      if (count($corners) == 1){
+        // cannot move on the teleported corner
+        Utils::filter($works, function ($s) use ($corners) {return !$this->game->board->isSameSpace($s, $corners[0]);});
+        Utils::filter($otherworks, function ($s) use ($corners) {return !$this->game->board->isSameSpace($s, $corners[0]);});
+        // first test with a single force
+        $okWithPower = ( $otheradnb && (!empty($works) || ($canmoveonotherad && $adnbs) || ($already && (!empty($otherworks) || $othercanmoveonotherad) ))) || // can teleport the other adonis worker and make an allowed move
+                     ($targetadnb && (!empty($workscorner) || ($canmoveontargetad && $targetadnbcorner) ||  ($nbcorners && (!empty($otherworks) || $othercanmoveontargetad))));
+
+        if (!$okWithPower && ($this->game->board->isCorner($powerData['adonisWorker']) || $this->game->board->isCorner($adotherworker)) && $otheradnb && $targetadnb){
+          // can teleport the other worker then Adonis target worker
+          if (!$this->game->board->isCorner($powerData['adonisWorker']))
+            $okWithPower = (!empty($worksotherad) || ($canmoveontargetad && $adnbs) || ($targetnbotherad && (!empty($otherworks) || $othercanmoveontargetad)));
+          else{
+            // teleport first Adonis target then the other worker
+            $okWithPower = (!empty($workscorner) || ($canmoveonotherad && $otheradnbcorner) || ($nbcorners && (!empty($otherworks) || $othercanmoveonotherad)));
+            // now test if force the other worker then the target helps
+            if (!$okWithPower && $this->game->board->isCorner($adotherworker))
+              $okWithPower = (!empty($worksotherad) ||  ($targetnbotherad && (!empty($otherworks) || $othercanmoveontargetad)));
+          }
+        }
+      }
+      elseif (count($corners) > 1){
+        // first test with a single force
+        $okWithPower = ( $otheradnb && (!empty($works) || ($canmoveonotherad && $adnbs) || ($already && (!empty($otherworks) || $othercanmoveonotherad) ))) || // can teleport the other adonis worker and make an allowed move
+                     ($targetadnb && (!empty($workscorner) || ($canmoveontargetad && $targetadnbcorner) ||  ($nbcorners && (!empty($otherworks) || $othercanmoveontargetad))));
+                     
+        if (!$okWithPower && $otheradnb && $targetadnb){
+            // allow to move inside the other Adonis worker
+            $okWithPower = ($canmoveonotherad && $otheradnbcorner) || ($nbcorners && $othercanmoveonotherad);
+
+            // try forcing the target in the corner freed by the other Adonis worker
+            if (!$okWithPower && $this->game->board->isCorner($adotherworker))
+              $okWithPower = (!empty($worksotherad) || ($canmoveontargetad && $adnbs) || ($targetnbotherad && (!empty($otherworks) || $othercanmoveontargetad)));
+        }
+      }
     }
     elseif($arg['ifPossiblePower'] == ATALANTA){
       $okWithPower = $this->testMultipleMoves($arg, $powerData);
@@ -489,8 +558,8 @@ class Adonis extends SantoriniHeroPower
         $withOrWithoutHero = $this->testHeroPower($arg, $powerData);
         $this->game->log->addAction('adonisTest', [],  ['possible' => $withOrWithoutHero]);
       }
-      
-      // TODO            
+      if ($withOrWithoutHero[1] && !$withOrWithoutHero[0])
+        $arg['workers'] = [];
     }
     
     if ($arg['power'] == SCYLLA){
@@ -635,8 +704,10 @@ class Adonis extends SantoriniHeroPower
         $alreadytested['possible'] = true;
       elseif (!$testedHero)
         $alreadytested['possible'] = false;
-      elseif (in_array($arg['ifPossiblePower'], [ACHILLES, ODYSSEUS]))
+      elseif (in_array($arg['ifPossiblePower'], [ACHILLES, ODYSSEUS])){
         $alreadytested['possible'] = !empty($this->game->log->getLastActions(['force','build','move'])); // if used the power, must respect the condition
+        $testedHero = $testedHero && $alreadytested['possible']; // if Odysseus did not use his power, act as if it was impossible to satisfy the condition
+      }
       elseif (in_array($arg['ifPossiblePower'], [BELLEROPHON]))
         $alreadytested['possible'] = false;
       elseif (in_array($arg['ifPossiblePower'], [ATALANTA])){
