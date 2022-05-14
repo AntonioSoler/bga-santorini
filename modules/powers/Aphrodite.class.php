@@ -100,7 +100,7 @@ class Aphrodite extends SantoriniPower
     }
 
     // Intermediate moves cannot win the game
-    if ($space['z'] == 3) {
+    if ($space['z'] == 3 && $worker['z'] < 3) {
       if ($this->game->board->isPerimeter($space) && in_array(HERA, $this->game->powerManager->getOpponentPowerIds())) {
         // Hera: Can't win on the permiter, so perimiter level 3 is valid
         return true;

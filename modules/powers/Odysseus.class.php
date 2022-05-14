@@ -49,6 +49,16 @@ class Odysseus extends SantoriniHeroPower
         }
       }
     }
+    
+    
+    $forces = $this->game->log->getLastActions(['force']);
+    
+    // remove previously forced workers
+    $prevForceIds = array_map(function ($force) {
+      return $force['piece_id'];
+    }, $forces);
+    Utils::filterWorkersById($arg, $prevForceIds, false);
+    
   }
   
   public function argPlayerMove(&$arg)
