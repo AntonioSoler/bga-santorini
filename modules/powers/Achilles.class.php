@@ -45,7 +45,6 @@ class Achilles extends SantoriniHeroPower
 
   public function stateAfterSkip()
   {
-    // TODO : check the state is "build" ?
     return is_null($this->game->log->getLastMove()) ? 'move' : null;
   }
 
@@ -62,12 +61,12 @@ class Achilles extends SantoriniHeroPower
     Utils::filterWorkersById($arg, $build['pieceId']);
   }
 
-  public function preEndPlayerTurn()
+  public function playerBuild($worker,$work)
   {
-    if (count($this->game->log->getLastBuilds($this->playerId)) > 1) {
+    if (count($this->game->log->getLastMoves($this->playerId)) == 0) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('usedPower', $stats);
     }
-    parent::preEndPlayerTurn();
+    return false;
   }
 }

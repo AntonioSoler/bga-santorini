@@ -156,6 +156,14 @@ class Hecate extends SantoriniPower
 
     // Cancel the turn from this move onward
     $this->game->cancelPreviousWorks($log['log_id']);
+    
+    // remove the hero power if its action is not cancelled
+    $opponent = $this->game->playerManager->getPlayer($this->game->getActivePlayerId());
+    foreach ($opponent->getPowers() as $power) {
+      if (in_array($power->getId(), [ATALANTA, POLYPHEMUS, ACHILLES, BELLEROPHON, HERACLES, JASON]))
+        $power->preEndPlayerTurn();   
+    }
+    
 
     // Briefly display the conflicting secret worker
     // Always show as female

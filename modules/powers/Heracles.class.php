@@ -53,14 +53,17 @@ class Heracles extends SantoriniHeroPower
       || $this->didSpecialBuild($builds);
     return $again ? 'build' : null;
   }
-
-  public function preEndPlayerTurn()
+  
+  public function playerBuild($worker, $work)
   {
     $builds = $this->game->log->getLastBuilds();
+    $builds[] = ['to'=> $work, 'from' => $worker, 'pieceId' => $worker['id']];
     if ($this->didSpecialBuild($builds)) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('usedPower', $stats);
     }
-    parent::preEndPlayerTurn();
+    return false;
   }
+  
+
 }

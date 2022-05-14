@@ -42,12 +42,12 @@ class Polyphemus extends SantoriniHeroPower
     return $count < 3 ? 'build' : null;
   }
 
-  public function preEndPlayerTurn()
+  public function playerBuild($worker, $work)
   {
-    if (count($this->game->log->getLastBuilds($this->playerId)) > 1) {
+    if (count($this->game->log->getLastBuilds($this->playerId)) == 1) {
       $stats = [[$this->playerId, 'usePower']];
       $this->game->log->addAction('usedPower', $stats);
     }
-    parent::preEndPlayerTurn();
+    return false;
   }
 }

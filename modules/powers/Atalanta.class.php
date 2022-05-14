@@ -34,18 +34,19 @@ class Atalanta extends SantoriniHeroPower
     $arg['skippable'] = true;
     Utils::filterWorkersById($arg, $move['pieceId']);
   }
+  
+  public function playerMove($worker, $work)
+  {
+    if (count($this->game->log->getLastMoves($this->playerId)) == 1) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('usedPower', $stats);
+    }
+    return false;
+  }
 
   public function stateAfterMove()
   {
     return 'move';
   }
 
-  public function preEndPlayerTurn()
-  {
-    if (count($this->game->log->getLastMoves($this->playerId)) > 1) {
-      $stats = [[$this->playerId, 'usePower']];
-      $this->game->log->addAction('usedPower', $stats);
-    }
-    parent::preEndPlayerTurn();
-  }
 }

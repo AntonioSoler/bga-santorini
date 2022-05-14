@@ -959,12 +959,12 @@ class santorini extends Table
     $work = Utils::checkWork($args, $wId, $x, $y, $z, $actionArg);
 
     // Use power
-    $this->powerManager->usePower($powerId, [$wId, $work]);
     $stats = [];
     if ($powerId != NEMESIS) {
       $stats = [[self::getActivePlayerId(), 'usePower']];
     }
     $this->log->addAction("usedPower", $stats, [$wId, $work]);
+    $this->powerManager->usePower($powerId, [$wId, $work]);
 
     $state = $this->powerManager->stateAfterUsePower();
     if ($state == null) {
@@ -1031,9 +1031,10 @@ class santorini extends Table
   /*
    * argPlayerMove: give the list of accessible unnocupied spaces for each worker
    */
-  public function argPlayerMove()
+  public function argPlayerMove($testOnly = false)
   {
     $arg = $this->argPlayerWork('move');
+    $arg['testOnly'] = $testOnly;
     $this->powerManager->argPlayerMove($arg);
     return $arg;
   }
