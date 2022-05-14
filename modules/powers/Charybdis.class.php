@@ -109,7 +109,7 @@ class Charybdis extends SantoriniPower
     return 'endturn';
   }
 
-  public function whirlpooledSpace($work){
+  public function whirlpooledSpace($work, $worker = null){
   
     $tokens = $this->getPlacedTokens();
     if (count($tokens) < 2)
@@ -122,8 +122,10 @@ class Charybdis extends SantoriniPower
     }
 
     $endToken = $tokens[1 - $startindex];
-
+    
     $acc = $this->game->board->getAccessibleSpaces('build');
+    if ($worker != null)
+      $acc[] = $worker;
     Utils::filter($acc, function ($space) use ($endToken) {
       return ($space['x'] == $endToken['x'] && $space['y'] == $endToken['y']);
     });

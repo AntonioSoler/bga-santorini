@@ -805,7 +805,7 @@ class Adonis extends SantoriniHeroPower
         return $this->game->board->isNeighbour($powerData['oppWorker'], $forced) || !$this->game->board->isSameSpace($powerData['adonisWorker'], $space);
       }
       if ($arg['ifPossiblePower'] == CHARYBDIS && $worker['id'] == $powerData['oppWorker']['id']){
-        $tel = $oppPower->whirlpooledSpace($space);
+        $tel = $oppPower->whirlpooledSpace($space, $worker);
         $target = empty($tel) ? $space : $tel[0];
         return $this->game->board->isNeighbour($powerData['adonisWorker'], $target);
       }
@@ -887,7 +887,7 @@ class Adonis extends SantoriniHeroPower
             return true;
         }
         if ($arg['ifPossiblePower'] == CHARYBDIS){
-          $tel = $oppPower->whirlpooledSpace($space);
+          $tel = $oppPower->whirlpooledSpace($space, $worker);
           if (empty($tel))
             return true;
           $space = $tel[0];
@@ -928,7 +928,6 @@ class Adonis extends SantoriniHeroPower
         $arg['skippable'] = $arg['skippable'] && $already;
       }
       if (!$arg['skippable'] && $alreadytested && empty($test['workers'])){
-        $adonisPlayer = $this->game->playerManager->getPlayer($powerData['adonisWorker']['player_id']);
         $this->game->notifyAllPlayers('message', clienttranslate('${power_name}: ${player_name2} could have satisfied the condition required but cannot anymore. The turn must be restarted.'), [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),

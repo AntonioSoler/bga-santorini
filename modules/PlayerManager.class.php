@@ -127,7 +127,17 @@ class PlayerManager extends APP_GameClass
    */
   public function getOpponents($pId = -1)
   {
-    return $this->getPlayers($this->getOpponentsIds($pId));
+    $opps = $this->getPlayers($this->getOpponentsIds($pId));
+    
+    // Persephone must come last, as per the 'if possible' rule
+    foreach ($opps as $key => $opp){
+      if (in_array(PERSEPHONE, $opp->getPowerIds())){
+          array_splice($opps,$key,1);
+          $opps[] = $opp;
+      }
+    }
+    
+    return $opps;
   }
 
 
