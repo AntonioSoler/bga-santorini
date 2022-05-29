@@ -142,10 +142,6 @@ class PowerManager extends APP_GameClass
     [CIRCE, POLYPHEMUS],
     [CIRCE, THESEUS],
 
-    // Incomplete Persephone implementation
-    // test if already moved up
-    [PERSEPHONE, ARTEMIS],  // multiple moves -- hard to solve 3p vs eg harpies...
-    [PERSEPHONE, TRITON], // multiple moves
 
     // Incomplete Hecate implementation: ban powers targetting opponent workers and other features to add
     [HECATE, CHAOS], // Chaos should switch powers if a dome is built before an illegal action but not if building the dome was illegal -- call endPlayerTurn if Chaos is the power 

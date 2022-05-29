@@ -23,10 +23,10 @@ class Artemis extends SantoriniPower
   public function argPlayerMove(&$arg)
   {
     $move = $this->game->log->getLastMove();
+    $arg['ifPossiblePower'] = ARTEMIS;
     // No move before => usual rule
     if ($move == null) {
       $arg['mayMoveAgain'] = ARTEMIS;
-      $arg['ifPossiblePower'] = ARTEMIS;
       return;
     }
 

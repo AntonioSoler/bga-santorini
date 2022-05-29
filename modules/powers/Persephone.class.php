@@ -150,59 +150,141 @@ class Persephone extends SantoriniPower
   }
   
   
-  // TODO if vs Aphrodite, once moved up, has to check if can go to a space where $aphro->canFinishHere().
-  // move the worker and use argteammatemove, argopponentmove for aphrodite, aeolus, hypnus etc
-  // then apply charybdis or harpies effect
-  // only works with Atalanta (2p game) for now
-  public function testMultipleMoves(&$arg, $worker)
+  // test whether a multi-move power (Triton, Artemis, Atalanta) can move up within a valid move sequence
+  // simulate all moves, restricting the possibilities according to other powers in game
+  // $worker is previously moved to the 'dummy' location
+  public function testMultipleMoves(&$arg, $worker, $objective = 'moveUp', $init = null)
   {
     $visited = [];
     // possible params: 'init' = initial position; 'once' = one more move possible, 'stop' = no more move possible, 'conti' = can continue
-
-    $queue = [[$worker, 'init']];    
+    if ($init == null)
+      $queue = [[$worker,  'init']];
+    else
+      $queue = $init;
+    $spacesAfterMoveUp = []; // intermediate queue for Aphrodite: first check all spaces we can reach directly after moving up, then go to Aphrodite
+    
+    $charybdis = null;
+    $harpies = null;
+    $aphrodite = null;
+    foreach ($this->game->powerManager->getPowersInLocation('hand') as $power) {
+      if ($power->getId() == CHARYBDIS)
+        $charybdis = $power;
+    }
+    foreach ($this->game->playerManager->getOpponents() as $opponent) {
+      foreach ($opponent->getPowers() as $power) {
+      if ($power->getId() == HARPIES)
+        $harpies = $power;
+      if ($power->getId() == APHRODITE)
+        $aphrodite = $power;
+    }}
+    $opponent = $this->game->playerManager->getPlayer();
+    if ($aphrodite){
+      $aphroWorkers = $aphrodite->game->board->getPlacedWorkers($aphrodite->playerId);
+      $aphroWorkers[] = $worker;
+      $forcedWorkers = $aphrodite->getForcedWorkers();
+    }
         
     while (!empty($queue)){
       $elem = array_pop($queue);
       $space = $elem[0];
       $param = $elem[1];
       
-      
+      // call restricting moves
       $reach = $this->game->board->getNeighbouringSpaces($space, 'move');
+      $worker['works'] = $reach;
+      $test = $arg;
+      $test ['workers'] = [$worker];
+      $test['testOnly'] = true;
+      
+      $this->game->powerManager->applyPower(["argTeammateMove", "argOpponentMove"], [&$test]);
+      Utils::cleanWorkers($test);
+      $reach = [];
+      if (count($test['workers']) > 0)
+        $reach = $test['workers'][0]['works'];
+      
+      // apply charybdis & harpies
+      $reach = array_map( function ($work) use ($space,$worker,$charybdis,$harpies, $opponent) {
+          $end = $work;
+          if ($charybdis){
+              $wp = $charybdis->whirlpooledSpace($work,$worker);
+          
+          
+              $dir = $work['direction'];
+              $end = count($wp) == 0 ? $end : $wp[0];
+              $end['direction'] = $dir;
+          }
+          
+          if ($harpies){
+            $end = $harpies->forceWorker($space, $end, $opponent, true);
+          }
+          
+      
+//          $this->game->notifyAllPlayers('message', '${coords}', [
+//            'i18n' => ['level_name'],
+//            'coords' => $this->game->board->getMsgCoords($work, $end)
+//          ]);
+//          
+          
+          
+          return [$end,$work]; // first space is where we end up, second is where we moved
+          } , $reach);
+      
+      
       if ($param == 'stop')
         $reach = [];
       
-      
-      foreach($reach as $sp){
+      foreach($reach as $sp2){
+        $end = $sp2[0];
+        $work = $sp2[1];
         
-        if ($sp['z'] > $space['z'])
-          return true;
-        if (!empty(array_filter($visited, function ($s) use ($sp) {return $this->game->board->isSameSpace($s   ,$sp);})) || 
-            !empty(array_filter($queue  , function ($s) use ($sp) {return $this->game->board->isSameSpace($s[0],$sp);})))
+        if ($arg['ifPossiblePower'] == ARTEMIS && $this->game->board->isSameSpace($work,$worker))
           continue;
+        
         $nextparam = 'stop';
         if ($param == 'init' && $arg['ifPossiblePower'] == ARTEMIS)
           $nextparam = 'once';
-        if ($arg['ifPossiblePower'] == TRITON && $this->game->board->isPerimeter($sp))
+        if ($arg['ifPossiblePower'] == TRITON && $this->game->board->isPerimeter($work))
           $nextparam = 'conti';
         if ($arg['ifPossiblePower'] == ATALANTA)
           $nextparam = 'conti';
-        $queue[] = [$sp, $nextparam];
+        
+        if ($work['z'] > $space['z'] && $objective == 'moveUp'){
+          if ($aphrodite == null)
+            return true;
+          elseif(empty(array_filter($spacesAfterMoveUp , function ($s) use ($end, $nextparam) {return $this->game->board->isSameSpace($s[0],$end) && ($s[1] != 'stop' || $nextparam == 'stop');}))){
+            $spacesAfterMoveUp[] = [$end, $nextparam];
+            continue;
+          }
+        }
+        
+        if ($objective == 'Aphrodite'){
+          if ($aphro->canFinishHere($worker, $sp, $forcedWorkers, $aphroWorkers))
+            return true;
+        }
+        
+        if (!empty(array_filter($visited          , function ($s) use ($end) {return $this->game->board->isSameSpace($s   ,$end);})) || 
+            !empty(array_filter($queue            , function ($s) use ($end, $nextparam) {return $this->game->board->isSameSpace($s[0],$end) && ($s[1] != 'stop' || $nextparam == 'stop');})) || 
+            !empty(array_filter($spacesAfterMoveUp, function ($s) use ($end, $nextparam) {return $this->game->board->isSameSpace($s[0],$end) && ($s[1] != 'stop' || $nextparam == 'stop');})))
+          continue;
+        $queue[] = [$end, $nextparam];
       }
       
       $visited[] = $space;
     }
-    return false;  
+    
+    if ($aphrodite && $objective == 'moveUp')
+      return $this->testMultipleMoves($arg, $worker, 'Aphrodite', $spacesAfterMoveUp);
+    else
+      return false;
   }
   
   
   public function argOpponentMove(&$arg)
   {
-    
     $canMoveUp = $this->canMoveUp($arg);
     
     $charybdis = null;
     $harpies = null;
-    $hypnus = null;
     foreach ($this->game->powerManager->getPowersInLocation('hand') as $power) {
       if ($power->getId() == CHARYBDIS)
         $charybdis = $power;
@@ -279,21 +361,38 @@ class Persephone extends SantoriniPower
       $arg['skippable'] = false;
     }
     
-//    if (in_array($arg['ifPossiblePower'], [ARTEMIS, TRITON, ATALANTA])){
-//      $test = $this->game->log->getLastAction('testMultipleMoves');
-//      if ($test == null)
-//      {
-//        $test = $this->testMultipleMoves($arg);
-//      }
-//      elseif($test['state'] == 'testing')
-//        $canMoveUp = false; // do nothing
-//      elseif($test['state'] == 'true'){
-//        if ($this->game->log->getLastAction('HasMovedUp') == null)
-//          $arg['skippable'] = false;
-//        $canMoveUp = true; 
-//        $canMoveUpLater = !in_array($arg['ifPossiblePower'], [ARTEMIS]);
-//      }
-//    }
+          
+    if (in_array($arg['ifPossiblePower'], [ARTEMIS, TRITON, ATALANTA])){
+      $test = $this->game->log->getLastAction('testMultPerse');
+      if ($test == null)
+      {
+        $this->game->log->addAction('testMultPerse', [] , ['state' => 'testing']);
+        $test = false;
+        foreach ($arg['workers'] as $worker){
+          $this->game->board->setPieceAt($worker, $worker, 'dummy');
+          $test = $test || $this->testMultipleMoves($arg, $worker);
+          $this->game->board->setPieceAt($worker, $worker);
+        }
+        $this->game->log->addAction('testMultPerse', [] , ['state' => $test ? 'true' : 'false']);
+        if ($test)
+          $this->game->log->addAction('CanMoveUp', [] , ['move' => 'up']);
+        $test = $this->game->log->getLastAction('testMultPerse');
+      }
+      elseif($test['state'] == 'testing')
+        $canMoveUp = false; // do nothing
+  
+      if($test['state'] == 'true'){
+        if ($this->game->log->getLastAction('HasMovedUp') == null){
+          $arg['skippable'] = false;
+          if (in_array($arg['ifPossiblePower'], [TRITON])){
+            // remove Triton terminal moves that do not go up
+            Utils::filterWorks($arg, function($space, $worker) {return $space['z']>$worker['z'] || $this->game->board->isPerimeter($space);});
+          }
+        }
+        $canMoveUp = true; 
+        $canMoveUpLater = !(in_array($arg['ifPossiblePower'], [ARTEMIS]) && $this->game->log->getLastMove() != null); // only terminal moves not going up available are Artemis's second move
+      }
+    }
 
     
     if ($arg['ifPossiblePower'] == ATALANTA && $this->game->log->getLastAction('CanMoveUp') == null && $this->game->log->getLastAction('CannotMoveUp') == null){
@@ -320,6 +419,7 @@ class Persephone extends SantoriniPower
       if ($moves > 0 || $canMoveUp){
         Utils::filterWorks($arg, function ($space, $worker) use ($arg) {      
           $this->game->board->setPieceAt($worker, $worker, 'dummy');
+          $space['id'] = $worker['id'];
           $res = $space['z'] > $worker['z'] || $this->testMultipleMoves($arg, $space);
           $this->game->board->setPieceAt($worker, $worker);
           return $res;

@@ -31,7 +31,7 @@ class Harpies extends SantoriniPower
       }
 
       // if secret, stop at secret
-      if ($worker['location'] == 'secret') {
+      if (array_key_exists('location', $worker) && $worker['location'] == 'secret') {
         $secretWorkers = $this->game->board->getPlacedWorkers($worker['player_id'], true);
         foreach ($secretWorkers as $secretWorker) {
           if ($this->game->board->isSameSpace($secretWorker, $newSpace)) {
