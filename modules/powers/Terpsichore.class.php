@@ -24,6 +24,11 @@ class Terpsichore extends SantoriniPower
   {
     $arg['ifPossiblePower'] = TERPSICHORE;
     $moves = $this->game->log->getLastMoves();
+    
+    $workers = count($this->game->board->getPlacedActiveWorkers());
+    if ($workers == 0)
+      $arg['skippable'] = true;
+      
     // No move before => usual rule
     if (count($moves) == 0) {
       return;
@@ -44,6 +49,8 @@ class Terpsichore extends SantoriniPower
 
   public function argPlayerBuild(&$arg)
   {
+    $workers = count($this->game->board->getPlacedActiveWorkers());
+      
     $builds = $this->game->log->getLastBuilds();
     $workersIds = array_map(function ($build) {
       return $build['pieceId'];
@@ -51,6 +58,8 @@ class Terpsichore extends SantoriniPower
 
     $arg = $this->game->argPlayerWork('build');
     Utils::filterWorkersById($arg, $workersIds, false);
+    if ($workers == 0)
+      $arg['skippable'] = true;
   }
 
   public function stateAfterBuild()

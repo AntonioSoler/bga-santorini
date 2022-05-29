@@ -52,13 +52,15 @@ class Castor extends SantoriniPower
 
   public function argPlayerBuild(&$arg)
   {
+    $workers = count($this->game->board->getPlacedActiveWorkers());      
     $moves = $this->game->log->getLastMoves();
+    
     // Normal turn
-    if (count($moves) == 1) {
+    if (count($moves) == 1 && $workers > 1) {
       return;
-    }
+    }    
 
-    // Oeverwise, every workers must build once
+    // Otherwise, each worker must build once
     $builds = $this->game->log->getLastBuilds();
     $workersIds = array_map(function ($build) {
       return $build['pieceId'];
@@ -66,6 +68,9 @@ class Castor extends SantoriniPower
 
     $arg = $this->game->argPlayerWork('build');
     Utils::filterWorkersById($arg, $workersIds, false);
+
+    if ($workers == 0 || ($workers == 1 && count($moves) == 1))
+      $arg['skippable'] = true;
   }
 
   public function stateAfterBuild()

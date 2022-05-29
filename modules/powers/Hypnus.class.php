@@ -28,15 +28,15 @@ class Hypnus extends SantoriniPower
 
   public function startOpponentTurn()
   {
-    // If at least two workers remeaining
+    // If at least one worker remeaining
     $workers = $this->game->board->getPlacedWorkers($this->game->getActivePlayerId(), true);
-    if (count($workers) < 2) {
+    if (count($workers) < 1) {
       return;
     }
 
-    // Sort them by height and see if first one is strictly higher
+    // Sort them by height and see if first one is strictly higher. A single worker is always blocked
     usort($workers, 'self::cmpZ');
-    if (self::cmpZ($workers[0], $workers[1]) != 0) {
+    if (count($workers) == 1 || self::cmpZ($workers[0], $workers[1]) != 0) {
       $this->game->notifyWithSecret($workers[0], 'message', clienttranslate('${power_name}: ${player_name} (${coords}) cannot move this turn'), [
         'i18n' => ['power_name'],
         'power_name' => $this->getName(),
