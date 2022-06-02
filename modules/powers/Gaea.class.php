@@ -136,7 +136,7 @@ class Gaea extends SantoriniPower
   public function usePower($action)
   {
     $space = $action[1];
-    $powerData = $this->getPowerData();
+    $powerData = $this->getPowerData(false);
     $extraWorker = $this->game->board->getPiece($powerData['extraWorkerId']);
     $this->placeWorker($extraWorker, $space);
     $this->updateUI();
