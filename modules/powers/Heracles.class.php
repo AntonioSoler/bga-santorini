@@ -54,6 +54,8 @@ class Heracles extends SantoriniHeroPower
     return $again ? 'build' : null;
   }
   
+  
+  // store usePower after the first usage (useful vs Hecate)
   public function playerBuild($worker, $work)
   {
     $builds = $this->game->log->getLastBuilds();
@@ -63,6 +65,20 @@ class Heracles extends SantoriniHeroPower
       $this->game->log->addAction('usedPower', $stats);
     }
     return false;
+  }
+  
+  // also remove the power if the build was skipped
+  public function preEndPlayerTurn()
+  {
+    $builds = $this->game->log->getLastBuilds();
+    if (count($builds) == 0) {
+      $stats = [[$this->playerId, 'usePower']];
+      $this->game->log->addAction('usedPower', $stats);
+    }
+    
+    if ($this->game->log->getLastAction('usedPower') != null) {
+      $this->game->powerManager->removePower($this, 'hero');
+    }
   }
   
 
