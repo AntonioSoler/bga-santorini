@@ -154,6 +154,8 @@ class PowerManager extends APP_GameClass
     
     [HECATE, ADONIS],
     [HECATE, ODYSSEUS],
+    
+    [PERSEPHONE, ATALANTA], // bug 
   ];
 
 
