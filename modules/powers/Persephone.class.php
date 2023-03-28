@@ -303,9 +303,11 @@ class Persephone extends SantoriniPower
     $canMoveUpLater = false;
     
     if (in_array($arg['ifPossiblePower'] , [CASTOR, TERPSICHORE]) && $this->game->log->getLastMove() == null){
-      if ($canMoveUp)
+      if ($canMoveUp){
+        $this->game->log->addAction('CanMoveUp', [] , ['move' => 'up']);
         $arg['skippable'] = false;
-    
+      }
+      
       $workers = $this->game->board->getPlacedActiveWorkers();
       if (count($workers) != 2)
         return;
