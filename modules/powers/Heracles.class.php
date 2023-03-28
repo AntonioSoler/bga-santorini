@@ -70,6 +70,10 @@ class Heracles extends SantoriniHeroPower
   // also remove the power if the build was skipped
   public function preEndPlayerTurn()
   {
+    // do nothing when switching power to Gaea
+    if ($this->game->getGameStateValue('switchState') > 0)
+      return;
+      
     $builds = $this->game->log->getLastBuilds();
     if (count($builds) == 0) {
       $stats = [[$this->playerId, 'usePower']];
