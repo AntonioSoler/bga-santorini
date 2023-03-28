@@ -109,6 +109,10 @@ class Aphrodite extends SantoriniPower
         // Dionysus: Can't win during additional turn, so any level 3 is valid
         return true;
       }
+      if ($mayMoveAgain == SCYLLA) {
+        // Scylla can always force aphrodite to make a legal win
+        return true;
+      }
       // Other level 3 space would win, invalid
       return false;
     }
