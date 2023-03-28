@@ -1174,11 +1174,22 @@ class santorini extends Table
         foreach ($logs as $log) {
             if ($log['action'] == 'switchPlayer'){
               $wasSwitched = True;
+              break;
             }
-            break;
         }
         
+        
         if ($wasSwitched) {
+          // add dummy action to prevent Gaea to play next, need to get Gaea ID first
+          $gaeaid = null;
+          foreach ($this->playerManager->getOpponents() as $opponent) {
+            foreach ($opponent->getPowers() as $power) {
+            if ($power->getId() == GAEA)
+              $gaeaid = $opponent->getId();
+          }}
+          $this->log->addAction('usePowerGaea', [], ['activePlayerId' => -1], $gaeaid); 
+      
+      
           $next = $this->powerManager->stateAfterPlayerBuild() ?: 'done';
           // Translate ambiguous state names for "build" context
           if ($next == 'done' || $next == 'skip') {

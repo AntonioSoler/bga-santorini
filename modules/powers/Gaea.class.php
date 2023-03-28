@@ -24,6 +24,8 @@ class Gaea extends SantoriniPower
   public function getPowerData($filterUsedOrSkipped = true)
   {
     $powerData = $this->game->log->getLastAction('usePowerGaea', $this->playerId, 'build');
+    if ($powerData != null && $powerData['activePlayerId'] == -1)
+      return null;
     if ($filterUsedOrSkipped) {
       $usedOrSkipped = $this->game->log->getLastActions(['usedPower', 'skippedPower'], $this->playerId, 'usePowerGaea');
       if (count($usedOrSkipped) > 0) {
