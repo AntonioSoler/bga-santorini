@@ -66,7 +66,7 @@ class Europa extends SantoriniPower
     $move = $this->game->log->getLastMove();
     Utils::filterWorkersById($arg, $move['pieceId']);
     foreach ($arg['workers'] as &$worker) {
-      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'build');
+      $worker['works'] = $this->game->board->getNeighbouringSpaces($worker, 'token');
     }
   }
 

@@ -79,14 +79,7 @@ class Charybdis extends SantoriniPower
       return;
     }
 
-    $worker['works'] = $this->game->board->getAccessibleSpaces('build');
-
-    $placedToken = $this->getPlacedTokens();
-    if (count($placedToken) > 0) {
-      Utils::filter($worker['works'], function ($space) use ($placedToken) {
-        return !($space['x'] == $placedToken[0]['x'] && $space['y'] == $placedToken[0]['y']);
-      });
-    }
+    $worker['works'] = $this->game->board->getAccessibleSpaces('token');
 
     $arg['workers'] = [$worker];
   }

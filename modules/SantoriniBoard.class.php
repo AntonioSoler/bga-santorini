@@ -335,7 +335,8 @@ class SantoriniBoard extends APP_GameClass
     $board = [];
     foreach ($this->getPlacedPieces() as $piece) {
       // Tokens not treated like domes should be filtered out to allow building on the same space
-      $ignoreToken = strpos($piece['type'], 'token') === 0 && !in_array($piece['type'], $domes);
+      // Placing a token on a token is forbidden
+      $ignoreToken = strpos($piece['type'], 'token') === 0 && !in_array($piece['type'], $domes) && $action != "token";
       if (!$ignoreToken) {
         $board[$piece['x']][$piece['y']][$piece['z']][] = $piece;
       }
@@ -354,16 +355,16 @@ class SantoriniBoard extends APP_GameClass
               'z' => $z,
               'arg' => null,
             ];
-            if ($action == "build") {
+            if ($action == "build" || $action == "token") {
               $space['arg'] = [$z];
             }
             $accessible[] = $space;
             break;
           }
 
-          // Stop the loop if we find a dome (cannot build above)
+          // Stop the loop if we find a dome or token (cannot build higher)
           foreach ($pieces as $piece) {
-            if (in_array($piece['type'], $domes)) {
+            if (in_array($piece['type'], $domes) || strpos($piece['type'], 'token') === 0) {
               break 2;
             }
           }
