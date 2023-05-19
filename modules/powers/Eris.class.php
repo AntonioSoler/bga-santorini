@@ -10,6 +10,7 @@ class Eris extends SantoriniPower
     $this->title = clienttranslate('Goddess of Discord');
     $this->text  = [
       clienttranslate("[Alternative Turn:] Move and build with an opponent Worker that was not the one your opponent most recently moved."),
+      clienttranslate("[REVISED POWER]"),
     ];
     $this->playerCount = [2, 4];
     $this->golden  = true;
