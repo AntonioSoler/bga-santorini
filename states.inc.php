@@ -53,19 +53,6 @@
 
 $machinestates = [
   /*
-   * BGA framework initial state. Do not modify.
-   */
-  ST_BGA_GAME_SETUP => [
-    'name' => 'gameSetup',
-    'description' => '',
-    'type' => 'manager',
-    'action' => 'stGameSetup',
-    'transitions' => [
-      '' => ST_POWERS_SETUP,
-    ],
-  ],
-
-  /*
    * The God/Hero Powers setup state.
    */
   ST_POWERS_SETUP => [
@@ -411,16 +398,4 @@ $machinestates = [
       'endgame' => ST_BGA_GAME_END,
     ],
   ],
-
-  /*
-   * BGA framework final state. Do not modify.
-   */
-  ST_BGA_GAME_END => [
-    'name' => 'gameEnd',
-    'description' => clienttranslate('End of game'),
-    'type' => 'manager',
-    'action' => 'stGameEnd',
-    'args' => 'argGameEnd'
-  ]
-
 ];

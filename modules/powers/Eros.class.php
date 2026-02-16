@@ -77,7 +77,7 @@ class Eros extends SantoriniPower
     }
 
     // In a 2 or 4 player game, this level should be 1
-    if ($this->game->playerManager->getPlayerCount() != 3 && $other[0]['z'] != 1) {
+    if ($this->game->playerManager->getPlayerCount() != 3 && $workers[0]['z'] != 1) {
       return;
     }
 
@@ -90,7 +90,7 @@ class Eros extends SantoriniPower
       'i18n' => ['power_name'],
       'power_name' => $this->getName(),
       'player_name' => $this->getPlayer()->getName(),
-      'level_name' => $this->game->levelNames[intval($other[0]['z'])],
+      'level_name' => $this->game->levelNames[intval($workers[0]['z'])],
     ]);
   }
 

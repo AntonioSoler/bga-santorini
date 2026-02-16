@@ -248,24 +248,14 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       return gameui.gamedatas.powers[card1.id].sort - gameui.gamedatas.powers[card2.id].sort;
     },
 
-    setupPreference: function () {
-      var _this = this;
-      var updatePreference = function (e) {
-        var match = e.target.id.match(/^preference_[cf]ontrol_(\d+)$/)
-        if (!match) {
-          return;
-        }
-        var pref = +match[1];
-        var prefValue = +e.target.value;
-        debug('Update preference', pref + ' = ' + prefValue);
-        _this.prefs[pref].value = prefValue;
-        if (pref == HELPERS) {
-          _this.board.toggleCoordsHelpers(prefValue == HELPERS_ENABLED);
-        }
-      };
+    onUserPreferenceChange(prefId, prefValue) {
+      if (prefId == HELPERS) {
+        this.board.toggleCoordsHelpers(prefValue == HELPERS_ENABLED);
+      }
+    },
 
-      dojo.query('.preference_control').connect('onchange', updatePreference);
-      updatePreference({ target: $('preference_control_' + HELPERS) });
+    setupPreference: function () {
+      this.bga.userPreferences.onChange = (prefId, prefValue) => this.onUserPreferenceChange(prefId, prefValue);
 
       // Add reset camera button
       var resetCameraBlock = this.format_block('jstpl_resetCamera', {
@@ -280,11 +270,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       if (q.length > 0) {
         dojo.place(resetCameraBlock, q[q.length - 1], 'after');
       }
-      dojo.query('.buttonResetCamera').connect('onclick', function () {
+      dojo.query('.buttonResetCamera').connect('onclick', () => {
         $('page-title').scrollIntoView({ block: "start", inline: "start" });
         $('scene-container').scrollIntoView({ block: "end", inline: "start" });
-        _this.board.updateSize();
-        _this.board.resetCameraPosition();
+        this.board.updateSize();
+        this.board.resetCameraPosition();
       });
     },
 
@@ -489,13 +479,11 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     /*
      * TODO description
      */
-    takeAction: function (action, data, callback) {
+    takeAction: function (action, data) {
       data = data || {};
-      data.lock = true;
-      callback = callback || function (res) { };
       this.stopActionTimer();
       debug('Taking action: ' + action, data);
-      this.ajaxcall("/santorini/santorini/" + action + ".html", data, this, callback);
+      this.bga.actions.performAction(action, data, { checkAction: false });
     },
 
 
@@ -588,7 +576,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
     startActionTimer: function (buttonId) {
       var button = $(buttonId);
       var isReadOnly = this.isReadOnly();
-      var prefValue = (this.prefs[CONFIRM] || {}).value;
+      var prefValue = this.bga.userPreferences.get(CONFIRM);
       if (button == null || isReadOnly || prefValue == CONFIRM_ENABLED) {
         debug('Ignoring startActionTimer(' + buttonId + ')', 'readOnly=' + isReadOnly, 'prefValue=' + prefValue);
         return;
@@ -1738,7 +1726,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         ['blockBuiltUnder'],// Happens with Zeus
         ['pieceRemoved'], // Happens with Bia, Ares, Medusa, Hecate
         ['updatePowerUI'], // Happens with Morpheus, Chaos
-        ['loadBug', 10], // used in studio only
       ];
 
       var _this = this;
@@ -1747,28 +1734,6 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
         dojo.subscribe(notif[0], _this, functionname);
         _this.notifqueue.setSynchronous(notif[0], notif[1]);
       });
-    },
-
-    notif_loadBug: function (n) {
-      function fetchNextUrl() {
-        var url = n.args.urls.shift();
-        debug('Fetching URL', url);
-        dojo.xhrGet({
-          url: url,
-          load: function (success) {
-            debug('Success for URL', url, success);
-            if (n.args.urls.length > 0) {
-              fetchNextUrl();
-            } else {
-              debug('Done, reloading page');
-              window.location.reload();
-            }
-          }
-        });
-      }
-
-      debug('Notif: load bug', n.args);
-      fetchNextUrl();
     },
   });
 });

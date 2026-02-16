@@ -1,6 +1,6 @@
 <?php
 
-abstract class SantoriniPower extends APP_GameClass
+abstract class SantoriniPower extends \APP_DbObject
 {
   public static function compareByName($power1, $power2)
   {

@@ -5,7 +5,7 @@
  *   and then fetch these actions latter (useful for powers or rollback)
  *   also responsible for managing game statistics
  */
-class SantoriniLog extends APP_GameClass
+class SantoriniLog extends \APP_DbObject
 {
   public $game;
   public function __construct($game)

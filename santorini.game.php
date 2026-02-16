@@ -17,13 +17,29 @@
  *
  */
 
-require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
+use Bga\GameFramework\Table;
+use Bga\GameFramework\UserException;
+use Bga\GameFramework\VisibleSystemException;
+
 require_once('modules/constants.inc.php');
 
 class santorini extends Table
 {
+  public SantoriniLog $log;
+  public SantoriniBoard $board;
+  public PowerManager $powerManager;
+  public PlayerManager $playerManager;
+
+  public array $msg;
+  public array $specialNames;
+  public array $colorNames;
+  public array $directionNames;
+  public array $levelNames;
+  public array $pieceNames;
+
   public function __construct()
   {
+
     parent::__construct();
 
     // Your global variables labels:
@@ -47,11 +63,6 @@ class santorini extends Table
     $this->board = new SantoriniBoard($this);
     $this->powerManager = new PowerManager($this);
     $this->playerManager = new PlayerManager($this);
-  }
-
-  protected function getGameName()
-  {
-    return 'santorini';
   }
 
   /*
@@ -135,6 +146,8 @@ class santorini extends Table
     self::setGameStateInitialValue('firstPlayer', $pId);
     self::setGameStateInitialValue('switchPlayer', 0);
     self::setGameStateInitialValue('switchState', 0);
+
+    return \ST_POWERS_SETUP;
   }
 
   /*
@@ -142,12 +155,12 @@ class santorini extends Table
    *  Gather all informations about current game situation (visible by the current player).
    *  The method is called each time the game interface is displayed to a player, ie: when the game starts and when a player refreshes the game page (F5)
    */
-  protected function getAllDatas()
+  protected function getAllDatas(int $currentPlayerId)
   {
     return [
       'fplayers' => $this->playerManager->getUiData(),       // Must not use players as it is already filled by bga
-      'placedPieces' => $this->board->getPlacedPieces($this->getCurrentPlayerId()),
-      'powers' => $this->powerManager->getUiData($this->getCurrentPlayerId()),
+      'placedPieces' => $this->board->getPlacedPieces($currentPlayerId),
+      'powers' => $this->powerManager->getUiData($currentPlayerId),
       'goldenFleece' => $this->powerManager->getSpecialPowerId('ram'),
       'nyxNightPower' => $this->powerManager->getSpecialPowerId('nyxNight'),
       'cancelMoveIds' => $this->log->getCancelMoveIds(),
@@ -189,31 +202,31 @@ class santorini extends Table
 
     // Notify player colors/teams
     if ($nPlayers == 4) {
-      self::notifyAllPlayers('message', $this->msg['colorTeam'], [
+      $this->bga->notify->all('message', $this->msg['colorTeam'], [
         'i18n' => ['color'],
         'player_name' => $players[0]->getName(),
         'player_name2' => $players[2]->getName(),
         'color' => $this->colorNames[BLUE],
       ]);
-      self::notifyAllPlayers('message', $this->msg['colorTeam'], [
+      $this->bga->notify->all('message', $this->msg['colorTeam'], [
         'i18n' => ['color'],
         'player_name' => $players[1]->getName(),
         'player_name2' => $players[3]->getName(),
         'color' => $this->colorNames[WHITE],
       ]);
     } else {
-      self::notifyAllPlayers('message', $this->msg['colorPlayer'], [
+      $this->bga->notify->all('message', $this->msg['colorPlayer'], [
         'i18n' => ['color'],
         'player_name' => $players[0]->getName(),
         'color' => $this->colorNames[BLUE],
       ]);
-      self::notifyAllPlayers('message', $this->msg['colorPlayer'], [
+      $this->bga->notify->all('message', $this->msg['colorPlayer'], [
         'i18n' => ['color'],
         'player_name' => $players[1]->getName(),
         'color' => $this->colorNames[WHITE],
       ]);
       if ($nPlayers == 3) {
-        self::notifyAllPlayers('message', $this->msg['colorPlayer'], [
+        $this->bga->notify->all('message', $this->msg['colorPlayer'], [
           'i18n' => ['color'],
           'player_name' => $players[2]->getName(),
           'color' => $this->colorNames[PURPLE],
@@ -273,7 +286,7 @@ class santorini extends Table
   public function addOffer($powerId)
   {
     if (in_array($powerId, $this->powerManager->computeBannedIds())) {
-      throw new BgaUserException(_("This power is not compatible with some already selected powers"));
+      throw new UserException(clienttranslate("This power is not compatible with some already selected powers"));
     }
 
     $this->powerManager->addOffer($powerId);
@@ -298,7 +311,7 @@ class santorini extends Table
     $powers = $this->powerManager->getPowersInLocation('offer');
     if (count($powers) != $n) {
       $msg = sprintf(self::_("You must offer exactly %d powers"), $n);
-      throw new BgaUserException($msg);
+      throw new UserException($msg);
     }
     usort($powers, ['SantoriniPower', 'compareByName']);
 
@@ -318,7 +331,7 @@ class santorini extends Table
       }
       $i++;
     }
-    self::notifyAllPlayers('buildOffer', $this->msg["offer$n"], $args);
+    $this->bga->notify->all('buildOffer', $this->msg["offer$n"], $args);
 
     if ($this->powerManager->isGoldenFleece()) {
       $this->gamestate->nextState('goldenFleece');
@@ -507,7 +520,7 @@ class santorini extends Table
     // Check the power and the work
     $args = $this->gamestate->state()['args'];
     if ($args['power'] != $powerId) {
-      throw new BgaUserException(_("You can't use this power setup"));
+      throw new UserException(clienttranslate("You can't use this power setup"));
     }
     $work = Utils::checkWork($args, null, $x, $y, $z, null);
 
@@ -516,7 +529,7 @@ class santorini extends Table
 
     $state = $this->powerManager->stateAfterPlaceSetup();
     if ($state == null) {
-      throw new BgaVisibleSystemException("stateAfterPlaceSetup: Missing next state");
+      throw new VisibleSystemException("stateAfterPlaceSetup: Missing next state");
     }
     $this->gamestate->nextState($state);
   }
@@ -604,12 +617,12 @@ class santorini extends Table
   {
     $stateArgs = $this->gamestate->state()['args'];
     if ($stateArgs['worker']['id'] != $workerId) {
-      throw new BgaUserException(_('You cannot place this piece'));
+      throw new UserException(clienttranslate('You cannot place this piece'));
     }
 
     $space = ['x' => $x, 'y' => $y, 'z' => $z, 'arg' => null];
     if (!in_array($space, $stateArgs['accessibleSpaces'])) {
-      throw new BgaUserException(_("This space is not available"));
+      throw new UserException(clienttranslate("This space is not available"));
     }
 
     // Place the worker in this space
@@ -805,13 +818,13 @@ class santorini extends Table
     $players = $win ? $this->playerManager->getTeammates($playerId) : $this->playerManager->getOpponents($playerId);
     if (count($players) == 2) {
       // 4 players
-      self::notifyAllPlayers('message', $this->msg['winTeam'], [
+      $this->bga->notify->all('message', $this->msg['winTeam'], [
         'player_name' => $players[0]->getName(),
         'player_name2' => $players[1]->getName(),
       ]);
     } else {
       // 2 or 3 players
-      self::notifyAllPlayers('message', $this->msg['winPlayer'], [
+      $this->bga->notify->all('message', $this->msg['winPlayer'], [
         'player_name' => $players[0]->getName(),
       ]);
     }
@@ -842,7 +855,7 @@ class santorini extends Table
       $args = [];
     }
     $args['player_name'] = self::getActivePlayerName();
-    self::notifyAllPlayers('message', $msg, $args);
+    $this->bga->notify->all('message', $msg, $args);
 
     // Still call preEndOfTurn to calculate player statistics
     $this->powerManager->preEndOfTurn();
@@ -902,7 +915,7 @@ class santorini extends Table
       }
     }
     if ($next == null) {
-      throw new BgaVisibleSystemException("stSwitchPlayer: Missing next state (player: $switchPlayer)");
+      throw new VisibleSystemException("stSwitchPlayer: Missing next state (player: $switchPlayer)");
     }
     $this->gamestate->nextState($next);
   }
@@ -935,7 +948,7 @@ class santorini extends Table
 
     $args = $this->gamestate->state()['args'];
     if ($args['power'] != $powerId || not(in_array($action, $args['actions']))) {
-      throw new BgaUserException(_("You can't use this power"));
+      throw new UserException(clienttranslate("You can't use this power"));
     }
 
     // Use power
@@ -954,7 +967,7 @@ class santorini extends Table
     // Check the power and the work
     $args = $this->gamestate->state()['args'];
     if ($args['power'] != $powerId) {
-      throw new BgaUserException(_("You can't use this power"));
+      throw new UserException(clienttranslate("You can't use this power"));
     }
     $work = Utils::checkWork($args, $wId, $x, $y, $z, $actionArg);
 
@@ -968,7 +981,7 @@ class santorini extends Table
 
     $state = $this->powerManager->stateAfterUsePower();
     if ($state == null) {
-      throw new BgaVisibleSystemException("stateAfterUsePower: Missing next state");
+      throw new VisibleSystemException("stateAfterUsePower: Missing next state");
     }
     $this->gamestate->nextState($state);
   }
@@ -982,14 +995,14 @@ class santorini extends Table
   {
     $args = $this->gamestate->state()['args'];
     if (!$args['skippable']) {
-      throw new BgaUserException(_("You can't skip this action"));
+      throw new UserException(clienttranslate("You can't skip this action"));
     }
     $this->log->addAction("skippedPower");
 
     // Apply power
     $state = $this->powerManager->stateAfterSkipPower();
     if ($state == null) {
-      throw new BgaVisibleSystemException("stateAfterSkipPower: Missing next state");
+      throw new VisibleSystemException("stateAfterSkipPower: Missing next state");
     }
     $this->gamestate->nextState($state);
   }
@@ -1107,7 +1120,7 @@ class santorini extends Table
   {
     $args = $this->gamestate->state()['args'];
     if (!$args['skippable']) {
-      throw new BgaUserException(_("You can't skip this action"));
+      throw new UserException(clienttranslate("You can't skip this action"));
     }
     if ($log) {
       $this->log->addAction('skippedWork');
@@ -1126,7 +1139,7 @@ class santorini extends Table
   public function cancelPreviousWorks($moveId = null)
   {
     if (!$this->log->canCancelTurn()) {
-      throw new BgaUserException(_("You have nothing to cancel"));
+      throw new UserException(clienttranslate("You have nothing to cancel"));
     }
 
     // Undo the turn
@@ -1146,7 +1159,7 @@ class santorini extends Table
     // Send the public view to all (supports spectators)
     // The players with a private view coming next will ignore this notification
     $msg = $moveId == null ? $this->msg['restart'] : '';
-    self::notifyAllPlayers('cancel', $msg, [
+    $this->bga->notify->all('cancel', $msg, [
       'ignorePlayerIds' => array_keys($privateView),
       'placedPieces' => $publicView,
       'moveIds' => $moveIds,
@@ -1155,7 +1168,7 @@ class santorini extends Table
 
     // Send the private view to individual player(s) as needed
     foreach ($privateView as $playerId => $view) {
-      self::notifyPlayer($playerId, 'cancel', '', [
+      $this->bga->notify->player($playerId, 'cancel', '', [
         'placedPieces' => $view,
         'moveIds' => $moveIds,
       ]);
@@ -1196,7 +1209,7 @@ class santorini extends Table
             $next = 'endturn';
           }
           if ($next == null) {
-            throw new BgaVisibleSystemException("cancelPreviousWorks: Missing next state");
+            throw new VisibleSystemException("cancelPreviousWorks: Missing next state");
           }
           $this->gamestate->nextState($next);
         }
@@ -1220,11 +1233,11 @@ class santorini extends Table
   public function resendBoard()
   {
     // Compute the public view (no secret pieces) and each player's private view
-    $publicView = $this->game->board->getPlacedPieces();
-    $playerIds = $this->game->playerManager->getPlayerIds();
+    $publicView = $this->board->getPlacedPieces();
+    $playerIds = $this->playerManager->getPlayerIds();
     $playerView = [];
     foreach ($playerIds as $playerId) {
-      $view = $this->game->board->getPlacedPieces($playerId);
+      $view = $this->board->getPlacedPieces($playerId);
       if ($view != $publicView) {
         $playerView[$playerId] = $view;
       }
@@ -1324,7 +1337,7 @@ class santorini extends Table
         $this->log->addRemoval($piece);
         $this->board->removePiece($piece);
         // Notify
-        $this->notifyAllPlayers('pieceRemoved', '', [
+        $this->bga->notify->all('pieceRemoved', '', [
           'duration' => INSTANT,
           'piece' => $piece,
           'tokenName' => ucfirst($this->pieceNames[$piece['type']]),
@@ -1360,7 +1373,7 @@ class santorini extends Table
     $type = 'lvl' . $space['arg'];
     if (!array_key_exists($type, $this->pieceNames)) {
       // What can cause this? https://boardgamearena.com/bug?id=23675
-      throw new BgaVisibleSystemException("playerBuild: Invalid piece type: $type");
+      throw new VisibleSystemException("playerBuild: Invalid piece type: $type");
     }
 
     // Remove tokens
@@ -1390,7 +1403,7 @@ class santorini extends Table
     if (array_key_exists('duration', $info)) {
       $args['duration'] = $info['duration'];
     }
-    self::notifyAllPlayers('blockBuilt', $this->msg['build'], $args);
+    $this->bga->notify->all('blockBuilt', $this->msg['build'], $args);
   }
 
 
@@ -1415,7 +1428,7 @@ class santorini extends Table
       'coords' => $this->board->getMsgCoords($worker)
     ];
     if ($notifAllWhenSecret) {
-      $this->notifyAllPlayers('pieceRemoved', $this->msg['powerKill'], $args);
+      $this->bga->notify->all('pieceRemoved', $this->msg['powerKill'], $args);
     } else {
       $this->notifyWithSecret($worker, 'pieceRemoved', $this->msg['powerKill'], $args);
     }
@@ -1432,7 +1445,7 @@ class santorini extends Table
     $player = $power->getPlayer();
     $stats = [[$player->getId(), 'usePower']];
     $this->log->addAction('additionalTurn', $stats, ['power_id' => $power->getId(), 'n' => $n]);
-    $this->notifyAllPlayers('message', $this->msg['powerAdditionalTurn'], [
+    $this->bga->notify->all('message', $this->msg['powerAdditionalTurn'], [
       'i18n' => ['power_name'],
       'power_name' => $power->getName(),
       'player_name' => $player->getName()
@@ -1453,7 +1466,7 @@ class santorini extends Table
       $this->gamestate->nextState('zombiePass');
       $this->playerManager->eliminate($activePlayer);
     } else {
-      throw new BgaVisibleSystemException('Zombie player ' . $activePlayer . ' stuck in unexpected state ' . $state['name']);
+      throw new VisibleSystemException('Zombie player ' . $activePlayer . ' stuck in unexpected state ' . $state['name']);
     }
   }
 
@@ -1480,61 +1493,9 @@ class santorini extends Table
 
   /////////////////////////////////////////
   /////////////////////////////////////////
-  ////////  production bug report  ////////
+  ////////          debug          ////////
   /////////////////////////////////////////
   /////////////////////////////////////////
-
-  /*
-   * loadBug: in studio, type loadBug(20762) into the table chat to load a bug report from production
-   * client side JavaScript will fetch each URL below in sequence, then refresh the page
-   */
-  public function loadBug($reportId)
-  {
-    $db = explode('_', self::getUniqueValueFromDB("SELECT SUBSTRING_INDEX(DATABASE(), '_', -2)"));
-    $game = $db[0];
-    $tableId = $db[1];
-    self::notifyAllPlayers('loadBug', "Trying to load <a href='https://boardgamearena.com/bug?id=$reportId' target='_blank'>bug report $reportId</a>", [
-      'urls' => [
-        "https://studio.boardgamearena.com/admin/studio/getSavedGameStateFromProduction.html?game=$game&report_id=$reportId&table_id=$tableId",
-        "https://studio.boardgamearena.com/table/table/loadSaveState.html?table=$tableId&state=1",
-        "https://studio.boardgamearena.com/1/$game/$game/loadBugSQL.html?table=$tableId&report_id=$reportId",
-        "https://studio.boardgamearena.com/admin/studio/clearGameserverPhpCache.html?game=$game",
-      ]
-    ]);
-  }
-
-  /*
-   * loadBugSQL: in studio, this is one of the URLs triggered by loadBug() above
-   */
-  public function loadBugSQL($reportId)
-  {
-    $studioPlayer = self::getCurrentPlayerId();
-    $playerIds = $this->playerManager->getPlayerIds();
-
-    $sql = [];
-    if (self::getUniqueValueFromDB("SHOW COLUMNS FROM gamelog WHERE field = 'cancel'") == null) {
-      $sql[] = "ALTER TABLE `gamelog` ADD `cancel` TINYINT(1) NOT NULL DEFAULT 0";
-    }
-    $sql[] = "UPDATE global SET global_value=" . ST_MOVE . " WHERE global_id=1 AND global_value=" . ST_BGA_GAME_END;
-    foreach ($playerIds as $pId) {
-      $sql[] = "UPDATE player SET player_id=$studioPlayer WHERE player_id=$pId";
-      $sql[] = "UPDATE global SET global_value=$studioPlayer WHERE global_value=$pId";
-      $sql[] = "UPDATE stats SET stats_player_id=$studioPlayer WHERE stats_player_id=$pId";
-      $sql[] = "UPDATE card SET card_location_arg=$studioPlayer WHERE card_location_arg=$pId";
-      $sql[] = "UPDATE piece SET player_id=$studioPlayer WHERE player_id=$pId";
-      $sql[] = "UPDATE log SET player_id=$studioPlayer WHERE player_id=$pId";
-      $sql[] = "UPDATE log SET action_arg=REPLACE(action_arg, $pId, $studioPlayer)";
-      $studioPlayer++;
-    }
-    $msg = "<b>Loaded <a href='https://boardgamearena.com/bug?id=$reportId' target='_blank'>bug report $reportId</a></b><hr><ul><li>" . implode(';</li><li>', $sql) . ';</li></ul>';
-    self::warn($msg);
-    self::notifyAllPlayers('message', $msg, []);
-
-    foreach ($sql as $q) {
-      self::DbQuery($q);
-    }
-    self::reloadPlayersBasicInfos();
-  }
 
   // call from studio chat to expedite game start
   public function quickBuild()
@@ -1576,7 +1537,7 @@ class santorini extends Table
     if ($piece['location'] == 'secret') {
       $redacted = array_key_exists('redacted', $args) && $args['redacted'];
       unset($args['redacted']);
-      self::notifyPlayer($piece['player_id'], $notif, $msg, $args);
+      $this->bga->notify->player($piece['player_id'], $notif, $msg, $args);
       if ($redacted) {
         // Also send a public version of the notication, without the specific piece
         unset($args['piece']);
@@ -1586,10 +1547,10 @@ class santorini extends Table
         if ($msg == $this->msg['moveUp'] || $msg == $this->msg['moveDown'] || $msg == $this->msg['moveOn']) {
           $msg = $this->msg['move'];
         }
-        self::notifyAllPlayers('message', $msg, $args);
+        $this->bga->notify->all('message', $msg, $args);
       }
     } else {
-      self::notifyAllPlayers($notif, $msg, $args);
+      $this->bga->notify->all($notif, $msg, $args);
     }
   }
 }

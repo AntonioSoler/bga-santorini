@@ -3,7 +3,7 @@
 /*
  * SantoriniBoard: all utility functions concerning space on the board are here
  */
-class SantoriniBoard extends APP_GameClass
+class SantoriniBoard extends \APP_DbObject
 {
   public $game;
   public function __construct($game)

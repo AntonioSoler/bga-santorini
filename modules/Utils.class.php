@@ -1,6 +1,8 @@
 <?php
 
-abstract class Utils extends APP_GameClass
+use Bga\GameFramework\UserException;
+
+abstract class Utils
 {
   public static function filter(&$data, $filter)
   {
@@ -28,7 +30,7 @@ abstract class Utils extends APP_GameClass
 
   public static function filterWorkersById(&$arg, $wId, $same = true)
   {
-    self::filterWorkers($arg, function (&$worker) use ($wId, $same) {
+    self::filterWorkers($arg, function ($worker) use ($wId, $same) {
       return is_array($wId)
         ? (($same && in_array($worker['id'], $wId)) || (!$same && !in_array($worker['id'], $wId)))
         : (($same && $worker['id'] == $wId) || (!$same && $worker['id'] != $wId));
@@ -137,7 +139,7 @@ abstract class Utils extends APP_GameClass
       return $w['id'] == $wId;
     });
     if (is_null($worker)) {
-      throw new BgaUserException(_("This worker can't be used"));
+      throw new UserException(clienttranslate("This worker can't be used"));
     }
 
     $work = Utils::search($worker['works'], function ($w) use ($x, $y, $z, $actionArg) {
@@ -145,7 +147,7 @@ abstract class Utils extends APP_GameClass
         && (is_null($actionArg) || in_array($actionArg, $w['arg']));
     });
     if (is_null($work)) {
-      throw new BgaUserException(_("You cannot reach this space with this worker"));
+      throw new UserException(clienttranslate("You cannot reach this space with this worker"));
     }
 
     $work['arg'] = $actionArg;

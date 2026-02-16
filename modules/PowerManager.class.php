@@ -3,7 +3,7 @@
 /*
  * PowerManager : allow to easily create and apply powers during play
  */
-class PowerManager extends APP_GameClass
+class PowerManager extends \APP_DbObject
 {
   /*
    * powerClasses : for each power Id, the corresponding class name
@@ -127,6 +127,7 @@ class PowerManager extends APP_GameClass
     [NYX, CHRONUS], // https://boardgamearena.com/bug?id=33571
     [NYX, DIONYSUS], // https://boardgamearena.com/bug?id=24644
     [PERSEPHONE, ERIS],
+    [SELENE, GAEA],
     [TARTARUS, TERPSICHORE],
 
     // Circe ban all heroes
@@ -158,17 +159,16 @@ class PowerManager extends APP_GameClass
   ];
 
 
-  public $game;
+  public ?\santorini $game;
   public $cards;
-  public function __construct($game)
+  public function __construct(?\santorini $game)
   {
     $this->game = $game;
 
     // stats.inc.php creates PowerManager without a game object
     if ($game != null) {
       // Initialize power deck
-      $this->cards = self::getNew('module.common.deck');
-      $this->cards->init('card');
+      $this->cards = $game->bga->deckFactory->createDeck('card');
       $this->cards->autoreshuffle = true;
       $this->cards->autoreshuffle_custom = [
         'deck' => 'discard',

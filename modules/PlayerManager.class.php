@@ -6,7 +6,7 @@ require_once('SantoriniPlayer.class.php');
  * PlayerManager : allows to easily access players, teams, opponents, ...
  *  a player is an instance of SantoriniPlayer class
  */
-class PlayerManager extends APP_GameClass
+class PlayerManager extends \APP_DbObject
 {
   public $game;
   public function __construct($game)

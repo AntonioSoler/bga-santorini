@@ -1,7 +1,7 @@
 <?php
 
 // Cannot use Player, already taken by BGA
-class SantoriniPlayer extends APP_GameClass
+class SantoriniPlayer extends \APP_DbObject
 {
     public function __construct($game, $row)
     {
