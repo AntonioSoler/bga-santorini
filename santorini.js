@@ -187,7 +187,7 @@ define(["dojo", "dojo/_base/declare", "ebg/core/gamegui", "ebg/counter"], functi
       });
 
       // Setup the board (3d scene using threejs)
-      this.board = new Board($('scene-container'), URL);
+      this.board = new Board($('scene-container'), SANTORINI_URL);
       this.setupPreference();
       this.setupWikiText();
 

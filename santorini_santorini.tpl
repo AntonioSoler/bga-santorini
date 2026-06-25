@@ -26,8 +26,8 @@
 </div>
 
 <script type="text/javascript">
-const URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
-document.write('<script src="' + URL + '/modules/scripts/board.js" type="module"><\/script>');
+const SANTORINI_URL = dojoConfig.packages.reduce((r,p) => p.name == "bgagame" ? p.location : r, null);
+document.write('<script src="' + SANTORINI_URL + '/modules/scripts/board.js" type="module"><\/script>');
 
 var jstpl_resetCamera = `<div class="preference_choice">
 	<div class="row-data row-data-large">
